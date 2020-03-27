@@ -1,4 +1,4 @@
 package com.wsep202.TradingSystem.domain.tradingSystemManagement;
 
-public class PolicyDiscount {
+public class DiscountPolicy {
 }
