@@ -1,9 +1,14 @@
-package com.wsep202.TradingSystem.domain.tradingSystemManagement;
+package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * define user in the system
@@ -12,16 +17,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
+@Slf4j
 public class UserSystem {
 
     /**
      * the user name
      */
+    @NotBlank
     private String userName;
 
     /**
      * the encryption password of the the user
      */
+    @NotBlank
     private String password;
 
     /**
@@ -33,5 +41,11 @@ public class UserSystem {
      * the last name of the user
      */
     private String lastName;
+
+    @Builder.Default
+    private Set<Store> managedStores = new HashSet<>();
+
+    @Builder.Default
+    private Set<Store> ownedStores  = new HashSet<>();
 
 }
