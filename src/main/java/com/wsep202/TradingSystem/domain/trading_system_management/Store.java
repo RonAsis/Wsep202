@@ -18,22 +18,48 @@ import java.util.Set;
 @Data
 public class Store {
 
+    public static int storeIdAcc = 0;
+
+    private int storeId;
+
+    private String storeName;
+
     private Map<UserSystem, Set<UserSystem>> appointedOwners;
 
     private Map<UserSystem, Set<MangerStore>> appointedManagers;
 
     private Map<ProductCategory, Set<Product>> products;
 
+    private PurchasePolicy purchasePolicy;
+
+    private DiscountPolicy discountPolicy;
+
+    private DiscountType discountType;
+
+    private PurchaseType purchaseType;
+
     private Set<UserSystem> owners ;
 
-    public Store(UserSystem owner){
+    private int rank;
+
+    public Store(UserSystem owner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, DiscountType discountType, PurchaseType purchaseType, String storeName){
         appointedOwners = new HashMap<>();
         appointedManagers = new HashMap<>();
         products = new HashMap<>();
         owners = new HashSet<>();
+        this.storeName = storeName;
         owners.add(owner);
+        this.discountPolicy = discountPolicy;
+        this.purchasePolicy = purchasePolicy;
+        this.discountType = discountType;
+        this.purchaseType = purchaseType;
+        this.storeId = getStoreIdAcc();
+        this.rank = 0;
     }
 
+    private int getStoreIdAcc(){
+        return storeIdAcc++;
+    }
     /**
      * add new owner to the store
      */
