@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -46,6 +47,24 @@ public class UserSystem {
     private Set<Store> managedStores = new HashSet<>();
 
     @Builder.Default
-    private Set<Store> ownedStores  = new HashSet<>();
+    private Set<Store> ownedStores = new HashSet<>();
 
+    @Builder.Default
+    private ShoppingCart shoppingCart = new ShoppingCart();
+
+    private boolean isLogin = false;
+
+    public void addNewStore(Store store) {
+        if (Objects.nonNull(store)) {
+            ownedStores.add(store);
+        }
+    }
+
+    public void login(){
+        isLogin = true;
+    }
+
+    public void logout(){
+        isLogin = false;
+    }
 }
