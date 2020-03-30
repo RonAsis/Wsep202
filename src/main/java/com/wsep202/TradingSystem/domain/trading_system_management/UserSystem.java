@@ -1,5 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.exception.NoManagerInStoreException;
+import com.wsep202.TradingSystem.exception.NoOwnerInStoreException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -54,6 +57,14 @@ public class UserSystem {
 
     private boolean isLogin = false;
 
+    private List<Receipt> receipts;
+
+    public UserSystem(String userName, String firstName, String lastName, String password){
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+    }
     public void addNewStore(Store store) {
         if (Objects.nonNull(store)) {
             ownedStores.add(store);
@@ -64,7 +75,20 @@ public class UserSystem {
         isLogin = true;
     }
 
-    public void logout(){
+    public boolean logout(){
         isLogin = false;
+        return !isLogin;
+    }
+
+    public Store getOwnerStore(int storeId) {
+        return ownedStores.stream()
+                .filter(store -> store.getStoreId() == storeId)
+                .findFirst().orElseThrow(() -> new NoOwnerInStoreException(userName, storeId));
+    }
+
+    public Store getManagerStore(int storeId) {
+        return managedStores.stream()
+                .filter(store -> store.getStoreId() == storeId)
+                .findFirst().orElseThrow(() -> new NoManagerInStoreException(userName, storeId));
     }
 }

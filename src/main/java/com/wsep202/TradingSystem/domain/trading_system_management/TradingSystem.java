@@ -1,8 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import com.wsep202.TradingSystem.exception.NotAdministratorException;
+import com.wsep202.TradingSystem.exception.StoreDontExistsException;
+import com.wsep202.TradingSystem.exception.UserDontExistInTheSystemException;
+
+import java.util.*;
 
 public class TradingSystem {
 
@@ -87,10 +89,6 @@ public class TradingSystem {
                     .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
     }
 
-    public Optional<Store> getStore(int storeId) {
-        return Optional.empty() ;//TODO
-    }
-
     public boolean closeStore(Store store) {
 
         //need remove from owner, managers//TODO
@@ -98,7 +96,7 @@ public class TradingSystem {
         return stores.remove(store);
     }
 
-    public Optional<UserSystem> getUser(String username) {
+    private Optional<UserSystem> getUserOpt(String username) {
         return users.stream()
                 .filter(user -> user.getUserName().equals(username))
                 .findFirst();
@@ -107,5 +105,45 @@ public class TradingSystem {
     public boolean logout(UserSystem user) {
         user.logout();
         return true;
+    }
+
+    public UserSystem getAdministratorUser(String administratorUsername) {
+        return getAdministratorUserOpt(administratorUsername)
+                .orElseThrow(()-> new NotAdministratorException(administratorUsername));
+    }
+
+    private Optional<UserSystem> getAdministratorUserOpt(String administratorUsername){
+        return administrators.stream()
+                .filter(user -> user.getUserName().equals(administratorUsername))
+                .findFirst();
+    }
+
+    private boolean isAdmin(String administratorUsername){
+        return getAdministratorUserOpt(administratorUsername).isPresent();
+    }
+
+    public Store getStore(String administratorUsername, int storeId) {
+        if(isAdmin(administratorUsername)) {
+            return getStore(storeId);
+        }
+        throw new NotAdministratorException(administratorUsername);
+    }
+
+    private Store getStore(int storeId) throws StoreDontExistsException {
+        Optional<Store> storeOptional = stores.stream()
+                .filter(store -> store.getStoreId() == storeId).findFirst();
+        return storeOptional.orElseThrow(() -> new StoreDontExistsException(storeId));
+    }
+
+    public UserSystem getUser(String username) throws UserDontExistInTheSystemException {
+        Optional<UserSystem> userOpt = getUserOpt(username);
+        return userOpt.orElseThrow(() -> new UserDontExistInTheSystemException(username));
+    }
+
+    public UserSystem getUserByAdmin(String administratorUsername, String userName) {
+        if(isAdmin(administratorUsername)) {
+            return getUser(userName);
+        }
+        throw new NotAdministratorException(administratorUsername);
     }
 }

@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.service.user_service;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.Receipt;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.service.user_service.dto.PurchaseHistoryDto;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class SellerOwnerService {
     /**
      * View store purchase history
      */
-    public List<PurchaseHistoryDto> viewPurchaseHistory(String ownerUsername, int storeId){
+    public List<Receipt> viewPurchaseHistory(String ownerUsername, int storeId){
         return tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername,storeId);
     }
 
@@ -26,14 +27,14 @@ public class SellerOwnerService {
      * add product
      */
     public boolean addProduct(String ownerUsername, int storeId, String productName, String category, int amount, double cost ){
-        return tradingSystemFacade.addProduct(storeId, productName, category, amount, cost);
+         return tradingSystemFacade.addProduct(ownerUsername, storeId, productName, category, amount, cost);
     }
 
     /**
      * remove product
      */
     public boolean removeProduct(String ownerUsername, int storeId, String productName){
-        return tradingSystemFacade.removeProductFromStore(storeId, productName);
+        return tradingSystemFacade.removeProductFromStore(ownerUsername, storeId, productName);
     }
 
     /**

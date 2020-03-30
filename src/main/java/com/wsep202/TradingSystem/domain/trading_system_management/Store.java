@@ -1,15 +1,13 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.exception.NoManagerInStoreException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @Builder
@@ -39,6 +37,8 @@ public class Store {
     private PurchaseType purchaseType;
 
     private Set<UserSystem> owners ;
+
+    private List<Receipt> receipts;
 
     private int rank;
 
@@ -118,8 +118,52 @@ public class Store {
     /**
      * add new product
      */
-    public void addNewProduct(Product product){
-
+    public boolean addNewProduct(UserSystem user, Product product){
+        return false;
+        //TODO
     }
 
+    private boolean isManager(UserSystem user){
+        return appointedManagers.entrySet().stream()
+                .anyMatch(entry -> entry.getValue().stream()
+                .anyMatch(mangerStore -> mangerStore.isTheUser(user)));
+    }
+
+    public List<Receipt> managerViewReceipts(UserSystem user) {
+        if(isManager(user)){
+            return receipts;
+        }
+        else {
+            throw new NoManagerInStoreException(user.getUserName(), storeId);
+        }
+    }
+
+    public List<Receipt> ownerViewReceipts(UserSystem user) {
+        if(isOwner(user)){
+            return receipts;
+        }
+        else {
+            throw new NoManagerInStoreException(user.getUserName(), storeId);
+        }
+    }
+
+    private boolean isOwner(UserSystem user) {
+        return owners.contains(user);
+    }
+
+    public boolean removeProductFromStore(UserSystem user, String productName) {
+        return false;
+    }
+
+    public boolean editProduct(UserSystem user, int productSn, String productName, String category, int amount, double cost) {
+        return false;
+    }
+
+    public boolean addOwner(Store ownerStore, UserSystem newOwnerUser) {
+        return false;
+    }
+
+    public boolean addManager(Store ownerStore, UserSystem newManagerUser) {
+        return false;
+    }
 }

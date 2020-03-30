@@ -33,7 +33,7 @@ public class BuyerRegisteredService {
     /**
      * View buyer purchase history
      */
-    public List<PurchaseHistoryDto> viewPurchaseHistory(String userName){
+    public List<Receipt> viewPurchaseHistory(String userName){
         return tradingSystemFacade.viewPurchaseHistory(userName);
     }
 

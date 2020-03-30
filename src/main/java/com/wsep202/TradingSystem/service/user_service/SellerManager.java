@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.service.user_service;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.Receipt;
 import com.wsep202.TradingSystem.domain.trading_system_management.Store;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.service.user_service.dto.PurchaseHistoryDto;
@@ -19,7 +20,7 @@ public class SellerManager {
     /**
      * View store purchase history
      */
-    public List<PurchaseHistoryDto> viewPurchaseHistory(String userName, int storeId){
+    public List<Receipt> viewPurchaseHistory(String userName, int storeId){
         return tradingSystemFacade.viewPurchaseHistoryOfSeller(userName, storeId);
     }
 

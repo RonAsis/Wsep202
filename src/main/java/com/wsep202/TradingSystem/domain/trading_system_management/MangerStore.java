@@ -11,4 +11,8 @@ public class MangerStore {
      *
      */
     private UserSystem appointedManager;
+
+    public boolean isTheUser(UserSystem user) {
+        return appointedManager.equals(user);
+    }
 }

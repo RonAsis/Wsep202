@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.service.user_service;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.Receipt;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.service.user_service.dto.PurchaseHistoryDto;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +19,14 @@ public class AdministratorService {
     /**
      * View store purchase history
      */
-    public List<PurchaseHistoryDto> viewPurchaseHistory(String administratorUsername, int storeId){
+    public List<Receipt> viewPurchaseHistory(String administratorUsername, int storeId){
         return tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId);
     }
 
     /**
      * View buyer purchase history
      */
-    public List<PurchaseHistoryDto> viewPurchaseHistory(String administratorUsername, String userName){
+    public List<Receipt> viewPurchaseHistory(String administratorUsername, String userName){
         return tradingSystemFacade.viewPurchaseHistory(administratorUsername, userName);
     }
 }
