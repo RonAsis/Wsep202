@@ -1,11 +1,13 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import java.util.Set;
+
 public class MangerStore {
 
     /**
      *
      */
-    private StorePermission storePermission;
+    private Set<StorePermission> storePermissions;
 
     /**
      *

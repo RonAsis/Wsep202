@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.exception.CategoryDontExistException;
-import org.springframework.util.CollectionUtils;
+import com.wsep202.TradingSystem.domain.exception.*;
 
 import java.util.Arrays;
 

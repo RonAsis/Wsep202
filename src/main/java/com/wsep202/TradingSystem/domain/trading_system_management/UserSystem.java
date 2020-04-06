@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.exception.NoManagerInStoreException;
-import com.wsep202.TradingSystem.exception.NoOwnerInStoreException;
+import com.wsep202.TradingSystem.domain.exception.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -90,5 +89,13 @@ public class UserSystem {
         return managedStores.stream()
                 .filter(store -> store.getStoreId() == storeId)
                 .findFirst().orElseThrow(() -> new NoManagerInStoreException(userName, storeId));
+    }
+
+    public boolean saveProductInShoppingBag(UserSystem user, Store store, Product product) {
+        return false;
+    }
+
+    public boolean removeProductInShoppingBag(Store store, Product product) {
+        return false;
     }
 }

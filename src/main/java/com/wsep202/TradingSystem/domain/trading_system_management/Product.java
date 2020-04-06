@@ -40,17 +40,20 @@ public class Product {
     @Builder.Default
     private int rank = 0;
 
+    private int storeId;
+
     private int createProductSkuAcc(){
         return productSnAcc++;
     }
 
-    public Product(String name, ProductCategory category, int amount, double cost){
+    public Product(String name, ProductCategory category, int amount, double cost, int storeId){
         this.productSn = createProductSkuAcc();
         this.name = name;
         this.category = category;
         this.amount = amount;
         this.cost = cost;
         this.rank = 0;
+        this.storeId = storeId;
     }
     /**
      * Increases the amount of products

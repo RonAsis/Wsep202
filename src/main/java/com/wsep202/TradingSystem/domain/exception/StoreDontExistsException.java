@@ -1,4 +1,4 @@
-package com.wsep202.TradingSystem.exception;
+package com.wsep202.TradingSystem.domain.exception;
 
 public class StoreDontExistsException extends RuntimeException {
 

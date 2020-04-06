@@ -1,6 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.exception.NoManagerInStoreException;
+import com.wsep202.TradingSystem.domain.exception.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -166,4 +166,18 @@ public class Store {
     public boolean addManager(Store ownerStore, UserSystem newManagerUser) {
         return false;
     }
+
+    public boolean addPermissionToManager(Store ownerStore, UserSystem user, StorePermission storePermission) {
+        return false;
+    }
+
+    public boolean removeManager(Store ownerStore, UserSystem user) {
+        return false;
+    }
+
+    public Product getProduct(int productId) {
+        return null;
+    }
+
+
 }

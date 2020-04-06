@@ -1,9 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.Receipt;
-import com.wsep202.TradingSystem.domain.trading_system_management.Store;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
-import com.wsep202.TradingSystem.service.user_service.dto.PurchaseHistoryDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,7 @@ public class SellerManager {
      * View store purchase history
      */
     public List<Receipt> viewPurchaseHistory(String userName, int storeId){
-        return tradingSystemFacade.viewPurchaseHistoryOfSeller(userName, storeId);
+        return tradingSystemFacade.viewPurchaseHistoryOfManager(userName, storeId);
     }
 
 }

@@ -12,51 +12,116 @@ public class TradingSystemFacade {
 
     private final TradingSystem tradingSystem;
 
+    /**
+     * @param userName - must be logged in
+     * @return
+     */
     public List<Receipt> viewPurchaseHistory(String userName) {
         UserSystem user = tradingSystem.getUser(userName);
         return user.getReceipts();
     }
 
+    /**
+     * administrator view purchase history of store
+     *
+     * @param administratorUsername
+     * @param storeId
+     * @return
+     */
     public List<Receipt> viewPurchaseHistory(String administratorUsername, int storeId) {
         Store store = tradingSystem.getStore(administratorUsername, storeId);
         return store.getReceipts();
     }
 
+    /**
+     * administrator view purchase history of user
+     *
+     * @param administratorUsername
+     * @param userName
+     * @return
+     */
     public List<Receipt> viewPurchaseHistory(String administratorUsername, String userName) {
         UserSystem userByAdmin = tradingSystem.getUserByAdmin(administratorUsername, userName);
         return userByAdmin.getReceipts();
     }
 
-    public List<Receipt> viewPurchaseHistoryOfSeller(String username, int storeId) {
+    /**
+     * Manager view purchase history of store
+     * @param username
+     * @param storeId
+     * @return
+     */
+    public List<Receipt> viewPurchaseHistoryOfManager(String username, int storeId) {
         UserSystem user = tradingSystem.getUser(username);
         return user.getManagerStore(storeId).getReceipts();
     }
 
+    /**
+     * Owner view purchase history of store
+     * @param username
+     * @param storeId
+     * @return
+     */
     public List<Receipt> viewPurchaseHistoryOfOwner(String username, int storeId) {
         UserSystem user = tradingSystem.getUser(username);
         return user.getOwnerStore(storeId).getReceipts();
     }
 
+    /**
+     * add product to store
+     * @param ownerUsername
+     * @param storeId
+     * @param productName
+     * @param category
+     * @param amount
+     * @param cost
+     * @return
+     */
     public boolean addProduct(String ownerUsername, int storeId, String productName, String category, int amount, double cost) {
         UserSystem user = tradingSystem.getUser(ownerUsername);
         Store ownerStore = user.getOwnerStore(storeId);
         ProductCategory productCategory = ProductCategory.getProductCategory(category);
-        Product product = new Product(productName, productCategory,amount, cost);
+        Product product = new Product(productName, productCategory, amount, cost, storeId);
         return ownerStore.addNewProduct(user, product);
     }
 
-    public boolean removeProductFromStore(String ownerUsername,int storeId, String productName) {
+    /**
+     * delete product form store
+     * @param ownerUsername
+     * @param storeId
+     * @param productName
+     * @return
+     */
+    public boolean deleteProductFromStore(String ownerUsername, int storeId, String productName) {
         UserSystem user = tradingSystem.getUser(ownerUsername);
         Store ownerStore = user.getOwnerStore(storeId);
-        return ownerStore.removeProductFromStore(user,productName);
+        return ownerStore.removeProductFromStore(user, productName);
     }
 
+    /**
+     * edit product
+     * @param ownerUsername
+     * @param storeId
+     * @param productSn
+     * @param productName
+     * @param category
+     * @param amount
+     * @param cost
+     * @return
+     */
     public boolean editProduct(String ownerUsername, int storeId, int productSn, String productName, String category, int amount, double cost) {
         UserSystem user = tradingSystem.getUser(ownerUsername);
         Store ownerStore = user.getOwnerStore(storeId);
-        return ownerStore.editProduct(user, productSn, productName, category, amount, cost);//TODO
+        return ownerStore.editProduct(user, productSn, productName, category, amount, cost);
     }
 
+    /**
+     * add new owner to store
+     * @param ownerUsername
+     * @param storeId
+     * @param newOwnerUsername
+     * @return
+     */
     public boolean addOwner(String ownerUsername, int storeId, String newOwnerUsername) {
         UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
         UserSystem newOwnerUser = tradingSystem.getUser(newOwnerUsername);
@@ -64,18 +129,41 @@ public class TradingSystemFacade {
         return ownerStore.addOwner(ownerStore, newOwnerUser);
     }
 
+    /**
+     * add manger
+     * @param ownerUsername
+     * @param storeId
+     * @param newManagerUsername
+     * @return
+     */
     public boolean addManager(String ownerUsername, int storeId, String newManagerUsername) {
         UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
         UserSystem newManagerUser = tradingSystem.getUser(newManagerUsername);
-        Store ownerStore = ownerUser.getOwnerStore(storeId);
-        return ownerStore.addManager(ownerStore, newManagerUser);
+        Store ownedStore = ownerUser.getOwnerStore(storeId);
+        return ownedStore.addManager(ownedStore, newManagerUser);
     }
 
-    public boolean addPermission(String ownerUsername, int storeId, String newManagerUsername, String permission){
-        return false;//TODO
+    /**
+     *
+     * @param ownerUsername
+     * @param storeId
+     * @param newManagerUsername
+     * @param permission
+     * @return
+     */
+    public boolean addPermission(String ownerUsername, int storeId, String newManagerUsername, String permission) {
+        UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
+        Store ownerStore = ownerUser.getOwnerStore(storeId);
+        UserSystem user = tradingSystem.getUser(newManagerUsername);
+        StorePermission storePermission = StorePermission.getStorePermission(permission);
+        return ownerStore.addPermissionToManager(ownerStore, user, storePermission);
     }
-    public boolean removeManager(String ownerUsername, int storeId, String newOwnerUsername) {
-        return false;//TODO
+
+    public boolean removeManager(String ownerUsername, int storeId, String managerUsername) {
+        UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
+        Store ownerStore = ownerUser.getOwnerStore(storeId);
+        UserSystem user = tradingSystem.getUser(managerUsername);
+        return ownerStore.removeManager(ownerStore, user);
     }
 
     public boolean logout(String username) {
@@ -83,72 +171,87 @@ public class TradingSystemFacade {
         return user.logout();
     }
 
-    public boolean openStore(String usernameOwner, String purchasePolicy, DiscountPolicy discountPolicy, DiscountPolicy discountPolicy1, String purchaseType, String storeName) {
-        return false;//TODO
+    public boolean openStore(String usernameOwner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy,
+                             String discountType, String purchaseType, String storeName) {
+        UserSystem user = tradingSystem.getUser(usernameOwner);
+
+        return false;//TODO ADD ENUM FOR TYPE
     }
 
     public boolean registerUser(String userName, String password, String firstName, String lastName) {
-        return false;//TODO
+        UserSystem userSystem = new UserSystem(userName, password, firstName, lastName);
+        return tradingSystem.registerNewUser(userSystem);
     }
 
     public boolean login(String userName, String password) {
-        return false;//TODO
+        UserSystem user = tradingSystem.getUser(userName);
+        return tradingSystem.login(user, false, password);
     }
 
-    public Store viewStoreInfo(String storeId) {
-        return null; //TODO
+    public Store viewStoreInfo(int storeId) {
+        return tradingSystem.getStore(storeId);
     }
 
-    public Product viewProduct(String storeId, String productId) {
-        return null; //TODO
+    public Product viewProduct(int storeId, int productId) {
+        Store store = tradingSystem.getStore(storeId);
+        return store.getProduct(productId);
     }
 
     public List<Product> searchProductByName(String productName) {
-        return null; //TODO
+        return tradingSystem.searchProductByName(productName);
     }
 
     public List<Product> searchProductByCategory(String category) {
-        return null; //TODO
+        ProductCategory productCategory = ProductCategory.getProductCategory(category);
+        return tradingSystem.searchProductByCategory(productCategory);
     }
 
     public List<Product> searchProductByKeyWords(List<String> keyWords) {
-        return null; //TODO
+        return tradingSystem.searchProductByKeyWords(keyWords);
     }
 
-    public List<Product> filterByRangePrice(double min, double max) {
-        return null; //TODO
+    public List<Product> filterByRangePrice(List<Product> products, double min, double max) {
+        return tradingSystem.filterByRangePrice(products, min, max);
     }
 
-    public List<Product> filterByProductRank(int rank) {
-        return null; //TODO
+    public List<Product> filterByProductRank(List<Product> products, int rank) {
+        return tradingSystem.filterByProductRank(products, rank);
     }
 
-    public List<Product> filterByStoreRank(int rank) {
-        return null; //TODO
+    public List<Product> filterByStoreRank(List<Product> products, int rank) {
+        return tradingSystem.filterByStoreRank(products, rank);
     }
 
-    public List<Product> filterByStoreCategory(String category) {
-        return null; //TODO
+    public List<Product> filterByStoreCategory(List<Product> products, String category) {
+        return tradingSystem.filterByStoreCategory(products, category);
     }
 
-    public boolean saveProductInShoppingBag(String userName, int id, int storeId, int productSn) {
-        return false; //TODO
+    public boolean saveProductInShoppingBag(String username, int id, int storeId, int productSn) {
+        UserSystem user = tradingSystem.getUser(username);
+        Store store = tradingSystem.getStore(storeId);
+        Product product = store.getProduct(productSn);
+        return user.saveProductInShoppingBag(user, store, product);
     }
 
-    public ShoppingCart viewProductsInShoppingCart(String userName) {
-        return null; //TODO
+    public ShoppingCart viewProductsInShoppingCart(String username) {
+        UserSystem user = tradingSystem.getUser(username);
+        return user.getShoppingCart();
     }
 
-    public boolean removeProductInShoppingBag(String userName, int storeId, int productSn) {
-        return false; //TODO
+    public boolean removeProductInShoppingBag(String username, int storeId, int productSn) {
+        UserSystem user = tradingSystem.getUser(username);
+        Store store = tradingSystem.getStore(storeId);
+        Product product = store.getProduct(productSn);
+        return user.removeProductInShoppingBag(store, product);
     }
 
     public Receipt purchaseShoppingCart(ShoppingCart shoppingCart) {
-        return null; //TODO
+        return tradingSystem.purchaseShoppingCart(shoppingCart);
     }
 
-    public Receipt purchaseShoppingCart(String userName) {
-        return null; //TODO
+    public Receipt purchaseShoppingCart(String username) {
+        UserSystem user = tradingSystem.getUser(username);
+        return tradingSystem.purchaseShoppingCart(user);
     }
 
 }

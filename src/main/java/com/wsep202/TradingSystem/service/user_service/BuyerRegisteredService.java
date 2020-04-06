@@ -25,9 +25,9 @@ public class BuyerRegisteredService {
     /**
      * open store
      */
-    public boolean openStore(String usernameOwner, String purchasePolicy, DiscountPolicy discountPolicy, String discountType,
+    public boolean openStore(String usernameOwner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, String discountType,
                              String purchaseType, String storeName){
-        return  tradingSystemFacade.openStore(usernameOwner, purchasePolicy, discountPolicy, discountPolicy, purchaseType, storeName);
+        return  tradingSystemFacade.openStore(usernameOwner, purchasePolicy, discountPolicy, discountType, purchaseType, storeName);
     }
 
     /**

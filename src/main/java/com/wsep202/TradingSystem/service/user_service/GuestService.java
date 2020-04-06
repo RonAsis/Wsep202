@@ -36,14 +36,14 @@ public class GuestService {
     /**
      * view store data
      */
-    public Store viewStoreInfo(String storeId){
+    public Store viewStoreInfo(int storeId){
         return tradingSystemFacade.viewStoreInfo(storeId);
     }
 
     /**
      * view product in store
      */
-    public Product viewProduct(String storeId, String productId){
+    public Product viewProduct(int storeId, int productId){
         return tradingSystemFacade.viewProduct(storeId, productId);
     }
 
@@ -71,29 +71,29 @@ public class GuestService {
     /**
      * filter products by range price
      */
-    public List<Product> filterByRangePrice(double min, double max){
-        return tradingSystemFacade.filterByRangePrice(min, max);
+    public List<Product> filterByRangePrice(List<Product> products, double min, double max){
+        return tradingSystemFacade.filterByRangePrice(products, min, max);
     }
 
     /**
      * filter products by product rank
      */
-    public List<Product> filterByProductRank(int rank){
-        return tradingSystemFacade.filterByProductRank(rank);
+    public List<Product> filterByProductRank(List<Product> products, int rank){
+        return tradingSystemFacade.filterByProductRank(products, rank);
     }
 
     /**
      * filter products by  store rank
      */
-    public List<Product> filterByStoreRank(int rank){
-        return tradingSystemFacade.filterByStoreRank(rank);
+    public List<Product> filterByStoreRank(List<Product> products, int rank){
+        return tradingSystemFacade.filterByStoreRank(products, rank);
     }
 
     /**
      * filter products by category
      */
-    public List<Product> filterByStoreCategory(String category){
-        return tradingSystemFacade.filterByStoreCategory(category);
+    public List<Product> filterByStoreCategory(List<Product> products, String category){
+        return tradingSystemFacade.filterByStoreCategory(products, category);
     }
 
     /**

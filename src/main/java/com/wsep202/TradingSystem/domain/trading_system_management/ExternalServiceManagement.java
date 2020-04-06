@@ -6,4 +6,8 @@ public class ExternalServiceManagement {
         // if cant throw exception
         //TODO
     }
+
+    public String encryptPassword(String password) {
+        return null;
+    }
 }

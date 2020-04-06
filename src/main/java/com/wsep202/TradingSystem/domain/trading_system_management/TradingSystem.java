@@ -1,22 +1,22 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.exception.NotAdministratorException;
-import com.wsep202.TradingSystem.exception.StoreDontExistsException;
-import com.wsep202.TradingSystem.exception.UserDontExistInTheSystemException;
+import com.wsep202.TradingSystem.domain.exception.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
+@Slf4j
 public class TradingSystem {
 
     private Set<Store> stores;
 
     private Set<UserSystem> users;
 
-    private ExternalServiceManagement externalServiceManagement ;
+    private ExternalServiceManagement externalServiceManagement;
 
     private Set<UserSystem> administrators;
 
-    public TradingSystem(ExternalServiceManagement externalServiceManagement){
+    public TradingSystem(ExternalServiceManagement externalServiceManagement) {
         stores = new HashSet<>();
         users = new HashSet<>();
         administrators = new HashSet<>();
@@ -24,11 +24,10 @@ public class TradingSystem {
         externalServiceManagement.connect();
     }
 
-
     /**
      * buy the shopping cart
      */
-    public Receipt buyShoppingCart(UserSystem userSystem){
+    public Receipt buyShoppingCart(UserSystem userSystem) {
         //TODO
         return null;
     }
@@ -36,17 +35,18 @@ public class TradingSystem {
     /**
      * open empty store
      */
-    public void openStore(UserSystem ownerStore, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, DiscountType discountType, PurchaseType purchaseType){
+    public void openStore(UserSystem ownerStore, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, DiscountType discountType, PurchaseType purchaseType) {
         //Store store = new Store(ownerStore, purchasePolicy, discountPolicy, discountType, purchaseType);
-       // ownerStore.addNewStore(store);
+        // ownerStore.addNewStore(store);
     }
 
     /**
      * register new user
      */
-    public boolean registerNewUser(UserSystem userToRegister){
+    public boolean registerNewUser(UserSystem userToRegister) {
+        userToRegister.setPassword(externalServiceManagement.encryptPassword(userToRegister.getPassword()));
         boolean isRegistered = isRegisteredUser(userToRegister);
-        if(!isRegistered){
+        if (!isRegistered) {
             users.add(userToRegister);
         }
         return !isRegistered;
@@ -55,14 +55,15 @@ public class TradingSystem {
     /**
      *
      */
-    public boolean login(UserSystem userToLogin, boolean isManager){
-        return isManager? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
+    public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+        //TODO
+        return isAdmin ? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
     }
 
     private boolean loginAdministrator(UserSystem userToLogin) {
         boolean isRegistered = isRegisteredAdministrator(userToLogin);
         boolean suc = false;
-        if(isRegistered && !userToLogin.isLogin()){
+        if (isRegistered && !userToLogin.isLogin()) {
             userToLogin.login();
             suc = true;
         }
@@ -77,7 +78,7 @@ public class TradingSystem {
     private boolean loginRegularUser(UserSystem userToLogin) {
         boolean isRegistered = isRegisteredUser(userToLogin);
         boolean suc = false;
-        if(isRegistered && !userToLogin.isLogin()){
+        if (isRegistered && !userToLogin.isLogin()) {
             userToLogin.login();
             suc = true;
         }
@@ -86,7 +87,7 @@ public class TradingSystem {
 
     private boolean isRegisteredUser(UserSystem userToRegister) {
         return users.stream()
-                    .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
+                .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
     }
 
     public boolean closeStore(Store store) {
@@ -109,31 +110,32 @@ public class TradingSystem {
 
     public UserSystem getAdministratorUser(String administratorUsername) {
         return getAdministratorUserOpt(administratorUsername)
-                .orElseThrow(()-> new NotAdministratorException(administratorUsername));
+                .orElseThrow(() -> new NotAdministratorException(administratorUsername));
     }
 
-    private Optional<UserSystem> getAdministratorUserOpt(String administratorUsername){
+    private Optional<UserSystem> getAdministratorUserOpt(String administratorUsername) {
         return administrators.stream()
                 .filter(user -> user.getUserName().equals(administratorUsername))
                 .findFirst();
     }
 
-    private boolean isAdmin(String administratorUsername){
+    private boolean isAdmin(String administratorUsername) {
         return getAdministratorUserOpt(administratorUsername).isPresent();
     }
 
     public Store getStore(String administratorUsername, int storeId) {
-        if(isAdmin(administratorUsername)) {
+        if (isAdmin(administratorUsername)) {
             return getStore(storeId);
         }
         throw new NotAdministratorException(administratorUsername);
     }
 
-    private Store getStore(int storeId) throws StoreDontExistsException {
+    public Store getStore(int storeId) throws StoreDontExistsException {
         Optional<Store> storeOptional = stores.stream()
                 .filter(store -> store.getStoreId() == storeId).findFirst();
         return storeOptional.orElseThrow(() -> new StoreDontExistsException(storeId));
     }
+
 
     public UserSystem getUser(String username) throws UserDontExistInTheSystemException {
         Optional<UserSystem> userOpt = getUserOpt(username);
@@ -141,9 +143,51 @@ public class TradingSystem {
     }
 
     public UserSystem getUserByAdmin(String administratorUsername, String userName) {
-        if(isAdmin(administratorUsername)) {
+        if (isAdmin(administratorUsername)) {
             return getUser(userName);
         }
         throw new NotAdministratorException(administratorUsername);
     }
+
+    /**
+     * need pass on all the stores and give the product with this name
+     * @param productName
+     * @return
+     */
+    public List<Product> searchProductByName(String productName) {
+        return null;
+    }
+
+    public List<Product> searchProductByCategory(ProductCategory productCategory) {
+        return null;
+    }
+
+    public List<Product> searchProductByKeyWords(List<String> keyWords) {
+        return null;
+    }
+
+    public List<Product> filterByRangePrice(List<Product> products, double min, double max) {
+        return null;
+    }
+
+    public List<Product> filterByProductRank(List<Product> products, int rank) {
+        return null;
+    }
+
+    public List<Product> filterByStoreRank(List<Product> products, int rank) {
+        return null;
+    }
+
+    public List<Product> filterByStoreCategory(List<Product> products, String category) {
+        return  null;
+    }
+
+    public Receipt purchaseShoppingCart(ShoppingCart shoppingCart) {
+        return null;
+    }
+
+    public Receipt purchaseShoppingCart(UserSystem user) {
+        return null;
+    }
+
 }
