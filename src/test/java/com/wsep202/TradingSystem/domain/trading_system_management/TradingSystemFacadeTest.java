@@ -1,20 +1,56 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.github.rozidan.springboot.modelmapper.WithModelMapper;
+import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TradingSystemConfiguration.class})
+@WithModelMapper
 class TradingSystemFacadeTest {
+
+    @Autowired
+    private TradingSystemFacade tradingSystemFacade;
+
+    @BeforeEach
+    public void setUp() {
+        assertNotNull(tradingSystemFacade);
+    }
 
     @Nested
     public class TradingSystemFacadeTestUnit {
 
         @Test
         void viewPurchaseHistoryUser() {
+            //TODO
+        }
+
+        private List<Receipt> setUpReceipts(){
+//            List<Receipt> receipts = new ArrayList<>();
+//            for(int counter=0; counter <= 10 ; counter++){
+//                receipts.add(Receipt)
+//            }
+//            return receipts;
+            //TODO
+        return null;
+        }
+
+        @Test
+        void viewPurchaseHistoryUserException() {
+            //TODO
         }
 
         @Test
@@ -134,6 +170,7 @@ class TradingSystemFacadeTest {
         }
     }
 
+    ///////////////////////////////integration test /////////////////////
     @Nested
     public class TradingSystemFacadeTestIntegration {
 

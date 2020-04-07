@@ -1,4 +1,4 @@
-package com.wsep202.TradingSystem.domain.trading_system_management;
+package com.wsep202.TradingSystem.service.user_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,8 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShoppingBag {
+public class ShoppingBagDto {
 
     private Map<Integer, Integer> mapProductSnToAmount;
+
 }
