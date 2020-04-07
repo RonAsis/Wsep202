@@ -23,7 +23,6 @@ public class TradingSystemFacade {
 
     /**
      * administrator view purchase history of store
-     *
      * @param administratorUsername
      * @param storeId
      * @return
