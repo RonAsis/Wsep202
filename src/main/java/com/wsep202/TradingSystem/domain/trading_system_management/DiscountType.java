@@ -12,7 +12,7 @@ public enum DiscountType {
         this.type = type;
     }
 
-    public static DiscountType getStorePermission(String type) {
+    public static DiscountType getDiscountType(String type) {
         return Arrays.stream(DiscountType.values())
                 .filter(discountType -> discountType.type.equals(type))
                 .findFirst().orElseThrow(() -> new DiscountTypeDontExistException(type));

@@ -13,7 +13,7 @@ public enum PurchaseType {
         this.type = type;
     }
 
-    public static PurchaseType getStorePermission(String type) {
+    public static PurchaseType getPurchaseType(String type) {
         return Arrays.stream(PurchaseType.values())
                 .filter(purchaseType -> purchaseType.type.equals(type))
                 .findFirst().orElseThrow(() -> new PurchaseTypeDontExistException(type));

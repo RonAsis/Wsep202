@@ -32,13 +32,7 @@ public class TradingSystem {
         return null;
     }
 
-    /**
-     * open empty store
-     */
-    public void openStore(UserSystem ownerStore, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, DiscountType discountType, PurchaseType purchaseType) {
-        //Store store = new Store(ownerStore, purchasePolicy, discountPolicy, discountType, purchaseType);
-        // ownerStore.addNewStore(store);
-    }
+
 
     /**
      * register new user
@@ -190,4 +184,7 @@ public class TradingSystem {
         return null;
     }
 
+    public boolean openStore(UserSystem user, DiscountType discountTypeObj, PurchaseType purchaseTypeObj, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, String storeName) {
+        return false;
+    }
 }

@@ -174,8 +174,9 @@ public class TradingSystemFacade {
     public boolean openStore(String usernameOwner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy,
                              String discountType, String purchaseType, String storeName) {
         UserSystem user = tradingSystem.getUser(usernameOwner);
-
-        return false;//TODO ADD ENUM FOR TYPE
+        DiscountType discountTypeObj = DiscountType.getDiscountType(discountType);
+        PurchaseType purchaseTypeObj = PurchaseType.getPurchaseType(purchaseType);
+        return tradingSystem.openStore(user, discountTypeObj, purchaseTypeObj, purchasePolicy, discountPolicy,storeName);
     }
 
     public boolean registerUser(String userName, String password, String firstName, String lastName) {
