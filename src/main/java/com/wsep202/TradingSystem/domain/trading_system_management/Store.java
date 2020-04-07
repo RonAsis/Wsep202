@@ -159,19 +159,19 @@ public class Store {
         return false;
     }
 
-    public boolean addOwner(Store ownerStore, UserSystem newOwnerUser) {
+    public boolean addOwner(UserSystem ownerStore, UserSystem newOwnerUser) {
         return false;
     }
 
-    public boolean addManager(Store ownerStore, UserSystem newManagerUser) {
+    public boolean addManager(UserSystem ownerStore, UserSystem newManagerUser) {
         return false;
     }
 
-    public boolean addPermissionToManager(Store ownerStore, UserSystem user, StorePermission storePermission) {
+    public boolean addPermissionToManager(UserSystem ownerStore, UserSystem user, StorePermission storePermission) {
         return false;
     }
 
-    public boolean removeManager(Store ownerStore, UserSystem user) {
+    public boolean removeManager(UserSystem ownerStore, UserSystem user) {
         return false;
     }
 
@@ -180,4 +180,10 @@ public class Store {
     }
 
 
+    public UserSystem getManager(UserSystem ownerUser, String managerUserName) {
+        return appointedManagers.get(ownerUser).stream()
+                .filter(mangerStore -> mangerStore.isTheUser(managerUserName))
+                .findFirst().orElseThrow(()-> new NoManagerInStoreException(managerUserName, storeId))
+                .getAppointedManager();
+    }
 }
