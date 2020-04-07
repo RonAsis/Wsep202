@@ -1,9 +1,12 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 
+import com.wsep202.TradingSystem.service.user_service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -12,13 +15,15 @@ public class TradingSystemFacade {
 
     private final TradingSystem tradingSystem;
 
+    private final ModelMapper modelMapper;
     /**
      * @param userName - must be logged in
      * @return
      */
-    public List<Receipt> viewPurchaseHistory(String userName) {
+    public List<ReceiptDto> viewPurchaseHistory(String userName) {
         UserSystem user = tradingSystem.getUser(userName);
-        return user.getReceipts();
+        List<Receipt> receipts = user.getReceipts();
+        return convertReceiptDtoList(receipts);
     }
 
     /**
@@ -27,9 +32,10 @@ public class TradingSystemFacade {
      * @param storeId
      * @return
      */
-    public List<Receipt> viewPurchaseHistory(String administratorUsername, int storeId) {
+    public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, int storeId) {
         Store store = tradingSystem.getStore(administratorUsername, storeId);
-        return store.getReceipts();
+        List<Receipt> receipts = store.getReceipts();
+        return convertReceiptDtoList(receipts);
     }
 
     /**
@@ -39,9 +45,9 @@ public class TradingSystemFacade {
      * @param userName
      * @return
      */
-    public List<Receipt> viewPurchaseHistory(String administratorUsername, String userName) {
+    public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, String userName) {
         UserSystem userByAdmin = tradingSystem.getUserByAdmin(administratorUsername, userName);
-        return userByAdmin.getReceipts();
+        return convertReceiptDtoList(userByAdmin.getReceipts());
     }
 
     /**
@@ -50,9 +56,9 @@ public class TradingSystemFacade {
      * @param storeId
      * @return
      */
-    public List<Receipt> viewPurchaseHistoryOfManager(String username, int storeId) {
+    public List<ReceiptDto> viewPurchaseHistoryOfManager(String username, int storeId) {
         UserSystem user = tradingSystem.getUser(username);
-        return user.getManagerStore(storeId).getReceipts();
+        return convertReceiptDtoList(user.getManagerStore(storeId).getReceipts());
     }
 
     /**
@@ -61,9 +67,9 @@ public class TradingSystemFacade {
      * @param storeId
      * @return
      */
-    public List<Receipt> viewPurchaseHistoryOfOwner(String username, int storeId) {
+    public List<ReceiptDto> viewPurchaseHistoryOfOwner(String username, int storeId) {
         UserSystem user = tradingSystem.getUser(username);
-        return user.getOwnerStore(storeId).getReceipts();
+        return convertReceiptDtoList(user.getOwnerStore(storeId).getReceipts());
     }
 
     /**
@@ -170,11 +176,13 @@ public class TradingSystemFacade {
         return user.logout();
     }
 
-    public boolean openStore(String usernameOwner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy,
+    public boolean openStore(String usernameOwner, PurchasePolicyDto purchasePolicyDto, DiscountPolicyDto discountPolicyDto,
                              String discountType, String purchaseType, String storeName) {
         UserSystem user = tradingSystem.getUser(usernameOwner);
         DiscountType discountTypeObj = DiscountType.getDiscountType(discountType);
         PurchaseType purchaseTypeObj = PurchaseType.getPurchaseType(purchaseType);
+        PurchasePolicy purchasePolicy = modelMapper.map(purchasePolicyDto, PurchasePolicy.class);
+        DiscountPolicy discountPolicy = modelMapper.map(discountPolicyDto, DiscountPolicy.class);
         return tradingSystem.openStore(user, discountTypeObj, purchaseTypeObj, purchasePolicy, discountPolicy,storeName);
     }
 
@@ -188,43 +196,57 @@ public class TradingSystemFacade {
         return tradingSystem.login(user, false, password);
     }
 
-    public Store viewStoreInfo(int storeId) {
-        return tradingSystem.getStore(storeId);
-    }
-
-    public Product viewProduct(int storeId, int productId) {
+    public StoreDto viewStoreInfo(int storeId) {
         Store store = tradingSystem.getStore(storeId);
-        return store.getProduct(productId);
+        return modelMapper.map(store, StoreDto.class);
     }
 
-    public List<Product> searchProductByName(String productName) {
-        return tradingSystem.searchProductByName(productName);
+    public ProductDto viewProduct(int storeId, int productId) {
+        Store store = tradingSystem.getStore(storeId);
+        Product product = store.getProduct(productId);
+        return modelMapper.map(product, ProductDto.class);
     }
 
-    public List<Product> searchProductByCategory(String category) {
+    public List<ProductDto> searchProductByName(String productName) {
+        List<Product> products = tradingSystem.searchProductByName(productName);
+        return convertProductDtoList(products);
+    }
+
+    public List<ProductDto> searchProductByCategory(String category) {
         ProductCategory productCategory = ProductCategory.getProductCategory(category);
-        return tradingSystem.searchProductByCategory(productCategory);
+        List<Product> products = tradingSystem.searchProductByCategory(productCategory);
+        return convertProductDtoList(products);
     }
 
-    public List<Product> searchProductByKeyWords(List<String> keyWords) {
-        return tradingSystem.searchProductByKeyWords(keyWords);
+    public List<ProductDto> searchProductByKeyWords(List<String> keyWords) {
+        List<Product> products = tradingSystem.searchProductByKeyWords(keyWords);
+        return convertProductDtoList(products);
     }
 
-    public List<Product> filterByRangePrice(List<Product> products, double min, double max) {
-        return tradingSystem.filterByRangePrice(products, min, max);
+    public List<ProductDto> filterByRangePrice(List<ProductDto> productDtos, double min, double max) {
+        List<Product> products = converterProductsList(productDtos);
+        List<Product> productsFiltered = tradingSystem.filterByRangePrice(products, min, max);
+        return convertProductDtoList(productsFiltered);
     }
 
-    public List<Product> filterByProductRank(List<Product> products, int rank) {
-        return tradingSystem.filterByProductRank(products, rank);
+    public List<ProductDto> filterByProductRank(List<ProductDto> productDtos, int rank) {
+        List<Product> products = converterProductsList(productDtos);
+        List<Product> productsFiltered = tradingSystem.filterByProductRank(products, rank);
+        return convertProductDtoList(productsFiltered);
     }
 
-    public List<Product> filterByStoreRank(List<Product> products, int rank) {
-        return tradingSystem.filterByStoreRank(products, rank);
+    public List<ProductDto> filterByStoreRank(List<ProductDto> productDtos, int rank) {
+        List<Product> products = converterProductsList(productDtos);
+        List<Product> productsFiltered = tradingSystem.filterByStoreRank(products, rank);
+        return convertProductDtoList(productsFiltered);
     }
 
-    public List<Product> filterByStoreCategory(List<Product> products, String category) {
-        return tradingSystem.filterByStoreCategory(products, category);
+    public List<ProductDto> filterByStoreCategory(List<ProductDto> productDtos, String category) {
+        List<Product> products = converterProductsList(productDtos);
+        List<Product> productsFiltered = tradingSystem.filterByStoreCategory(products, category);
+        return convertProductDtoList(productsFiltered);
     }
+
 
     public boolean saveProductInShoppingBag(String username, int id, int storeId, int productSn) {
         UserSystem user = tradingSystem.getUser(username);
@@ -233,9 +255,10 @@ public class TradingSystemFacade {
         return user.saveProductInShoppingBag(user, store, product);
     }
 
-    public ShoppingCart viewProductsInShoppingCart(String username) {
+    public ShoppingCartDto viewProductsInShoppingCart(String username) {
         UserSystem user = tradingSystem.getUser(username);
-        return user.getShoppingCart();
+        ShoppingCart shoppingCart = user.getShoppingCart();
+        return modelMapper.map(shoppingCart, ShoppingCartDto.class);
     }
 
     public boolean removeProductInShoppingBag(String username, int storeId, int productSn) {
@@ -245,13 +268,34 @@ public class TradingSystemFacade {
         return user.removeProductInShoppingBag(store, product);
     }
 
-    public Receipt purchaseShoppingCart(ShoppingCart shoppingCart) {
-        return tradingSystem.purchaseShoppingCart(shoppingCart);
+    public ReceiptDto purchaseShoppingCart(ShoppingCartDto shoppingCartDto) {
+        ShoppingCart shoppingCart = modelMapper.map(shoppingCartDto, ShoppingCart.class);
+        Receipt receipt = tradingSystem.purchaseShoppingCart(shoppingCart);
+        return modelMapper.map(receipt, ReceiptDto.class);
     }
 
-    public Receipt purchaseShoppingCart(String username) {
+    public ReceiptDto purchaseShoppingCart(String username) {
         UserSystem user = tradingSystem.getUser(username);
-        return tradingSystem.purchaseShoppingCart(user);
+        Receipt receipt = tradingSystem.purchaseShoppingCart(user);
+        return modelMapper.map(receipt, ReceiptDto.class);
     }
 
+    /////////////////////////////////// convectors ////////////////////
+    private List<ReceiptDto> convertReceiptDtoList(List<Receipt> receipts) {
+        List<ReceiptDto> receiptDtos = new ArrayList<>();
+        modelMapper.map(receipts, receiptDtos);
+        return receiptDtos;
+    }
+
+    private List<ProductDto> convertProductDtoList(List<Product> products){
+        List<ProductDto> productDtos = new ArrayList<>();
+        modelMapper.map(products, productDtos);
+        return productDtos;
+    }
+
+    private List<Product> converterProductsList(List<ProductDto> productDtos) {
+        List<Product> products = new ArrayList<>();
+        modelMapper.map(productDtos, products);
+        return products;
+    }
 }

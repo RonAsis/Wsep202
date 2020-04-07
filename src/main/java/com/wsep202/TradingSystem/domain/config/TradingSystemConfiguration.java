@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.config;
 import com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,7 +15,7 @@ public class TradingSystemConfiguration {
     }
 
     @Bean
-    public TradingSystemFacade tradingSystemFacade(){
-        return new TradingSystemFacade(tradingSystem());
+    public TradingSystemFacade tradingSystemFacade(ModelMapper modelMapper){
+        return new TradingSystemFacade(tradingSystem(),modelMapper);
     }
 }

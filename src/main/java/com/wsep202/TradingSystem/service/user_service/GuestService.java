@@ -2,6 +2,10 @@ package com.wsep202.TradingSystem.service.user_service;
 
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
+import com.wsep202.TradingSystem.service.user_service.dto.ProductDto;
+import com.wsep202.TradingSystem.service.user_service.dto.ReceiptDto;
+import com.wsep202.TradingSystem.service.user_service.dto.ShoppingCartDto;
+import com.wsep202.TradingSystem.service.user_service.dto.StoreDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,70 +40,70 @@ public class GuestService {
     /**
      * view store data
      */
-    public Store viewStoreInfo(int storeId){
+    public StoreDto viewStoreInfo(int storeId){
         return tradingSystemFacade.viewStoreInfo(storeId);
     }
 
     /**
      * view product in store
      */
-    public Product viewProduct(int storeId, int productId){
+    public ProductDto viewProduct(int storeId, int productId){
         return tradingSystemFacade.viewProduct(storeId, productId);
     }
 
     /**
      * search product by productName
      */
-    public List<Product> searchProductByName(String productName){
+    public List<ProductDto> searchProductByName(String productName){
         return tradingSystemFacade.searchProductByName(productName);
     }
 
     /**
      * search product by category
      */
-    public List<Product> searchProductByCategory(String category){
+    public List<ProductDto> searchProductByCategory(String category){
         return tradingSystemFacade.searchProductByCategory(category);
     }
 
     /**
      * search product by KeyWords
      */
-    public List<Product> searchProductByKeyWords(List<String> keyWords){
+    public List<ProductDto> searchProductByKeyWords(List<String> keyWords){
         return tradingSystemFacade.searchProductByKeyWords(keyWords);
     }
 
     /**
      * filter products by range price
      */
-    public List<Product> filterByRangePrice(List<Product> products, double min, double max){
+    public List<ProductDto> filterByRangePrice(List<ProductDto> products, double min, double max){
         return tradingSystemFacade.filterByRangePrice(products, min, max);
     }
 
     /**
      * filter products by product rank
      */
-    public List<Product> filterByProductRank(List<Product> products, int rank){
+    public List<ProductDto> filterByProductRank(List<ProductDto> products, int rank){
         return tradingSystemFacade.filterByProductRank(products, rank);
     }
 
     /**
      * filter products by  store rank
      */
-    public List<Product> filterByStoreRank(List<Product> products, int rank){
+    public List<ProductDto> filterByStoreRank(List<ProductDto> products, int rank){
         return tradingSystemFacade.filterByStoreRank(products, rank);
     }
 
     /**
      * filter products by category
      */
-    public List<Product> filterByStoreCategory(List<Product> products, String category){
+    public List<ProductDto> filterByStoreCategory(List<ProductDto> products, String category){
         return tradingSystemFacade.filterByStoreCategory(products, category);
     }
 
     /**
      * purchase shopping cart
      */
-    public Receipt purchaseShoppingCart(ShoppingCart shoppingCart){
+    public ReceiptDto purchaseShoppingCart(ShoppingCartDto shoppingCart){
         return tradingSystemFacade.purchaseShoppingCart(shoppingCart);
     }
 }

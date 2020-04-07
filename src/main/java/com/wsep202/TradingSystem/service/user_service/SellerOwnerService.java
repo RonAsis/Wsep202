@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.Receipt;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.service.user_service.dto.ReceiptDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class SellerOwnerService {
     /**
      * View store purchase history
      */
-    public List<Receipt> viewPurchaseHistory(String ownerUsername, int storeId){
+    public List<ReceiptDto> viewPurchaseHistory(String ownerUsername, int storeId){
         return tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername,storeId);
     }
 
