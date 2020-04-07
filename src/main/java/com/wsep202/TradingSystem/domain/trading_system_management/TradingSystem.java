@@ -27,6 +27,14 @@ public class TradingSystem {
         externalServiceManagement.connect();
     }
 
+    public TradingSystem(ExternalServiceManagement externalServiceManagement, Set<Store> stores) {
+        this.stores = stores;
+        users = new HashSet<>();
+        administrators = new HashSet<>();
+        this.externalServiceManagement = externalServiceManagement;
+        externalServiceManagement.connect();
+    }
+
     /**
      * buy the shopping cart
      */
