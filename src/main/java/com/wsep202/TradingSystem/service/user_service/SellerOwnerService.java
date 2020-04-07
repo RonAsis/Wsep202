@@ -33,8 +33,8 @@ public class SellerOwnerService {
     /**
      * remove product
      */
-    public boolean removeProduct(String ownerUsername, int storeId, String productName){
-        return tradingSystemFacade.deleteProductFromStore(ownerUsername, storeId, productName);
+    public boolean removeProduct(String ownerUsername, int storeId, int productSn){
+        return tradingSystemFacade.deleteProductFromStore(ownerUsername, storeId, productSn);
     }
 
     /**

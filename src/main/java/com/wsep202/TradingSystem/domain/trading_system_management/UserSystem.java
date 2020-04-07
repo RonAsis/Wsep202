@@ -91,7 +91,7 @@ public class UserSystem {
                 .findFirst().orElseThrow(() -> new NoManagerInStoreException(userName, storeId));
     }
 
-    public boolean saveProductInShoppingBag(UserSystem user, Store store, Product product) {
+    public boolean saveProductInShoppingBag(UserSystem user, Store store, Product product, int amount) {
         return false;
     }
 

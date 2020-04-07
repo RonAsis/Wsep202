@@ -151,7 +151,7 @@ public class Store {
         return owners.contains(user);
     }
 
-    public boolean removeProductFromStore(UserSystem user, String productName) {
+    public boolean removeProductFromStore(UserSystem user, int productSn) {
         return false;
     }
 
