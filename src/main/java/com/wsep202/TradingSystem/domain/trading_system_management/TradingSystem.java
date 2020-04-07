@@ -35,8 +35,6 @@ public class TradingSystem {
         return null;
     }
 
-
-
     /**
      * register new user
      */
@@ -132,7 +130,6 @@ public class TradingSystem {
                 .filter(store -> store.getStoreId() == storeId).findFirst();
         return storeOptional.orElseThrow(() -> new StoreDontExistsException(storeId));
     }
-
 
     public UserSystem getUser(String username) throws UserDontExistInTheSystemException {
         Optional<UserSystem> userOpt = getUserOpt(username);
