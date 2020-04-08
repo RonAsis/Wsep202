@@ -11,9 +11,7 @@ import org.modelmapper.TypeToken;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -236,7 +234,7 @@ public class TradingSystemFacade {
      * @param lastName - the last name of the new user
      * @return true if succeed
      */
-    public boolean registerUser(String userName, String password, String firstName, String lastName) {
+    public boolean registerUser(@NotBlank String userName,@NotBlank String password, @NotBlank String firstName,@NotBlank String lastName) {
         UserSystem userSystem = factoryObjects.createSystemUser(userName, password, firstName, lastName);
         return tradingSystem.registerNewUser(userSystem);
     }
@@ -247,7 +245,7 @@ public class TradingSystemFacade {
      * @param password - the password must be the correct password of the user
      * @return true if succeed
      */
-    public boolean login(String userName, String password) {
+    public boolean login(@NotBlank String userName,@NotBlank String password) {
         UserSystem user = tradingSystem.getUser(userName);
         return tradingSystem.login(user, false, password);
     }
@@ -279,7 +277,7 @@ public class TradingSystemFacade {
      * @param productName - the product name that want to search
      * @return list of all the product with this name
      */
-    public List<ProductDto> searchProductByName(String productName) {
+    public List<ProductDto> searchProductByName(@NotBlank String productName) {
         List<Product> products = tradingSystem.searchProductByName(productName);
         return convertProductDtoList(products);
     }
@@ -289,7 +287,7 @@ public class TradingSystemFacade {
      * @param category - the category of product that want to search
      * @return list of all the products that belong to this category
      */
-    public List<ProductDto> searchProductByCategory(String category) {
+    public List<ProductDto> searchProductByCategory(@NotBlank String category) {
         ProductCategory productCategory = ProductCategory.getProductCategory(category);
         List<Product> products = tradingSystem.searchProductByCategory(productCategory);
         return convertProductDtoList(products);
@@ -300,7 +298,7 @@ public class TradingSystemFacade {
      * @param keyWords - the keyWords that want search with
      * @return list of all the products that include the keyWords
      */
-    public List<ProductDto> searchProductByKeyWords(List<String> keyWords) {
+    public List<ProductDto> searchProductByKeyWords(@NotNull List<@NotBlank String> keyWords) {
         List<Product> products = tradingSystem.searchProductByKeyWords(keyWords);
         return convertProductDtoList(products);
     }
@@ -312,7 +310,7 @@ public class TradingSystemFacade {
      * @param maxPrice - the maxPrice price
      * @return list of all the products filtered by range price
      */
-    public List<ProductDto> filterByRangePrice(List<ProductDto> productDtos, double minPrice, double maxPrice) {
+    public List<ProductDto> filterByRangePrice(@NotNull List< @NotNull ProductDto> productDtos, double minPrice, double maxPrice) {
         List<Product> products = converterProductsList(productDtos);
         List<Product> productsFiltered = tradingSystem.filterByRangePrice(products, minPrice, maxPrice);
         return convertProductDtoList(productsFiltered);
@@ -324,7 +322,7 @@ public class TradingSystemFacade {
      * @param rank - the product rank
      * @return list of all the products filtered by the product rank
      */
-    public List<ProductDto> filterByProductRank(List<ProductDto> productDtos, int rank) {
+    public List<ProductDto> filterByProductRank(@NotNull List<@NotNull ProductDto> productDtos, int rank) {
         List<Product> products = converterProductsList(productDtos);
         List<Product> productsFiltered = tradingSystem.filterByProductRank(products, rank);
         return convertProductDtoList(productsFiltered);
@@ -336,7 +334,7 @@ public class TradingSystemFacade {
      * @param rank the rank of the store
      * @return list of all the products filtered by the store rank
      */
-    public List<ProductDto> filterByStoreRank(List<ProductDto> productDtos, int rank) {
+    public List<ProductDto> filterByStoreRank(@NotNull List<@NotNull ProductDto> productDtos, int rank) {
         List<Product> products = converterProductsList(productDtos);
         List<Product> productsFiltered = tradingSystem.filterByStoreRank(products, rank);
         return convertProductDtoList(productsFiltered);
@@ -348,7 +346,7 @@ public class TradingSystemFacade {
      * @param category the category of the product
      * @return list of all the products filtered by the category
      */
-    public List<ProductDto> filterByStoreCategory(List<ProductDto> productDtos, String category) {
+    public List<ProductDto> filterByStoreCategory(@NotNull List<@NotNull ProductDto> productDtos,@NotBlank String category) {
         List<Product> products = converterProductsList(productDtos);
         ProductCategory productCategory = ProductCategory.getProductCategory(category);
         List<Product> productsFiltered = tradingSystem.filterByStoreCategory(products, productCategory);
@@ -363,7 +361,7 @@ public class TradingSystemFacade {
      * @param amount - the amount that want save
      * @return true if succeed
      */
-    public boolean saveProductInShoppingBag(String username, int storeId, int productSn, int amount) {
+    public boolean saveProductInShoppingBag(@NotBlank String username, int storeId, int productSn, int amount) {
         UserSystem user = tradingSystem.getUser(username);
         Store store = tradingSystem.getStore(storeId);
         Product product = store.getProduct(productSn);
@@ -375,7 +373,7 @@ public class TradingSystemFacade {
      * @param username the username that want view the ShoppingBag
      * @return shopping bag
      */
-    public ShoppingCartDto viewProductsInShoppingCart(String username) {
+    public ShoppingCartDto viewProductsInShoppingCart(@NotBlank String username) {
         UserSystem user = tradingSystem.getUser(username);
         ShoppingCart shoppingCart = user.getShoppingCart();
         return modelMapper.map(shoppingCart, ShoppingCartDto.class);
@@ -388,7 +386,7 @@ public class TradingSystemFacade {
      * @param productSn - the sn of the product
      * @return true if succeed
      */
-    public boolean removeProductInShoppingBag(String username, int storeId, int productSn) {
+    public boolean removeProductInShoppingBag(@NotBlank String username, int storeId, int productSn) {
         UserSystem user = tradingSystem.getUser(username);
         Store store = tradingSystem.getStore(storeId);
         Product product = store.getProduct(productSn);
@@ -400,7 +398,7 @@ public class TradingSystemFacade {
      * @param shoppingCartDto the shopping cart
      * @return the receipt
      */
-    public ReceiptDto purchaseShoppingCart(ShoppingCartDto shoppingCartDto) {
+    public ReceiptDto purchaseShoppingCart(@NotNull ShoppingCartDto shoppingCartDto) {
         ShoppingCart shoppingCart = modelMapper.map(shoppingCartDto, ShoppingCart.class);
         Receipt receipt = tradingSystem.purchaseShoppingCart(shoppingCart);
         return modelMapper.map(receipt, ReceiptDto.class);
@@ -411,7 +409,7 @@ public class TradingSystemFacade {
      * @param username - the username that want purchase shopping cart
      * @return the receipt
      */
-    public ReceiptDto purchaseShoppingCart(String username) {
+    public ReceiptDto purchaseShoppingCart(@NotBlank String username) {
         UserSystem user = tradingSystem.getUser(username);
         Receipt receipt = tradingSystem.purchaseShoppingCart(user);
         return modelMapper.map(receipt, ReceiptDto.class);
@@ -424,7 +422,7 @@ public class TradingSystemFacade {
      * @param receipts - list of receipts
      * @return list of ReceiptDto
      */
-    private List<ReceiptDto> convertReceiptDtoList(List<Receipt> receipts) {
+    private List<ReceiptDto> convertReceiptDtoList(@NotNull List<@NotNull Receipt> receipts) {
         Type listType = new TypeToken<List<ReceiptDto>>(){}.getType();
         return modelMapper.map(receipts, listType);
     }
@@ -434,7 +432,7 @@ public class TradingSystemFacade {
      * @param products - list of products
      * @return  list of ProductDto
      */
-    private List<ProductDto> convertProductDtoList(List<Product> products) {
+    private List<ProductDto> convertProductDtoList(@NotNull List<@NotNull Product> products) {
         Type listType = new TypeToken<List<ProductDto>>(){}.getType();
         return modelMapper.map(products, listType);
     }
@@ -444,7 +442,7 @@ public class TradingSystemFacade {
      * @param productDtos - list of productDtos
      * @return list of products
      */
-    private List<Product> converterProductsList(List<ProductDto> productDtos) {
+    private List<Product> converterProductsList(@NotNull List<@NotNull ProductDto> productDtos) {
         Type listType = new TypeToken<List<Product>>(){}.getType();
         return modelMapper.map(productDtos, listType);
     }
