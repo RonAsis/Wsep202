@@ -1,7 +1,9 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.invocation.InvocationOnMock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 
+@ExtendWith(SpringExtension.class)
 class TradingSystemTest {
 
     private TradingSystem tradingSystem;
@@ -306,7 +309,7 @@ public class TradingSystemTestIntegration {
         List<Product> products = setUpProductsForFilterTests();
         List<Store> stores = (setUpStoresForFilterTests(products));
         Set<Store> storesSet = new HashSet<>((stores));
-        tradingSystem = new TradingSystem(externalServiceManagement, storesSet);
+        tradingSystem = new TradingSystem(new ExternalServiceManagement(), storesSet);
 
         // the tests
         for (int rank = -1; rank < 100; rank++) {
