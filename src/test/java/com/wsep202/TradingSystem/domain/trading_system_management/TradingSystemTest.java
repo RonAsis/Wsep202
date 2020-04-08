@@ -216,9 +216,10 @@ class TradingSystemTest {
 public class TradingSystemTestIntegration {
 
     ExternalServiceManagement externalServiceManagement;
+
     @BeforeEach
     void setUp() {
-        ExternalServiceManagement externalServiceManagement = new ExternalServiceManagement();
+        externalServiceManagement = new ExternalServiceManagement();
         tradingSystem = new TradingSystem(externalServiceManagement);
     }
 
