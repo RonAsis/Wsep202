@@ -350,7 +350,8 @@ public class TradingSystemFacade {
      */
     public List<ProductDto> filterByStoreCategory(List<ProductDto> productDtos, String category) {
         List<Product> products = converterProductsList(productDtos);
-        List<Product> productsFiltered = tradingSystem.filterByStoreCategory(products, category);
+        ProductCategory productCategory = ProductCategory.getProductCategory(category);
+        List<Product> productsFiltered = tradingSystem.filterByStoreCategory(products, productCategory);
         return convertProductDtoList(productsFiltered);
     }
 

@@ -423,7 +423,7 @@ class TradingSystemFacadeTest {
             String category = ProductCategory.values()[0].category;
             List<Product> products = new ArrayList<>(setUpProducts());
             List<ProductDto> productsDtoArg = convertProductDtoList(products);
-            when(tradingSystem.filterByStoreCategory(products,category)).thenReturn(products);
+            when(tradingSystem.filterByStoreCategory(products,ProductCategory.getProductCategory(category))).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.filterByStoreCategory(productsDtoArg, category);
             assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
