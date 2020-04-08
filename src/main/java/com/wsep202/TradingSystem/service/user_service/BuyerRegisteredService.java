@@ -1,7 +1,10 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.service.user_service.dto.PurchaseHistoryDto;
+import com.wsep202.TradingSystem.service.user_service.dto.DiscountPolicyDto;
+import com.wsep202.TradingSystem.service.user_service.dto.PurchasePolicyDto;
+import com.wsep202.TradingSystem.service.user_service.dto.ReceiptDto;
+import com.wsep202.TradingSystem.service.user_service.dto.ShoppingCartDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,7 @@ public class BuyerRegisteredService {
     /**
      * open store
      */
-    public boolean openStore(String usernameOwner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, String discountType,
+    public boolean openStore(String usernameOwner, PurchasePolicyDto purchasePolicy, DiscountPolicyDto discountPolicy, String discountType,
                              String purchaseType, String storeName){
         return  tradingSystemFacade.openStore(usernameOwner, purchasePolicy, discountPolicy, discountType, purchaseType, storeName);
     }
@@ -33,7 +36,7 @@ public class BuyerRegisteredService {
     /**
      * View buyer purchase history
      */
-    public List<Receipt> viewPurchaseHistory(String userName){
+    public List<ReceiptDto> viewPurchaseHistory(String userName){
         return tradingSystemFacade.viewPurchaseHistory(userName);
     }
 
@@ -48,7 +51,7 @@ public class BuyerRegisteredService {
     /**
      * view product in shopping bag
      */
-    public ShoppingCart viewProductsInShoppingCart(String userName){
+    public ShoppingCartDto viewProductsInShoppingCart(String userName){
         return tradingSystemFacade.viewProductsInShoppingCart(userName);
     }
 
@@ -62,7 +65,7 @@ public class BuyerRegisteredService {
     /**
      * purchase shopping cart
      */
-    public Receipt purchaseShoppingCart(String userName){
+    public ReceiptDto purchaseShoppingCart(String userName){
         return tradingSystemFacade.purchaseShoppingCart(userName);
     }
 

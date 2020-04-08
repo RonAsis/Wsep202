@@ -231,5 +231,4 @@ public class TradingSystem {
     public boolean openStore(UserSystem user, DiscountType discountTypeObj, PurchaseType purchaseTypeObj, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, String storeName) {
         return false;
     }
-
 }
