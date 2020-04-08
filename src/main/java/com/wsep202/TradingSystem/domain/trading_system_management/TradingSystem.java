@@ -1,9 +1,12 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class TradingSystem {
@@ -24,6 +27,14 @@ public class TradingSystem {
         externalServiceManagement.connect();
     }
 
+    public TradingSystem(ExternalServiceManagement externalServiceManagement, Set<Store> stores) {
+        this.stores = stores;
+        users = new HashSet<>();
+        administrators = new HashSet<>();
+        this.externalServiceManagement = externalServiceManagement;
+        externalServiceManagement.connect();
+    }
+
     /**
      * buy the shopping cart
      */
@@ -31,8 +42,6 @@ public class TradingSystem {
         //TODO
         return null;
     }
-
-
 
     /**
      * register new user
@@ -130,7 +139,6 @@ public class TradingSystem {
         return storeOptional.orElseThrow(() -> new StoreDontExistsException(storeId));
     }
 
-
     public UserSystem getUser(String username) throws UserDontExistInTheSystemException {
         Optional<UserSystem> userOpt = getUserOpt(username);
         return userOpt.orElseThrow(() -> new UserDontExistInTheSystemException(username));
@@ -160,20 +168,56 @@ public class TradingSystem {
         return null;
     }
 
-    public List<Product> filterByRangePrice(List<Product> products, double min, double max) {
-        return null;
+    /**
+     * filter products by range price
+     * @param products - the list of products
+     * @param min - min price
+     * @param max - max price
+     * @return - products filtered by range price
+     */
+    public List<Product> filterByRangePrice(@NotNull List<@NonNull Product> products, double min, double max) {
+        return products.stream()
+                .filter(product -> min <= product.getCost() && product.getCost() <= max)
+                .collect(Collectors.toList());
     }
 
-    public List<Product> filterByProductRank(List<Product> products, int rank) {
-        return null;
+    /**
+     * filter products by product rank
+     * @param products - the list of products
+     * @param rank - the minimum rank that want for product
+     * @return - list of products filtered product rank
+     */
+    public List<Product> filterByProductRank(@NotNull List<@NonNull Product> products, int rank) {
+        return products.stream()
+                .filter(product -> rank <= product.getRank())
+                .collect(Collectors.toList());
     }
 
-    public List<Product> filterByStoreRank(List<Product> products, int rank) {
-        return null;
+    /**
+     * filter products by store rank
+     * @param products - the list of products
+     * @param rank - the store rank
+     * @return list of products filtered by store rank
+     */
+    public List<Product> filterByStoreRank(@NotNull List<@NonNull Product> products, int rank) {
+        return products.stream()
+                .filter(product -> {
+                    Store store = getStore(product.getStoreId());
+                    return rank <= store.getRank();
+                })
+                .collect(Collectors.toList());
     }
 
-    public List<Product> filterByStoreCategory(List<Product> products, String category) {
-        return  null;
+    /**
+     * filter products by category
+     * @param products - the list of products
+     * @param category - the category that want get the products for
+     * @return list of products filtered by category
+     */
+    public List<Product> filterByStoreCategory(@NotNull List<@NonNull Product> products, @NotNull ProductCategory category) {
+        return products.stream()
+                .filter(product -> category == product.getCategory())
+                .collect(Collectors.toList());
     }
 
     public Receipt purchaseShoppingCart(ShoppingCart shoppingCart) {

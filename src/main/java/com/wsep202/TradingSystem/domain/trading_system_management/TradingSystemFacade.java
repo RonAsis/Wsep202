@@ -223,7 +223,8 @@ public class TradingSystemFacade {
     }
 
     public List<Product> filterByStoreCategory(List<Product> products, String category) {
-        return tradingSystem.filterByStoreCategory(products, category);
+        ProductCategory productCategory = ProductCategory.getProductCategory(category);
+        return tradingSystem.filterByStoreCategory(products, productCategory);
     }
 
     public boolean saveProductInShoppingBag(String username, int id, int storeId, int productSn) {
