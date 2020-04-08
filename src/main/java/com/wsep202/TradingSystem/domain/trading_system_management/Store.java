@@ -22,11 +22,14 @@ public class Store {
 
     private String storeName;
 
-    private Map<UserSystem, Set<UserSystem>> appointedOwners;
+    @Builder.Default
+    private Map<UserSystem, Set<UserSystem>> appointedOwners = new HashMap<>();
 
-    private Map<UserSystem, Set<MangerStore>> appointedManagers;
+    @Builder.Default
+    private Map<UserSystem, Set<MangerStore>> appointedManagers = new HashMap<>();
 
-    private Map<ProductCategory, Set<Product>> products;
+    @Builder.Default
+    Set<Product> products= new HashSet<>();
 
     private PurchasePolicy purchasePolicy;
 
@@ -38,14 +41,15 @@ public class Store {
 
     private Set<UserSystem> owners ;
 
-    private List<Receipt> receipts;
+    @Builder.Default
+    private List<Receipt> receipts = new LinkedList<>();
 
     private int rank;
 
     public Store(UserSystem owner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, DiscountType discountType, PurchaseType purchaseType, String storeName){
         appointedOwners = new HashMap<>();
         appointedManagers = new HashMap<>();
-        products = new HashMap<>();
+        products = new HashSet<>();
         owners = new HashSet<>();
         this.storeName = storeName;
         owners.add(owner);
@@ -84,20 +88,6 @@ public class Store {
             appointed = true;
         }
         return appointed;
-    }
-
-    /**
-     * get product filtered by categories
-     */
-    public Set<Product> getProductFilterByCategory(Set<ProductCategory> categories) {
-        return products.entrySet().stream()
-                .filter(entry -> categories.contains(entry.getKey()))
-                .map(Map.Entry::getValue)
-                .reduce(new HashSet<>(),
-                        (cur, acc) -> {
-                            acc.addAll(cur);
-                            return acc;
-                        });
     }
 
     /**

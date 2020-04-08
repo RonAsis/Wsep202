@@ -1,12 +1,14 @@
 package com.wsep202.TradingSystem.service.user_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Builder
+@Slf4j
 public class ProductDto {
 
     private int productSn;

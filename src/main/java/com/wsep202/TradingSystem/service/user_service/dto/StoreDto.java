@@ -18,7 +18,7 @@ public class StoreDto {
 
     private String storeName;
 
-    private Map<ProductCategory, Set<ProductDto>> products;
+    private  Set<ProductDto> products;
 
     private PurchasePolicyDto purchasePolicy;
 

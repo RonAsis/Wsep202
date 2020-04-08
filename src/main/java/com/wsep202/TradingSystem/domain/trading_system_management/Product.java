@@ -1,8 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.Max;
@@ -10,8 +8,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Getter
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Slf4j
 public class Product {

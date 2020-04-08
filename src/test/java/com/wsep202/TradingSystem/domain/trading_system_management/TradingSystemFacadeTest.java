@@ -10,15 +10,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import static org.mockito.Mockito.*;
-
+import org.junit.platform.commons.util.CollectionUtils;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.lang.reflect.Type;
 import java.util.*;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @WithModelMapper(basePackageClasses = TradingSystemMapper.class)
@@ -343,131 +345,162 @@ class TradingSystemFacadeTest {
             assertionStore(store, storeDto);
         }
 
-
         @Test
         void viewProduct() {
+            //init
+            int storeId = 1;
+            int productId = 1;
+            Product product = createProduct(productId);
+
+            //mock
+            when(tradingSystem.getStore(storeId)).thenReturn(store);
+            when(store.getProduct(productId)).thenReturn(product);
+            ProductDto productDto = tradingSystemFacade.viewProduct(storeId, productId);
+            assertProduct(product, productDto);
         }
 
         @Test
         void searchProductByName() {
+            List<Product> products = new ArrayList<>(setUpProducts());
+            String productName = "productName";
+            when(tradingSystem.searchProductByName(productName)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.searchProductByName(productName);
+            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
         void searchProductByCategory() {
+            String category = ProductCategory.values()[0].category;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            when(tradingSystem.searchProductByCategory(ProductCategory.getProductCategory(category))).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.searchProductByCategory(category);
+            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
         void searchProductByKeyWords() {
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<String> keyWords = new LinkedList<>();
+            keyWords.add("test-key-words");
+            when(tradingSystem.searchProductByKeyWords(keyWords)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.searchProductByKeyWords(keyWords);
+            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
         void filterByRangePrice() {
+            int minPrice = 0;
+            int maxPrice = 10;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<ProductDto> productsDtoArg = convertProductDtoList(products);
+            when(tradingSystem.filterByRangePrice(products, minPrice, maxPrice)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.filterByRangePrice(productsDtoArg, minPrice, maxPrice);
+            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
         void filterByProductRank() {
+            int rank = 0;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<ProductDto> productsDtoArg = convertProductDtoList(products);
+            when(tradingSystem.filterByProductRank(products,rank)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.filterByProductRank(productsDtoArg, rank);
+            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
         void filterByStoreRank() {
+            int rank = 0;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<ProductDto> productsDtoArg = convertProductDtoList(products);
+            when(tradingSystem.filterByStoreRank(products,rank)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.filterByStoreRank(productsDtoArg, rank);
+            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
         void filterByStoreCategory() {
+            String category = ProductCategory.values()[0].category;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<ProductDto> productsDtoArg = convertProductDtoList(products);
+            when(tradingSystem.filterByStoreCategory(products,category)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.filterByStoreCategory(productsDtoArg, category);
+            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
         void saveProductInShoppingBag() {
+            //initial
+            String username = "username";
+            int storeId = 1;
+            int productSn = 1;
+            int amount = 1;
+
+            //mock
+            Product product = mock(Product.class);
+            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(tradingSystem.getStore(storeId)).thenReturn(store);
+            when(store.getProduct(productSn)).thenReturn(product);
+            when(userSystem.saveProductInShoppingBag(store, product, amount)).thenReturn(true);
+
+            Assertions.assertTrue(tradingSystemFacade.saveProductInShoppingBag(username, storeId, productSn, amount));
         }
 
         @Test
         void viewProductsInShoppingCart() {
+            //init
+            String username = "username";
+            ShoppingCart shoppingCart = createShoppingCart();
+            //mock
+            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(userSystem.getShoppingCart()).thenReturn(shoppingCart);
+            ShoppingCartDto shoppingCartDto = tradingSystemFacade.viewProductsInShoppingCart(username);
+            assertShoppingCart(shoppingCart, shoppingCartDto);
         }
 
         @Test
         void removeProductInShoppingBag() {
+            //initial
+            String username = "username";
+            int storeId = 1;
+            int productSn = 1;
+
+            //mock
+            Product product = mock(Product.class);
+            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(tradingSystem.getStore(storeId)).thenReturn(store);
+            when(store.getProduct(productSn)).thenReturn(product);
+            when(userSystem.removeProductInShoppingBag(store, product)).thenReturn(true);
+            Assertions.assertTrue(userSystem.removeProductInShoppingBag(store, product));
         }
 
         @Test
         void purchaseShoppingCart() {
+            //init
+            ShoppingCart shoppingCart = createShoppingCart();
+            ShoppingCartDto shoppingCartDto =  modelMapper.map(shoppingCart, ShoppingCartDto.class);
+            List<Receipt> receipts = setUpReceipts();
+            Receipt receipt = receipts.get(0);
+
+            when(tradingSystem.purchaseShoppingCart(any(ShoppingCart.class))).thenReturn(receipt);
+            ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto);
+            assertRecipes(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
         }
 
         @Test
         void testPurchaseShoppingCart() {
-        }
+            //init
+            String username = "username";
+            ShoppingCart shoppingCart = createShoppingCart();
+            ShoppingCartDto shoppingCartDto =  modelMapper.map(shoppingCart, ShoppingCartDto.class);
+            List<Receipt> receipts = setUpReceipts();
+            Receipt receipt = receipts.get(0);
 
-        private void assertionStore(Store store, StoreDto storeDto) {
-            Assertions.assertEquals(store.getStoreId(), storeDto.getStoreId());
-            Assertions.assertEquals(store.getStoreName(), storeDto.getStoreName());
-            assertProducts(store.getProducts(), storeDto.getProducts());
-            assertPurchasePolicy(store.getPurchasePolicy(), storeDto.getPurchasePolicy());
-            assertDiscountPolicy(store.getDiscountPolicy(), storeDto.getDiscountPolicy());
-            Assertions.assertEquals(store.getDiscountType().type, storeDto.getDiscountType());
-            Assertions.assertEquals(store.getPurchaseType().type, storeDto.getPurchaseType());
-            assertUserSystem(store.getOwners(), storeDto.getOwners());
-            assertRecipes(store.getReceipts(), storeDto.getReceipts());
-            Assertions.assertEquals(store.getRank(), storeDto.getRank());
-        }
-
-
-        private List<ReceiptDto> receipts;
-
-        private void assertUserSystem(Set<UserSystem> userSystems, Set<UserSystemDto> userSystemDtos) {
-            userSystems.forEach(userSystemExpected -> {
-                Optional<UserSystemDto> userSystemOptional = userSystemDtos.stream()
-                        .filter(userSystem1 -> userSystem1.getUserName().equals(userSystemExpected.getUserName()))
-                        .findFirst();
-                Assertions.assertTrue(userSystemOptional.isPresent());
-                UserSystemDto userSystemDto = userSystemOptional.get();
-                Assertions.assertEquals(userSystemExpected.getUserName(), userSystemDto.getUserName());
-                Assertions.assertEquals(userSystemExpected.getFirstName(), userSystemDto.getFirstName());
-                Assertions.assertEquals(userSystemExpected.getLastName(), userSystemDto.getLastName());
-                assertSetStore(userSystemExpected.getOwnedStores(), userSystemDto.getOwnedStores());
-                assertSetStore(userSystemExpected.getManagedStores(), userSystemDto.getManagedStores());
-                assertShoppingCart(userSystemExpected.getShoppingCart(), userSystemDto.getShoppingCart());
-                assertRecipes(userSystemExpected.getReceipts(), userSystemDto.getReceipts());
-            });
-        }
-
-        private void assertShoppingCart(ShoppingCart shoppingCartExpected, ShoppingCartDto shoppingCartActual) {
-            shoppingCartExpected.getShoppingBags().forEach((storeKey, shoppingBagExpected) -> {
-                ShoppingBagDto shoppingBagDto = shoppingCartActual.getShoppingBags().get(storeKey);
-                Assertions.assertNotNull(shoppingBagDto);
-                Assertions.assertEquals(shoppingBagExpected.getMapProductSnToAmount(), shoppingBagDto.getMapProductSnToAmount());
-            });
-        }
-
-        private void assertSetStore(Set<Store> stores, Set<StoreDto> storeDtos) {
-            stores.forEach(
-                    storeExpected -> {
-                        Optional<StoreDto> storeDtoOpt = storeDtos.stream()
-                                .filter(storeDto -> storeDto.getStoreId() == storeExpected.getStoreId())
-                                .findFirst();
-                        Assertions.assertTrue(storeDtoOpt.isPresent());
-                        StoreDto storeDto = storeDtoOpt.get();
-                        assertionStore(storeExpected, storeDto);
-                    }
-            );
-        }
-
-        private void assertPurchasePolicy(PurchasePolicy purchasePolicy, PurchasePolicyDto purchasePolicy1) {
-            //TODO when PurchasePolicy and PurchasePolicyDto are ready
-        }
-
-        private void assertProducts(Map<ProductCategory, Set<Product>> products, Map<ProductCategory, Set<ProductDto>> products1) {
-        }
-
-        private void assertDiscountPolicy(DiscountPolicy discountPolicy, DiscountPolicyDto discountPolicy1) {
-            //TODO when discountPolicy and DiscountPolicyDto are ready
-        }
-
-        private void assertRecipes(List<Receipt> receipts, List<ReceiptDto> receiptDtos) {
-            Assertions.assertEquals(receipts.size(), receiptDtos.size());
-            receipts.forEach(
-                    receipt -> {
-                        //TODO - compare the receipts
-                    }
-            );
+            //mock
+            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(tradingSystem.purchaseShoppingCart(userSystem)).thenReturn(receipt);
+            ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(username);
+            assertRecipes(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
         }
 
         private List<Receipt> setUpReceipts() {
@@ -517,6 +550,7 @@ class TradingSystemFacadeTest {
             Set<Store> stores = new HashSet<>();
             for (int counter = 0; counter <= 10; counter++) {
                 stores.add(Store.builder()
+                        .storeId(counter)
                         .discountType(DiscountType.OPEN_DISCOUNT)
                         .purchaseType(PurchaseType.BUY_IMMEDIATELY)
                         .storeName("storeName" + counter)
@@ -533,9 +567,7 @@ class TradingSystemFacadeTest {
             String storeName = "storeName";
 
             //init products
-            Map<ProductCategory, Set<Product>> products = new HashMap<>();
-            Set<Product> productsSet = setUpProducts();
-            products.putIfAbsent(ProductCategory.BOOKS_MOVIES_MUSIC, productsSet);
+            Set<Product> products =  setUpProducts();
 
             PurchasePolicy purchasePolicy = new PurchasePolicy();
             DiscountPolicy discountPolicy = new DiscountPolicy();
@@ -555,7 +587,38 @@ class TradingSystemFacadeTest {
                     .purchasePolicy(purchasePolicy)
                     .build();
         }
+
+        private Product createProduct(int productId) {
+            return Product.builder()
+                    .storeId(productId)
+                    .category(ProductCategory.values()[productId % ProductCategory.values().length])
+                    .rank(productId)
+                    .cost(productId)
+                    .amount(productId)
+                    .name("product" + productId)
+                    .productSn(productId)
+                    .build();
+        }
+
+        private ShoppingCart createShoppingCart() {
+            //create shoppingBags
+            Map<Integer, Integer> shoppingBagMap = new HashMap<>();
+            for(int counter =0; counter< 10 ; counter++){
+                shoppingBagMap.put(counter, counter);
+            }
+            ShoppingBag shoppingBag = new ShoppingBag(shoppingBagMap);
+
+            Map<Store, ShoppingBag> shoppingBags = new HashMap<>();
+            Set<Store> stores = setUpStores();
+            stores.forEach(store1 -> shoppingBags.put(store1, shoppingBag));
+
+            // create ShoppingCart
+            return ShoppingCart.builder()
+                    .shoppingBags(shoppingBags)
+                    .build();
+        }
     }
+
 
     ///////////////////////////////integration test /////////////////////
     @Nested
@@ -685,5 +748,105 @@ class TradingSystemFacadeTest {
         @Test
         void testPurchaseShoppingCart() {
         }
+    }
+
+    ///////////////////////////////////////// assert functions ///////////////////////////
+    private void assertUserSystem(Set<UserSystem> userSystems, Set<UserSystemDto> userSystemDtos) {
+        if (Objects.nonNull(userSystems)) {
+            userSystems.forEach(userSystemExpected -> {
+                Optional<UserSystemDto> userSystemOptional = userSystemDtos.stream()
+                        .filter(userSystem1 -> userSystem1.getUserName().equals(userSystemExpected.getUserName()))
+                        .findFirst();
+                Assertions.assertTrue(userSystemOptional.isPresent());
+                UserSystemDto userSystemDto = userSystemOptional.get();
+                Assertions.assertEquals(userSystemExpected.getUserName(), userSystemDto.getUserName());
+                Assertions.assertEquals(userSystemExpected.getFirstName(), userSystemDto.getFirstName());
+                Assertions.assertEquals(userSystemExpected.getLastName(), userSystemDto.getLastName());
+                assertSetStore(userSystemExpected.getOwnedStores(), userSystemDto.getOwnedStores());
+                assertSetStore(userSystemExpected.getManagedStores(), userSystemDto.getManagedStores());
+                assertShoppingCart(userSystemExpected.getShoppingCart(), userSystemDto.getShoppingCart());
+                assertRecipes(userSystemExpected.getReceipts(), userSystemDto.getReceipts());
+            });
+        }
+    }
+
+    private void assertShoppingCart(ShoppingCart shoppingCartExpected, ShoppingCartDto shoppingCartActual) {
+        shoppingCartExpected.getShoppingBags().forEach((storeKey, shoppingBagExpected) -> {
+            Map.Entry<StoreDto, ShoppingBagDto> storeDtoShoppingBagDtoEntry = shoppingCartActual.getShoppingBags().entrySet().stream()
+                    .filter(entry -> entry.getKey().getStoreId() == storeKey.getStoreId())
+                    .findFirst().orElseThrow(RuntimeException::new);
+            ShoppingBagDto shoppingBagDto = storeDtoShoppingBagDtoEntry.getValue();
+            Assertions.assertNotNull(shoppingBagDto);
+            Assertions.assertEquals(shoppingBagExpected.getMapProductSnToAmount(), shoppingBagDto.getMapProductSnToAmount());
+        });
+    }
+
+    private void assertSetStore(Set<Store> stores, Set<StoreDto> storeDtos) {
+        stores.forEach(
+                storeExpected -> {
+                    Optional<StoreDto> storeDtoOpt = storeDtos.stream()
+                            .filter(storeDto -> storeDto.getStoreId() == storeExpected.getStoreId())
+                            .findFirst();
+                    Assertions.assertTrue(storeDtoOpt.isPresent());
+                    StoreDto storeDto = storeDtoOpt.get();
+                    assertionStore(storeExpected, storeDto);
+                }
+        );
+    }
+
+    private void assertPurchasePolicy(PurchasePolicy purchasePolicy, PurchasePolicyDto purchasePolicy1) {
+        //TODO when PurchasePolicy and PurchasePolicyDto are ready
+    }
+
+    private void assertProducts(Set<Product> products, Set<ProductDto> productsDtos) {
+        products.forEach(product -> {
+            Optional<ProductDto> productDtoOptional = productsDtos.stream().filter(productDto -> productDto.getProductSn() == product.getProductSn())
+                    .findFirst();
+            Assertions.assertTrue(productDtoOptional.isPresent());
+            assertProduct(product, productDtoOptional.get());
+
+        });
+    }
+
+    private void assertProduct(Product product, ProductDto productDto) {
+        Assertions.assertEquals(product.getProductSn(), productDto.getProductSn());
+        Assertions.assertEquals(product.getName(), productDto.getName());
+        Assertions.assertEquals(product.getCategory().category, productDto.getCategory());
+        Assertions.assertEquals(product.getAmount(), productDto.getAmount());
+        Assertions.assertEquals(product.getCost(), productDto.getCost());
+        Assertions.assertEquals(product.getRank(), productDto.getRank());
+        Assertions.assertEquals(product.getStoreId(), productDto.getStoreId());
+    }
+
+    private void assertDiscountPolicy(DiscountPolicy discountPolicy, DiscountPolicyDto discountPolicy1) {
+        //TODO when discountPolicy and DiscountPolicyDto are ready
+    }
+
+    private void assertRecipes(List<Receipt> receipts, List<ReceiptDto> receiptDtos) {
+        Assertions.assertEquals(receipts.size(), receiptDtos.size());
+        receipts.forEach(
+                receipt -> {
+                    //TODO - compare the receipts
+                }
+        );
+    }
+
+    private void assertionStore(Store store, StoreDto storeDto) {
+        Assertions.assertEquals(store.getStoreId(), storeDto.getStoreId());
+        Assertions.assertEquals(store.getStoreName(), storeDto.getStoreName());
+        assertProducts(store.getProducts(), storeDto.getProducts());
+        assertPurchasePolicy(store.getPurchasePolicy(), storeDto.getPurchasePolicy());
+        assertDiscountPolicy(store.getDiscountPolicy(), storeDto.getDiscountPolicy());
+        Assertions.assertEquals(store.getDiscountType().type, storeDto.getDiscountType());
+        Assertions.assertEquals(store.getPurchaseType().type, storeDto.getPurchaseType());
+        assertUserSystem(store.getOwners(), storeDto.getOwners());
+        assertRecipes(store.getReceipts(), storeDto.getReceipts());
+        Assertions.assertEquals(store.getRank(), storeDto.getRank());
+    }
+
+    /////////////////////////////////General /////////////////////////////////
+    private List<ProductDto> convertProductDtoList(List<Product> products) {
+        Type listType = new TypeToken<List<ProductDto>>(){}.getType();
+        return modelMapper.map(products, listType);
     }
 }

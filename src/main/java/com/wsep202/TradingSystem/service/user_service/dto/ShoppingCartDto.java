@@ -12,6 +12,6 @@ import java.util.Map;
 @NoArgsConstructor
 public class ShoppingCartDto {
 
-    private Map<Store, ShoppingBagDto> shoppingBags;
+    private Map<StoreDto, ShoppingBagDto> shoppingBags;
 
 }

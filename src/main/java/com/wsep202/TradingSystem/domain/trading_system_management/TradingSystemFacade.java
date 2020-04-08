@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -365,7 +366,7 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username);
         Store store = tradingSystem.getStore(storeId);
         Product product = store.getProduct(productSn);
-        return user.saveProductInShoppingBag(user, store, product, amount);
+        return user.saveProductInShoppingBag(store, product, amount);
     }
 
     /**
