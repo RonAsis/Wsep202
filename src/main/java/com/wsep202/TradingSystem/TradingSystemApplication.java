@@ -11,9 +11,8 @@ public class TradingSystemApplication {
 	private static final Logger logger = LoggerFactory.getLogger(TradingSystemApplication.class);
 	public static void main(String[] args) {
 		SpringApplication.run(TradingSystemApplication.class, args);
-		/*logger.info("this is a info message");
+		logger.info("this is a info message");
 		logger.warn("this is a warn message");
-		logger.error("this is a error message");*/
+		logger.error("this is a error message");
 	}
-
 }
