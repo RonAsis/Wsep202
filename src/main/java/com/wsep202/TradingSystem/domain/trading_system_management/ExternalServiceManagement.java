@@ -7,7 +7,13 @@ public class ExternalServiceManagement {
         //TODO
     }
 
+    /**
+     * Request to get hashed password from the Security system.
+     * @param password - password received from the user
+     * @return hashedPass - password after encryption
+     */
     public String encryptPassword(String password) {
-        return null;
+        String hashedPass = null;
+        return hashedPass;
     }
 }
