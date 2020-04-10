@@ -1,5 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
+import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.invocation.InvocationOnMock;
@@ -16,7 +18,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 class TradingSystemTest {
 
+    ExternalServiceManagement externalServiceManagement;
     private TradingSystem tradingSystem;
+    private UserSystem userSystem;
+    private UserSystem userToRegister;
+    private FactoryObjects factoryObjects;
 
     @AfterEach
     void tearDown() {
@@ -30,31 +36,108 @@ class TradingSystemTest {
 
         @BeforeEach
         void setUp() {
-            ExternalServiceManagement externalServiceManagement = mock(ExternalServiceManagement.class);
+             externalServiceManagement = mock(ExternalServiceManagement.class);
             tradingSystem = new TradingSystem(externalServiceManagement);
             doNothing().when(externalServiceManagement).connect();
+            userSystem = mock(UserSystem.class);
+            factoryObjects = new FactoryObjects();
+            String username = "usernameTest";
+            String password = "passwordTest";
+            String fName = "moti";
+            String lName = "Banana";
+            userToRegister = new UserSystem(username,fName,lName,password);
+
         }
 
+        //TODO create the test after we will know the identity of the admin name
+        //TODO and after creation of register Admin tests
+        @Test
+        void isAdmin(){
+
+        }
         @Test
         void buyShoppingCart() {
         }
 
+        /**
+         * the following checks registration of valid user
+         */
         @Test
         void registerNewUser() {
+            //setup
+            //the following user details are necessary for the login tests
+            Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister));
         }
 
+        /**
+         * checks handling with failure of registration
+         * this test has to run after its respective positive test
+         */
+        @Test
+        void registerNewUserNegative() {
+            //registration with already registered user
+            Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister)); //setup
+            Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
+        }
+
+    /*  the following tested method is private
+        @Test
+        void isRegisteredUser(){
+            when(userSystem.getUserName()).thenReturn("usernameTest");
+            Assertions.assertTrue(tradingSystem.isRegisteredUser(userSystem));
+        }
+        */
         @Test
         void login() {
+            //check login of regular user
+            loginRegularUser();
+            //check login of admin
+            //TODO
         }
-
         @Test
-        void closeStore() {
+        void loginRegularUser(){
+            //mockup
+            when(userSystem.getUserName()).thenReturn("usernameTest");
+            doNothing().when(userSystem).login();
+            //the following register should register usernameTest as username
+            // and passwordTest as password
+            registerNewUser();  //register user test as setup for login
+            boolean ans = tradingSystem.login(userSystem,false,"passwordTest");
+            Assertions.assertTrue(ans);
         }
 
+        /**
+         * test handling with login failure
+         */
+        @Test
+        void loginRegularUserNegative(){
+            //mockup
+            when(userSystem.getUserName()).thenReturn("usernameTest");
+            doNothing().when(userSystem).login();
+            boolean ans = tradingSystem.login(userSystem,false,"passwordTest");
+            Assertions.assertFalse(ans);
+        }
+
+        /**
+         * check the logout functionality of exists user in the system
+         */
         @Test
         void logout() {
+            //mockup
+            when(userSystem.isLogin()).thenReturn(true);
+            Assertions.assertTrue(tradingSystem.logout(userSystem));
+        }
+        /**
+         * check handling with logout failure
+         */
+        @Test
+        void logoutNegative() {
+            //mockup
+            when(userSystem.isLogin()).thenReturn(false);
+            Assertions.assertFalse(tradingSystem.logout(userSystem));
         }
 
+        //TODO after we will know how to register we'll test it and the we test the getter bellow
         @Test
         void getAdministratorUser() {
         }
@@ -205,6 +288,7 @@ class TradingSystemTest {
         }
         return stores;
     }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,33 +300,94 @@ class TradingSystemTest {
 public class TradingSystemTestIntegration {
 
     ExternalServiceManagement externalServiceManagement;
-
+    private TradingSystem tradingSystem;
+    private UserSystem userSystem;
+    private UserSystem userToRegister;
+    private FactoryObjects factoryObjects;
     @BeforeEach
     void setUp() {
-        externalServiceManagement = new ExternalServiceManagement();
+        externalServiceManagement = mock(ExternalServiceManagement.class);
         tradingSystem = new TradingSystem(externalServiceManagement);
+        //doNothing().when(externalServiceManagement).connect();
+        factoryObjects = new FactoryObjects();
+        String username = "usernameTest";
+        String password = "passwordTest";
+        String fName = "moti";
+        String lName = "Banana";
+        userToRegister = new UserSystem(username,fName,lName,password);
+
+
     }
 
     @Test
     void buyShoppingCart() {
     }
 
+    /**
+     * the following checks registration of valid user
+     */
     @Test
     void registerNewUser() {
+        //setup
+        //the following user details are necessary for the login tests
+        Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister));
+    }
+
+    /**
+     * checks handling with failure of registration
+     * this test has to run after its respective positive test
+     */
+    @Test
+    void registerNewUserNegative() {
+        //registration with already registered user
+        Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister)); //setup
+        Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
     }
 
     @Test
     void login() {
+        //check login of regular user
+        loginRegularUser();
+        //check login of admin
+        //TODO
     }
-
     @Test
-    void closeStore() {
+    void loginRegularUser(){
+        //the following register should register usernameTest as username
+        // and passwordTest as password
+        registerNewUser();  //register user test as setup for login
+        boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
+        Assertions.assertTrue(ans);
     }
 
+    /**
+     * test handling with login failure
+     */
+    @Test
+    void loginRegularUserNegative(){
+        boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
+        Assertions.assertFalse(ans);
+    }
+
+
+    /**
+     * check the logout functionality of exists user in the system
+     */
     @Test
     void logout() {
+        //setup of login for the logout
+        UserSystem user = factoryObjects.createSystemUser("usernameTest","Moti","Banana","passwordTest");
+        loginRegularUser();
+        Assertions.assertTrue(tradingSystem.logout(userToRegister));
     }
 
+    /**
+     * check handling with logout failure
+     */
+    @Test
+    void logoutNegative() {
+        Assertions.assertFalse(tradingSystem.logout(userToRegister));
+    }
     @Test
     void getAdministratorUser() {
     }
@@ -385,5 +530,6 @@ public class TradingSystemTestIntegration {
         }
         return stores;
     }
+
 }
 }

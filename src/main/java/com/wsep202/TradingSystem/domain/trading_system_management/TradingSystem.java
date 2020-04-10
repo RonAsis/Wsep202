@@ -51,16 +51,17 @@ public class TradingSystem {
         boolean isRegistered = isRegisteredUser(userToRegister);
         if (!isRegistered) {
             users.add(userToRegister);
+            return true;
         }
-        return !isRegistered;
+        return false;
     }
 
     /**
      *
      */
     public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
-        //TODO
-        return isAdmin ? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
+        //TODO to check encrypted user password against password received
+        return !isAdmin ? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
     }
 
     private boolean loginAdministrator(UserSystem userToLogin) {
@@ -78,27 +79,31 @@ public class TradingSystem {
                 .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
     }
 
+    /**
+     * login the userToLogin in the system in case he is registered
+     * @param userToLogin
+     * @return true upon success, else false
+     */
     private boolean loginRegularUser(UserSystem userToLogin) {
         boolean isRegistered = isRegisteredUser(userToLogin);
-        boolean suc = false;
+        boolean isSuccess = false;
         if (isRegistered && !userToLogin.isLogin()) {
             userToLogin.login();
-            suc = true;
+            isSuccess = true;
         }
-        return suc;
+        return isSuccess;
     }
 
+    /**
+     * Checks if serToRegister is registered in the system
+     * @param userToRegister
+     * @return true if there is match of such userv in the system, else false.
+     */
     private boolean isRegisteredUser(UserSystem userToRegister) {
         return users.stream()
                 .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
     }
 
-    public boolean closeStore(Store store) {
-
-        //need remove from owner, managers//TODO
-
-        return stores.remove(store);
-    }
 
     private Optional<UserSystem> getUserOpt(String username) {
         return users.stream()
@@ -106,22 +111,48 @@ public class TradingSystem {
                 .findFirst();
     }
 
+    /**
+     * logout the user from the system
+     * @param user
+     * @return true if logged out, otherwise false
+     */
     public boolean logout(UserSystem user) {
-        user.logout();
-        return true;
+        if(user.isLogin()){
+            user.logout();
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * returns the User system object match the received string in case its an admin user
+     * otherwise throw exception
+     * @param administratorUsername
+     * @return administrator type user
+     */
     public UserSystem getAdministratorUser(String administratorUsername) {
         return getAdministratorUserOpt(administratorUsername)
                 .orElseThrow(() -> new NotAdministratorException(administratorUsername));
     }
 
+    /**
+     * search for administratorUsername as administrator in the
+     * @param administratorUsername
+     * @return administrator as user system in case found natch
+     * or else return null.
+     */
     private Optional<UserSystem> getAdministratorUserOpt(String administratorUsername) {
         return administrators.stream()
                 .filter(user -> user.getUserName().equals(administratorUsername))
                 .findFirst();
     }
 
+    /**
+     * checks if the 'administratorUsername' is registered as administrator in the system.
+     * @param administratorUsername
+     * @return true if found admin with the received username
+     * otherwise returns false
+     */
     private boolean isAdmin(String administratorUsername) {
         return getAdministratorUserOpt(administratorUsername).isPresent();
     }
