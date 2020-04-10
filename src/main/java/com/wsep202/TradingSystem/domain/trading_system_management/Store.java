@@ -176,4 +176,8 @@ public class Store {
                 .findFirst().orElseThrow(()-> new NoManagerInStoreException(managerUserName, storeId))
                 .getAppointedManager();
     }
+
+    public String getStoreName(){
+        return this.storeName;
+    }
 }

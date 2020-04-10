@@ -36,7 +36,7 @@ public class TradingSystem {
     }
 
     /**
-     * buy the shopping cart
+     * @ksenia TODO this method OR DELETE IT
      */
     public Receipt buyShoppingCart(UserSystem userSystem) {
         //TODO
@@ -44,21 +44,37 @@ public class TradingSystem {
     }
 
     /**
-     * register new user
+     * This method is used to register a new user in the system,
+     * this method uses the method isRegisteredUser to check if the user is already registered.
+     * In the process of registration the system will encrypt the users password.
+     * @param userToRegister - the user that needs to be registered
+     * @return true if the registration was successful, returns false if the user is already registered
+     * @version 1.0
      */
     public boolean registerNewUser(UserSystem userToRegister) {
-        userToRegister.setPassword(externalServiceManagement.encryptPassword(userToRegister.getPassword()));
-        boolean isRegistered = isRegisteredUser(userToRegister);
-        if (!isRegistered) {
+        if (!isRegisteredUser(userToRegister)) {
             users.add(userToRegister);
+            userToRegister.setPassword(externalServiceManagement.encryptPassword(userToRegister.getPassword()));
+            //log.info("TradingSystem.registerNewUser: a new user was registered in the system");
             return true;
         }
+        //log.error("TradingSystem.registerNewUser: the user is already registered");
         return false;
     }
 
-    /**
-     *
-     */
+    public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+        boolean isRegistered = administrators.stream()
+                .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
+        if (!isRegistered){
+            //log.error("TradingSystem.login: a non registered user tries to login");
+            return false;
+        }
+        //TODO to check encrypted user password against password received
+        return true;
+    }
+
+
+    /*
     public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
         //TODO to check encrypted user password against password received
         return !isAdmin ? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
@@ -74,16 +90,13 @@ public class TradingSystem {
         return suc;
     }
 
-    private boolean isRegisteredAdministrator(UserSystem userToRegister) {
+    ate boolean isRegisteredAdministrator(UserSystem userToRegister) {
         return administrators.stream()
                 .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
+
     }
 
-    /**
-     * login the userToLogin in the system in case he is registered
-     * @param userToLogin
-     * @return true upon success, else false
-     */
+
     private boolean loginRegularUser(UserSystem userToLogin) {
         boolean isRegistered = isRegisteredUser(userToLogin);
         boolean isSuccess = false;
@@ -93,7 +106,7 @@ public class TradingSystem {
         }
         return isSuccess;
     }
-
+    */
     /**
      * Checks if serToRegister is registered in the system
      * @param userToRegister
@@ -250,16 +263,50 @@ public class TradingSystem {
                 .filter(product -> category == product.getCategory())
                 .collect(Collectors.toList());
     }
-
+    /**
+     * @ksenia TODO this method
+     */
     public Receipt purchaseShoppingCart(ShoppingCart shoppingCart) {
         return null;
     }
-
+    /**
+     * @ksenia TODO this method
+     */
     public Receipt purchaseShoppingCart(UserSystem user) {
         return null;
     }
 
-    public boolean openStore(UserSystem user, DiscountType discountTypeObj, PurchaseType purchaseTypeObj, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, String storeName) {
-        return false;
+    /**
+     * This method is used to open a new store in the system
+     * @param user - the user that wants to open the store
+     * @param discountTypeObj - the type of discount that can be in the store
+     * @param purchaseTypeObj - the type of purchase that can be in the store
+     * @param purchasePolicy -  a collection of purchase rules that the user has decided on for his store
+     * @param discountPolicy -  a collection of discount rules that the user has decided on for his store
+     * @param storeName - the name of the store that the user decided
+     * @return - false if the user is not registered, and true after the new store is added to store list
+     * @version 1.0
+     */
+    public boolean openStore(UserSystem user, DiscountType discountTypeObj, PurchaseType purchaseTypeObj, PurchasePolicy purchasePolicy,
+                             DiscountPolicy discountPolicy, String storeName) {
+        //log.info("TradingSystem.openStore: the method was called with the user who wishes to open the store, discount and purchase policies & types
+        // and a string of the name of the store");
+        if (!this.users.contains(user)) {//if the user is not registered to the system, he can't open a store
+            //log.error("TradingSystem.openStore: a non registered user tried to open a store");
+            return false;
+        }
+        Store newStore = new Store(user,purchasePolicy,discountPolicy,discountTypeObj,purchaseTypeObj,storeName);
+        this.stores.add(newStore);
+        user.addNewStore(newStore);
+        //log.info("TradingSystem.openStore: a new store was opened in the system");
+        return true;
+    }
+
+    public Set<Store> getStoresList(){
+        return this.stores;
+    }
+
+    public void setUsersList(Set<UserSystem> users){
+        this.users = users;
     }
 }

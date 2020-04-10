@@ -496,8 +496,43 @@ public class TradingSystemTestIntegration {
     void testPurchaseShoppingCart() {
     }
 
+    /**
+     * This test checks that the store's opening succeeds
+     */
     @Test
-    void openStore() {
+    void openStoreSuccess() {
+        Set<UserSystem> testUsersList = setUpUsersForOpenStoreTest();
+        //number of stores in the system before addition
+        int numOfStoreInSystemBefore = tradingSystem.getStoresList().size();
+        //all the parameters are correct, the method should return true
+        Assertions.assertTrue(tradingSystem.openStore((UserSystem)testUsersList.toArray()[0], DiscountType.OPEN_DISCOUNT, PurchaseType.BUY_IMMEDIATELY, new PurchasePolicy(),
+                new DiscountPolicy(), "Castro"));
+        //number of stores in the system after addition
+        int numOfStoreInSystemAfter = tradingSystem.getStoresList().size();
+        // numOfStoreInSystemBefore +1 == numOfStoreInSystemAfter
+        Assertions.assertFalse(numOfStoreInSystemBefore == numOfStoreInSystemAfter);
+        //all the parameters are correct, the method should return true
+        Assertions.assertTrue(tradingSystem.openStore((UserSystem)testUsersList.toArray()[1], DiscountType.OPEN_DISCOUNT, PurchaseType.BUY_IMMEDIATELY, new PurchasePolicy(),
+                new DiscountPolicy(), "Fox"));
+        // number of stores in the system should be 2
+        Assertions.assertTrue(tradingSystem.getStoresList().size() == 2);
+        // check if there is a store named 'Castro' in the system
+        Assertions.assertTrue(tradingSystem.getStoresList().stream()
+                .anyMatch(store -> store.getStoreName().equals("Castro")));
+    }
+
+    /**
+     * This test checks that the store's opening fails
+     */
+    @Test
+    void openStoreFail(){
+        int numOfStoreInSystemBefore = tradingSystem.getStoresList().size();
+        // the user is not registered
+        Assertions.assertFalse(tradingSystem.openStore(new UserSystem(), DiscountType.OPEN_DISCOUNT, PurchaseType.BUY_IMMEDIATELY, new PurchasePolicy(),
+                new DiscountPolicy(), "Castro"));
+        int numOfStoreInSystemAfter = tradingSystem.getStoresList().size();
+        // check that the store named "Castro" wasn't added to the store list
+        Assertions.assertTrue(numOfStoreInSystemBefore == numOfStoreInSystemAfter);
     }
 
     /////////////////////////////setup for tests //////////////////////////
@@ -531,5 +566,20 @@ public class TradingSystemTestIntegration {
         return stores;
     }
 
-}
+    /**
+     * sets up users for openStore test
+     * @return a list of users
+     */
+    private Set<UserSystem> setUpUsersForOpenStoreTest(){
+        UserSystem testUser1 = new UserSystem("DaniDin", "Dani", "Din", "123dsa");
+        UserSystem testUser2 = new UserSystem("YuvalMevulbal", "Yuval", "Mevulbal", "456hgf");
+        Set<UserSystem> users = new HashSet<>();
+        users.add(testUser1);
+        users.add(testUser2);
+        tradingSystem.setUsersList(users);
+        return users;
+        }
+    }
+
+
 }
