@@ -1,0 +1,19 @@
+2020-04-11 00:49:10.204  INFO 9193 --- [main] c.w.T.TradingSystemApplication           : Starting TradingSystemApplication on moran-Lenovo-ideapad-310-15ISK with PID 9193 (/home/moran/Desktop/sadna/Wsep202/target/classes started by moran in /home/moran/Desktop/sadna/Wsep202)
+2020-04-11 00:49:10.210  INFO 9193 --- [main] c.w.T.TradingSystemApplication           : No active profile set, falling back to default profiles: default
+2020-04-11 00:49:11.772  INFO 9193 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2020-04-11 00:49:11.789  INFO 9193 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2020-04-11 00:49:11.790  INFO 9193 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.33]
+2020-04-11 00:49:11.911  INFO 9193 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2020-04-11 00:49:11.912  INFO 9193 --- [main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 1596 ms
+2020-04-11 00:49:12.844  INFO 9193 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2020-04-11 00:49:13.194  INFO 9193 --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 6391bf0d-1a31-464a-9fec-84c990bca945
+
+2020-04-11 00:49:13.291  INFO 9193 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7fcf294e, org.springframework.security.web.context.SecurityContextPersistenceFilter@52d6cd34, org.springframework.security.web.header.HeaderWriterFilter@153cd6bb, org.springframework.security.web.csrf.CsrfFilter@6ef1a1b9, org.springframework.security.web.authentication.logout.LogoutFilter@5cb5bb88, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@79d06bbd, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@77d680e6, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@4867ab9f, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@6c42f2a1, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@27b2faa6, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6014a9ba, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@65f2f9b0, org.springframework.security.web.session.SessionManagementFilter@2d9f64c9, org.springframework.security.web.access.ExceptionTranslationFilter@642505c7, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@11b455e5]
+2020-04-11 00:49:13.379  INFO 9193 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2020-04-11 00:49:13.382  INFO 9193 --- [main] c.w.T.TradingSystemApplication           : Started TradingSystemApplication in 3.99 seconds (JVM running for 4.606)
+2020-04-11 00:49:13.384  INFO 9193 --- [main] c.w.T.TradingSystemApplication           : this is a info message
+2020-04-11 00:49:13.384  WARN 9193 --- [main] c.w.T.TradingSystemApplication           : this is a warn message
+2020-04-11 00:49:13.384 ERROR 9193 --- [main] c.w.T.TradingSystemApplication           : this is a error message
+2020-04-11 00:49:54.261  INFO 9193 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'

@@ -53,6 +53,7 @@ public class Product {
         this.cost = cost;
         this.rank = 0;
         this.storeId = storeId;
+
     }
     /**
      * Increases the amount of products
