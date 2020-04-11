@@ -17,6 +17,6 @@ public enum StorePermission {
     public static StorePermission getStorePermission(String function) {
         return Arrays.stream(StorePermission.values())
                 .filter(productCategory -> productCategory.function.equals(function))
-                .findFirst().orElseThrow(() -> new CategoryDontExistException(function));
+                .findFirst().orElseThrow(() -> new CategoryDoesntExistException(function));
     }
 }
