@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * define user in the system
@@ -29,11 +26,29 @@ public class UserSystem {
     @NotBlank
     private String userName;
 
+    public Optional<String> getPassword() {
+        return password;
+    }
+
     /**
      * the encryption password of the the user
      */
     @NotBlank
-    private String password;
+    private Optional<String> password;
+
+    /**
+     * the salt we use to hash the password for the user
+     */
+    @NotBlank
+    private String salt;
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
 
     /**
      * the first name of the user
@@ -58,7 +73,7 @@ public class UserSystem {
 
     private List<Receipt> receipts;
 
-    public UserSystem(String userName, String firstName, String lastName, String password){
+    public UserSystem(String userName, String firstName, String lastName, Optional<String> password){
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
