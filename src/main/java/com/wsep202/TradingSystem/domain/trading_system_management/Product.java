@@ -19,9 +19,12 @@ public class Product {
      * the product serial number
      */
     @Min(value = 0, message = "Must be greater than or equal zero")
-    private int productSn=-1;
+    private int productSn;
 
-    //private static int productSnAcc = 0;
+    /**
+     * saves the last productSnAcc when a new product is created
+     */
+    private static int productSnAcc = 0;
 
     /**
      * the name of the product
@@ -85,8 +88,7 @@ public class Product {
      * @return - the new produceSn.
      */
     private int generateProductSn(){
-        productSn += 1;
-        return productSn;
+        return productSnAcc++;
     }
 
     /**
@@ -96,7 +98,6 @@ public class Product {
      * @return - true if succeeded, else returns false.
      */
     public boolean increasesProductAmount(int addedAmount){
-        //amount++;
         boolean canIncrease = false;
         if (addedAmount > 0) { // can't increase with negative or zero newAmount
             amount += addedAmount;
