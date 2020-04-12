@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import Externals.PasswordSaltPair;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.*;
@@ -64,6 +65,14 @@ class TradingSystemTest {
          */
         @Test
         void registerNewUser() {
+            //mockup
+            userToRegister = mock(UserSystem.class);
+            when(userToRegister.getPassword()).thenReturn("");
+            when(externalServiceManagement.getEncryptedPasswordAndSalt(userToRegister.getPassword()))
+            .thenReturn(new PasswordSaltPair("pass","salt"));
+            doNothing().when(userToRegister).setPassword("pass");
+            doNothing().when(userToRegister).setSalt("salt");
+            when(userToRegister.getUserName()).thenReturn("usernameTest");
             //setup
             //the following user details are necessary for the login tests
             Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister));
@@ -76,7 +85,7 @@ class TradingSystemTest {
         @Test
         void registerNewUserNegative() {
             //registration with already registered user
-            Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister)); //setup
+            registerNewUser(); //setup test of registration
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
         }
 
@@ -99,6 +108,8 @@ class TradingSystemTest {
             //mockup
             when(userSystem.getUserName()).thenReturn("usernameTest");
             doNothing().when(userSystem).login();
+            when(externalServiceManagement.isAuthenticatedUserPassword("passwordTest",userSystem))
+                    .thenReturn(true);
             //the following register should register usernameTest as username
             // and passwordTest as password
             registerNewUser();  //register user test as setup for login
@@ -301,20 +312,20 @@ public class TradingSystemTestIntegration {
 
     ExternalServiceManagement externalServiceManagement;
     private TradingSystem tradingSystem;
-    private UserSystem userSystem;
     private UserSystem userToRegister;
     private FactoryObjects factoryObjects;
+
     @BeforeEach
     void setUp() {
-        externalServiceManagement = mock(ExternalServiceManagement.class);
+        externalServiceManagement = new ExternalServiceManagement();
         tradingSystem = new TradingSystem(externalServiceManagement);
-        //doNothing().when(externalServiceManagement).connect();
         factoryObjects = new FactoryObjects();
         String username = "usernameTest";
         String password = "passwordTest";
         String fName = "moti";
         String lName = "Banana";
         userToRegister = new UserSystem(username,fName,lName,password);
+
 
 
     }
@@ -365,8 +376,13 @@ public class TradingSystemTestIntegration {
      */
     @Test
     void loginRegularUserNegative(){
-        boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
-        Assertions.assertFalse(ans);
+        String username = "username";
+        String password = "password";
+        String fName = "mati";
+        String lName = "Tut";
+        UserSystem user = new UserSystem(username,fName,lName,password);
+        user.setSalt("salt");
+        Assertions.assertFalse(tradingSystem.login(user,false,"password"));
     }
 
 

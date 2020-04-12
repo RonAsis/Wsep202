@@ -53,7 +53,7 @@ public class TradingSystem {
     public boolean registerNewUser(UserSystem userToRegister) {
         //encrypt his password to store it and its salt in the system
         PasswordSaltPair passwordSaltPair = externalServiceManagement
-                .getEncryptedPasswordAndSalt(userToRegister.getPassword().toString());
+                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
         //set the user password and its salt
         userToRegister.setPassword(passwordSaltPair.getHashedPassword());
         userToRegister.setSalt(passwordSaltPair.getSalt());

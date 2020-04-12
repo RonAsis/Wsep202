@@ -26,7 +26,7 @@ public class UserSystem {
     @NotBlank
     private String userName;
 
-    public Optional<String> getPassword() {
+    public String getPassword() {
         return password;
     }
 
@@ -34,7 +34,7 @@ public class UserSystem {
      * the encryption password of the the user
      */
     @NotBlank
-    private Optional<String> password;
+    private String password;
 
     /**
      * the salt we use to hash the password for the user
@@ -73,7 +73,7 @@ public class UserSystem {
 
     private List<Receipt> receipts;
 
-    public UserSystem(String userName, String firstName, String lastName, Optional<String> password){
+    public UserSystem(String userName, String firstName, String lastName, String password){
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;

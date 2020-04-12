@@ -22,7 +22,7 @@ public class ExternalServiceManagement {
         //get salt for the user password to hash with
         String userSalt = SecuritySystem.generateSalt(512).get();
         //generate unique password for the user using the salt
-        Optional<String> hashedPassword = SecuritySystem.hashPassword(password,userSalt);
+        String hashedPassword = SecuritySystem.hashPassword(password,userSalt).get();
         PasswordSaltPair passAndSalt = new PasswordSaltPair(hashedPassword,userSalt);
         return passAndSalt; //return the password generated with the used salt to generate it
     }
@@ -35,7 +35,7 @@ public class ExternalServiceManagement {
      * otherwise return false
      */
     public boolean isAuthenticatedUserPassword(String password, UserSystem user){
-        boolean isLegitimateUser = SecuritySystem.verifyPassword(password,user.getPassword().toString(),user.getSalt());
+        boolean isLegitimateUser = SecuritySystem.verifyPassword(password,user.getPassword(),user.getSalt());
         return isLegitimateUser;
     }
 }
