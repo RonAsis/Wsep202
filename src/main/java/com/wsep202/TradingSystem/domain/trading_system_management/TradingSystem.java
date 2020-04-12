@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import Externals.PasswordSaltPair;
 import com.wsep202.TradingSystem.domain.exception.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -44,10 +45,18 @@ public class TradingSystem {
     }
 
     /**
-     * register new user
+     * register new user in the system
+     * with its password
+     * @param userToRegister the user we want to register
+     * @return true if the registration succeeded
      */
     public boolean registerNewUser(UserSystem userToRegister) {
-        userToRegister.setPassword(externalServiceManagement.encryptPassword(userToRegister.getPassword()));
+        //encrypt his password to store it and its salt in the system
+        PasswordSaltPair passwordSaltPair = externalServiceManagement
+                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
+        //set the user password and its salt
+        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
+        userToRegister.setSalt(passwordSaltPair.getSalt());
         boolean isRegistered = isRegisteredUser(userToRegister);
         if (!isRegistered) {
             users.add(userToRegister);
@@ -60,7 +69,11 @@ public class TradingSystem {
      *
      */
     public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
-        //TODO to check encrypted user password against password received
+        //TODO example for using the security system password verification
+        //verify that the user's password is correct as saved in our system
+        if(!externalServiceManagement.isAuthenticatedUserPassword(password,userToLogin)){
+            return false;
+        }
         return !isAdmin ? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
     }
 
