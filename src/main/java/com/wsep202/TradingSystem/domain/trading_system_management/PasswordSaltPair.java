@@ -1,4 +1,4 @@
-package Externals;
+package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import java.util.Optional;
 

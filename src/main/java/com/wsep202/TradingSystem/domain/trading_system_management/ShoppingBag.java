@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -11,5 +12,5 @@ import java.util.Map;
 @NoArgsConstructor
 public class ShoppingBag {
 
-    private Map<Integer, Integer> mapProductSnToAmount;
+    private Map<Integer, Integer> mapProductSnToAmount = new HashMap<>();
 }

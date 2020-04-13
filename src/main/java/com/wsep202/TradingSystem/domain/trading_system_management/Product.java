@@ -120,4 +120,7 @@ public class Product {
         }
         return canReduce;
     }
+    public String showProductInfo(){
+        return this.getName();
+    }
 }

@@ -1,11 +1,8 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import Externals.PasswordSaltPair;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
-import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.invocation.InvocationOnMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashSet;
@@ -85,17 +82,10 @@ class TradingSystemTest {
         @Test
         void registerNewUserNegative() {
             //registration with already registered user
-            registerNewUser(); //setup test of registration
+            registerAsSetup(); //setup test of registration
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
         }
 
-    /*  the following tested method is private
-        @Test
-        void isRegisteredUser(){
-            when(userSystem.getUserName()).thenReturn("usernameTest");
-            Assertions.assertTrue(tradingSystem.isRegisteredUser(userSystem));
-        }
-        */
         @Test
         void login() {
             //check login of regular user
@@ -112,7 +102,7 @@ class TradingSystemTest {
                     .thenReturn(true);
             //the following register should register usernameTest as username
             // and passwordTest as password
-            registerNewUser();  //register user test as setup for login
+            registerAsSetup();  //register user test as setup for login
             boolean ans = tradingSystem.login(userSystem,false,"passwordTest");
             Assertions.assertTrue(ans);
         }
@@ -270,6 +260,24 @@ class TradingSystemTest {
 
     /////////////////////////////////////////setups functions for tests /////////////////////////
 
+        /**
+         * setup of successful pre registration
+         */
+        private void registerAsSetup(){
+            //mockup
+            userToRegister = mock(UserSystem.class);
+            when(userToRegister.getPassword()).thenReturn("");
+            when(externalServiceManagement.getEncryptedPasswordAndSalt(userToRegister.getPassword()))
+                    .thenReturn(new PasswordSaltPair("pass","salt"));
+            doNothing().when(userToRegister).setPassword("pass");
+            doNothing().when(userToRegister).setSalt("salt");
+            when(userToRegister.getUserName()).thenReturn("usernameTest");
+            //setup
+            //the following user details are necessary for the login tests
+            tradingSystem.registerNewUser(userToRegister);
+        }
+
+
     /**
      * setUp Products For Filter Tests
      */
@@ -339,7 +347,6 @@ public class TradingSystemTestIntegration {
      */
     @Test
     void registerNewUser() {
-        //setup
         //the following user details are necessary for the login tests
         Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister));
     }
@@ -351,9 +358,11 @@ public class TradingSystemTestIntegration {
     @Test
     void registerNewUserNegative() {
         //registration with already registered user
-        Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister)); //setup
-        Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
+        registerAsSetup(); //first registration
+        Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));  //second registration
     }
+
+
 
     @Test
     void login() {
@@ -366,7 +375,7 @@ public class TradingSystemTestIntegration {
     void loginRegularUser(){
         //the following register should register usernameTest as username
         // and passwordTest as password
-        registerNewUser();  //register user test as setup for login
+        registerAsSetup();  //register user test as setup for login
         boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
         Assertions.assertTrue(ans);
     }
@@ -518,6 +527,13 @@ public class TradingSystemTestIntegration {
 
     /////////////////////////////setup for tests //////////////////////////
     /**
+     * set up of successful pre registration
+     */
+    private void registerAsSetup(){
+        tradingSystem.registerNewUser(userToRegister);
+    }
+
+    /**
      * setUp Products For Filter Tests
      */
     private List<Product> setUpProductsForFilterTests() {
@@ -548,4 +564,5 @@ public class TradingSystemTestIntegration {
     }
 
 }
+
 }

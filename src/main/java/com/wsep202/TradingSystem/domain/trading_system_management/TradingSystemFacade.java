@@ -98,7 +98,8 @@ public class TradingSystemFacade {
      * @param cost - the cost of the product
      * @return true if succeed
      */
-    public boolean addProduct( @NotBlank String ownerUsername, int storeId, @NotBlank String productName, @NotBlank String category,
+    public boolean addProduct( @NotBlank String ownerUsername, int storeId,
+                               @NotBlank String productName, @NotBlank String category,
                                int amount, double cost) {
         UserSystem user = tradingSystem.getUser(ownerUsername);
         Store ownerStore = user.getOwnerStore(storeId);
