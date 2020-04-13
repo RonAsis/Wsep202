@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * check if all the application is running
  */
-@SpringBootTest
+@SpringBootTest(args = {"admin", "admin"})
 class TradingSystemApplicationTest {
 
     @Test

@@ -1,11 +1,19 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import Externals.PasswordSaltPair;
+import com.github.rozidan.springboot.modelmapper.WithModelMapper;
+import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
+import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
 import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.invocation.InvocationOnMock;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashSet;
@@ -19,11 +27,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 class TradingSystemTest {
 
-    ExternalServiceManagement externalServiceManagement;
-    private TradingSystem tradingSystem;
-    private UserSystem userSystem;
-    private UserSystem userToRegister;
-    private FactoryObjects factoryObjects;
+
 
     @AfterEach
     void tearDown() {
@@ -35,10 +39,22 @@ class TradingSystemTest {
     @Nested
     public class TradingSystemTestUnit {
 
+        ExternalServiceManagement externalServiceManagement;
+        private TradingSystem tradingSystem;
+        private UserSystem userSystem;
+        private UserSystem userToRegister;
+        private FactoryObjects factoryObjects;
+        private UserSystem admin;
+
         @BeforeEach
         void setUp() {
-             externalServiceManagement = mock(ExternalServiceManagement.class);
-            tradingSystem = new TradingSystem(externalServiceManagement);
+            externalServiceManagement = mock(ExternalServiceManagement.class);
+            admin = UserSystem.builder()
+                    .userName("admin")
+                    .password("admin")
+                    .build();
+            when(externalServiceManagement.getEncryptedPasswordAndSalt(admin.getPassword())).thenReturn(new PasswordSaltPair("hash","admin"));
+            tradingSystem = new TradingSystem(externalServiceManagement, admin);
             doNothing().when(externalServiceManagement).connect();
             userSystem = mock(UserSystem.class);
             factoryObjects = new FactoryObjects();
@@ -308,26 +324,24 @@ class TradingSystemTest {
  * Integration tests for the TradingSystem
  */
 @Nested
+@ContextConfiguration(classes = {TradingSystemConfiguration.class})
+@SpringBootTest(args = {"admin", "admin"})
 public class TradingSystemTestIntegration {
 
-    ExternalServiceManagement externalServiceManagement;
+    @Autowired
     private TradingSystem tradingSystem;
     private UserSystem userToRegister;
-    private FactoryObjects factoryObjects;
+
+    @MockBean // for pass compilation
+    private ModelMapper modelMapper;
 
     @BeforeEach
     void setUp() {
-        externalServiceManagement = new ExternalServiceManagement();
-        tradingSystem = new TradingSystem(externalServiceManagement);
-        factoryObjects = new FactoryObjects();
         String username = "usernameTest";
         String password = "passwordTest";
         String fName = "moti";
         String lName = "Banana";
         userToRegister = new UserSystem(username,fName,lName,password);
-
-
-
     }
 
     @Test
@@ -339,9 +353,13 @@ public class TradingSystemTestIntegration {
      */
     @Test
     void registerNewUser() {
+        UserSystem userToRegistration = UserSystem.builder()
+                .userName("test register!")
+                .password("test register")
+                .build();
         //setup
         //the following user details are necessary for the login tests
-        Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister));
+        Assertions.assertTrue(tradingSystem.registerNewUser(userToRegistration));
     }
 
     /**
@@ -351,25 +369,35 @@ public class TradingSystemTestIntegration {
     @Test
     void registerNewUserNegative() {
         //registration with already registered user
-        Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister)); //setup
-        Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
+        UserSystem userToRegistration = UserSystem.builder()
+                .userName("registerNewUserNegative")
+                .password("registerNewUserNegative")
+                .build();
+        Assertions.assertTrue(tradingSystem.registerNewUser(userToRegistration)); //setup
+        Assertions.assertFalse(tradingSystem.registerNewUser(userToRegistration));
     }
 
     @Test
     void login() {
         //check login of regular user
-        loginRegularUser();
+        String password = "test login";
+        UserSystem user = UserSystem.builder()
+                .userName("test login")
+                .password(password)
+                .build();
+        tradingSystem.registerNewUser(user);
+        tradingSystem.login(user, false, password);
         //check login of admin
         //TODO
     }
-    @Test
-    void loginRegularUser(){
-        //the following register should register usernameTest as username
-        // and passwordTest as password
-        registerNewUser();  //register user test as setup for login
-        boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
-        Assertions.assertTrue(ans);
-    }
+//    @Test
+//    void loginRegularUser(){
+//        //the following register should register usernameTest as username
+//        // and passwordTest as password
+//        registerNewUser();  //register user test as setup for login
+//        boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
+//        Assertions.assertTrue(ans);
+//    }
 
     /**
      * test handling with login failure
@@ -392,9 +420,15 @@ public class TradingSystemTestIntegration {
     @Test
     void logout() {
         //setup of login for the logout
-        UserSystem user = factoryObjects.createSystemUser("usernameTest","Moti","Banana","passwordTest");
-        loginRegularUser();
-        Assertions.assertTrue(tradingSystem.logout(userToRegister));
+        String password = "Moti";
+        UserSystem user = UserSystem.builder()
+                .userName("usernameTest")
+                .password(password)
+                .firstName("Banana")
+                .lastName("passwordTest").build();
+        tradingSystem.registerNewUser(user);
+        tradingSystem.login(user, false, password);
+        Assertions.assertTrue(tradingSystem.logout(user));
     }
 
     /**
@@ -471,7 +505,11 @@ public class TradingSystemTestIntegration {
         List<Product> products = setUpProductsForFilterTests();
         List<Store> stores = (setUpStoresForFilterTests(products));
         Set<Store> storesSet = new HashSet<>((stores));
-        tradingSystem = new TradingSystem(new ExternalServiceManagement(), storesSet);
+        UserSystem admin = UserSystem.builder()
+                .userName("admin")
+                .password("admin")
+                .build();
+        tradingSystem = new TradingSystem(new ExternalServiceManagement(), storesSet, admin);
 
         // the tests
         for (int rank = -1; rank < 100; rank++) {
