@@ -1,4 +1,4 @@
-package Externals;
+package externals;
 
 import java.security.SecureRandom;
 import java.util.Base64;

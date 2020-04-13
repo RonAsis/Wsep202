@@ -26,9 +26,7 @@ public class UserSystem {
     @NotBlank
     private String userName;
 
-    public String getPassword() {
-        return password;
-    }
+
 
     /**
      * the encryption password of the the user
@@ -42,13 +40,7 @@ public class UserSystem {
     @NotBlank
     private String salt;
 
-    public String getSalt() {
-        return salt;
-    }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
 
     /**
      * the first name of the user
@@ -113,4 +105,6 @@ public class UserSystem {
     public boolean removeProductInShoppingBag(Store store, Product product) {
         return false;
     }
+
+
 }
