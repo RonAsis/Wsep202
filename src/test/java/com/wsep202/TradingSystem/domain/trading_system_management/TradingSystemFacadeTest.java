@@ -5,15 +5,13 @@ import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
 import com.wsep202.TradingSystem.service.user_service.dto.*;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.CollectionUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -502,139 +500,61 @@ class TradingSystemFacadeTest {
             ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(username);
             assertRecipes(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
         }
-
-        private List<Receipt> setUpReceipts() {
-            List<Receipt> receipts = new ArrayList<>();
-            for (int counter = 0; counter <= 10; counter++) {
-                receipts.add(Receipt.builder() //TODO - when Receipt will be ready
-                        .build());
-            }
-            return receipts;
-        }
-
-        private Set<Product> setUpProducts() {
-            Set<Product> products = new HashSet<>();
-            for (int counter = 0; counter <= 10; counter++) {
-                products.add(Product.builder()
-                        .name("productName" + counter)
-                        .amount(counter)
-                        .category(ProductCategory.values()[counter % ProductCategory.values().length])
-                        .productSn(counter)
-                        .storeId(counter)
-                        .cost(counter)
-                        .rank(counter)
-                        .build());
-            }
-            return products;
-        }
-
-        private Set<UserSystem> setupUsers() {
-            Set<UserSystem> userSystems = new HashSet<>();
-            for (int counter = 0; counter <= 10; counter++) {
-                userSystems.add(UserSystem.builder()
-                        .firstName("firstName" + counter)
-                        .lastName("lastName" + counter)
-                        .userName("username" + counter)
-                        .isLogin(false)
-                        .password("password" + counter)
-                        .receipts(setUpReceipts())
-                        .shoppingCart(new ShoppingCart())
-                        .ownedStores(setUpStores())
-                        .managedStores(setUpStores())
-                        .build());
-            }
-            return userSystems;
-        }
-
-        private Set<Store> setUpStores() {
-            Set<Store> stores = new HashSet<>();
-            for (int counter = 0; counter <= 10; counter++) {
-                stores.add(Store.builder()
-                        .storeId(counter)
-                        .discountType(DiscountType.OPEN_DISCOUNT)
-                        .purchaseType(PurchaseType.BUY_IMMEDIATELY)
-                        .storeName("storeName" + counter)
-                        .rank(counter)
-                        .build());
-            }
-            return stores;
-        }
-
-        private Store createStore() {
-            //init
-            int storeId = 1;
-            int rank = 1;
-            String storeName = "storeName";
-
-            //init products
-            Set<Product> products =  setUpProducts();
-
-            PurchasePolicy purchasePolicy = new PurchasePolicy();
-            DiscountPolicy discountPolicy = new DiscountPolicy();
-            Set<UserSystem> owners = setupUsers();
-            List<Receipt> receipts = setUpReceipts();
-
-            return Store.builder()
-                    .storeId(storeId)
-                    .owners(owners)
-                    .storeName(storeName)
-                    .discountPolicy(discountPolicy)
-                    .discountType(DiscountType.OPEN_DISCOUNT)
-                    .products(products)
-                    .receipts(receipts)
-                    .rank(rank)
-                    .purchaseType(PurchaseType.BUY_IMMEDIATELY)
-                    .purchasePolicy(purchasePolicy)
-                    .build();
-        }
-
-        private Product createProduct(int productId) {
-            return Product.builder()
-                    .storeId(productId)
-                    .category(ProductCategory.values()[productId % ProductCategory.values().length])
-                    .rank(productId)
-                    .cost(productId)
-                    .amount(productId)
-                    .name("product" + productId)
-                    .productSn(productId)
-                    .build();
-        }
-
-        private ShoppingCart createShoppingCart() {
-            //create shoppingBags
-            Map<Integer, Integer> shoppingBagMap = new HashMap<>();
-            for(int counter =0; counter< 10 ; counter++){
-                shoppingBagMap.put(counter, counter);
-            }
-            ShoppingBag shoppingBag = new ShoppingBag(shoppingBagMap);
-
-            Map<Store, ShoppingBag> shoppingBags = new HashMap<>();
-            Set<Store> stores = setUpStores();
-            stores.forEach(store1 -> shoppingBags.put(store1, shoppingBag));
-
-            // create ShoppingCart
-            return ShoppingCart.builder()
-                    .shoppingBags(shoppingBags)
-                    .build();
-        }
     }
-
 
     ///////////////////////////////integration test /////////////////////
     @Nested
     @ContextConfiguration(classes = {TradingSystemConfiguration.class})
     @WithModelMapper(basePackageClasses = TradingSystemMapper.class)
+    @SpringBootTest(args = {"admin", "admin"})
     public class TradingSystemFacadeTestIntegration {
 
         @Autowired
         private TradingSystemFacade tradingSystemFacade;
 
+        @Autowired
+        private TradingSystem tradingSystem;
+
+        private Set<UserSystem> userSystems;
+        private  List<Receipt> receipts;
+        private Set<Store> stores;
+
+        @BeforeEach
+        void setUp(){
+            addUsers();
+            receipts = setUpReceipts();
+            addStores();
+
+        }
+
+        private void addStores() {
+//            stores = setUpStores();
+//            stores.forEach(store ->
+//                    tradingSystem.op);
+        }
+
+        void addUsers(){
+            userSystems = setupUsers();
+            userSystems.forEach(userSystem ->
+                    tradingSystem.registerNewUser(userSystem));
+        }
+
         @Test
         void viewPurchaseHistoryUser() {
+            Optional<UserSystem> userSystemOptional = userSystems.stream().findFirst();
+            Assertions.assertTrue(userSystemOptional.isPresent());
+            UserSystem userSystem = userSystemOptional.get();
+            userSystem.setReceipts(receipts);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(userSystem.getUserName());
+            assertRecipes(receipts, receiptDtos);
+
+            //clean all
+            userSystem.setReceipts(new LinkedList<>());
         }
 
         @Test
         void viewPurchaseHistoryAdministratorOfStore() {
+
         }
 
         @Test
@@ -842,6 +762,123 @@ class TradingSystemFacadeTest {
         assertUserSystem(store.getOwners(), storeDto.getOwners());
         assertRecipes(store.getReceipts(), storeDto.getReceipts());
         Assertions.assertEquals(store.getRank(), storeDto.getRank());
+    }
+
+    //////////////////////////////////setup//////////////////////////////////////////
+
+    private List<Receipt> setUpReceipts() {
+        List<Receipt> receipts = new ArrayList<>();
+        for (int counter = 0; counter <= 10; counter++) {
+            receipts.add(Receipt.builder() //TODO - when Receipt will be ready
+                    .build());
+        }
+        return receipts;
+    }
+
+    private Set<Product> setUpProducts() {
+        Set<Product> products = new HashSet<>();
+        for (int counter = 0; counter <= 10; counter++) {
+            products.add(Product.builder()
+                    .name("productName" + counter)
+                    .amount(counter)
+                    .category(ProductCategory.values()[counter % ProductCategory.values().length])
+                    .productSn(counter)
+                    .storeId(counter)
+                    .cost(counter)
+                    .rank(counter)
+                    .build());
+        }
+        return products;
+    }
+
+    private Set<UserSystem> setupUsers() {
+        Set<UserSystem> userSystems = new HashSet<>();
+        for (int counter = 0; counter <= 10; counter++) {
+            userSystems.add(UserSystem.builder()
+                    .firstName("firstName" + counter)
+                    .lastName("lastName" + counter)
+                    .userName("username" + counter)
+                    .isLogin(false)
+                    .password("password" + counter)
+                    .receipts(setUpReceipts())
+                    .shoppingCart(new ShoppingCart())
+                    .ownedStores(setUpStores())
+                    .managedStores(setUpStores())
+                    .build());
+        }
+        return userSystems;
+    }
+
+    private Set<Store> setUpStores() {
+        Set<Store> stores = new HashSet<>();
+        for (int counter = 0; counter <= 10; counter++) {
+            stores.add(Store.builder()
+                    .storeId(counter)
+                    .discountType(DiscountType.OPEN_DISCOUNT)
+                    .purchaseType(PurchaseType.BUY_IMMEDIATELY)
+                    .storeName("storeName" + counter)
+                    .rank(counter)
+                    .build());
+        }
+        return stores;
+    }
+
+    private Store createStore() {
+        //init
+        int storeId = 1;
+        int rank = 1;
+        String storeName = "storeName";
+
+        //init products
+        Set<Product> products =  setUpProducts();
+
+        PurchasePolicy purchasePolicy = new PurchasePolicy();
+        DiscountPolicy discountPolicy = new DiscountPolicy();
+        Set<UserSystem> owners = setupUsers();
+        List<Receipt> receipts = setUpReceipts();
+
+        return Store.builder()
+                .storeId(storeId)
+                .owners(owners)
+                .storeName(storeName)
+                .discountPolicy(discountPolicy)
+                .discountType(DiscountType.OPEN_DISCOUNT)
+                .products(products)
+                .receipts(receipts)
+                .rank(rank)
+                .purchaseType(PurchaseType.BUY_IMMEDIATELY)
+                .purchasePolicy(purchasePolicy)
+                .build();
+    }
+
+    private Product createProduct(int productId) {
+        return Product.builder()
+                .storeId(productId)
+                .category(ProductCategory.values()[productId % ProductCategory.values().length])
+                .rank(productId)
+                .cost(productId)
+                .amount(productId)
+                .name("product" + productId)
+                .productSn(productId)
+                .build();
+    }
+
+    private ShoppingCart createShoppingCart() {
+        //create shoppingBags
+        Map<Integer, Integer> shoppingBagMap = new HashMap<>();
+        for(int counter =0; counter< 10 ; counter++){
+            shoppingBagMap.put(counter, counter);
+        }
+        ShoppingBag shoppingBag = new ShoppingBag(shoppingBagMap);
+
+        Map<Store, ShoppingBag> shoppingBags = new HashMap<>();
+        Set<Store> stores = setUpStores();
+        stores.forEach(store1 -> shoppingBags.put(store1, shoppingBag));
+
+        // create ShoppingCart
+        return ShoppingCart.builder()
+                .shoppingBags(shoppingBags)
+                .build();
     }
 
     /////////////////////////////////General /////////////////////////////////

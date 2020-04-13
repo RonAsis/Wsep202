@@ -19,19 +19,23 @@ public class TradingSystem {
 
     private Set<UserSystem> administrators;
 
-    public TradingSystem(ExternalServiceManagement externalServiceManagement) {
+    public TradingSystem(@NotNull ExternalServiceManagement externalServiceManagement,
+                         @NotNull UserSystem admin){
+        this.externalServiceManagement = externalServiceManagement;// must be first
+        encryptPassword(admin);
         stores = new HashSet<>();
         users = new HashSet<>();
-        administrators = new HashSet<>();
-        this.externalServiceManagement = externalServiceManagement;
+        administrators = new HashSet<>(Collections.singletonList(admin));
         externalServiceManagement.connect();
     }
 
-    public TradingSystem(ExternalServiceManagement externalServiceManagement, Set<Store> stores) {
+    public TradingSystem(ExternalServiceManagement externalServiceManagement, Set<Store> stores,
+                         @NotNull UserSystem admin) {
+        this.externalServiceManagement = externalServiceManagement;
+        encryptPassword(admin);
+        administrators = new HashSet<>(Collections.singletonList(admin));
         this.stores = stores;
         users = new HashSet<>();
-        administrators = new HashSet<>();
-        this.externalServiceManagement = externalServiceManagement;
         externalServiceManagement.connect();
     }
 
@@ -51,17 +55,21 @@ public class TradingSystem {
      */
     public boolean registerNewUser(UserSystem userToRegister) {
         //encrypt his password to store it and its salt in the system
-        PasswordSaltPair passwordSaltPair = externalServiceManagement
-                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
-        //set the user password and its salt
-        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
-        userToRegister.setSalt(passwordSaltPair.getSalt());
+        encryptPassword(userToRegister);
         boolean isRegistered = isRegisteredUser(userToRegister);
         if (!isRegistered) {
             users.add(userToRegister);
             return true;
         }
         return false;
+    }
+
+    private void encryptPassword(UserSystem userToRegister) {
+        PasswordSaltPair passwordSaltPair = externalServiceManagement
+                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
+        //set the user password and its salt
+        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
+        userToRegister.setSalt(passwordSaltPair.getSalt());
     }
 
     /**
@@ -274,4 +282,5 @@ public class TradingSystem {
     public boolean openStore(UserSystem user, DiscountType discountTypeObj, PurchaseType purchaseTypeObj, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, String storeName) {
         return false;
     }
+
 }
