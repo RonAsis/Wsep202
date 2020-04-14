@@ -110,6 +110,13 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
         }
 
+        /*  the following tested method is private
+            @Test
+            void isRegisteredUser(){
+                when(userSystem.getUserName()).thenReturn("usernameTest");
+                Assertions.assertTrue(tradingSystem.isRegisteredUser(userSystem));
+            }
+            */
         @Test
         void login() {
             //check login of regular user
@@ -421,37 +428,74 @@ class TradingSystemTest {
                         .collect(Collectors.toList());
                 Assertions.assertEquals(productsExpected, productsActual);
             }
-    }
+        }
 
-    @Test
-    void filterByStoreCategory() {
-        List<Product> products = setUpProductsForFilterTests();
-        for (int min = -1; min < 100; min++) {
-            for (int categoryIndex = 0; categoryIndex < ProductCategory.values().length; categoryIndex++) {
-                ProductCategory category = ProductCategory.values()[categoryIndex];
-                List<Product> productsActual = tradingSystem.filterByStoreCategory(products, category);
-                int finalMin = min;
-                List<Product> productsExpected = products.stream()
-                        .filter(product -> product.getCategory() == category)
-                        .collect(Collectors.toList());
-                Assertions.assertEquals(productsExpected, productsActual);
+        @Test
+        void filterByStoreCategory() {
+            List<Product> products = setUpProductsForFilterTests();
+            for (int min = -1; min < 100; min++) {
+                for (int categoryIndex = 0; categoryIndex < ProductCategory.values().length; categoryIndex++) {
+                    ProductCategory category = ProductCategory.values()[categoryIndex];
+                    List<Product> productsActual = tradingSystem.filterByStoreCategory(products, category);
+                    int finalMin = min;
+                    List<Product> productsExpected = products.stream()
+                            .filter(product -> product.getCategory() == category)
+                            .collect(Collectors.toList());
+                    Assertions.assertEquals(productsExpected, productsActual);
+                }
             }
         }
-    }
 
-    @Test
-    void purchaseShoppingCart() {
-    }
+        @Test
+        void purchaseShoppingCart() {
+        }
 
-    @Test
-    void testPurchaseShoppingCart() {
-    }
+        @Test
+        void testPurchaseShoppingCart() {
+        }
 
-    @Test
-    void openStore() {
-    }
+      // todo go over mocks
+        /**
+         * This test checks that the store's opening succeeds
+         */
+        @Test
+        void openStoreSuccess() {
+            Set<UserSystem> testUsersList = setUpUsersForOpenStoreTest();
+            //number of stores in the system before addition
+            int numOfStoreInSystemBefore = tradingSystem.getStoresList().size();
+            //all the parameters are correct, the method should return true
+            Assertions.assertTrue(tradingSystem.openStore((UserSystem)testUsersList.toArray()[0], DiscountType.OPEN_DISCOUNT, PurchaseType.BUY_IMMEDIATELY, new PurchasePolicy(),
+                    new DiscountPolicy(), "Castro"));
+            //number of stores in the system after addition
+            int numOfStoreInSystemAfter = tradingSystem.getStoresList().size();
+            // numOfStoreInSystemBefore +1 == numOfStoreInSystemAfter
+            Assertions.assertFalse(numOfStoreInSystemBefore == numOfStoreInSystemAfter);
+            //all the parameters are correct, the method should return true
+            Assertions.assertTrue(tradingSystem.openStore((UserSystem)testUsersList.toArray()[1], DiscountType.OPEN_DISCOUNT, PurchaseType.BUY_IMMEDIATELY, new PurchasePolicy(),
+                    new DiscountPolicy(), "Fox"));
+            // number of stores in the system should be 2
+            Assertions.assertTrue(tradingSystem.getStoresList().size() == 2);
+            // check if there is a store named 'Castro' in the system
+            Assertions.assertTrue(tradingSystem.getStoresList().stream()
+                    .anyMatch(store -> store.getStoreName().equals("Castro")));
+        }
+      
+      // todo go over mocks
+        /**
+         * This test checks that the store's opening fails
+         */
+        @Test
+        void openStoreFail(){
+            int numOfStoreInSystemBefore = tradingSystem.getStoresList().size();
+            // the user is not registered
+            Assertions.assertFalse(tradingSystem.openStore(new UserSystem(), DiscountType.OPEN_DISCOUNT, PurchaseType.BUY_IMMEDIATELY, new PurchasePolicy(),
+                    new DiscountPolicy(), "Castro"));
+            int numOfStoreInSystemAfter = tradingSystem.getStoresList().size();
+            // check that the store named "Castro" wasn't added to the store list
+            Assertions.assertTrue(numOfStoreInSystemBefore == numOfStoreInSystemAfter);
+        }
 
-    /////////////////////////////////////////setups functions for tests /////////////////////////
+        /////////////////////////////////////////setups functions for tests /////////////////////////
 
         /**
          * setup of successful pre registration
@@ -487,21 +531,21 @@ class TradingSystemTest {
         return products;
     }
 
-    /**
-     * setUp Stores For Filter Tests
-     */
-    private List<Store> setUpStoresForFilterTests(List<Product> products) {
-        List<Store> stores = new LinkedList<>();
-        for (int counter = 0; counter < products.size(); counter++) {
-            stores.add(Store.builder()
-                    .storeId(counter)
-                    .rank(counter)
-                    .build());
+        /**
+         * setUp Stores For Filter Tests
+         */
+        private List<Store> setUpStoresForFilterTests(List<Product> products) {
+            List<Store> stores = new LinkedList<>();
+            for (int counter = 0; counter < products.size(); counter++) {
+                stores.add(Store.builder()
+                        .storeId(counter)
+                        .rank(counter)
+                        .build());
+            }
+            return stores;
         }
-        return stores;
-    }
 
-}
+    }
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -535,10 +579,7 @@ public class TradingSystemTestIntegration {
         product.setName("dollhouse");
         product.setCategory(ProductCategory.TOYS_HOBBIES);
     }
-
-    @Test
-    void buyShoppingCart() {
-    }
+        }
 
     /**
      * the following checks registration of valid user
@@ -576,8 +617,6 @@ public class TradingSystemTestIntegration {
         Assertions.assertFalse(tradingSystem.registerNewUser(userToRegistration)); */
 
     }
-
-
 
     @Test
     void login() {
@@ -617,7 +656,14 @@ public class TradingSystemTestIntegration {
         Assertions.assertFalse(tradingSystem.login(user,false,"password"));
     }
 
-
+        /**
+         * test handling with login failure
+         */
+        @Test
+        void loginRegularUserNegative(){
+            boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
+            Assertions.assertFalse(ans);
+        }
     /**
      * check the logout functionality of exists user in the system
      */
@@ -839,35 +885,21 @@ public class TradingSystemTestIntegration {
         Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByKeyWords(keyWords), products));
     }
 
-    @Test
-    void filterByRangePrice() {
-        List<Product> products = setUpProductsForFilterTests();
-        int max = products.size();
-        for (int min = -1; min < 100; min++) {
-            List<Product> productsActual = tradingSystem.filterByRangePrice(products, min, max);
-            int finalMin = min;
-            int finalMax = max;
-            List<Product> productsExpected = products.stream()
-                    .filter(product -> finalMin <= product.getCost() && product.getCost() <= finalMax)
-                    .collect(Collectors.toList());
-            max--;
-            Assertions.assertEquals(productsExpected, productsActual);
+        @Test
+        void filterByRangePrice() {
+            List<Product> products = setUpProductsForFilterTests();
+            int max = products.size();
+            for (int min = -1; min < 100; min++) {
+                List<Product> productsActual = tradingSystem.filterByRangePrice(products, min, max);
+                int finalMin = min;
+                int finalMax = max;
+                List<Product> productsExpected = products.stream()
+                        .filter(product -> finalMin <= product.getCost() && product.getCost() <= finalMax)
+                        .collect(Collectors.toList());
+                max--;
+                Assertions.assertEquals(productsExpected, productsActual);
+            }
         }
-    }
-
-    @Test
-    void filterByProductRank() {
-        List<Product> products = setUpProductsForFilterTests();
-        for (int rank = -1; rank < 100; rank++) {
-            List<Product> productsActual = tradingSystem.filterByProductRank(products, rank);
-            int finalRank = rank;
-            List<Product> productsExpected = products.stream()
-                    .filter(product -> finalRank <= product.getRank())
-                    .collect(Collectors.toList());
-            Assertions.assertEquals(productsExpected, productsActual);
-        }
-    }
-
     @Test
     void filterByStoreRank() {
         //initial
@@ -893,36 +925,54 @@ public class TradingSystemTestIntegration {
                     .collect(Collectors.toList());
             Assertions.assertEquals(productsExpected, productsActual);
         }
-    }
 
-    @Test
-    void filterByStoreCategory() {
-        List<Product> products = setUpProductsForFilterTests();
-        for (int min = -1; min < 100; min++) {
-            for (int categoryIndex = 0; categoryIndex < ProductCategory.values().length; categoryIndex++) {
-                ProductCategory category = ProductCategory.values()[categoryIndex];
-                List<Product> productsActual = tradingSystem.filterByStoreCategory(products, category);
-                int finalMin = min;
+        @Test
+        void filterByStoreRank() {
+            //initial
+            List<Product> products = setUpProductsForFilterTests();
+            List<Store> stores = (setUpStoresForFilterTests(products));
+            Set<Store> storesSet = new HashSet<>((stores));
+            tradingSystem = new TradingSystem(new ExternalServiceManagement(), storesSet);
+
+            // the tests
+            for (int rank = -1; rank < 100; rank++) {
+                List<Product> productsActual = tradingSystem.filterByStoreRank(products, rank);
+                int finalRank = rank;
                 List<Product> productsExpected = products.stream()
-                        .filter(product -> product.getCategory() == category)
+                        .filter(product -> {
+                            int storeId = product.getStoreId();
+                            Store store = stores.get(storeId);
+                            return finalRank <= store.getRank();
+                        })
                         .collect(Collectors.toList());
                 Assertions.assertEquals(productsExpected, productsActual);
             }
         }
-    }
 
-    @Test
-    void purchaseShoppingCart() {
-    }
+        @Test
+        void filterByStoreCategory() {
+            List<Product> products = setUpProductsForFilterTests();
+            for (int min = -1; min < 100; min++) {
+                for (int categoryIndex = 0; categoryIndex < ProductCategory.values().length; categoryIndex++) {
+                    ProductCategory category = ProductCategory.values()[categoryIndex];
+                    List<Product> productsActual = tradingSystem.filterByStoreCategory(products, category);
+                    int finalMin = min;
+                    List<Product> productsExpected = products.stream()
+                            .filter(product -> product.getCategory() == category)
+                            .collect(Collectors.toList());
+                    Assertions.assertEquals(productsExpected, productsActual);
+                }
+            }
+        }
 
-    @Test
-    void testPurchaseShoppingCart() {
-    }
+        @Test
+        void purchaseShoppingCart() {
+        }
 
-    @Test
-    void openStore() {
-    }
-
+        @Test
+        void testPurchaseShoppingCart() {
+        }
+      
     /////////////////////////////setup for tests //////////////////////////
     /**
      * set up of successful pre registration
@@ -931,6 +981,7 @@ public class TradingSystemTestIntegration {
         tradingSystem.registerNewUser(userToRegister);
     }
 
+       /////////////////////////////setup for tests //////////////////////////
     /**
      * setUp Products For Filter Tests
      */
@@ -946,21 +997,33 @@ public class TradingSystemTestIntegration {
         }
         return products;
     }
-
-    /**
-     * setUp Stores For Filter Tests
-     */
-    private List<Store> setUpStoresForFilterTests(List<Product> products) {
-        List<Store> stores = new LinkedList<>();
-        for (int counter = 0; counter < products.size(); counter++) {
-            stores.add(Store.builder()
-                    .storeId(counter)
-                    .rank(counter)
-                    .build());
+      
+        /**
+         * setUp Stores For Filter Tests
+         */
+        private List<Store> setUpStoresForFilterTests(List<Product> products) {
+            List<Store> stores = new LinkedList<>();
+            for (int counter = 0; counter < products.size(); counter++) {
+                stores.add(Store.builder()
+                        .storeId(counter)
+                        .rank(counter)
+                        .build());
+            }
+            return stores;
         }
-        return stores;
+
+        /**
+         * sets up users for openStore test
+         * @return a list of users
+         */
+        private Set<UserSystem> setUpUsersForOpenStoreTest(){
+            UserSystem testUser1 = new UserSystem("DaniDin", "Dani", "Din", "123dsa");
+            UserSystem testUser2 = new UserSystem("YuvalMevulbal", "Yuval", "Mevulbal", "456hgf");
+            Set<UserSystem> users = new HashSet<>();
+            users.add(testUser1);
+            users.add(testUser2);
+            tradingSystem.setUsersList(users);
+            return users;
+        }
     }
-
-}
-
 }
