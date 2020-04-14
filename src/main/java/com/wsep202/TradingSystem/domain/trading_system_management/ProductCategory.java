@@ -22,9 +22,14 @@ public enum ProductCategory {
         this.category = category;
     }
 
+    /**
+     * converts between category to ProductCategory enum if category exist.
+     * @param category - the category that needs to be converted.
+     * @return - the converted ProductCategory enum or CategoryDoestExistException if category doesn't exist.
+     */
     public static ProductCategory getProductCategory(String category) {
         return Arrays.stream(ProductCategory.values())
-                .filter(productCategory -> productCategory.category.equals(category))
-                .findFirst().orElseThrow(() -> new CategoryDontExistException(category));
+                .filter(productCategory -> productCategory.category.equals(category)).findFirst()
+                .orElseThrow(() -> new CategoryDoesntExistException(category));
     }
 }

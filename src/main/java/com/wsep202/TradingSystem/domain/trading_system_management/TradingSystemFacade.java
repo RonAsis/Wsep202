@@ -50,7 +50,7 @@ public class TradingSystemFacade {
      * @return all the receipt of the store
      */
     public List<ReceiptDto> viewPurchaseHistory( @NotBlank String administratorUsername, int storeId) {
-        Store store = tradingSystem.getStore(administratorUsername, storeId);
+        Store store = tradingSystem.getStoreByAdmin(administratorUsername, storeId);
         List<Receipt> receipts = store.getReceipts();
         return convertReceiptDtoList(receipts);
     }
@@ -98,7 +98,8 @@ public class TradingSystemFacade {
      * @param cost - the cost of the product
      * @return true if succeed
      */
-    public boolean addProduct( @NotBlank String ownerUsername, int storeId, @NotBlank String productName, @NotBlank String category,
+    public boolean addProduct( @NotBlank String ownerUsername, int storeId,
+                               @NotBlank String productName, @NotBlank String category,
                                int amount, double cost) {
         UserSystem user = tradingSystem.getUser(ownerUsername);
         Store ownerStore = user.getOwnerStore(storeId);
@@ -213,17 +214,17 @@ public class TradingSystemFacade {
      * @param discountPolicyDto - the discount Policy
      * @param discountType - the discount type
      * @param purchaseType - the purchase type
-     * @param storeName - the name of the new store
+     * @param storeId - the id of the new store
      * @return true if succeed
      */
     public boolean openStore(@NotBlank String usernameOwner, @NotNull PurchasePolicyDto purchasePolicyDto, @NotNull DiscountPolicyDto discountPolicyDto,
-                             @NotBlank String discountType, @NotBlank String purchaseType, @NotBlank String storeName) {
+                             @NotBlank String discountType, @NotBlank String purchaseType, @NotBlank int storeId) {
         UserSystem user = tradingSystem.getUser(usernameOwner);
         DiscountType discountTypeObj = DiscountType.getDiscountType(discountType);
         PurchaseType purchaseTypeObj = PurchaseType.getPurchaseType(purchaseType);
         PurchasePolicy purchasePolicy = modelMapper.map(purchasePolicyDto, PurchasePolicy.class);
         DiscountPolicy discountPolicy = modelMapper.map(discountPolicyDto, DiscountPolicy.class);
-        return tradingSystem.openStore(user, discountTypeObj, purchaseTypeObj, purchasePolicy, discountPolicy, storeName);
+        return tradingSystem.openStore(user, discountTypeObj, purchaseTypeObj, purchasePolicy, discountPolicy, storeId);
     }
 
     /**

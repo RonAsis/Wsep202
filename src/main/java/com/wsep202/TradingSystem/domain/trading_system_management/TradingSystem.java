@@ -19,19 +19,23 @@ public class TradingSystem {
 
     private Set<UserSystem> administrators;
 
-    public TradingSystem(ExternalServiceManagement externalServiceManagement) {
+    public TradingSystem(@NotNull ExternalServiceManagement externalServiceManagement,
+                         @NotNull UserSystem admin){
+        this.externalServiceManagement = externalServiceManagement;// must be first
+        encryptPassword(admin);
         stores = new HashSet<>();
         users = new HashSet<>();
-        administrators = new HashSet<>();
-        this.externalServiceManagement = externalServiceManagement;
+        administrators = new HashSet<>(Collections.singletonList(admin));
         externalServiceManagement.connect();
     }
 
-    public TradingSystem(ExternalServiceManagement externalServiceManagement, Set<Store> stores) {
+    public TradingSystem(ExternalServiceManagement externalServiceManagement, Set<Store> stores,
+                         @NotNull UserSystem admin) {
+        this.externalServiceManagement = externalServiceManagement;
+        encryptPassword(admin);
+        administrators = new HashSet<>(Collections.singletonList(admin));
         this.stores = stores;
         users = new HashSet<>();
-        administrators = new HashSet<>();
-        this.externalServiceManagement = externalServiceManagement;
         externalServiceManagement.connect();
     }
 
@@ -52,8 +56,10 @@ public class TradingSystem {
      */
     public boolean registerNewUser(UserSystem userToRegister) {
         if (!isRegisteredUser(userToRegister)) {
+        //encrypt his password to store it and its salt in the system
+        encryptPassword(userToRegister);
             users.add(userToRegister);
-            userToRegister.setPassword(externalServiceManagement.encryptPassword(userToRegister.getPassword()));
+            //userToRegister.setPassword(externalServiceManagement.encryptPassword(userToRegister.getPassword()));
             //log.info("TradingSystem.registerNewUser: a new user was registered in the system");
             return true;
         }
@@ -71,11 +77,21 @@ public class TradingSystem {
         //TODO to check encrypted user password against password received
         return true;
     }
-
-
-    /*
-    public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
-        //TODO to check encrypted user password against password received
+  
+    private void encryptPassword(UserSystem userToRegister) {
+        PasswordSaltPair passwordSaltPair = externalServiceManagement
+                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
+        //set the user password and its salt
+        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
+        userToRegister.setSalt(passwordSaltPair.getSalt());
+    }
+  /*
+  public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+        //TODO example for using the security system password verification
+        //verify that the user's password is correct as saved in our system
+        if(!externalServiceManagement.isAuthenticatedUserPassword(password,userToLogin)){
+            return false;
+        }
         return !isAdmin ? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
     }
 
@@ -161,32 +177,56 @@ public class TradingSystem {
 
     /**
      * checks if the 'administratorUsername' is registered as administrator in the system.
-     * @param administratorUsername
+     * @param administratorUsername - the name of the administrator
      * @return true if found admin with the received username
      * otherwise returns false
      */
-    private boolean isAdmin(String administratorUsername) {
+    public boolean isAdmin(String administratorUsername) {
         return getAdministratorUserOpt(administratorUsername).isPresent();
     }
 
-    public Store getStore(String administratorUsername, int storeId) {
+    /**
+     * returns a store if the person who ask it is an administrator.
+     * @param administratorUsername - the name of the administrator
+     * @param storeId - the given store id to return
+     * @return - a store if administratorUsername is an admin, else returns NotAdministratorException
+     */
+    public Store getStoreByAdmin(String administratorUsername, int storeId) {
         if (isAdmin(administratorUsername)) {
             return getStore(storeId);
         }
         throw new NotAdministratorException(administratorUsername);
     }
 
+    /**
+     * returns a store by a given store id.
+     * @param storeId - the store id to search for return
+     * @return - the store that we searched for according to its id, else
+     * @throws StoreDontExistsException
+     */
     public Store getStore(int storeId) throws StoreDontExistsException {
         Optional<Store> storeOptional = stores.stream()
                 .filter(store -> store.getStoreId() == storeId).findFirst();
         return storeOptional.orElseThrow(() -> new StoreDontExistsException(storeId));
     }
 
+    /**
+     * returns a user by a given user name.
+     * @param username - the user name to search for return
+     * @return - the user that we searched for according to its name, else
+     * @throws UserDontExistInTheSystemException
+     */
     public UserSystem getUser(String username) throws UserDontExistInTheSystemException {
         Optional<UserSystem> userOpt = getUserOpt(username);
         return userOpt.orElseThrow(() -> new UserDontExistInTheSystemException(username));
     }
 
+    /**
+     * returns a user if the person who ask it is an administrator.
+     * @param administratorUsername - the name of the administrator
+     * @param userName - the given user name to return
+     * @return - a user if administratorUsername is an admin, else returns NotAdministratorException
+     */
     public UserSystem getUserByAdmin(String administratorUsername, String userName) {
         if (isAdmin(administratorUsername)) {
             return getUser(userName);
@@ -195,20 +235,45 @@ public class TradingSystem {
     }
 
     /**
-     * need pass on all the stores and give the product with this name
-     * @param productName
-     * @return
+     * searches all the products that there name is productName in all stores.
+     * @param productName - the name of product we want to search.
+     * @return - a list that contains all suitable products.
      */
     public List<Product> searchProductByName(String productName) {
-        return null;
+        return new ArrayList<>(stores.stream()
+                .map(store -> store.searchProductByName(productName))
+                .reduce((products, products2) -> {
+                    products.addAll(products2);
+                    return products;})
+                .orElse(new HashSet<>()));
     }
 
+    /**
+     * searches all the products that there category is productCategory in all stores.
+     * @param productCategory - the category of product we want to search.
+     * @return - a list that contains all suitable products.
+     */
     public List<Product> searchProductByCategory(ProductCategory productCategory) {
-        return null;
+        return new ArrayList<>(stores.stream()
+                .map(store -> store.searchProductByCategory(productCategory))
+                .reduce((products, products2) -> {
+                    products.addAll(products2);
+                    return products;})
+                .orElse(new HashSet<>()));
     }
 
+    /**
+     * searches all the products that there name contains keyWords in all stores.
+     * @param keyWords - the key words that contained in product name.
+     * @return - a list that contains all suitable products.
+     */
     public List<Product> searchProductByKeyWords(List<String> keyWords) {
-        return null;
+        return new ArrayList<>(stores.stream()
+                .map(store -> store.searchProductByKeyWords(keyWords))
+                .reduce((products, products2) -> {
+                    products.addAll(products2);
+                    return products;})
+                .orElse(new HashSet<>()));
     }
 
     /**
@@ -306,5 +371,9 @@ public class TradingSystem {
 
     public void setUsersList(Set<UserSystem> users){
         this.users = users;
+    }
+  
+    public void insertStoreToStores(Store store){
+        stores.add(store);
     }
 }

@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * define user in the system
@@ -29,11 +26,21 @@ public class UserSystem {
     @NotBlank
     private String userName;
 
+
+
     /**
      * the encryption password of the the user
      */
     @NotBlank
     private String password;
+
+    /**
+     * the salt we use to hash the password for the user
+     */
+    @NotBlank
+    private String salt;
+
+
 
     /**
      * the first name of the user
@@ -98,4 +105,6 @@ public class UserSystem {
     public boolean removeProductInShoppingBag(Store store, Product product) {
         return false;
     }
+
+
 }

@@ -1,18 +1,19 @@
 package com.wsep202.TradingSystem;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@Slf4j
 @SpringBootApplication
 public class TradingSystemApplication {
 
-	private static final Logger logger = LoggerFactory.getLogger(TradingSystemApplication.class);
 	public static void main(String[] args) {
-		SpringApplication.run(TradingSystemApplication.class, args);
-		logger.info("this is a info message");
-		logger.warn("this is a warn message");
-		logger.error("this is a error message");
+		log.info("The application is starting");
+		if(args.length < 2){
+			log.error("Must enter admin user and password for start the application");
+		}else {
+			SpringApplication.run(TradingSystemApplication.class, args);
+		}
 	}
 }
