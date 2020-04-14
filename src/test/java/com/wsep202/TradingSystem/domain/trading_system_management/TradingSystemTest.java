@@ -696,23 +696,21 @@ class TradingSystemTest {
         /**
          * check the getStoreByAdmin() functionality in case of exists admin in the system
          */
-        // todo when admin entered
         @Test
         void getStoreByAdminPositive() {
-            //tradingSystem.insertStoreToStores(store);
-            //Assertions.assertEquals(tradingSystem.getStoreByAdmin("admin", 1),store);
+            tradingSystem.insertStoreToStores(store);
+            Assertions.assertEquals(tradingSystem.getStoreByAdmin("admin", 1),store);
         }
 
         /**
          * check the getStoreByAdmin() functionality in case of not exists admin in the system
          */
-        // todo when admin entered
         @Test
         void getStoreByAdminNegative() {
-            /*Assertions.assertThrows(NotAdministratorException.class, () -> {
-                doNothing().when(store).setStoreId(1);
+            Assertions.assertThrows(NotAdministratorException.class, () -> {
+                tradingSystem.insertStoreToStores(store);
                 tradingSystem.getStoreByAdmin("userSystem", 1);
-            });*/
+            });
         }
 
         /**
@@ -760,26 +758,21 @@ class TradingSystemTest {
         /**
          * check the getUserByAdmin() functionality in case of exists admin in the system
          */
-        // todo when admin entered
         @Test
         void getUserByAdminPositive() {
-            /*registerAsSetup();
-            doNothing().when(userToRegister).setUserName("userToRegister");
-            when(userToRegister.getUserName()).thenReturn("userToRegister");
-            Assertions.assertEquals(tradingSystem.getUserByAdmin("admin", "userToRegister"),userToRegister);*/
+            registerAsSetup();
+            Assertions.assertEquals(tradingSystem.getUserByAdmin("admin", "usernameTest"),userToRegister);
         }
 
         /**
          * check the getUserByAdmin() functionality in case of not exists admin in the system
          */
-        // todo when admin entered
         @Test
         void getUserByAdminNegative(){
-            /*Assertions.assertThrows(NotAdministratorException.class, () -> {
+            Assertions.assertThrows(NotAdministratorException.class, () -> {
                 registerAsSetup();
-                doNothing().when(userToRegister).setUserName("userToRegister");
-                tradingSystem.getUserByAdmin("userSystem", "userToRegister");
-            });*/
+                tradingSystem.getUserByAdmin("userSystem", "usernameTest");
+            });
         }
 
         /**
