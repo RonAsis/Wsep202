@@ -8,6 +8,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -133,5 +134,20 @@ public class Product {
                 "\nProduct cost: " + cost +
                 "\nProduct rank: " + rank +
                 "\nProduct store id: " + storeId;
+    }
+
+    /**
+     * check if the current product name contains the given key words
+     * @param keyWords - the key words to check for
+     * @return - the current product.
+     */
+    public Product productNameThatContainsKeyWords(List<String> keyWords){
+        boolean contains = true;
+        for(String keyWord : keyWords)
+            if (!name.contains(keyWord))
+                contains = false;
+        if(!contains)
+            return null;
+        return this;
     }
 }

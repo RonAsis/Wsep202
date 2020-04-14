@@ -7,7 +7,6 @@ import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
 import com.wsep202.TradingSystem.service.user_service.dto.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.util.CollectionUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +67,7 @@ class TradingSystemFacadeTest {
             int storeId = 1;
 
             //mock
-            when(tradingSystem.getStore(administratorUsername, storeId)).thenReturn(store);
+            when(tradingSystem.getStoreByAdmin(administratorUsername, storeId)).thenReturn(store);
             when(store.getReceipts()).thenReturn(receipts);
 
             //test
@@ -283,7 +282,7 @@ class TradingSystemFacadeTest {
             DiscountPolicyDto discountPolicyDto = DiscountPolicyDto.builder().build();
             String discountType = DiscountType.OPEN_DISCOUNT.type;
             String purchaseType = PurchaseType.BUY_IMMEDIATELY.type;
-            String storeName = "storeName";
+            int storeId = 1;
 
             //mock
             ModelMapper modelMapper = mock(ModelMapper.class);
@@ -295,11 +294,11 @@ class TradingSystemFacadeTest {
             when(modelMapper.map(purchasePolicyDto, PurchasePolicy.class)).thenReturn(purchasePolicy);
             when(modelMapper.map(discountPolicyDto, DiscountPolicy.class)).thenReturn(discountPolicy);
             when(tradingSystem.openStore(userSystem, DiscountType.getDiscountType(discountType),
-                    PurchaseType.getPurchaseType(purchaseType), purchasePolicy, discountPolicy, storeName)).thenReturn(true);
+                    PurchaseType.getPurchaseType(purchaseType), purchasePolicy, discountPolicy, storeId)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
-                    .openStore(ownerUsername, purchasePolicyDto, discountPolicyDto, discountType, purchaseType, storeName));
+                    .openStore(ownerUsername, purchasePolicyDto, discountPolicyDto, discountType, purchaseType, storeId));
         }
 
         @Test
@@ -879,6 +878,7 @@ class TradingSystemFacadeTest {
         return ShoppingCart.builder()
                 .shoppingBags(shoppingBags)
                 .build();
+
     }
 
     /////////////////////////////////General /////////////////////////////////

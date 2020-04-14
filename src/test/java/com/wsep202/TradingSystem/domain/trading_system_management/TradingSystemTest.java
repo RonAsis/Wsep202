@@ -1,9 +1,12 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 
-import Externals.PasswordSaltPair;
+//import Externals.PasswordSaltPair;
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.domain.exception.NotAdministratorException;
+import com.wsep202.TradingSystem.domain.exception.StoreDontExistsException;
+import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
 import org.assertj.core.api.Assert;
@@ -14,14 +17,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.parameters.P;
 import org.springframework.test.context.ContextConfiguration;
-
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
@@ -47,6 +47,8 @@ class TradingSystemTest {
         private UserSystem userToRegister;
         private FactoryObjects factoryObjects;
         private UserSystem admin;
+        private Store store;
+        private Product product;
 
         @BeforeEach
         void setUp() {
@@ -65,7 +67,8 @@ class TradingSystemTest {
             String fName = "moti";
             String lName = "Banana";
             userToRegister = new UserSystem(username,fName,lName,password);
-
+            store = mock(Store.class);
+            product = mock(Product.class);
         }
 
         //TODO create the test after we will know the identity of the admin name
@@ -164,32 +167,201 @@ class TradingSystemTest {
         void getAdministratorUser() {
         }
 
+        /**
+         * check the getStoreByAdmin() functionality in case of exists admin in the system
+         */
         @Test
-        void getStore() {
+        void getStoreByAdminPositive() {
+            doNothing().when(store).setStoreId(1);
+            when(store.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store);
+            Assertions.assertEquals(tradingSystem.getStoreByAdmin("admin", 1),store);
         }
 
+        /**
+         * check the getStoreByAdmin() functionality in case of not exists admin in the system
+         */
         @Test
-        void testGetStore() {
+        void getStoreByAdminNegative() {
+            Assertions.assertThrows(NotAdministratorException.class, () -> {
+                doNothing().when(store).setStoreId(1);
+                tradingSystem.getStoreByAdmin("userSystem", 1);
+            });
         }
 
+        /**
+         * check the getStore() functionality in case of exists store in the system
+         */
         @Test
-        void getUser() {
+        void getStorePositive() {
+            doNothing().when(store).setStoreId(1);
+            when(store.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store);
+            Assertions.assertEquals(tradingSystem.getStore(1),store);
         }
 
+        /**
+         * check the getStore() functionality in case of not exists store in the system
+         */
         @Test
-        void getUserByAdmin() {
+        void getStoreNegative() {
+            Assertions.assertThrows(StoreDontExistsException.class, () -> {
+                doNothing().when(store).setStoreId(1);
+                when(store.getStoreId()).thenReturn(2);
+                tradingSystem.insertStoreToStores(store);
+                tradingSystem.getStore(1);
+            });
         }
 
+        /**
+         * check the getUser() functionality in case of exists user in the system
+         */
         @Test
-        void searchProductByName() {
+        void getUserPositive() {
+            // register "userToRegister" to the users list in trading system
+            registerAsSetup();
+            doNothing().when(userToRegister).setUserName("userToRegister");
+            when(userToRegister.getUserName()).thenReturn("userToRegister");
+            Assertions.assertEquals(tradingSystem.getUser("userToRegister"),userToRegister);
         }
 
+        /**
+         * check the getUser() functionality in case of not exists user in the system
+         */
         @Test
-        void searchProductByCategory() {
+        void getUserNegative() {
+            // register "userToRegister" to the users list in trading system
+            Assertions.assertThrows(UserDontExistInTheSystemException.class, () -> {
+                registerAsSetup();
+                doNothing().when(userToRegister).setUserName("userToRegister");
+                when(userToRegister.getUserName()).thenReturn("userSystem");
+                tradingSystem.getUser("userToRegister");
+            });
         }
 
+        /**
+         * check the getUserByAdmin() functionality in case of exists admin in the system
+         */
         @Test
-        void searchProductByKeyWords() {
+        void getUserByAdminPositive() {
+            registerAsSetup();
+            doNothing().when(userToRegister).setUserName("userToRegister");
+            when(userToRegister.getUserName()).thenReturn("userToRegister");
+            Assertions.assertEquals(tradingSystem.getUserByAdmin("admin", "userToRegister"),userToRegister);
+        }
+
+        /**
+         * check the getUserByAdmin() functionality in case of not exists admin in the system
+         */
+        @Test
+        void getUserByAdminNegative(){
+            Assertions.assertThrows(NotAdministratorException.class, () -> {
+                registerAsSetup();
+                doNothing().when(userToRegister).setUserName("userToRegister");
+                tradingSystem.getUserByAdmin("userSystem", "userToRegister");
+            });
+        }
+
+        /**
+         * check the searchProductByName() functionality in case of exists product in store in the system
+         */
+        @Test
+        void searchProductByNamePositive() {
+            doNothing().when(store).setStoreId(1);
+            when(store.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store);
+            doNothing().when(product).setName("dollhouse");
+            HashSet<Product> products = new HashSet<Product>();
+            products.add(product);
+            when(store.searchProductByName("dollhouse")).thenReturn(products);
+            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+            Assertions.assertArrayEquals(tradingSystem.searchProductByName("dollhouse").toArray(),products.toArray());
+        }
+
+        /**
+         * check the searchProductByName() functionality in case of not exists product in store in the system
+         */
+        @Test
+        void searchProductByNameNegative() {
+            doNothing().when(store).setStoreId(1);
+            when(store.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store);
+            doNothing().when(product).setName("dollhouse");
+            HashSet<Product> products = new HashSet<Product>();
+            products.add(product);
+            when(store.searchProductByName("dollhouse")).thenReturn(new HashSet<>());
+            // The disjoint method returns true if its two arguments have no elements in common.
+            Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByName("dollhouse"), products));
+        }
+
+        /**
+         * check the searchProductByCategory() functionality in case of exists product in store in the system
+         */
+        @Test
+        void searchProductByCategoryPositive() {
+            doNothing().when(store).setStoreId(1);
+            when(store.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store);
+            doNothing().when(product).setCategory(ProductCategory.TOYS_HOBBIES);
+            HashSet<Product> products = new HashSet<Product>();
+            products.add(product);
+            when(store.searchProductByCategory(ProductCategory.TOYS_HOBBIES)).thenReturn(products);
+            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+            Assertions.assertArrayEquals(tradingSystem.searchProductByCategory(ProductCategory.TOYS_HOBBIES).toArray(),products.toArray());
+        }
+
+        /**
+         * check the searchProductByCategory() functionality in case of not exists product in store in the system
+         */
+        @Test
+        void searchProductByCategoryNegative() {
+            doNothing().when(store).setStoreId(1);
+            when(store.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store);
+            doNothing().when(product).setCategory(ProductCategory.TOYS_HOBBIES);
+            HashSet<Product> products = new HashSet<Product>();
+            products.add(product);
+            when(store.searchProductByCategory(ProductCategory.TOYS_HOBBIES)).thenReturn(new HashSet<>());
+            // The disjoint method returns true if its two arguments have no elements in common.
+            Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByCategory(ProductCategory.TOYS_HOBBIES), products));
+        }
+
+        /**
+         * check the searchProductByKeyWords() functionality in case of exists product in store in the system
+         */
+        @Test
+        void searchProductByKeyWordsPositive() {
+            doNothing().when(store).setStoreId(1);
+            when(store.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store);
+            doNothing().when(product).setName("dollhouse");
+            List<String> keyWords = new ArrayList<String>();
+            keyWords.add("doll");
+            keyWords.add("house");
+            HashSet<Product> products = new HashSet<Product>();
+            products.add(product);
+            when(store.searchProductByKeyWords(keyWords)).thenReturn(products);
+            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+            Assertions.assertArrayEquals(tradingSystem.searchProductByKeyWords(keyWords).toArray(),products.toArray());
+        }
+
+        /**
+         * check the searchProductByKeyWords() functionality in case of not exists product in store in the system
+         */
+        @Test
+        void searchProductByKeyWordsNegative() {
+            doNothing().when(store).setStoreId(1);
+            when(store.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store);
+            doNothing().when(product).setName("dollhouse");
+            List<String> keyWords = new ArrayList<String>();
+            keyWords.add("elephant");
+            keyWords.add("pig");
+            HashSet<Product> products = new HashSet<Product>();
+            products.add(product);
+            when(store.searchProductByKeyWords(keyWords)).thenReturn(new HashSet<>());
+            // The disjoint method returns true if its two arguments have no elements in common.
+            Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByKeyWords(keyWords), products));
         }
 
         @Test
@@ -344,6 +516,8 @@ public class TradingSystemTestIntegration {
     @Autowired
     private TradingSystem tradingSystem;
     private UserSystem userToRegister;
+    private Store store;
+    private Product product;
 
     @MockBean // for pass compilation
     private ModelMapper modelMapper;
@@ -355,6 +529,11 @@ public class TradingSystemTestIntegration {
         String fName = "moti";
         String lName = "Banana";
         userToRegister = new UserSystem(username,fName,lName,password);
+        store = new Store();
+        product = new Product();
+        store.setStoreId(1);
+        product.setName("dollhouse");
+        product.setCategory(ProductCategory.TOYS_HOBBIES);
     }
 
     @Test
@@ -375,7 +554,7 @@ public class TradingSystemTestIntegration {
         //setup*/
 
         //the following user details are necessary for the login tests
-        Assertions.assertTrue(tradingSystem.registerNewUser(userToRegistration));
+        //Assertions.assertTrue(tradingSystem.registerNewUser(userToRegistration));
     }
 
     /**
@@ -463,36 +642,201 @@ public class TradingSystemTestIntegration {
     void logoutNegative() {
         Assertions.assertFalse(tradingSystem.logout(userToRegister));
     }
+
     @Test
     void getAdministratorUser() {
     }
 
+    /**
+     * check the getStoreByAdmin() functionality in case of exists admin in the system
+     */
+    // todo when admin entered
     @Test
-    void getStore() {
+    void getStoreByAdminPositive() {
+        //tradingSystem.insertStoreToStores(store);
+        //Assertions.assertEquals(tradingSystem.getStoreByAdmin("admin", 1),store);
     }
 
+    /**
+     * check the getStoreByAdmin() functionality in case of not exists admin in the system
+     */
+    // todo when admin entered
     @Test
-    void testGetStore() {
+    void getStoreByAdminNegative() {
+        /*Assertions.assertThrows(NotAdministratorException.class, () -> {
+            doNothing().when(store).setStoreId(1);
+            tradingSystem.getStoreByAdmin("userSystem", 1);
+        });*/
     }
 
+    /**
+     * check the getStore() functionality in case of exists store in the system
+     */
     @Test
-    void getUser() {
+    void getStorePositive() {
+        tradingSystem.insertStoreToStores(store);
+        Assertions.assertEquals(tradingSystem.getStore(1),store);
     }
 
+    /**
+     * check the getStore() functionality in case of not exists store in the system
+     */
     @Test
-    void getUserByAdmin() {
+    void getStoreNegative() {
+        Assertions.assertThrows(StoreDontExistsException.class, () -> {
+            tradingSystem.insertStoreToStores(store);
+            tradingSystem.getStore(2);
+        });
     }
 
+    /**
+     * check the getUser() functionality in case of exists user in the system
+     */
     @Test
-    void searchProductByName() {
+    void getUserPositive() {
+        // register "userToRegister" to the users list in trading system
+        registerAsSetup();
+        Assertions.assertEquals(tradingSystem.getUser("usernameTest"),userToRegister);
     }
 
+    /**
+     * check the getUser() functionality in case of not exists user in the system
+     */
     @Test
-    void searchProductByCategory() {
+    void getUserNegative() {
+        // register "userToRegister" to the users list in trading system
+        Assertions.assertThrows(UserDontExistInTheSystemException.class, () -> {
+            registerAsSetup();
+            tradingSystem.getUser("userToRegister");
+        });
     }
 
+    /**
+     * check the getUserByAdmin() functionality in case of exists admin in the system
+     */
+    // todo when admin entered
     @Test
-    void searchProductByKeyWords() {
+    void getUserByAdminPositive() {
+        /*registerAsSetup();
+        doNothing().when(userToRegister).setUserName("userToRegister");
+        when(userToRegister.getUserName()).thenReturn("userToRegister");
+        Assertions.assertEquals(tradingSystem.getUserByAdmin("admin", "userToRegister"),userToRegister);*/
+    }
+
+    /**
+     * check the getUserByAdmin() functionality in case of not exists admin in the system
+     */
+    // todo when admin entered
+    @Test
+    void getUserByAdminNegative(){
+        /*Assertions.assertThrows(NotAdministratorException.class, () -> {
+            registerAsSetup();
+            doNothing().when(userToRegister).setUserName("userToRegister");
+            tradingSystem.getUserByAdmin("userSystem", "userToRegister");
+        });*/
+    }
+
+    /**
+     * check the searchProductByName() functionality in case of exists product in store in the system
+     */
+    @Test
+    void searchProductByNamePositive() {
+        tradingSystem.insertStoreToStores(store);
+        HashSet<Product> products = new HashSet<Product>();
+        products.add(product);
+        HashSet<UserSystem> owners = new HashSet<UserSystem>();
+        owners.add(userToRegister);
+        store.setOwners(owners);
+        store.addNewProduct(userToRegister, product);
+        // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+        Assertions.assertArrayEquals(tradingSystem.searchProductByName("dollhouse").toArray(),products.toArray());
+    }
+
+    /**
+     * check the searchProductByName() functionality in case of not exists product in store in the system
+     */
+    @Test
+    void searchProductByNameNegative() {
+        tradingSystem.insertStoreToStores(store);
+        HashSet<Product> products = new HashSet<Product>();
+        products.add(product);
+        HashSet<UserSystem> owners = new HashSet<UserSystem>();
+        owners.add(userToRegister);
+        store.setOwners(owners);
+        store.addNewProduct(userToRegister, product);
+        // The disjoint method returns true if its two arguments have no elements in common.
+        Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByName("puppy"), products));
+    }
+
+    /**
+     * check the searchProductByCategory() functionality in case of exists product in store in the system
+     */
+    @Test
+    void searchProductByCategoryPositive() {
+        tradingSystem.insertStoreToStores(store);
+        HashSet<Product> products = new HashSet<Product>();
+        products.add(product);
+        HashSet<UserSystem> owners = new HashSet<UserSystem>();
+        owners.add(userToRegister);
+        store.setOwners(owners);
+        store.addNewProduct(userToRegister, product);
+        // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+        Assertions.assertArrayEquals(tradingSystem.searchProductByCategory(ProductCategory.TOYS_HOBBIES).toArray(),products.toArray());
+    }
+
+    /**
+     * check the searchProductByCategory() functionality in case of not exists product in store in the system
+     */
+    @Test
+    void searchProductByCategoryNegative() {
+        tradingSystem.insertStoreToStores(store);
+        HashSet<Product> products = new HashSet<Product>();
+        products.add(product);
+        product.setCategory(ProductCategory.BOOKS_MOVIES_MUSIC);
+        HashSet<UserSystem> owners = new HashSet<UserSystem>();
+        owners.add(userToRegister);
+        store.setOwners(owners);
+        store.addNewProduct(userToRegister, product);
+        // The disjoint method returns true if its two arguments have no elements in common.
+        Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByCategory(ProductCategory.TOYS_HOBBIES), products));
+    }
+
+    /**
+     * check the searchProductByKeyWords() functionality in case of exists product in store in the system
+     */
+    @Test
+    void searchProductByKeyWordsPositive() {
+        tradingSystem.insertStoreToStores(store);
+        HashSet<Product> products = new HashSet<Product>();
+        products.add(product);
+        HashSet<UserSystem> owners = new HashSet<UserSystem>();
+        owners.add(userToRegister);
+        store.setOwners(owners);
+        store.addNewProduct(userToRegister, product);
+        List<String> keyWords = new ArrayList<String>();
+        keyWords.add("doll");
+        keyWords.add("house");
+        // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+        Assertions.assertArrayEquals(tradingSystem.searchProductByKeyWords(keyWords).toArray(),products.toArray());
+    }
+
+    /**
+     * check the searchProductByKeyWords() functionality in case of not exists product in store in the system
+     */
+    @Test
+    void searchProductByKeyWordsNegative() {
+        tradingSystem.insertStoreToStores(store);
+        HashSet<Product> products = new HashSet<Product>();
+        products.add(product);
+        HashSet<UserSystem> owners = new HashSet<UserSystem>();
+        owners.add(userToRegister);
+        store.setOwners(owners);
+        store.addNewProduct(userToRegister, product);
+        List<String> keyWords = new ArrayList<String>();
+        keyWords.add("elephant");
+        keyWords.add("pig");
+        // The disjoint method returns true if its two arguments have no elements in common.
+        Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByKeyWords(keyWords), products));
     }
 
     @Test

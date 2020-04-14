@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Builder
@@ -357,8 +358,6 @@ public class Store {
                 .findFirst().orElseThrow(()-> new NoManagerInStoreException(managerUserName, storeId));
     }
 
-
-
     /**
      * return a product with the SN reveived
      * @param productId - SN of product to get
@@ -394,5 +393,40 @@ public class Store {
      */
     private boolean isOwner(UserSystem user) {
         return ownersContains(user);
+    }
+
+    //TODO ADDED by MORAN THE QUEEN
+
+    /**
+     * search a product by a given productName
+     * @param productName - the name to search
+     * @return - the product who has name equals to productName
+     */
+    public Set<Product> searchProductByName(String productName){
+        return products.stream()
+                .filter(product -> product.getName().equals(productName))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * search a product by a given productCategory
+     * @param productCategory - the category to search
+     * @return - the product who has category equals to productCategory
+     */
+    public Set<Product> searchProductByCategory(ProductCategory productCategory){
+        return products.stream()
+                .filter(product -> product.getCategory().category.equals(productCategory.category))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * search a product by a given list of key words that contained in product name
+     * @param keyWords - the keyWords to search in the name
+     * @return - the product who has keyWords contained in product name
+     */
+    public Set<Product> searchProductByKeyWords(List<String> keyWords){
+        return products.stream()
+                .map(product -> product.productNameThatContainsKeyWords(keyWords)).filter(product -> product!=null)
+                .collect(Collectors.toSet());
     }
 }
