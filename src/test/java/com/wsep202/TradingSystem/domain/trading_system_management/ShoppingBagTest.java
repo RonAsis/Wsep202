@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -23,10 +24,17 @@ class ShoppingBagTest {
     void setUp() {
         testStore1 = mock(Store.class);
         testProduct = mock(Product.class);
-        testProduct2 = new Product("iPhone", ProductCategory.ELECTRONICS, 50, 1999.99, 1);
-        testProduct3 = new Product("iPod", ProductCategory.ELECTRONICS, 50, 199.85, 1);
-        testProduct4 = new Product("Harry Potter", ProductCategory.BOOKS_MOVIES_MUSIC, 100, 100.50, 2);
+        testProduct2 = mock(Product.class);
+        testProduct3 = mock(Product.class);
+        testProduct4 = mock(Product.class);
         testShoppingBag = new ShoppingBag(testStore1);
+        when(testStore1.getStoreId()).thenReturn(1);
+        when(testProduct2.getCost()).thenReturn(1999.99);
+        when(testProduct2.getStoreId()).thenReturn(1);
+        when(testProduct3.getCost()).thenReturn(199.85);
+        when(testProduct3.getStoreId()).thenReturn(1);
+        when(testProduct4.getCost()).thenReturn(100.50);
+        when(testProduct4.getStoreId()).thenReturn(2);
     }
 
     /**
@@ -35,7 +43,6 @@ class ShoppingBagTest {
      */
     @Test
     void addProductToBagSuccess() {
-        when(testStore1.getStoreId()).thenReturn(1);
         //check that the product was added successfully, needs to return true
         assertTrue(testShoppingBag.addProductToBag(testProduct2,3));
         //checks that the number of the type product is 1
@@ -62,7 +69,6 @@ class ShoppingBagTest {
      */
     @Test
     void addProductToBagFail() {
-        when(testStore1.getStoreId()).thenReturn(1);
         //checks that testProduct4 can't be added to the shoppingBag, because it's from a dif store
         assertFalse(testShoppingBag.addProductToBag(testProduct4,3));
         //check that the method does not add a null product
@@ -74,6 +80,10 @@ class ShoppingBagTest {
         testShoppingBag.addProductToBag(testProduct2,1);
         //the amount of a product can't be less than 0
         assertFalse(testShoppingBag.addProductToBag(testProduct2,-2));
+        //check that product amount needs to be greater than 0
+        assertFalse(testShoppingBag.addProductToBag(testProduct3, 0));
+        //check that product amount needs to be greater than 0
+        assertFalse(testShoppingBag.addProductToBag(testProduct3, -1));
     }
 
     /**
@@ -83,7 +93,6 @@ class ShoppingBagTest {
     @Test
     void removeProductFromBagSuccess() {
         setUpForRemove();
-        when(testStore1.getStoreId()).thenReturn(1);
         //check that the product is removed from the bag
         assertTrue(testShoppingBag.removeProductFromBag(testProduct2));
         //check that the number of products in the bag is updated
@@ -105,8 +114,6 @@ class ShoppingBagTest {
     @Test
     void removeProductFromBagFail() {
         setUpForRemove();
-        when(testStore1.getStoreId()).thenReturn(1);
-        when(testProduct.getStoreId()).thenReturn(1);
         //try to remove a null product
         assertFalse(testShoppingBag.removeProductFromBag(null));
         //try to remove a product that has a different store id
@@ -129,5 +136,66 @@ class ShoppingBagTest {
         testShoppingBag.setProductListFromStore(testProductList);
         testShoppingBag.setNumOfProductsInBag(2);
         testShoppingBag.setTotalCostOfBag((testProduct2.getCost()*2)+(testProduct3.getCost()*2));
+    }
+
+    /**
+     * Integration tests for ShoppingCart class
+     */
+    @Nested
+    public class ShoppingCartIntegration {
+        Store testStore1;
+        ShoppingBag testShoppingBag;
+        Product testProduct;
+        Product testProduct2;
+        Product testProduct3;
+        Product testProduct4;
+
+        @BeforeEach
+        void setUp() {
+            testStore1 = mock(Store.class);
+            testProduct = mock(Product.class);
+            testProduct2 = mock(Product.class);
+            testProduct3 = mock(Product.class);
+            testProduct4 = mock(Product.class);
+            testShoppingBag = new ShoppingBag(testStore1);
+            when(testStore1.getStoreId()).thenReturn(1);
+            when(testProduct2.getCost()).thenReturn(1999.99);
+            when(testProduct2.getStoreId()).thenReturn(1);
+            when(testProduct3.getCost()).thenReturn(199.85);
+            when(testProduct3.getStoreId()).thenReturn(1);
+            when(testProduct4.getCost()).thenReturn(100.50);
+            when(testProduct4.getStoreId()).thenReturn(2);
+        }
+
+        /**
+         * This test check if the add & remove methods succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addAndRemoveSuccess(){
+            testShoppingBag.addProductToBag(testProduct2, 2);
+            //check that the amount of products is 1 after add
+            assertEquals(1,testShoppingBag.getNumOfProductsInBag());
+            //check that the added product is deleted from bag
+            assertTrue(testShoppingBag.removeProductFromBag(testProduct2));
+            //check that number of products is 0 after remove
+            assertEquals(0,testShoppingBag.getNumOfProductsInBag());
+        }
+
+        /**
+         * This test check if the add & remove methods fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addAndRemoveFail(){
+            testShoppingBag.addProductToBag(testProduct2, -1);
+            //can't remove a product that was never added
+            assertFalse(testShoppingBag.removeProductFromBag(testProduct2));
+            //check that there are 0 products in bag
+            assertEquals(0, testShoppingBag.getNumOfProductsInBag());
+            testShoppingBag.addProductToBag(testProduct2,2);
+            //can't remove a product that was never added
+            assertFalse(testShoppingBag.removeProductFromBag(testProduct3));
+        }
     }
 }

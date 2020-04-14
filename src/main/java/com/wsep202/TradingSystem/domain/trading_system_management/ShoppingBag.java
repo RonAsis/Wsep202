@@ -47,6 +47,10 @@ public class ShoppingBag {
                 //log.info("ShoppingBag.addProductToBag: calls changeAmountOfProductInBag to update the amount of the exciting product");
                 return changeAmountOfProductInBag(productToAdd, amountOfProduct);
             }
+            if (amountOfProduct <= 0){
+                //log.error("ShoppingBag.addProductToBag: the amount of the product needs to be greater than zero");
+                return false;
+            }
             //log.info("ShoppingBag.addProductToBag: add new product to the bag");
             productListFromStore.put(productToAdd, amountOfProduct);
             numOfProductsInBag += 1;
