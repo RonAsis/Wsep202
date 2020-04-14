@@ -214,17 +214,17 @@ public class TradingSystemFacade {
      * @param discountPolicyDto - the discount Policy
      * @param discountType - the discount type
      * @param purchaseType - the purchase type
-     * @param storeId - the id of the new store
+     * @param storeName - the name of the new store
      * @return true if succeed
      */
     public boolean openStore(@NotBlank String usernameOwner, @NotNull PurchasePolicyDto purchasePolicyDto, @NotNull DiscountPolicyDto discountPolicyDto,
-                             @NotBlank String discountType, @NotBlank String purchaseType, @NotBlank int storeId) {
+                             @NotBlank String discountType, @NotBlank String purchaseType, @NotBlank String storeName) {
         UserSystem user = tradingSystem.getUser(usernameOwner);
         DiscountType discountTypeObj = DiscountType.getDiscountType(discountType);
         PurchaseType purchaseTypeObj = PurchaseType.getPurchaseType(purchaseType);
         PurchasePolicy purchasePolicy = modelMapper.map(purchasePolicyDto, PurchasePolicy.class);
         DiscountPolicy discountPolicy = modelMapper.map(discountPolicyDto, DiscountPolicy.class);
-        return tradingSystem.openStore(user, discountTypeObj, purchaseTypeObj, purchasePolicy, discountPolicy, storeId);
+        return tradingSystem.openStore(user, discountTypeObj, purchaseTypeObj, purchasePolicy, discountPolicy, storeName);
     }
 
     /**

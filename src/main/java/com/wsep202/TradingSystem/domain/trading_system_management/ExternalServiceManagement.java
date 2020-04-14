@@ -68,11 +68,12 @@ public class ExternalServiceManagement {
      * @param shoppingBag - the shopping bag we wish to calculate its price.
      * @return totalPrice as the price the customer needs to pay for the bag.
      */
+    //TODO - BAR instead using the for use shoppingBag.getTotalCostOfBag
     private int calculateShoppingBagPrice(ShoppingBag shoppingBag) {
         int totalPrice = 0;
-        for(Integer productPrice :shoppingBag.getMapProductSnToAmount().keySet()){
+        /*for(Integer productPrice :shoppingBag.getMapProductSnToAmount().keySet()){
             totalPrice+= productPrice;  //add current product price
-        }
+        }*/
         return totalPrice;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////

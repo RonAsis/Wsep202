@@ -40,7 +40,19 @@ public class TradingSystem {
     }
 
     /**
-     *  TODO this method OR DELETE IT
+     * a function that encrypts a password
+     * @param userToRegister - the user we want to encrypt his password
+     */
+    private void encryptPassword(UserSystem userToRegister) {
+        PasswordSaltPair passwordSaltPair = externalServiceManagement
+                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
+        //set the user password and its salt
+        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
+        userToRegister.setSalt(passwordSaltPair.getSalt());
+    }
+
+    /**
+     *  TODO this method OR DELETE IT - KSENIA
      */
     public Receipt buyShoppingCart(UserSystem userSystem) {
         //TODO
@@ -48,26 +60,28 @@ public class TradingSystem {
     }
 
     /**
-     * This method is used to register a new user in the system,
-     * this method uses the method isRegisteredUser to check if the user is already registered.
-     * In the process of registration the system will encrypt the users password.
-     * @param userToRegister - the user that needs to be registered
-     * @return true if the registration was successful, returns false if the user is already registered
+     * register new user in the system
+     * with its password
+     * @param userToRegister the user we want to register
+     * @return true if the registration succeeded
      */
     public boolean registerNewUser(UserSystem userToRegister) {
-        if (!isRegisteredUser(userToRegister)) {
         //encrypt his password to store it and its salt in the system
-        encryptPassword(userToRegister);
+        PasswordSaltPair passwordSaltPair = externalServiceManagement
+                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
+        //set the user password and its salt
+        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
+        userToRegister.setSalt(passwordSaltPair.getSalt());
+        boolean isRegistered = isRegisteredUser(userToRegister);
+        if (!isRegistered) {
             users.add(userToRegister);
-            //userToRegister.setPassword(externalServiceManagement.encryptPassword(userToRegister.getPassword()));
-            //log.info("TradingSystem.registerNewUser: a new user was registered in the system");
             return true;
         }
-        //log.error("TradingSystem.registerNewUser: the user is already registered");
         return false;
     }
 
-    public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+    // TODO - ksenia = add comment + check the correctness of the nex login functions
+    /*public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
         boolean isRegistered = administrators.stream()
                 .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
         if (!isRegistered){
@@ -76,17 +90,9 @@ public class TradingSystem {
         }
         //TODO to check encrypted user password against password received
         return true;
-    }
-  
-    private void encryptPassword(UserSystem userToRegister) {
-        PasswordSaltPair passwordSaltPair = externalServiceManagement
-                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
-        //set the user password and its salt
-        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
-        userToRegister.setSalt(passwordSaltPair.getSalt());
-    }
-  /*
-  public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+    }*/
+
+    public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
         //TODO example for using the security system password verification
         //verify that the user's password is correct as saved in our system
         if(!externalServiceManagement.isAuthenticatedUserPassword(password,userToLogin)){
@@ -105,12 +111,11 @@ public class TradingSystem {
         return suc;
     }
 
-    ate boolean isRegisteredAdministrator(UserSystem userToRegister) {
+    private boolean isRegisteredAdministrator(UserSystem userToRegister) {
         return administrators.stream()
                 .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
 
     }
-
 
     private boolean loginRegularUser(UserSystem userToLogin) {
         boolean isRegistered = isRegisteredUser(userToLogin);
@@ -121,7 +126,7 @@ public class TradingSystem {
         }
         return isSuccess;
     }
-    */
+
     /**
      * Checks if serToRegister is registered in the system
      * @param userToRegister
@@ -132,7 +137,7 @@ public class TradingSystem {
                 .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
     }
 
-
+    // TODO - BAR = add comment
     private Optional<UserSystem> getUserOpt(String username) {
         return users.stream()
                 .filter(user -> user.getUserName().equals(username))
@@ -328,18 +333,19 @@ public class TradingSystem {
                 .collect(Collectors.toList());
     }
     /**
-     *  TODO this method
+     *  TODO this method - KSENIA
      */
     public Receipt purchaseShoppingCart(ShoppingCart shoppingCart) {
         return null;
     }
     /**
-     *  TODO this method
+     *  TODO this method - KSENIA
      */
     public Receipt purchaseShoppingCart(UserSystem user) {
         return null;
     }
 
+    // TODO - KSENIA = move over all comments (things putted in log)
     /**
      * This method is used to open a new store in the system
      * @param user - the user that wants to open the store
