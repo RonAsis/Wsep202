@@ -3,12 +3,14 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Builder
 @AllArgsConstructor
 @Data
@@ -37,11 +39,11 @@ public class ShoppingCart {
      */
     public boolean addBagToCart(Store storeOfBag, ShoppingBag bagToAdd){
         if(storeOfBag == null || bagToAdd == null){
-            //log.error("ShoppingCart.addBagToCart: can't add bag to cart if bag or store is null");
+            log.error("Can't add bag to cart if bag or store is null");
             return false;
         }
         if(shoppingBagsList.containsKey(storeOfBag)){
-            //log.error("ShoppingCart.addBagToCart: can't add the same bag again");
+            log.error("Can't add the same bag again");
             return false;
         }
         shoppingBagsList.put(storeOfBag, bagToAdd);
@@ -49,7 +51,7 @@ public class ShoppingCart {
         numOfProductsInCart += bagToAdd.getNumOfProductsInBag();
         totalCartCost += bagToAdd.getTotalCostOfBag();
         totalCartCost = Double.parseDouble(formatter.format(totalCartCost));
-        //log.info("ShoppingCart.addBagToCart: bag was successfully added to cart");
+        log.info("Bag was successfully added to cart");
         return true;
     }
 
@@ -62,11 +64,11 @@ public class ShoppingCart {
      */
     public boolean removeBagFromCart(Store storeOfBag, ShoppingBag bagToRemove){
         if(storeOfBag == null || bagToRemove == null){
-            //log.error("ShoppingCart.removeBagFromCart: can't remove bag from cart if bag or store is null");
+            log.error("Can't remove bag from cart if bag or store is null");
             return false;
         }
         if(!shoppingBagsList.containsKey(storeOfBag)){
-            //log.error("ShoppingCart.removeBagFromCart: the bag is not in the cart");
+            log.error("The bag is not in the cart");
             return false;
         }
         numOfBagsInCart -= 1;
@@ -74,7 +76,7 @@ public class ShoppingCart {
         totalCartCost -= bagToRemove.getTotalCostOfBag();
         totalCartCost = Double.parseDouble(formatter.format(totalCartCost));
         shoppingBagsList.remove(storeOfBag);
-        //log.info("ShoppingCart.removeBagFromCart: bag was successfully removed from cart");
+        log.info("Bag was successfully removed from cart");
         return true;
     }
 
@@ -86,14 +88,14 @@ public class ShoppingCart {
      */
     public ShoppingBag getShoppingBag(Store storeOfBag){
        if(storeOfBag == null){
-           //log.error("ShoppingCart.getShoppingBag: can't return shopping of a null store");
+           log.error("Can't return shopping of a null store");
            return null;
        }
        if (shoppingBagsList.containsKey(storeOfBag)) {
-           //log.info("ShoppingCart.getShoppingBag: returns the wanted shopping bag");
+           log.info("Returns the wanted shopping bag");
            return shoppingBagsList.get(storeOfBag);
        }
-       //log.error("ShoppingCart.getShoppingBag: the bag is not in the cart");
+       log.error("The bag is not in the cart");
        return null;
     }
 }

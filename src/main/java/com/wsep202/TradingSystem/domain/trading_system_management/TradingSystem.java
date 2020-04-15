@@ -40,44 +40,9 @@ public class TradingSystem {
     }
 
     /**
-     *  TODO this method OR DELETE IT
+     * a function that encrypts a password
+     * @param userToRegister - the user we want to encrypt his password
      */
-    public Receipt buyShoppingCart(UserSystem userSystem) {
-        //TODO
-        return null;
-    }
-
-    /**
-     * This method is used to register a new user in the system,
-     * this method uses the method isRegisteredUser to check if the user is already registered.
-     * In the process of registration the system will encrypt the users password.
-     * @param userToRegister - the user that needs to be registered
-     * @return true if the registration was successful, returns false if the user is already registered
-     */
-    public boolean registerNewUser(UserSystem userToRegister) {
-        if (!isRegisteredUser(userToRegister)) {
-        //encrypt his password to store it and its salt in the system
-        encryptPassword(userToRegister);
-            users.add(userToRegister);
-            //userToRegister.setPassword(externalServiceManagement.encryptPassword(userToRegister.getPassword()));
-            //log.info("TradingSystem.registerNewUser: a new user was registered in the system");
-            return true;
-        }
-        //log.error("TradingSystem.registerNewUser: the user is already registered");
-        return false;
-    }
-
-    public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
-        boolean isRegistered = administrators.stream()
-                .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
-        if (!isRegistered){
-            //log.error("TradingSystem.login: a non registered user tries to login");
-            return false;
-        }
-        //TODO to check encrypted user password against password received
-        return true;
-    }
-  
     private void encryptPassword(UserSystem userToRegister) {
         PasswordSaltPair passwordSaltPair = externalServiceManagement
                 .getEncryptedPasswordAndSalt(userToRegister.getPassword());
@@ -85,8 +50,50 @@ public class TradingSystem {
         userToRegister.setPassword(passwordSaltPair.getHashedPassword());
         userToRegister.setSalt(passwordSaltPair.getSalt());
     }
-  /*
-  public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+
+    /**
+     *  TODO this method OR DELETE IT - KSENIA
+     */
+    public Receipt buyShoppingCart(UserSystem userSystem) {
+        //TODO
+        return null;
+    }
+
+    /**
+     * register new user in the system
+     * with its password
+     * @param userToRegister the user we want to register
+     * @return true if the registration succeeded
+     */
+    public boolean registerNewUser(UserSystem userToRegister) {
+        //encrypt his password to store it and its salt in the system
+        PasswordSaltPair passwordSaltPair = externalServiceManagement
+                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
+        //set the user password and its salt
+        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
+        userToRegister.setSalt(passwordSaltPair.getSalt());
+        boolean isRegistered = isRegisteredUser(userToRegister);
+        if (!isRegistered) {
+            users.add(userToRegister);
+            return true;
+        }
+        return false;
+    }
+
+    // TODO - ksenia = add comment + check the correctness of the nex login functions
+    /*public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+        boolean isRegistered = administrators.stream()
+                .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
+        if (!isRegistered){
+
+            .error("TradingSystem.login: a non registered user tries to login");
+            return false;
+        }
+        //TODO to check encrypted user password against password received
+        return true;
+    }*/
+
+    public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
         //TODO example for using the security system password verification
         //verify that the user's password is correct as saved in our system
         if(!externalServiceManagement.isAuthenticatedUserPassword(password,userToLogin)){
@@ -105,12 +112,11 @@ public class TradingSystem {
         return suc;
     }
 
-    ate boolean isRegisteredAdministrator(UserSystem userToRegister) {
+    private boolean isRegisteredAdministrator(UserSystem userToRegister) {
         return administrators.stream()
                 .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
 
     }
-
 
     private boolean loginRegularUser(UserSystem userToLogin) {
         boolean isRegistered = isRegisteredUser(userToLogin);
@@ -121,7 +127,7 @@ public class TradingSystem {
         }
         return isSuccess;
     }
-    */
+
     /**
      * Checks if serToRegister is registered in the system
      * @param userToRegister
@@ -132,7 +138,7 @@ public class TradingSystem {
                 .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
     }
 
-
+    // TODO - BAR = add comment
     private Optional<UserSystem> getUserOpt(String username) {
         return users.stream()
                 .filter(user -> user.getUserName().equals(username))
@@ -193,8 +199,10 @@ public class TradingSystem {
      */
     public Store getStoreByAdmin(String administratorUsername, int storeId) {
         if (isAdmin(administratorUsername)) {
+            log.info("Admin exists --> calls to 'getStore(storeId)' function.");
             return getStore(storeId);
         }
+        log.error("Admin isn't exist --> throws 'NotAdministratorException(administratorUsername)' exception!");
         throw new NotAdministratorException(administratorUsername);
     }
 
@@ -207,6 +215,10 @@ public class TradingSystem {
     public Store getStore(int storeId) throws StoreDontExistsException {
         Optional<Store> storeOptional = stores.stream()
                 .filter(store -> store.getStoreId() == storeId).findFirst();
+        if (storeOptional.isPresent())
+            log.info("Store: " + storeId + " exists in the Trading System.");
+        else
+            log.error("Store: " + storeId + " isn't exist in the Trading System.");
         return storeOptional.orElseThrow(() -> new StoreDontExistsException(storeId));
     }
 
@@ -218,6 +230,10 @@ public class TradingSystem {
      */
     public UserSystem getUser(String username) throws UserDontExistInTheSystemException {
         Optional<UserSystem> userOpt = getUserOpt(username);
+        if (userOpt.isPresent())
+            log.info("User: " + username + " exists in the Trading System.");
+        else
+            log.error("User: " + username + " isn't exist in the Trading System.");
         return userOpt.orElseThrow(() -> new UserDontExistInTheSystemException(username));
     }
 
@@ -229,8 +245,10 @@ public class TradingSystem {
      */
     public UserSystem getUserByAdmin(String administratorUsername, String userName) {
         if (isAdmin(administratorUsername)) {
+            log.info("Admin exists --> calls to 'getUser(userName)' function.");
             return getUser(userName);
         }
+        log.error("Admin isn't exist --> throws 'NotAdministratorException(administratorUsername)' exception!");
         throw new NotAdministratorException(administratorUsername);
     }
 
@@ -328,18 +346,19 @@ public class TradingSystem {
                 .collect(Collectors.toList());
     }
     /**
-     *  TODO this method
+     *  TODO this method - KSENIA
      */
     public Receipt purchaseShoppingCart(ShoppingCart shoppingCart) {
         return null;
     }
     /**
-     *  TODO this method
+     *  TODO this method - KSENIA
      */
     public Receipt purchaseShoppingCart(UserSystem user) {
         return null;
     }
 
+    // TODO - KSENIA = move over all comments (things putted in log)
     /**
      * This method is used to open a new store in the system
      * @param user - the user that wants to open the store
@@ -352,16 +371,17 @@ public class TradingSystem {
      */
     public boolean openStore(UserSystem user, DiscountType discountTypeObj, PurchaseType purchaseTypeObj, PurchasePolicy purchasePolicy,
                              DiscountPolicy discountPolicy, String storeName) {
-        //log.info("TradingSystem.openStore: the method was called with the user who wishes to open the store, discount and purchase policies & types
-        // and a string of the name of the store");
+        log.info("The method was called with the user who wishes to open the store, discount and purchase policies & types " +
+                "and a string of the name of the store");
+
         if (!this.users.contains(user)) {//if the user is not registered to the system, he can't open a store
-            //log.error("TradingSystem.openStore: a non registered user tried to open a store");
+            log.error("A non registered user tried to open a store");
             return false;
         }
         Store newStore = new Store(user,purchasePolicy,discountPolicy,discountTypeObj,purchaseTypeObj,storeName);
         this.stores.add(newStore);
         user.addNewStore(newStore);
-        //log.info("TradingSystem.openStore: a new store was opened in the system");
+        log.info("A new store was opened in the system");
         return true;
     }
 

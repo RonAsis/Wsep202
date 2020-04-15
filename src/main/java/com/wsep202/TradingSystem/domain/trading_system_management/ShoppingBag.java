@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -9,7 +10,7 @@ import java.util.Map;
 
 
 @Data
-
+@Slf4j
 public class ShoppingBag {
 
     //private Map<Integer, Integer> mapProductSnToAmount;
@@ -35,23 +36,23 @@ public class ShoppingBag {
      */
     public boolean addProductToBag(Product productToAdd, int amountOfProduct){
         if (productToAdd == null) {
-            //log.error("ShoppingBag.addProductToBag: a null product was trying to be added to the bag");
+            log.error("A null product was trying to be added to the bag");
             return false;
         }
         if(productToAdd.getStoreId() != storeOfProduct.getStoreId()){
-            //log.error("ShoppingBag.addProductToBag: store id and product store id does not mach");
+            log.error("Store id and product store id does not mach");
             return false;
         }
         else {
             if (productListFromStore.containsKey(productToAdd)) {
-                //log.info("ShoppingBag.addProductToBag: calls changeAmountOfProductInBag to update the amount of the exciting product");
+                log.info("Calls changeAmountOfProductInBag to update the amount of the exciting product");
                 return changeAmountOfProductInBag(productToAdd, amountOfProduct);
             }
             if (amountOfProduct <= 0){
-                //log.error("ShoppingBag.addProductToBag: the amount of the product needs to be greater than zero");
+                log.error("The amount of the product needs to be greater than zero");
                 return false;
             }
-            //log.info("ShoppingBag.addProductToBag: add new product to the bag");
+            log.info("Add new product to the bag");
             productListFromStore.put(productToAdd, amountOfProduct);
             numOfProductsInBag += 1;
             totalCostOfBag += (productToAdd.getCost() * amountOfProduct);
@@ -68,22 +69,22 @@ public class ShoppingBag {
      */
     public boolean removeProductFromBag(Product productToRemove){
         if (productToRemove == null){
-            //log.error("ShoppingBag.removeProductFromBag: a null product was trying to be deleted");
+            log.error("A null product was trying to be deleted");
             return false;
         }
         if(productToRemove.getStoreId() != storeOfProduct.getStoreId()){
-            //log.error("ShoppingBag.removeProductFromBag: store id and product store id does not mach");
+            log.error("Store id and product store id does not mach");
             return false;
         }
         if (productListFromStore.containsKey(productToRemove)){
-            //log.info("ShoppingBag.removeProductFromBag: a product was removed from the bag");
+            log.info("A product was removed from the bag");
             totalCostOfBag -= (productListFromStore.get(productToRemove)*productToRemove.getCost());
             totalCostOfBag = Double.parseDouble(formatter.format(totalCostOfBag));
             numOfProductsInBag -= 1;
             productListFromStore.remove(productToRemove);
             return true;
         }
-        //log.error("ShoppingBag.removeProductFromBag: the product was not found");
+        log.error("The product was not found");
         return false;
     }
 
@@ -96,10 +97,10 @@ public class ShoppingBag {
      */
     private boolean changeAmountOfProductInBag(Product product, int amountOfProduct){
         if(amountOfProduct < 0 && amountOfProduct + productListFromStore.get(product) < 0){
-            //log.error("ShoppingBag.changeAmountOfProductInBag: the amount of product cannot be less than 0");
+            log.error("The amount of product cannot be less than 0");
             return false;
         }
-        //log.info(ShoppingBag.changeAmountOfProductInBag: update the amount of an exciting product);
+        log.info("Update the amount of an exciting product");
         totalCostOfBag += (amountOfProduct*product.getCost());
         totalCostOfBag = Double.parseDouble(formatter.format(totalCostOfBag));
         productListFromStore.replace(product,productListFromStore.get(product)+amountOfProduct);
@@ -109,5 +110,4 @@ public class ShoppingBag {
         }
         return true;
     }
-
 }
