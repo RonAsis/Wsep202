@@ -13,7 +13,7 @@ public class TradingSystemApplication {
 			log.error("Must enter admin user and password for start the application");
 		}else {
 			SpringApplication.run(TradingSystemApplication.class, args);
-			log.info("The aaaaaaaaaaaaaaaapplication is starting");
+			log.info("The application is starting");
 		}
 	}
 }
