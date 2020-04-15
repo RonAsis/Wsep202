@@ -102,9 +102,11 @@ public class Product {
     public boolean increasesProductAmount(int addedAmount){
         boolean canIncrease = false;
         if (addedAmount > 0) { // can't increase with negative or zero newAmount
+            log.info("The amount in product: " + productSn + " raised from: " + amount + " to: "+ amount+addedAmount + ".");
             amount += addedAmount;
             canIncrease = true;
         }
+        log.error("The function 'increasesProductAmount(int addedAmount)' can't accept negative/zero amount!");
         return canIncrease;
     }
 
@@ -117,9 +119,11 @@ public class Product {
     public boolean reducesProductAmount(int removalAmount){
         boolean canReduce = false;
         if(removalAmount > 0){ // can't reduce with negative or zero newAmount
+            log.info("The amount in product: " + productSn + " raised from: " + amount + " to: "+ amount+removalAmount + ".");
             amount -= removalAmount;
             canReduce = true;
         }
+        log.error("The function 'increasesProductAmount(int addedAmount)' can't accept negative/zero amount!");
         return canReduce;
     }
 
