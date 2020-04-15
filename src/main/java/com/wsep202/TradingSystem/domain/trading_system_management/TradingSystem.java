@@ -85,7 +85,8 @@ public class TradingSystem {
         boolean isRegistered = administrators.stream()
                 .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
         if (!isRegistered){
-            //log.error("TradingSystem.login: a non registered user tries to login");
+
+            .error("TradingSystem.login: a non registered user tries to login");
             return false;
         }
         //TODO to check encrypted user password against password received
@@ -198,8 +199,10 @@ public class TradingSystem {
      */
     public Store getStoreByAdmin(String administratorUsername, int storeId) {
         if (isAdmin(administratorUsername)) {
+            log.info("Admin exists --> calls to 'getStore(storeId)' function.");
             return getStore(storeId);
         }
+        log.error("Admin isn't exist --> throws 'NotAdministratorException(administratorUsername)' exception!");
         throw new NotAdministratorException(administratorUsername);
     }
 
@@ -212,6 +215,10 @@ public class TradingSystem {
     public Store getStore(int storeId) throws StoreDontExistsException {
         Optional<Store> storeOptional = stores.stream()
                 .filter(store -> store.getStoreId() == storeId).findFirst();
+        if (storeOptional.isPresent())
+            log.info("Store: " + storeId + " exists in the Trading System.");
+        else
+            log.error("Store: " + storeId + " isn't exist in the Trading System.");
         return storeOptional.orElseThrow(() -> new StoreDontExistsException(storeId));
     }
 
@@ -223,6 +230,10 @@ public class TradingSystem {
      */
     public UserSystem getUser(String username) throws UserDontExistInTheSystemException {
         Optional<UserSystem> userOpt = getUserOpt(username);
+        if (userOpt.isPresent())
+            log.info("User: " + username + " exists in the Trading System.");
+        else
+            log.error("User: " + username + " isn't exist in the Trading System.");
         return userOpt.orElseThrow(() -> new UserDontExistInTheSystemException(username));
     }
 
@@ -234,8 +245,10 @@ public class TradingSystem {
      */
     public UserSystem getUserByAdmin(String administratorUsername, String userName) {
         if (isAdmin(administratorUsername)) {
+            log.info("Admin exists --> calls to 'getUser(userName)' function.");
             return getUser(userName);
         }
+        log.error("Admin isn't exist --> throws 'NotAdministratorException(administratorUsername)' exception!");
         throw new NotAdministratorException(administratorUsername);
     }
 
@@ -358,16 +371,17 @@ public class TradingSystem {
      */
     public boolean openStore(UserSystem user, DiscountType discountTypeObj, PurchaseType purchaseTypeObj, PurchasePolicy purchasePolicy,
                              DiscountPolicy discountPolicy, String storeName) {
-        //log.info("TradingSystem.openStore: the method was called with the user who wishes to open the store, discount and purchase policies & types
-        // and a string of the name of the store");
+        log.info("The method was called with the user who wishes to open the store, discount and purchase policies & types " +
+                "and a string of the name of the store");
+
         if (!this.users.contains(user)) {//if the user is not registered to the system, he can't open a store
-            //log.error("TradingSystem.openStore: a non registered user tried to open a store");
+            log.error("A non registered user tried to open a store");
             return false;
         }
         Store newStore = new Store(user,purchasePolicy,discountPolicy,discountTypeObj,purchaseTypeObj,storeName);
         this.stores.add(newStore);
         user.addNewStore(newStore);
-        //log.info("TradingSystem.openStore: a new store was opened in the system");
+        log.info("A new store was opened in the system");
         return true;
     }
 
