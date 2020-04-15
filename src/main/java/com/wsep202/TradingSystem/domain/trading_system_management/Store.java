@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,13 +53,15 @@ public class Store {
     private Set<MangerStore> managers;
 
     //list of purchases made in the store
-    @Builder.Default
-    private List<Receipt> receipts = new LinkedList<>();
+
+    private List<Receipt> receipts;
 
     //the store rank
     private int rank;
 
-    public Store(UserSystem owner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy, DiscountType discountType, PurchaseType purchaseType, String storeName){
+    public Store(UserSystem owner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy
+            , String storeName){
+        receipts = new LinkedList<>();
         appointedOwners = new HashMap<>();
         appointedManagers = new HashMap<>();
         products = new HashSet<>();
@@ -90,7 +91,7 @@ public class Store {
      * @param willBeOwner
      * @return true if owner added successfully
      */
-    public boolean appointAdditionOwner(UserSystem owner, UserSystem willBeOwner) {
+    private boolean appointAdditionOwner(UserSystem owner, UserSystem willBeOwner) {
         boolean appointed = false;
 
         if(isOwner(owner) && !isOwner(willBeOwner)) {
@@ -123,7 +124,7 @@ public class Store {
      * @param mangerStore
      * @return true for successful addition
      */
-    public boolean appointAdditionManager(UserSystem owner, MangerStore mangerStore) {
+    private boolean appointAdditionManager(UserSystem owner, MangerStore mangerStore) {
         boolean appointed = false;
         //manager is not owner or manager in this store
         if (!(managersContains(mangerStore)||ownersContains(mangerStore.getAppointedManager()))) {
@@ -153,7 +154,7 @@ public class Store {
         return false;
     }
 
-    public boolean removeAppointManager(UserSystem owner, MangerStore mangerStore) {
+    private boolean removeAppointManager(UserSystem owner, MangerStore mangerStore) {
         boolean appointed = false;
         if ((managersContains(mangerStore) && appointedManagers.get(owner).stream().anyMatch(man->man.equals(mangerStore)))) {
             appointedManagers.get(owner).remove(mangerStore);
@@ -178,8 +179,7 @@ public class Store {
             //remove from appointed managers Set
             boolean isRemovedFromAppointedManagers = removeAppointManager(ownerStore,manager);
             if(isRemovedFromAppointedManagers) {
-                managers.remove(manager);   //remove from managers list as well
-                return true;
+                return managers.remove(manager);   //remove from managers list as well
             }
         }
         //couldn't remove manager
@@ -194,11 +194,11 @@ public class Store {
      * @return true for success
      */
     public boolean addNewProduct(UserSystem user, Product product){
-            if(isOwner(user)) {  //verify the user is owner of the store
-                products.add(product);
-                return true;
-            }
-            return false;
+        if(isOwner(user)) {  //verify the user is owner of the store
+            products.add(product);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -217,7 +217,6 @@ public class Store {
         if(isOwner(user)){   //the user is owner
             Optional<Product> product = products.stream().filter(p -> p.getProductSn()==productSn).findFirst();
             if(product.isPresent()){    //update the product properties
-                product.get().setProductSn(productSn);
                 product.get().setName(productName);
                 product.get().setCategory(ProductCategory.getProductCategory(category));
                 product.get().setAmount(product.get().getAmount()+amount);
@@ -237,10 +236,7 @@ public class Store {
     public boolean removeProductFromStore(UserSystem user, int productSn) {
         if(isOwner(user)){  //only owner can remove products from its store
             int sizeOfProducts = products.size();
-            products.stream().forEach(product -> {  //find the product to remove in products set
-                if (product.getProductSn() == productSn) {
-                    products.remove(product);
-                }});
+            products.removeIf(product -> product.getProductSn()==productSn);
             return sizeOfProducts > products.size() ? true : false; //verify the product removed
         }
         //the user is not an owner of the store so can't remove
@@ -262,8 +258,7 @@ public class Store {
             return false;
         //holds the manager appointed by the received owner to be manager in this store
         MangerStore manager = getManagerObject(ownerStore,user.getUserName());
-        manager.addStorePermission(storePermission);    //add the permission
-        return true;
+        return manager.addStorePermission(storePermission);    //add the permission
     }
 
     /**
@@ -279,8 +274,8 @@ public class Store {
         }
         //holds the manager appointed by the received owner to be manager in this store
         MangerStore manager = getManagerObject(ownerStore,user.getUserName());
-        manager.removeStorePermission(storePermission);    //add the permission
-        return true;
+        return manager.removeStorePermission(storePermission);    //add the permission
+
     }
 
 
@@ -317,7 +312,7 @@ public class Store {
      * @return
      */
     public String showStoreInfo(){
-        return "The store "+storeName+ "has ID: "+getStoreId();
+        return "The store "+storeName+ " has ID: "+getStoreId();
     }
 
     /**
@@ -338,9 +333,11 @@ public class Store {
      * @param ownerUser - the appointing owner
      * @param managerUserName - the appointed manager
      * @return the user belongs to the manager username
+     * or exception if not appointed by the owner
+     * or null if the owner didn't appointed anyone
      */
     public UserSystem getManager(UserSystem ownerUser, String managerUserName) {
-        return appointedManagers.get(ownerUser).stream()
+        return appointedManagers.get(ownerUser) == null ? null : appointedManagers.get(ownerUser).stream()
                 .filter(mangerStore -> mangerStore.isTheUser(managerUserName))
                 .findFirst().orElseThrow(()-> new NoManagerInStoreException(managerUserName, storeId))
                 .getAppointedManager();
@@ -353,10 +350,12 @@ public class Store {
      * @return the manager object which wraps the manager with manager username
      */
     public MangerStore getManagerObject(UserSystem ownerUser, String managerUserName) {
-        return appointedManagers.get(ownerUser).stream()
+        return appointedManagers.get(ownerUser) == null ? null : appointedManagers.get(ownerUser).stream()
                 .filter(mangerStore -> mangerStore.isTheUser(managerUserName))
                 .findFirst().orElseThrow(()-> new NoManagerInStoreException(managerUserName, storeId));
     }
+
+
 
     /**
      * return a product with the SN reveived
@@ -376,7 +375,7 @@ public class Store {
         return (managers.stream().anyMatch(curUser -> curUser.getAppointedManager().getUserName().equals(user.getAppointedManager().getUserName())));
     }
     /**
-     * checks if the user is a manager in the store
+     * checks if the user is manager in the store
      * @param user
      * @return
      */
@@ -395,7 +394,7 @@ public class Store {
         return ownersContains(user);
     }
 
-    //TODO ADDED by MORAN THE QUEEN
+    //TODO ADDED by MORAN THE QUEEN. Moran, tu eres reina!
 
     /**
      * search a product by a given productName
