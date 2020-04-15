@@ -378,7 +378,7 @@ public class TradingSystem {
             log.error("A non registered user tried to open a store");
             return false;
         }
-        Store newStore = new Store(user,purchasePolicy,discountPolicy,discountTypeObj,purchaseTypeObj,storeName);
+        Store newStore = new Store(user,purchasePolicy,discountPolicy,storeName);
         this.stores.add(newStore);
         user.addNewStore(newStore);
         log.info("A new store was opened in the system");
