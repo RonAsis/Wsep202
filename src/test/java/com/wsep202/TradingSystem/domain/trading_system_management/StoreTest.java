@@ -1,19 +1,11 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.domain.exception.CategoryDoesntExistException;
 import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
 import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
-import org.apache.catalina.StoreManager;
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import java.security.Permission;
 import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -66,6 +58,93 @@ class StoreTest {
             product = mock(Product.class);
         }
 
+        /**
+         * verifies the method returns occurences of products with the name inserted
+         * in case there are in the store
+         */
+        @Test
+        void searchProductByNamePositive(){
+            addNewProductSetUp();
+            when(product.getName()).thenReturn("PSP");
+            Set<Product> resultsForSearch = storeUT.searchProductByName("PSP");
+            for(Product product : resultsForSearch){
+                //success: there is one product in the list after filter by name PSP
+                Assertions.assertEquals("PSP",product.getName());
+            }
+        }
+
+        /**
+         * check the case of searching for products with name that is not exist for any product
+         */
+        @Test
+        void searchProductByNameNegative(){
+            addNewProductSetUp();
+            when(product.getName()).thenReturn("football");
+            Set<Product> resultsForSearch = storeUT.searchProductByName("PSP");
+            //fail: no results for the name football
+            Assertions.assertEquals(0,resultsForSearch.size());
+        }
+
+        /**
+         *  get list of products only with the same category which inserted
+         */
+        @Test
+        void searchProductByCategoryPositive(){
+            addNewProductSetUp();
+            ProductCategory category = ProductCategory.HEALTH;
+            when(product.getCategory()).thenReturn(category);
+            Set<Product> resultsForSearch = storeUT.searchProductByCategory(ProductCategory.HEALTH);
+            for(Product product : resultsForSearch){
+                //success: all products in the list are in the same category
+                Assertions.assertEquals(category,product.getCategory());
+            }
+        }
+
+        /**
+         *  handling with search of category which is not exist for the store products
+         */
+        @Test
+        void searchProductByCategoryNegative(){
+            addNewProductSetUp();
+            ProductCategory notInStoreCategory = ProductCategory.TOYS_HOBBIES;
+            ProductCategory category = ProductCategory.HEALTH;
+            when(product.getCategory()).thenReturn(category);
+            Set<Product> resultsForSearch = storeUT.searchProductByCategory(notInStoreCategory);
+            //fail: the requested category not exist so empty list of products returned
+            Assertions.assertEquals(0,resultsForSearch.size());
+        }
+
+        /**
+         * verifies searching by keywords which is part of a name of product in store
+         * returns the proper products list
+         */
+        @Test
+        void searchProductByKeywordPositive(){
+            addNewProductSetUp();
+            when(product.getName()).thenReturn("foot ball");
+            List<String> keywords = new ArrayList<>();
+            keywords.add("foot");
+            keywords.add(" b");
+            Set<Product> resultsForSearch = storeUT.searchProductByKeyWords(keywords);
+            for(Product product : resultsForSearch){
+                //success: there is match between keyword to product
+                Assertions.assertTrue(product.getName().contains("foot b"));
+            }
+        }
+
+        /**
+         * test handling with searching of keyword which doesn't exist
+         */
+        @Test
+        void searchProductByKeywordNegative(){
+            addNewProductSetUp();
+            when(product.getName()).thenReturn("foot ball");
+            List<String> keywords = new ArrayList<>();
+            keywords.add("to");
+            Set<Product> resultsForSearch = storeUT.searchProductByKeyWords(keywords);
+            //fail: there is no match between keyword to products
+            Assertions.assertEquals(0,resultsForSearch.size());
+        }
 
         /**
          * @pre the appointing owner is registered as the store owner
@@ -73,7 +152,6 @@ class StoreTest {
          */
         @Test
         void addOwnerPositive() {
-
             Assertions.assertTrue(storeUT.addOwner(owner,newOwner));    //Success: owner appointing a newOwner as a new owner
         }
         /**

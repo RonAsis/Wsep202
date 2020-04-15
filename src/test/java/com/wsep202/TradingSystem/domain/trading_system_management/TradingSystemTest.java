@@ -5,6 +5,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.exception.NotAdministratorException;
+import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
 import com.wsep202.TradingSystem.domain.exception.StoreDontExistsException;
 import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
@@ -65,10 +66,22 @@ class TradingSystemTest {
             product = mock(Product.class);
         }
 
-        //TODO create the test after we will know the identity of the admin name
-        //TODO and after creation of register Admin tests
+        /**
+         * checks if there is admin with username admin in the systen
+         */
         @Test
-        void isAdmin(){
+        void isAdminPositive(){
+            //success: returns true because there is admin in the system with username "admin"
+            Assertions.assertTrue(tradingSystem.isAdmin("admin"));
+        }
+
+        /**
+         * checks case of check about user that is not admin
+         */
+        @Test
+        void isAdminNegative(){
+            //fail: there is no user with this user name as admin
+            Assertions.assertFalse(tradingSystem.isAdmin("nimda"));
         }
 
         @Test
@@ -104,13 +117,6 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
         }
 
-        /*  the following tested method is private
-        @Test
-        void isRegisteredUser(){
-            when(userSystem.getUserName()).thenReturn("usernameTest");
-            Assertions.assertTrue(tradingSystem.isRegisteredUser(userSystem));
-        }
-        */
 
         @Test
         void login() {
@@ -166,9 +172,22 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.logout(userSystem));
         }
 
-        //TODO after we will know how to register we'll test it and the we test the getter bellow
+        /**
+         * get one of the administrators in the system
+          */
         @Test
-        void getAdministratorUser() {
+        void getAdministratorUserPositive() {
+            //success: the correct admin returned back
+            Assertions.assertEquals(admin,tradingSystem.getAdministratorUser("admin"));
+        }
+        /**
+         * check handling with failure get user that is not an admin
+         */
+        @Test
+        void getAdministratorUserNegative() {
+            //fail: the requested user is not administrator in the system
+            Throwable exception = Assertions.assertThrows(NotAdministratorException.class,()->tradingSystem.getAdministratorUser("moshe"));
+            Assertions.assertEquals("The username '" + "moshe" + "' is not Administrator",exception.getMessage());
         }
 
         /**
