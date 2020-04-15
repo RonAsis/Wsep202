@@ -54,7 +54,7 @@ public class ExternalServiceManagement {
      */
     public boolean charge(PaymentDetails paymentDetails, ShoppingCart cart){
         boolean isCharged = true;
-        Map<Store, ShoppingBag> shoppingBags = cart.getShoppingBags();
+        Map<Store, ShoppingBag> shoppingBags = cart.getShoppingBagsList();
         //make the payment for each store in the cart
         for (Store store : shoppingBags.keySet()){
             int calculatedPrice = calculateShoppingBagPrice(shoppingBags.get(store));
@@ -90,7 +90,7 @@ public class ExternalServiceManagement {
      */
     public boolean deliver(BillingAddress addressIfo,ShoppingCart cart){
       List<ShoppingBag> bags = new ArrayList<>();
-      for(ShoppingBag bag : cart.getShoppingBags().values()){
+      for(ShoppingBag bag : cart.getShoppingBagsList().values()){
           bags.add(bag);
       }
       return SupplySystem.deliver(addressIfo,bags);

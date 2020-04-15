@@ -9,11 +9,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TradingSystemApplication {
 
 	public static void main(String[] args) {
-		log.info("The application is starting");
 		if(args.length < 2){
 			log.error("Must enter admin user and password for start the application");
 		}else {
 			SpringApplication.run(TradingSystemApplication.class, args);
+			log.info("The aaaaaaaaaaaaaaaapplication is starting");
 		}
 	}
 }
