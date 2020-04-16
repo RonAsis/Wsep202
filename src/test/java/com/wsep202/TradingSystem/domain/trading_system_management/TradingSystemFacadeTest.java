@@ -195,7 +195,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
             when(tradingSystem.getUser(newOwnerUsername)).thenReturn(newOwner);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-            when(store.addOwner(userSystem, newOwner)).thenReturn(true);
+            when(tradingSystem.addOwnerToStore(store,userSystem, newOwner)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
@@ -215,7 +215,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
             when(tradingSystem.getUser(newManagerUsername)).thenReturn(newOwner);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-            when(store.addManager(userSystem, newOwner)).thenReturn(true);
+            when(tradingSystem.addMangerToStore(store,userSystem, newOwner)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
@@ -742,12 +742,14 @@ class TradingSystemFacadeTest {
     }
 
     private void assertRecipes(List<Receipt> receipts, List<ReceiptDto> receiptDtos) {
-        Assertions.assertEquals(receipts.size(), receiptDtos.size());
-        receipts.forEach(
-                receipt -> {
-                    //TODO - compare the receipts
-                }
-        );
+        if(Objects.nonNull(receipts)) {
+            Assertions.assertEquals(receipts.size(), receiptDtos.size());
+            receipts.forEach(
+                    receipt -> {
+                        //TODO - compare the receipts
+                    }
+            );
+        }
     }
 
     private void assertionStore(Store store, StoreDto storeDto) {

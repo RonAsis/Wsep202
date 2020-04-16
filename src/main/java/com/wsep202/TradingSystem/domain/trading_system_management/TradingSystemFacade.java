@@ -150,7 +150,7 @@ public class TradingSystemFacade {
         UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
         UserSystem newOwnerUser = tradingSystem.getUser(newOwnerUsername);
         Store ownerStore = ownerUser.getOwnerStore(storeId);
-        return ownerStore.addOwner(ownerUser, newOwnerUser);
+        return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUser);
     }
 
     /**
@@ -164,7 +164,7 @@ public class TradingSystemFacade {
         UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
         UserSystem newManagerUser = tradingSystem.getUser(newManagerUsername);
         Store ownedStore = ownerUser.getOwnerStore(storeId);
-        return ownedStore.addManager(ownerUser, newManagerUser);
+        return tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUser);
     }
 
     /**

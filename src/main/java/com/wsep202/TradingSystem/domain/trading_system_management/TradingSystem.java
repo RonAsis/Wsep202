@@ -396,4 +396,12 @@ public class TradingSystem {
     public void insertStoreToStores(Store store){
         stores.add(store);
     }
+
+    public boolean addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
+        return false;
+    }
+
+    public boolean addOwnerToStore(Store ownerStore, UserSystem ownerUser, UserSystem newOwnerUser) {
+        return false;
+    }
 }
