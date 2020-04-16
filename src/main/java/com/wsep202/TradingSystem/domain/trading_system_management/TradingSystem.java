@@ -380,7 +380,7 @@ public class TradingSystem {
         }
         Store newStore = new Store(user,purchasePolicy,discountPolicy,storeName);
         this.stores.add(newStore);
-        user.addNewStore(newStore);
+        user.addNewOwnedStore(newStore);
         log.info("A new store was opened in the system");
         return true;
     }
@@ -398,6 +398,7 @@ public class TradingSystem {
     }
 
     public boolean addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
+
         return false;
     }
 
