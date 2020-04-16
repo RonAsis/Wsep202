@@ -10,9 +10,29 @@ import java.util.Map;
 
 public class ExternalServiceManagement {
 
+    private SecuritySystem securitySystem;
+    private ChargeSystem chargeSystem;
+    private SupplySystem supplySystem;
+
+    /**
+     * default connect if we don't have any prefers for the external systems
+     */
     public void connect() {
-        // if cant throw exception
-        //TODO
+        securitySystem = new SecuritySystem();
+        chargeSystem = new ChargeSystem();
+        supplySystem = new SupplySystem();
+    }
+
+    /**
+     * initialize connection with external systems by user request
+     * @param secSys   preferred security system
+     * @param supSys   preferred supply system
+     * @param chrgSys  preffered charge system
+     */
+    public void connect(SecuritySystem secSys, SupplySystem supSys, ChargeSystem chrgSys){
+        this.securitySystem = secSys;
+        this.supplySystem = supSys;
+        this.chargeSystem = chrgSys;
     }
 ////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////interface to security system/////////////////////////////
@@ -24,9 +44,9 @@ public class ExternalServiceManagement {
      */
     public PasswordSaltPair getEncryptedPasswordAndSalt(String password) {
         //get salt for the user password to hash with
-        String userSalt = SecuritySystem.generateSalt(512).get();
+        String userSalt = securitySystem.generateSalt(512).get();
         //generate unique password for the user using the salt
-        String hashedPassword = SecuritySystem.hashPassword(password,userSalt).get();
+        String hashedPassword = securitySystem.hashPassword(password,userSalt).get();
         PasswordSaltPair passAndSalt = new PasswordSaltPair(hashedPassword,userSalt);
         return passAndSalt; //return the password generated with the used salt to generate it
     }
@@ -39,7 +59,7 @@ public class ExternalServiceManagement {
      * otherwise return false
      */
     public boolean isAuthenticatedUserPassword(String password, UserSystem user){
-        boolean isLegitimateUser = SecuritySystem.verifyPassword(password,user.getPassword(),user.getSalt());
+        boolean isLegitimateUser = securitySystem.verifyPassword(password,user.getPassword(),user.getSalt());
         return isLegitimateUser;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,8 +77,8 @@ public class ExternalServiceManagement {
         Map<Store, ShoppingBag> shoppingBags = cart.getShoppingBagsList();
         //make the payment for each store in the cart
         for (Store store : shoppingBags.keySet()){
-            int calculatedPrice = calculateShoppingBagPrice(shoppingBags.get(store));
-            isCharged = isCharged && ChargeSystem.sendPaymentTransaction(store.getStoreName(),calculatedPrice,paymentDetails);
+            double calculatedPrice = calculateShoppingBagPrice(shoppingBags.get(store));
+            isCharged = isCharged && chargeSystem.sendPaymentTransaction(store.getStoreName(),calculatedPrice,paymentDetails);
         }
         return isCharged;   //isCharged = true iff all charge iterations succeeded
     }
@@ -68,13 +88,8 @@ public class ExternalServiceManagement {
      * @param shoppingBag - the shopping bag we wish to calculate its price.
      * @return totalPrice as the price the customer needs to pay for the bag.
      */
-    //TODO - BAR instead using the for use shoppingBag.getTotalCostOfBag
-    private int calculateShoppingBagPrice(ShoppingBag shoppingBag) {
-        int totalPrice = 0;
-        /*for(Integer productPrice :shoppingBag.getMapProductSnToAmount().keySet()){
-            totalPrice+= productPrice;  //add current product price
-        }*/
-        return totalPrice;
+    private double calculateShoppingBagPrice(ShoppingBag shoppingBag) {
+        return shoppingBag.getTotalCostOfBag();
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////interface to supply system/////////////////////////////////////////////
@@ -83,16 +98,16 @@ public class ExternalServiceManagement {
     /**
      * this method responsible for arrange the shopping bags in a list and send them to
      * delivery with the billing address of the customer
-     * @param addressIfo - the billing address of the customer
+     * @param addressInfo - the billing address of the customer
      * @param cart - the shopping cart of the customer to deliver the products from
      * @return true if the request for delivery accepted
      * otherwise returns false
      */
-    public boolean deliver(BillingAddress addressIfo,ShoppingCart cart){
-      List<ShoppingBag> bags = new ArrayList<>();
-      for(ShoppingBag bag : cart.getShoppingBagsList().values()){
-          bags.add(bag);
-      }
-      return SupplySystem.deliver(addressIfo,bags);
+    public boolean deliver(BillingAddress addressInfo,ShoppingCart cart){
+        List<ShoppingBag> bags = new ArrayList<>();
+        for(ShoppingBag bag : cart.getShoppingBagsList().values()){
+            bags.add(bag);
+        }
+        return supplySystem.deliver(addressInfo,bags);
     }
 }
