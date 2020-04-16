@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
+@Builder
 public class UserSystem {
 
     /**
@@ -33,7 +35,6 @@ public class UserSystem {
      * the first name of the user
      */
     private String firstName;
-
     /**
      * the last name of the user
      */
@@ -41,15 +42,18 @@ public class UserSystem {
     /**
      * The stores that the user manages
      */
-    private Set<Store> managedStores;
+    @Builder.Default
+    private Set<Store> managedStores = new HashSet<>();
     /**
      * The stores that the user own
      */
-    private Set<Store> ownedStores;
+    @Builder.Default
+    private Set<Store> ownedStores = new HashSet<>();
     /**
      * The user personal shopping cart
      */
-    private ShoppingCart shoppingCart;
+    @Builder.Default
+    private ShoppingCart shoppingCart = new ShoppingCart();
     /**
      * Show the stage of the user, logged-in or logged-out
      */
@@ -57,17 +61,14 @@ public class UserSystem {
     /**
      * The users personal receipts list
      */
-    private List<Receipt> receipts;
+    @Builder.Default
+    private List<Receipt> receipts = new LinkedList<>();
 
     public UserSystem(String userName, String firstName, String lastName, String password){
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        managedStores = new HashSet<>();
-        ownedStores = new HashSet<>();
-        shoppingCart = new ShoppingCart();
-        receipts = new LinkedList<>();
     }
 
     /**
@@ -109,7 +110,7 @@ public class UserSystem {
     }
 
     /**
-     * This method is used to change the stage of the user to loggin-out
+     * This method is used to change the stage of the user to logged-in
      */
     public void login(){
         isLogin = true;
@@ -181,6 +182,4 @@ public class UserSystem {
         log.info("try to remove a product from cart");
         return shoppingCart.getShoppingBag(storeOfProduct).removeProductFromBag(productToRemove);
     }
-
-
 }
