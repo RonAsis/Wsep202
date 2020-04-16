@@ -588,8 +588,7 @@ class TradingSystemTest {
     @SpringBootTest(args = {"admin", "admin"})
     public class TradingSystemTestIntegration {
 
-        //@Autowired // TODO - RON - TAKE CARE OF IT
-        ExternalServiceManagement externalServiceManagement;
+        @Autowired
         private TradingSystem tradingSystem;
         private UserSystem userToRegister;
         private Store store;
@@ -616,7 +615,7 @@ class TradingSystemTest {
                     .userName("admin")
                     .password("admin")
                     .build();
-            externalServiceManagement = new ExternalServiceManagement();
+            ExternalServiceManagement externalServiceManagement = new ExternalServiceManagement();
             tradingSystem = new TradingSystem(externalServiceManagement, admin);
             PasswordSaltPair psp = externalServiceManagement.getEncryptedPasswordAndSalt(admin.getPassword());
             admin.setPassword(psp.getHashedPassword());
