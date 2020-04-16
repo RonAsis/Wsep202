@@ -13,7 +13,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class ShoppingCartDto {
 
-    private Map<Store, ShoppingBag> shoppingBagsList;
+    private Map<StoreDto, ShoppingBagDto> shoppingBagsList;
 
     private double totalCartCost;
 
