@@ -22,6 +22,7 @@ public class TradingSystem {
     public TradingSystem(@NotNull ExternalServiceManagement externalServiceManagement,
                          @NotNull UserSystem admin){
         this.externalServiceManagement = externalServiceManagement;// must be first
+        this.externalServiceManagement.connect();    //connect to the externals
         encryptPassword(admin);
         stores = new HashSet<>();
         users = new HashSet<>();
@@ -32,6 +33,7 @@ public class TradingSystem {
     public TradingSystem(ExternalServiceManagement externalServiceManagement, Set<Store> stores,
                          @NotNull UserSystem admin) {
         this.externalServiceManagement = externalServiceManagement;
+        this.externalServiceManagement.connect();    //connect to the externals
         encryptPassword(admin);
         administrators = new HashSet<>(Collections.singletonList(admin));
         this.stores = stores;
@@ -49,6 +51,7 @@ public class TradingSystem {
         //set the user password and its salt
         userToRegister.setPassword(passwordSaltPair.getHashedPassword());
         userToRegister.setSalt(passwordSaltPair.getSalt());
+        log.info("The user "+ userToRegister.getUserName()+" got encrypted password and salt");
     }
 
     /**
@@ -66,17 +69,15 @@ public class TradingSystem {
      * @return true if the registration succeeded
      */
     public boolean registerNewUser(UserSystem userToRegister) {
-        //encrypt his password to store it and its salt in the system
-        PasswordSaltPair passwordSaltPair = externalServiceManagement
-                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
-        //set the user password and its salt
-        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
-        userToRegister.setSalt(passwordSaltPair.getSalt());
+        //encrypt user password to store it and its salt in the system
+        encryptPassword(userToRegister);
         boolean isRegistered = isRegisteredUser(userToRegister);
         if (!isRegistered) {
             users.add(userToRegister);
+            log.info("The user "+userToRegister.getUserName()+ " has been registered successfully.");
             return true;
         }
+        log.warn("The user "+userToRegister.getUserName()+ " failed to register (user already exist).");
         return false;
     }
 
@@ -93,10 +94,17 @@ public class TradingSystem {
         return true;
     }*/
 
+    /**
+     * login a user into the system
+     * @param userToLogin   the user to login
+     * @param isAdmin   flag to tell if we login an administrator or other user
+     * @param password the inserted password to approve
+     * @return
+     */
     public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
-        //TODO example for using the security system password verification
         //verify that the user's password is correct as saved in our system
         if(!externalServiceManagement.isAuthenticatedUserPassword(password,userToLogin)){
+            log.warn("The user "+userToLogin.getUserName()+" failed to login.");
             return false;
         }
         return !isAdmin ? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
@@ -105,10 +113,14 @@ public class TradingSystem {
     private boolean loginAdministrator(UserSystem userToLogin) {
         boolean isRegistered = isRegisteredAdministrator(userToLogin);
         boolean suc = false;
+        String statusLogin = "failed";
         if (isRegistered && !userToLogin.isLogin()) {
             userToLogin.login();
             suc = true;
+            statusLogin = "succeeded";
+
         }
+        log.warn("The user "+userToLogin.getUserName()+" "+statusLogin+" to as administrator.");
         return suc;
     }
 
@@ -121,10 +133,15 @@ public class TradingSystem {
     private boolean loginRegularUser(UserSystem userToLogin) {
         boolean isRegistered = isRegisteredUser(userToLogin);
         boolean isSuccess = false;
+        String statusLogin = "failed";
+
         if (isRegistered && !userToLogin.isLogin()) {
             userToLogin.login();
             isSuccess = true;
+            statusLogin = "succeeded";
+
         }
+        log.warn("The user "+userToLogin.getUserName()+" "+statusLogin+" to as administrator.");
         return isSuccess;
     }
 
@@ -138,7 +155,11 @@ public class TradingSystem {
                 .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
     }
 
-    // TODO - BAR = add comment
+    /**
+     * get the user by its username from users list
+     * @param username
+     * @return
+     */
     private Optional<UserSystem> getUserOpt(String username) {
         return users.stream()
                 .filter(user -> user.getUserName().equals(username))
@@ -153,8 +174,10 @@ public class TradingSystem {
     public boolean logout(UserSystem user) {
         if(user.isLogin()){
             user.logout();
+            log.info("The user "+user.getUserName()+" logged out successfully.");
             return true;
         }
+        log.warn("The user "+user.getUserName()+ " failed to logout");
         return false;
     }
 
@@ -378,9 +401,9 @@ public class TradingSystem {
             log.error("A non registered user tried to open a store");
             return false;
         }
-        Store newStore = new Store(user,purchasePolicy,discountPolicy,discountTypeObj,purchaseTypeObj,storeName);
+        Store newStore = new Store(user,purchasePolicy,discountPolicy,storeName);
         this.stores.add(newStore);
-        user.addNewStore(newStore);
+        user.addNewOwnedStore(newStore);
         log.info("A new store was opened in the system");
         return true;
     }
@@ -395,5 +418,54 @@ public class TradingSystem {
   
     public void insertStoreToStores(Store store){
         stores.add(store);
+    }
+
+
+
+
+
+    public boolean addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
+        boolean addToUser = false;
+        if(ownedStore == null || ownerUser == null || newManagerUser == null) // error
+            return false;
+        else{
+            boolean addToStore = ownedStore.addManager(ownerUser, newManagerUser);
+            if (addToStore) { // add to store succeed
+                addToUser = newManagerUser.addNewManageStore(ownedStore);
+                if(addToStore) // add to user succeed
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addOwnerToStore(Store ownerStore, UserSystem ownerUser, UserSystem newOwnerUser) {
+        boolean addToUser = false;
+        if(ownerStore == null || ownerUser == null || newOwnerUser == null) // error
+            return false;
+        else{
+            boolean addToStore = ownerStore.addOwner(ownerUser, newOwnerUser);
+            if (addToStore) { // add to store succeed
+                addToUser = newOwnerUser.addNewOwnedStore(ownerStore);
+                if(addToStore) // add to user succeed
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * remove manager from the store
+     * @param ownedStore - the store
+     * @param ownerUser - the owner of the store that want remove the manager
+     * @param managerStore - the manager that want to remove
+     * @return true if succ else false
+     */
+    public boolean removeManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore) {
+        if(ownedStore.removeManager(ownerUser, managerStore)){
+            //ownerUser
+            //TODO
+        }
+        return false;
     }
 }

@@ -23,7 +23,7 @@ public class SecuritySystem {
      * @param length
      * @return salt
      */
-    public static Optional<String> generateSalt (final int length) {
+    public Optional<String> generateSalt (final int length) {
 
         if (length < 1) {
             System.err.println("error in generateSalt: length must be > 0");
@@ -42,7 +42,7 @@ public class SecuritySystem {
      * @param salt
      * @return the hashed password by the selected ALGORITHM
      */
-    public static Optional<String> hashPassword (String password, String salt) {
+    public Optional<String> hashPassword (String password, String salt) {
 
         char[] chars = password.toCharArray();
         byte[] bytes = salt.getBytes();
@@ -74,7 +74,7 @@ public class SecuritySystem {
      * @return true if password authenticated successfully
      * otherwise false
      */
-    public static boolean verifyPassword (String password, String key, String salt) {
+    public boolean verifyPassword (String password, String key, String salt) {
         Optional<String> optEncrypted = hashPassword(password, salt);
         if (!optEncrypted.isPresent()) return false;
         return optEncrypted.get().equals(key);

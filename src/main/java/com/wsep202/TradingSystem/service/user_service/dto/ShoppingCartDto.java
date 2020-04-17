@@ -12,6 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class ShoppingCartDto {
 
+
     /**
      * list of stores and there shopping bags
      */

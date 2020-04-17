@@ -5,6 +5,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.exception.NotAdministratorException;
+import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
 import com.wsep202.TradingSystem.domain.exception.StoreDontExistsException;
 import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
@@ -38,6 +39,7 @@ class TradingSystemTest {
         ExternalServiceManagement externalServiceManagement;
         private TradingSystem tradingSystem;
         private UserSystem userSystem;
+        private UserSystem userSystem1;
         private UserSystem userToRegister;
         private FactoryObjects factoryObjects;
         private UserSystem admin;
@@ -55,6 +57,7 @@ class TradingSystemTest {
             tradingSystem = new TradingSystem(externalServiceManagement, admin);
             doNothing().when(externalServiceManagement).connect();
             userSystem = mock(UserSystem.class);
+            userSystem1 = mock(UserSystem.class);
             factoryObjects = new FactoryObjects();
             String username = "usernameTest";
             String password = "passwordTest";
@@ -63,12 +66,28 @@ class TradingSystemTest {
             userToRegister = new UserSystem(username,fName,lName,password);
             store = mock(Store.class);
             product = mock(Product.class);
+            doNothing().when(userSystem1).setOwnedStores(new HashSet<Store>());
+            doNothing().when(userSystem1).setManagedStores(new HashSet<Store>());
+            doNothing().when(userSystem).setOwnedStores(new HashSet<Store>());
+            doNothing().when(userSystem).setManagedStores(new HashSet<Store>());
         }
 
-        //TODO create the test after we will know the identity of the admin name
-        //TODO and after creation of register Admin tests
+        /**
+         * checks if there is admin with username admin in the systen
+         */
         @Test
-        void isAdmin(){
+        void isAdminPositive(){
+            //success: returns true because there is admin in the system with username "admin"
+            Assertions.assertTrue(tradingSystem.isAdmin("admin"));
+        }
+
+        /**
+         * checks case of check about user that is not admin
+         */
+        @Test
+        void isAdminNegative(){
+            //fail: there is no user with this user name as admin
+            Assertions.assertFalse(tradingSystem.isAdmin("nimda"));
         }
 
         @Test
@@ -90,6 +109,7 @@ class TradingSystemTest {
             when(userToRegister.getUserName()).thenReturn("usernameTest");
             //setup
             //the following user details are necessary for the login tests
+            //success: registration done. valid user details
             Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister));
         }
 
@@ -101,23 +121,8 @@ class TradingSystemTest {
         void registerNewUserNegative() {
             //registration with already registered user
             registerAsSetup(); //setup test of registration
+            //fail: this user is already registered
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
-        }
-
-        /*  the following tested method is private
-        @Test
-        void isRegisteredUser(){
-            when(userSystem.getUserName()).thenReturn("usernameTest");
-            Assertions.assertTrue(tradingSystem.isRegisteredUser(userSystem));
-        }
-        */
-
-        @Test
-        void login() {
-            //check login of regular user
-            loginRegularUserPositive();
-            //check login of admin
-            //TODO
         }
 
         @Test
@@ -166,9 +171,22 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.logout(userSystem));
         }
 
-        //TODO after we will know how to register we'll test it and the we test the getter bellow
+        /**
+         * get one of the administrators in the system
+          */
         @Test
-        void getAdministratorUser() {
+        void getAdministratorUserPositive() {
+            //success: the correct admin returned back
+            Assertions.assertEquals(admin,tradingSystem.getAdministratorUser("admin"));
+        }
+        /**
+         * check handling with failure get user that is not an admin
+         */
+        @Test
+        void getAdministratorUserNegative() {
+            //fail: the requested user is not administrator in the system
+            Throwable exception = Assertions.assertThrows(NotAdministratorException.class,()->tradingSystem.getAdministratorUser("moshe"));
+            Assertions.assertEquals("The username '" + "moshe" + "' is not Administrator",exception.getMessage());
         }
 
         /**
@@ -265,6 +283,80 @@ class TradingSystemTest {
                 tradingSystem.getUserByAdmin("userSystem", "userToRegister");
             });
         }
+
+
+        /**
+         * check the addMangerToStore() functionality in case of success in addNewManageStore and addManager
+         */
+        @Test
+        void addMangerToStorePositive() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addManager(userSystem,userSystem1)).thenReturn(true);
+            when(userSystem1.addNewManageStore(store)).thenReturn(true);
+            Assertions.assertTrue(tradingSystem.addMangerToStore(store, userSystem, userSystem1));
+        }
+
+        /**
+         * check the addMangerToStore() functionality in case of not initialized parameters.
+         */
+        @Test
+        void addMangerToStoreNullParams() {
+            Store storeNull = mock(Store.class);
+            UserSystem userSystemNull1 = mock(UserSystem.class);
+            UserSystem userSystemNull2 = mock(UserSystem.class);
+            Assertions.assertFalse(tradingSystem.addMangerToStore(storeNull, userSystemNull1, userSystemNull2));
+        }
+
+        /**
+         * check the addMangerToStore() functionality in case of failure in addNewManageStore and addManager
+         */
+        @Test
+        void addMangerToStoreNegative() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addManager(userSystem,userSystem1)).thenReturn(false);
+            when(userSystem1.addNewManageStore(store)).thenReturn(false);
+            Assertions.assertFalse(tradingSystem.addMangerToStore(store, userSystem, userSystem1));
+        }
+
+        /**
+         * check the addOwnerToStore() functionality in case of success in addNewOwnedStore and addOwner
+         */
+        @Test
+        void addOwnerToStorePositive() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addOwner(userSystem,userSystem1)).thenReturn(true);
+            when(userSystem1.addNewOwnedStore(store)).thenReturn(true);
+            Assertions.assertTrue(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
+        }
+
+        /**
+         * check the addOwnerToStore() functionality in case of not initialized parameters.
+         */
+        @Test
+        void addOwnerToStoreNullParams() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addOwner(userSystem,userSystem1)).thenReturn(true);
+            when(userSystem1.addNewOwnedStore(store)).thenReturn(true);
+            Assertions.assertTrue(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
+        }
+
+        /**
+         * check the addOwnerToStore() functionality in case of failure in addNewOwnedStore and addOwner
+         */
+        @Test
+        void addOwnerToStoreNegative() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addOwner(userSystem,userSystem1)).thenReturn(false);
+            when(userSystem1.addNewOwnedStore(store)).thenReturn(false);
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
+        }
+
+
 
         /**
          * check the searchProductByName() functionality in case of exists product in store in the system
@@ -569,8 +661,7 @@ class TradingSystemTest {
     @SpringBootTest(args = {"admin", "admin"})
     public class TradingSystemTestIntegration {
 
-        //@Autowired // TODO - RON - TAKE CARE OF IT
-        ExternalServiceManagement externalServiceManagement;
+        @Autowired
         private TradingSystem tradingSystem;
         private UserSystem userToRegister;
         private Store store;
@@ -597,7 +688,7 @@ class TradingSystemTest {
                     .userName("admin")
                     .password("admin")
                     .build();
-            externalServiceManagement = new ExternalServiceManagement();
+            ExternalServiceManagement externalServiceManagement = new ExternalServiceManagement();
             tradingSystem = new TradingSystem(externalServiceManagement, admin);
             PasswordSaltPair psp = externalServiceManagement.getEncryptedPasswordAndSalt(admin.getPassword());
             admin.setPassword(psp.getHashedPassword());

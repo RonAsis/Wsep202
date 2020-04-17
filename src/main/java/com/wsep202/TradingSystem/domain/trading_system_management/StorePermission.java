@@ -9,7 +9,8 @@ import java.util.Arrays;
 
 public enum StorePermission {
 
-    VIEW("view");
+    VIEW("view"),
+    EDIT("edit");
 
 
     public final String function;

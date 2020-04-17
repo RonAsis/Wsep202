@@ -195,7 +195,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
             when(tradingSystem.getUser(newOwnerUsername)).thenReturn(newOwner);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-            when(store.addOwner(userSystem, newOwner)).thenReturn(true);
+            when(tradingSystem.addOwnerToStore(store,userSystem, newOwner)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
@@ -215,7 +215,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
             when(tradingSystem.getUser(newManagerUsername)).thenReturn(newOwner);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-            when(store.addManager(userSystem, newOwner)).thenReturn(true);
+            when(tradingSystem.addMangerToStore(store,userSystem, newOwner)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
@@ -254,7 +254,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
-            when(store.removeManager(userSystem, managerStore)).thenReturn(true);
+            when(tradingSystem.removeManager(store, userSystem, managerStore)).thenReturn(true);
             //test
             Assertions.assertTrue(tradingSystemFacade
                     .removeManager(ownerUsername, storeId, managerUsername));
@@ -690,14 +690,14 @@ class TradingSystemFacadeTest {
     }
 
     private void assertShoppingCart(ShoppingCart shoppingCartExpected, ShoppingCartDto shoppingCartActual) {
-        /*shoppingCartExpected.getShoppingBags().forEach((storeKey, shoppingBagExpected) -> {
-            Map.Entry<StoreDto, ShoppingBagDto> storeDtoShoppingBagDtoEntry = shoppingCartActual.getShoppingBags().entrySet().stream()
+        shoppingCartExpected.getShoppingBagsList().forEach((storeKey, shoppingBagExpected) -> {
+            Map.Entry<StoreDto, ShoppingBagDto> storeDtoShoppingBagDtoEntry = shoppingCartActual.getShoppingBagsList().entrySet().stream()
                     .filter(entry -> entry.getKey().getStoreId() == storeKey.getStoreId())
                     .findFirst().orElseThrow(RuntimeException::new);
             ShoppingBagDto shoppingBagDto = storeDtoShoppingBagDtoEntry.getValue();
             Assertions.assertNotNull(shoppingBagDto);
             Assertions.assertEquals(shoppingBagExpected.getProductListFromStore(), shoppingBagDto.getProductListFromStore());
-        });*/
+        });
     }
 
     private void assertSetStore(Set<Store> stores, Set<StoreDto> storeDtos) {
@@ -742,12 +742,14 @@ class TradingSystemFacadeTest {
     }
 
     private void assertRecipes(List<Receipt> receipts, List<ReceiptDto> receiptDtos) {
-        Assertions.assertEquals(receipts.size(), receiptDtos.size());
-        receipts.forEach(
-                receipt -> {
-                    //TODO - compare the receipts
-                }
-        );
+        if(Objects.nonNull(receipts)) {
+            Assertions.assertEquals(receipts.size(), receiptDtos.size());
+            receipts.forEach(
+                    receipt -> {
+                        //TODO - compare the receipts
+                    }
+            );
+        }
     }
 
     private void assertionStore(Store store, StoreDto storeDto) {

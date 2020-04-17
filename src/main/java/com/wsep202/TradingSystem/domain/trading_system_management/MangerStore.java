@@ -58,10 +58,8 @@ public class MangerStore {
      */
     public boolean removeStorePermission(StorePermission permission){
         int sizeOfPermissions = storePermissions.size();
-        storePermissions.stream().forEach(per -> {  //find the product to remove in products set
-            if (per.equals(permission)) {
-                storePermissions.remove(per);
-            }});
+        //remove all permissions equals to permission received
+        storePermissions.removeIf(permission1 -> permission1.equals(permission));
         return sizeOfPermissions > storePermissions.size() ? true : false;
 
     }

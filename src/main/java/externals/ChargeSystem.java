@@ -11,8 +11,16 @@ public class ChargeSystem {
      * @return true for successful transaction
      * otherwise false
      */
-    public static boolean sendPaymentTransaction(String storeName, float calculatedPrice, PaymentDetails paymentDetails) {
-        //make some validation operations and then charge
+    public boolean sendPaymentTransaction(String storeName, double calculatedPrice, PaymentDetails paymentDetails) {
+        //make some validation operations and then charge. e.g.:
+        if(!isValidCardNumber(paymentDetails.getCreditCardNumber())){
+            return false;
+        }
+
         return true;
+    }
+
+    private boolean isValidCardNumber(String creditCardNumber) {
+        return creditCardNumber.length()==9;
     }
 }

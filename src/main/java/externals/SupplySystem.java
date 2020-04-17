@@ -9,9 +9,16 @@ import java.util.List;
 
 public class SupplySystem {
 
-    public static boolean deliver(BillingAddress addressInfo, List<ShoppingBag> bags){
-        //check if the address is valid
+    public boolean deliver(BillingAddress addressInfo, List<ShoppingBag> bags){
+        //check if the address is valid for example
+        if(!isValidPhone(addressInfo.getPhone())){
+            return false;
+        }
         return true;    //the request for delivery accepted
+    }
+
+    private boolean isValidPhone(String phoneNum) {
+        return phoneNum.length()==10;
     }
 
 }
