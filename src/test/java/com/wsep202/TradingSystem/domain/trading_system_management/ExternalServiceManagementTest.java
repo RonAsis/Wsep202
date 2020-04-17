@@ -118,6 +118,8 @@ class ExternalServiceManagementTest {
             when(bag.getTotalCostOfBag()).thenReturn(priceOfEachBag);
             when(store.getStoreName()).thenReturn("Keter");
             when(chargeSystem.sendPaymentTransaction(store.getStoreName(),priceOfEachBag,paymentDetails)).thenReturn(true);
+            when(store.getStoreId()).thenReturn(2);
+            expectedStores.add(store.getStoreId());
             //success: the charge succeeded
             Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
         }
@@ -135,8 +137,7 @@ class ExternalServiceManagementTest {
             when(bag.getTotalCostOfBag()).thenReturn(priceOfEachBag);
             when(store.getStoreName()).thenReturn("Keter");
             when(chargeSystem.sendPaymentTransaction(store.getStoreName(),priceOfEachBag,paymentDetails)).thenReturn(false);
-            when(store.getStoreId()).thenReturn(2);
-            expectedStores.add(store.getStoreId());
+
             //fail: the charge by the charge system failed for the received store in the list (store)
             Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
         }
@@ -248,6 +249,8 @@ class ExternalServiceManagementTest {
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
             List<Integer> expectedStores = new LinkedList<>();
+            expectedStores.add(store.getStoreId()); //the expected store that failed to be returned in list
+
             //success: the charge succeeded no failed stores received
             paymentDetails.setCreditCardNumber("123456789");    //valid card no. length
             Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
@@ -262,7 +265,6 @@ class ExternalServiceManagementTest {
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
             List<Integer> expectedStores = new LinkedList<>();
-            expectedStores.add(store.getStoreId()); //the expected store that failed to be returned in list
             //fail: the charge failed for shopping bag of store
             paymentDetails.setCreditCardNumber("1234567890");    //invalid card no. length
             Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));

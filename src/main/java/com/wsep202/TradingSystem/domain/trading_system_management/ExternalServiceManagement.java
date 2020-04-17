@@ -89,7 +89,7 @@ public class ExternalServiceManagement {
             double calculatedPrice = calculateShoppingBagPrice(shoppingBags.get(store));
             isChargedForCurrentBag = chargeSystem.sendPaymentTransaction(store.getStoreName(),calculatedPrice,paymentDetails);
             isCharged = isCharged && isChargedForCurrentBag;    //all last charges succeeded ans current as well?
-            if(!isChargedForCurrentBag){    //add store that its bag didn't charged by the user
+            if(isChargedForCurrentBag){    //add store that its bag didn't charged by the user
                 storesFailedToChargeForBags.add(store.getStoreId());
             }
         }
