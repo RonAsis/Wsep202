@@ -565,7 +565,7 @@ class StoreTest {
             for(int i = 0; i < 10 ; i++){
                 storeUT.getReceipts().add(Receipt.builder()
                         .amountToPay(i)
-                        .productsBought(new HashSet<Product>())
+                        .productsBought(new HashMap<Product,Integer>())
                         .purchaseDate(new Date())
                         .storeId(0)
                         .userName("felix")
@@ -1079,7 +1079,7 @@ class StoreTest {
             for(int i = 0; i < 10 ; i++){
                 storeUT.getReceipts().add(Receipt.builder()
                         .amountToPay(i)
-                        .productsBought(new HashSet<Product>())
+                        .productsBought(new HashMap<Product,Integer>())
                         .purchaseDate(new Date())
                         .storeId(0)
                         .userName("felix")

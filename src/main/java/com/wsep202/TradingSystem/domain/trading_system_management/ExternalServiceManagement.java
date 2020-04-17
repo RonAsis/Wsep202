@@ -107,6 +107,31 @@ public class ExternalServiceManagement {
     private double calculateShoppingBagPrice(ShoppingBag shoppingBag) {
         return shoppingBag.getTotalCostOfBag();
     }
+
+    /**
+     * The following request the chargeSystem to cancel charge of user belongs to the
+     * payment details and get refund for the purchase of the cart from the stores inside it
+     * @param paymentDetails
+     * @param cart
+     * @return  true for successful cancellation for all payment.
+     */
+    public boolean cancelCharge(PaymentDetails paymentDetails, ShoppingCart cart){
+        String logStatus = "failed";
+        boolean isRefund = true;           //isCharged = true iff all charge iterations succeeded
+        Map<Store, ShoppingBag> shoppingBags = cart.getShoppingBagsList();
+        //make the refund for each store in the cart
+        for (Store store : shoppingBags.keySet()){
+            double calculatedPrice = calculateShoppingBagPrice(shoppingBags.get(store));
+            isRefund = isRefund && chargeSystem.cancelCharge(store.getStoreName(),calculatedPrice,paymentDetails);
+                //all last charges succeeded ans current as well?
+        }
+        if(isRefund==true)
+            logStatus = "succeeded";
+        log.info("The user charging "+logStatus);
+        return isRefund;
+    }
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////interface to supply system/////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,4 +151,13 @@ public class ExternalServiceManagement {
         }
         return supplySystem.deliver(addressInfo,bags);
     }
+
+    public boolean cancelDelivery(BillingAddress addressInfo, ShoppingCart cart){
+        List<ShoppingBag> bags = new ArrayList<>();
+        for(ShoppingBag bag : cart.getShoppingBagsList().values()){
+            bags.add(bag);
+        }
+        return supplySystem.canceldelivery(addressInfo,bags);
+    }
 }
+

@@ -17,8 +17,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 
 public class BillingAddress {
-    private String fName;
-    private String lName;
+    /**
+     * the name of customer
+     */
+    private String customerFullName;
+    /**
+     * the street name
+     */
     private String address;
-    private String phone;
+    /**
+     * the users city for the delivery
+     */
+    private String city;
+    /**
+     * the users country for the delivery
+     */
+    private String country;
+    /**
+     * the users zip code for the delivery
+     */
+    private String zipCode;
 }
