@@ -3,10 +3,13 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import externals.ChargeSystem;
 import externals.SecuritySystem;
 import externals.SupplySystem;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+@Slf4j
 
 public class ExternalServiceManagement {
 
@@ -21,6 +24,8 @@ public class ExternalServiceManagement {
         securitySystem = new SecuritySystem();
         chargeSystem = new ChargeSystem();
         supplySystem = new SupplySystem();
+        log.info("The system is now connected to the external systems");
+
     }
 
     /**
@@ -33,6 +38,7 @@ public class ExternalServiceManagement {
         this.securitySystem = secSys;
         this.supplySystem = supSys;
         this.chargeSystem = chrgSys;
+        log.info("The system is now connected to the external systems");
     }
 ////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////interface to security system/////////////////////////////
@@ -70,17 +76,27 @@ public class ExternalServiceManagement {
      * charge the customer for the items in the shopping cart
      * @param paymentDetails
      * @param cart
-     * @return
+     * @return storesFailedToChargeForBags list of failed stores to charge
      */
-    public boolean charge(PaymentDetails paymentDetails, ShoppingCart cart){
-        boolean isCharged = true;
+    public List<Integer> charge(PaymentDetails paymentDetails, ShoppingCart cart){
+        List<Integer> storesFailedToChargeForBags = new LinkedList<>(); //holds store ID of failed transactions for stores
+        String logStatus = "failed";
+        boolean isChargedForCurrentBag;     //flag tells if payment for current bag of store succeeded
+        boolean isCharged = true;           //isCharged = true iff all charge iterations succeeded
         Map<Store, ShoppingBag> shoppingBags = cart.getShoppingBagsList();
         //make the payment for each store in the cart
         for (Store store : shoppingBags.keySet()){
             double calculatedPrice = calculateShoppingBagPrice(shoppingBags.get(store));
-            isCharged = isCharged && chargeSystem.sendPaymentTransaction(store.getStoreName(),calculatedPrice,paymentDetails);
+            isChargedForCurrentBag = chargeSystem.sendPaymentTransaction(store.getStoreName(),calculatedPrice,paymentDetails);
+            isCharged = isCharged && isChargedForCurrentBag;    //all last charges succeeded ans current as well?
+            if(!isChargedForCurrentBag){    //add store that its bag didn't charged by the user
+                storesFailedToChargeForBags.add(store.getStoreId());
+            }
         }
-        return isCharged;   //isCharged = true iff all charge iterations succeeded
+        if(isCharged==true)
+            logStatus = "succeeded";
+        log.info("The user charging "+logStatus);
+        return storesFailedToChargeForBags;
     }
 
     /**
