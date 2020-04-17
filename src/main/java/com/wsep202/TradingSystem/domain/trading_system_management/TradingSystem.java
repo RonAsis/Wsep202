@@ -22,6 +22,7 @@ public class TradingSystem {
     public TradingSystem(@NotNull ExternalServiceManagement externalServiceManagement,
                          @NotNull UserSystem admin){
         this.externalServiceManagement = externalServiceManagement;// must be first
+        this.externalServiceManagement.connect();    //connect to the externals
         encryptPassword(admin);
         stores = new HashSet<>();
         users = new HashSet<>();
@@ -32,6 +33,7 @@ public class TradingSystem {
     public TradingSystem(ExternalServiceManagement externalServiceManagement, Set<Store> stores,
                          @NotNull UserSystem admin) {
         this.externalServiceManagement = externalServiceManagement;
+        this.externalServiceManagement.connect();    //connect to the externals
         encryptPassword(admin);
         administrators = new HashSet<>(Collections.singletonList(admin));
         this.stores = stores;
