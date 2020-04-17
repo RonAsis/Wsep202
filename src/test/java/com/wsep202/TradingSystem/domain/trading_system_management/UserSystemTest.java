@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 class UserSystemTest {
 
     /**
-     * Unit tests for ShoppingCart class
+     * Unit tests for UserSystem class
      */
     @Nested
     public class UserSystemUnit {
@@ -25,21 +25,21 @@ class UserSystemTest {
         UserSystem testUserSystem;
         Store testStore1;
         Store testStore2;
+        Store testStore3;
         ShoppingCart testShoppingCart;
         ShoppingBag testShoppingBag;
         Product testProduct1;
-        Product testProduct2;
 
 
         @BeforeEach
         void setUp() {
-            testUserSystem = new UserSystem("CoolIsrael", "Israel", "Israeli", "123456");
+            testUserSystem = UserSystem.builder().build();
             testStore1 = mock(Store.class);
             testStore2 = mock(Store.class);
+            testStore3 = mock(Store.class);
             testShoppingCart = mock(ShoppingCart.class);
             testShoppingBag = mock(ShoppingBag.class);
             testProduct1 = mock(Product.class);
-            testProduct2 = mock(Product.class);
             Set<Store> testStoreList = new HashSet<>();
             testStoreList.add(testStore1);
             testUserSystem.setManagedStores(testStoreList);
@@ -47,33 +47,109 @@ class UserSystemTest {
             testUserSystem.setShoppingCart(testShoppingCart);
             when(testStore1.getStoreId()).thenReturn(1);
             when(testStore2.getStoreId()).thenReturn(2);
+            when(testStore3.getStoreId()).thenReturn(3);
             when(testShoppingCart.getShoppingBag(testStore1)).thenReturn(testShoppingBag);
             when(testShoppingBag.addProductToBag(testProduct1,3)).thenReturn(true);
-            //when(testShoppingCart.getShoppingBag())
         }
 
+        /**
+         * This test check if the addOwner method succeeds when the parameters
+         * are correct.
+         */
         @Test
         void addNewOwnedStoreSuccess() {
+            //check that the store was added to the owned list
+            assertTrue(testUserSystem.addNewOwnedStore(testStore3));
+            //check that testStore3 was added
+            assertTrue(testUserSystem.getOwnedStores().contains(testStore3));
+            //check that the store was added to the owned list
+            assertTrue(testUserSystem.addNewOwnedStore(testStore2));
         }
 
+        /**
+         * This test check if the addOwner method fails when the parameters
+         * are wrong.
+         */
         @Test
         void addNewOwnedStoreFail() {
+            //check that a null store can't be added
+            assertFalse(testUserSystem.addNewOwnedStore(null));
+            //was already added in setUp, check that a store can't be added twice
+            assertFalse(testUserSystem.addNewOwnedStore(testStore1));
         }
 
+        /**
+         * This test check if the addManager method succeeds when the parameters
+         * are correct.
+         */
         @Test
         void addNewManageStoreSuccess() {
+            //check that the store was added to the owned list
+            assertTrue(testUserSystem.addNewManageStore(testStore3));
+            //check that testStore3 was added
+            assertTrue(testUserSystem.getManagedStores().contains(testStore3));
+            //check that the store was added to the owned list
+            assertTrue(testUserSystem.addNewManageStore(testStore2));
         }
 
+        /**
+         * This test check if the addManager method fails when the parameters
+         * are wrong.
+         */
         @Test
         void addNewManageStoreFail() {
+            //check that a null store can't be added
+            assertFalse(testUserSystem.addNewManageStore(null));
+            //was already added in setUp, check that a store can't be added twice
+            assertFalse(testUserSystem.addNewManageStore(testStore1));
         }
 
+        /**
+         * This test check if the removeManged method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void removeManagedStoreSuccess(){
+            //check before remove there is 1 store in managed stores list
+            assertEquals(1, testUserSystem.getManagedStores().size());
+            //check that the removal was successful
+            assertTrue(testUserSystem.removeManagedStore(testStore1));
+            //check after the removal there is no store in managed stores list
+            assertEquals(0, testUserSystem.getManagedStores().size());
+        }
+
+        /**
+         * This test check if the removeManged method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void removeManagedStoreFail(){
+            //check before remove there is 1 store in managed stores list
+            assertEquals(1, testUserSystem.getManagedStores().size());
+            //check that the removal failed
+            assertFalse(testUserSystem.removeManagedStore(testStore2));
+            //check after the removal there is still 1 store in managed stores list
+            assertEquals(1, testUserSystem.getManagedStores().size());
+            //can't remove a null store
+            assertFalse(testUserSystem.removeManagedStore(null));
+        }
+
+        /**
+         * This test check if the getOwner method succeeds when the parameters
+         * are correct.
+         */
         @Test
         void getOwnerStoreSuccess() {
             //check that the right store comes back
             assertEquals(testStore1, testUserSystem.getOwnerStore(testStore1.getStoreId()));
+            //check that store is still in the list after getOwnerStore
+            assertTrue(testUserSystem.getOwnedStores().contains(testStore1));
         }
 
+        /**
+         * This test check if the getOwner method fails when the parameters
+         * are wrong.
+         */
         @Test
         void getOwnerStoreFail() {
             //check that for a store that does not exists the method return exception
@@ -82,12 +158,22 @@ class UserSystemTest {
             });
         }
 
+        /**
+         * This test check if the getManager method succeeds when the parameters
+         * are correct.
+         */
         @Test
         void getManagerStoreSuccess() {
             //check that the right store comes back
             assertEquals(testStore1, testUserSystem.getManagerStore(testStore1.getStoreId()));
+            //check that store is still in the list after getOwnerStore
+            assertTrue(testUserSystem.getManagedStores().contains(testStore1));
         }
 
+        /**
+         * This test check if the getManager method fails when the parameters
+         * are wrong.
+         */
         @Test
         void getManagerStoreFail() {
             //check that for a store that does not exists the method return exception
@@ -96,31 +182,171 @@ class UserSystemTest {
             });
         }
 
+        /**
+         * This test check if the saveProduct method succeeds when the parameters
+         * are correct.
+         */
         @Test
         void saveProductInShoppingBagSuccess() {
             //check that for existing shopping bag addition of a new product is successful
             assertTrue(testUserSystem.saveProductInShoppingBag(testStore1,testProduct1,3));
-            //
- //           assertTrue(testUserSystem.saveProductInShoppingBag(testStore2,testProduct2,4));
         }
 
+        /**
+         * This test check if the removeProduct method fails when the parameters
+         * are wrong.
+         */
         @Test
-        void saveProductInShoppingBagFail() {
-
-        }
-
-        @Test
-        void removeProductInShoppingBag() {
+        void removeProductInShoppingBagFail() {
+            //can't remove a product with null store
+            assertFalse(testUserSystem.removeProductInShoppingBag(null,testProduct1));
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Integration tests for ShoppingCart class
+     * Integration tests for UserSystem class
      */
     @Nested
     public class UserSystemIntegration {
+        UserSystem testUserSystem;
+        Store testStore1;
+        Store testStore2;
+        ShoppingCart testShoppingCart;
 
+
+        @BeforeEach
+        void setUp() {
+            testUserSystem = UserSystem.builder().build();
+            testStore1 = mock(Store.class);
+            testStore2 = mock(Store.class);
+            testShoppingCart = mock(ShoppingCart.class);
+            testUserSystem.setShoppingCart(testShoppingCart);
+            when(testStore1.getStoreId()).thenReturn(1);
+            when(testStore2.getStoreId()).thenReturn(2);
+        }
+
+        /**
+         * This test check if the addOwner & getOwner methods succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addNewOwnedStoreAndGetOwnerSuccess() {
+            //check that the store was added
+            assertTrue(testUserSystem.addNewOwnedStore(testStore1));
+            //check that number of owned stores after addition is 1
+            assertEquals(1, testUserSystem.getOwnedStores().size());
+            //check that the object are equals
+            assertEquals(testStore1,testUserSystem.getOwnerStore(testStore1.getStoreId()));
+            //check that there are still 1 store in the owned list
+            assertEquals(1, testUserSystem.getOwnedStores().size());
+        }
+
+        /**
+         * This test check if the addOwner & getOwner methods fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addNewOwnedStoreAndGetOwnerFail() {
+            testUserSystem.addNewOwnedStore(testStore1);
+            //check if a store the wasn't added is in the list
+            assertThrows(NoOwnerInStoreException.class, ()->{
+                testUserSystem.getOwnerStore(testStore2.getStoreId());
+            });
+        }
+
+        /**
+         * This test check if the addManager & getManager methods succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addNewMangedStoreAndGetOwnerSuccess() {
+            //check that the store was added
+            assertTrue(testUserSystem.addNewManageStore(testStore1));
+            //check that number of owned stores after addition is 1
+            assertEquals(1, testUserSystem.getManagedStores().size());
+            //check that the object are equals
+            assertEquals(testStore1,testUserSystem.getManagerStore(testStore1.getStoreId()));
+            //check that there are still 1 store in the owned list
+            assertEquals(1, testUserSystem.getManagedStores().size());
+        }
+
+        /**
+         * This test check if the addManager & getManager methods fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addNewManagedStoreAndGetOwnerFail() {
+            testUserSystem.addNewManageStore(testStore1);
+            //check if a store the wasn't added is in the list
+            assertThrows(NoManagerInStoreException.class, ()->{
+                testUserSystem.getManagerStore(testStore2.getStoreId());
+            });
+        }
+
+        /**
+         * This test check if the addManager & removeManager methods succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addMangedAndRemoveManagedSuccess(){
+            testUserSystem.addNewManageStore(testStore1);
+            //check that after addition there is 1 store in managed store
+            assertEquals(1, testUserSystem.getManagedStores().size());
+            testUserSystem.removeManagedStore(testStore1);
+            //check that after removal there is 0 stores in managed store
+            assertEquals(0, testUserSystem.getManagedStores().size());
+        }
+
+        /**
+         * This test check if the addManager & removeManager methods fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addMangedAndRemoveManagedFail(){
+            testUserSystem.addNewManageStore(testStore1);
+            //check that after addition there is 1 store in managed store
+            assertEquals(1, testUserSystem.getManagedStores().size());
+            //try to remove a store that does mot exists
+            testUserSystem.removeManagedStore(testStore2);
+            //check that after removal there is still 1 stores in managed store
+            assertEquals(1, testUserSystem.getManagedStores().size());
+        }
+
+        /**
+         * This test check if the addManager & getManager & removeManager methods succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addRemoveGetManagedSuccess(){
+            //check that before addition the managed list is empty
+            assertEquals(0, testUserSystem.getManagedStores().size());
+            testUserSystem.addNewManageStore(testStore1);
+            testUserSystem.addNewManageStore(testStore2);
+            //check after addition there are 2 stores in managed list
+            assertEquals(2, testUserSystem.getManagedStores().size());
+            //check that the removal is successful
+            assertTrue(testUserSystem.removeManagedStore(testStore1));
+            //check the store that wasn't remove  is still in the list
+            assertEquals(testStore2, testUserSystem.getManagerStore(testStore2.getStoreId()));
+            //check that the number of stores is in the list is 1
+            assertEquals(1, testUserSystem.getManagedStores().size());
+        }
+
+        /**
+         * This test check if the addManager & getManager & removeManager methods fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addRemoveGetManagedFail(){
+            testUserSystem.addNewManageStore(testStore1);
+            //check that the store that was added is different from testStore2
+            assertThrows(NoManagerInStoreException.class, ()->{
+                testUserSystem.getManagerStore(testStore2.getStoreId());
+            });
+            //can't remove store that was never added
+            assertFalse(testUserSystem.removeManagedStore(testStore2));
+        }
     }
 }

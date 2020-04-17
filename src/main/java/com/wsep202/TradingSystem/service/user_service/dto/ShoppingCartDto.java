@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.service.user_service.dto;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag;
-import com.wsep202.TradingSystem.domain.trading_system_management.Store;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,12 +12,22 @@ import java.util.Map;
 @NoArgsConstructor
 public class ShoppingCartDto {
 
+
+    /**
+     * list of stores and there shopping bags
+     */
     private Map<StoreDto, ShoppingBagDto> shoppingBagsList;
-
+    /**
+     * the total cost of the products in cart
+     */
     private double totalCartCost;
-
+    /**
+     * number of different shopping bags in cart
+     */
     private int numOfBagsInCart;
-
+    /**
+     * number of different products in the cart
+     */
     private int numOfProductsInCart;
 
 }

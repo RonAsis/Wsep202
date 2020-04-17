@@ -110,6 +110,25 @@ public class UserSystem {
     }
 
     /**
+     * This method is used to remove a store that is under a users management
+     * @param storeToRemove - the store that needs to be removed
+     * @return true if the store exists in managedStores, false if not or null
+     */
+    public boolean removeManagedStore(Store storeToRemove){
+        if (storeToRemove == null){
+            log.error("can't remove a null store");
+            return false;
+        }
+        if (!managedStores.contains(storeToRemove)){
+            log.error("the store is not managed by this user");
+            return false;
+        }
+        managedStores.remove(storeToRemove);
+        log.info("store was removed from managed store list");
+        return true;
+    }
+
+    /**
      * This method is used to change the stage of the user to logged-in
      */
     public void login(){
@@ -178,6 +197,7 @@ public class UserSystem {
     public boolean removeProductInShoppingBag(Store storeOfProduct, Product productToRemove) {
         if(shoppingCart.getShoppingBag(storeOfProduct) == null){
             log.error("the product is not in cart");
+            return false;
         }
         log.info("try to remove a product from cart");
         return shoppingCart.getShoppingBag(storeOfProduct).removeProductFromBag(productToRemove);

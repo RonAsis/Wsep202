@@ -17,10 +17,22 @@ import java.util.Map;
 public class ShoppingCart {
 
     NumberFormat formatter = new DecimalFormat("#.##");
+    /**
+     * list of stores and there shopping bags
+     */
     @Builder.Default
-    private Map<Store, ShoppingBag> shoppingBagsList;
+    private Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
+    /**
+     * the total cost of the products in cart
+     */
     private double totalCartCost;
+    /**
+     * number of different shopping bags in cart
+     */
     private int numOfBagsInCart;
+    /**
+     * number of different products in the cart
+     */
     private int numOfProductsInCart;
 
     public ShoppingCart(){

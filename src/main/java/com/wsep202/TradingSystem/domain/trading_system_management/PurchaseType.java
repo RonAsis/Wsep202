@@ -13,6 +13,11 @@ public enum PurchaseType {
         this.type = type;
     }
 
+    /**
+     * This method is used to find the needed type.
+     * @param type - the name of the type
+     * @return the value if the type if exists
+     */
     public static PurchaseType getPurchaseType(String type) {
         return Arrays.stream(PurchaseType.values())
                 .filter(purchaseType -> purchaseType.type.equals(type))
