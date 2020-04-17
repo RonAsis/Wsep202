@@ -16,9 +16,21 @@ public class ShoppingBag {
     //private Map<Integer, Integer> mapProductSnToAmount;
     NumberFormat formatter = new DecimalFormat("#.##");
 
+    /**
+     * the store of the products
+     */
     private Store storeOfProduct;
+    /**
+     * list of all of the products and the amount of each product
+     */
     private Map<Product, Integer> productListFromStore;
+    /**
+     * shows the cost of all of the products in bag
+     */
     private double totalCostOfBag;
+    /**
+     * shows how many types of products in the bag
+     */
     private int numOfProductsInBag;
 
     public ShoppingBag(Store storeOfProduct){

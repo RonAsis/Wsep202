@@ -12,6 +12,11 @@ public enum DiscountType {
         this.type = type;
     }
 
+    /**
+     * This method is used to find the needed type.
+     * @param type - the name of the type
+     * @return the value if the type if exists
+     */
     public static DiscountType getDiscountType(String type) {
         return Arrays.stream(DiscountType.values())
                 .filter(discountType -> discountType.type.equals(type))

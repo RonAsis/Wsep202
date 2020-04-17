@@ -13,6 +13,11 @@ import static org.mockito.Mockito.when;
 
 class ShoppingCartTest {
 
+    /**
+     * Unit tests for ShoppingCart class
+     */
+    @Nested
+    public class ShoppingCartUnit {
     ShoppingCart testShoppingCart;
     ShoppingBag testShoppingBag1;
     ShoppingBag testShoppingBag2;
@@ -156,7 +161,7 @@ class ShoppingCartTest {
         //check that there is no shopping bag for a store that does not exists in cart
         assertNull(testShoppingCart.getShoppingBag(testStore2));
     }
-
+}
     /////////////////////////////////////////////////////////////////////////////////
 
 /**

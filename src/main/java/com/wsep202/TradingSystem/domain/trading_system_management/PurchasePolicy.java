@@ -1,12 +1,23 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@NoArgsConstructor
 public class PurchasePolicy {
 
-    //Who can buy
+    /**
+     * allow everyone to purchase from store
+     */
+    private boolean isAllAllowed = true;
 
-    // purchase ways
+    /**
+     * status as string
+     */
+    private String whoCanBuyStatus = "allow all purchases";
 
-    // Rules that apply
 
-    //
+
 }
