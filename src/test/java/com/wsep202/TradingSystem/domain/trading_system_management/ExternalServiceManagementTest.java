@@ -112,12 +112,14 @@ class ExternalServiceManagementTest {
             double priceOfEachBag = 5.5;    //some price for each bag to return
             Map<Store,ShoppingBag> shoppingBagsMap = new HashMap<>();   //bags to inject into cart
             shoppingBagsMap.put(store,bag);
+            //expected failed stores to receive
+            List<Integer> expectedStores = new LinkedList<>();
             when(cart.getShoppingBagsList()).thenReturn(shoppingBagsMap);
             when(bag.getTotalCostOfBag()).thenReturn(priceOfEachBag);
             when(store.getStoreName()).thenReturn("Keter");
             when(chargeSystem.sendPaymentTransaction(store.getStoreName(),priceOfEachBag,paymentDetails)).thenReturn(true);
             //success: the charge succeeded
-            Assertions.assertTrue(externalServiceManagement.charge(paymentDetails,cart));
+            Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
         }
 
         /**
@@ -128,12 +130,15 @@ class ExternalServiceManagementTest {
             double priceOfEachBag = 5.5;    //some price for each bag to return
             Map<Store,ShoppingBag> shoppingBagsMap = new HashMap<>();   //bags to inject into cart
             shoppingBagsMap.put(store,bag);
+            List<Integer> expectedStores = new LinkedList<>();
             when(cart.getShoppingBagsList()).thenReturn(shoppingBagsMap);
             when(bag.getTotalCostOfBag()).thenReturn(priceOfEachBag);
             when(store.getStoreName()).thenReturn("Keter");
             when(chargeSystem.sendPaymentTransaction(store.getStoreName(),priceOfEachBag,paymentDetails)).thenReturn(false);
-            //fail: the charge by the charge system failed
-            Assertions.assertFalse(externalServiceManagement.charge(paymentDetails,cart));
+            when(store.getStoreId()).thenReturn(2);
+            expectedStores.add(store.getStoreId());
+            //fail: the charge by the charge system failed for the received store in the list (store)
+            Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
         }
 
         /**
@@ -242,9 +247,10 @@ class ExternalServiceManagementTest {
             bag.setTotalCostOfBag(5.5);
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
-            //success: the charge succeeded
+            List<Integer> expectedStores = new LinkedList<>();
+            //success: the charge succeeded no failed stores received
             paymentDetails.setCreditCardNumber("123456789");    //valid card no. length
-            Assertions.assertTrue(externalServiceManagement.charge(paymentDetails,cart));
+            Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
         }
 
         /**
@@ -255,9 +261,11 @@ class ExternalServiceManagementTest {
             bag.setTotalCostOfBag(5.5);
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
-            //fail: the charge succeeded
+            List<Integer> expectedStores = new LinkedList<>();
+            expectedStores.add(store.getStoreId()); //the expected store that failed to be returned in list
+            //fail: the charge failed for shopping bag of store
             paymentDetails.setCreditCardNumber("1234567890");    //invalid card no. length
-            Assertions.assertFalse(externalServiceManagement.charge(paymentDetails,cart));
+            Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
         }
 
         /**
