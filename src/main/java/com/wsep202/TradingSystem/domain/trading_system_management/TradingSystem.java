@@ -454,4 +454,18 @@ public class TradingSystem {
         return false;
     }
 
+    /**
+     * remove manager from the store
+     * @param ownedStore - the store
+     * @param ownerUser - the owner of the store that want remove the manager
+     * @param managerStore - the manager that want to remove
+     * @return true if succ else false
+     */
+    public boolean removeManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore) {
+        if(ownedStore.removeManager(ownerUser, managerStore)){
+            //ownerUser
+            //TODO
+        }
+        return false;
+    }
 }

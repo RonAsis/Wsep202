@@ -254,7 +254,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
-            when(store.removeManager(userSystem, managerStore)).thenReturn(true);
+            when(tradingSystem.removeManager(store, userSystem, managerStore)).thenReturn(true);
             //test
             Assertions.assertTrue(tradingSystemFacade
                     .removeManager(ownerUsername, storeId, managerUsername));

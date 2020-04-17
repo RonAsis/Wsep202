@@ -194,7 +194,7 @@ public class TradingSystemFacade {
         UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
         Store ownedStore = ownerUser.getOwnerStore(storeId);
         UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
-        return ownedStore.removeManager(ownerUser, managerStore);
+        return tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
     }
 
     /**
