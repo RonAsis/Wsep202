@@ -39,6 +39,7 @@ class TradingSystemTest {
         ExternalServiceManagement externalServiceManagement;
         private TradingSystem tradingSystem;
         private UserSystem userSystem;
+        private UserSystem userSystem1;
         private UserSystem userToRegister;
         private FactoryObjects factoryObjects;
         private UserSystem admin;
@@ -56,6 +57,7 @@ class TradingSystemTest {
             tradingSystem = new TradingSystem(externalServiceManagement, admin);
             doNothing().when(externalServiceManagement).connect();
             userSystem = mock(UserSystem.class);
+            userSystem1 = mock(UserSystem.class);
             factoryObjects = new FactoryObjects();
             String username = "usernameTest";
             String password = "passwordTest";
@@ -64,6 +66,10 @@ class TradingSystemTest {
             userToRegister = new UserSystem(username,fName,lName,password);
             store = mock(Store.class);
             product = mock(Product.class);
+            doNothing().when(userSystem1).setOwnedStores(new HashSet<Store>());
+            doNothing().when(userSystem1).setManagedStores(new HashSet<Store>());
+            doNothing().when(userSystem).setOwnedStores(new HashSet<Store>());
+            doNothing().when(userSystem).setManagedStores(new HashSet<Store>());
         }
 
         /**
@@ -103,6 +109,7 @@ class TradingSystemTest {
             when(userToRegister.getUserName()).thenReturn("usernameTest");
             //setup
             //the following user details are necessary for the login tests
+            //success: registration done. valid user details
             Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister));
         }
 
@@ -114,16 +121,8 @@ class TradingSystemTest {
         void registerNewUserNegative() {
             //registration with already registered user
             registerAsSetup(); //setup test of registration
+            //fail: this user is already registered
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
-        }
-
-
-        @Test
-        void login() {
-            //check login of regular user
-            loginRegularUserPositive();
-            //check login of admin
-            //TODO
         }
 
         @Test
@@ -284,6 +283,80 @@ class TradingSystemTest {
                 tradingSystem.getUserByAdmin("userSystem", "userToRegister");
             });
         }
+
+
+        /**
+         * check the addMangerToStore() functionality in case of success in addNewManageStore and addManager
+         */
+        @Test
+        void addMangerToStorePositive() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addManager(userSystem,userSystem1)).thenReturn(true);
+            when(userSystem1.addNewManageStore(store)).thenReturn(true);
+            Assertions.assertTrue(tradingSystem.addMangerToStore(store, userSystem, userSystem1));
+        }
+
+        /**
+         * check the addMangerToStore() functionality in case of not initialized parameters.
+         */
+        @Test
+        void addMangerToStoreNullParams() {
+            Store storeNull = mock(Store.class);
+            UserSystem userSystemNull1 = mock(UserSystem.class);
+            UserSystem userSystemNull2 = mock(UserSystem.class);
+            Assertions.assertFalse(tradingSystem.addMangerToStore(storeNull, userSystemNull1, userSystemNull2));
+        }
+
+        /**
+         * check the addMangerToStore() functionality in case of failure in addNewManageStore and addManager
+         */
+        @Test
+        void addMangerToStoreNegative() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addManager(userSystem,userSystem1)).thenReturn(false);
+            when(userSystem1.addNewManageStore(store)).thenReturn(false);
+            Assertions.assertFalse(tradingSystem.addMangerToStore(store, userSystem, userSystem1));
+        }
+
+        /**
+         * check the addOwnerToStore() functionality in case of success in addNewOwnedStore and addOwner
+         */
+        @Test
+        void addOwnerToStorePositive() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addOwner(userSystem,userSystem1)).thenReturn(true);
+            when(userSystem1.addNewOwnedStore(store)).thenReturn(true);
+            Assertions.assertTrue(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
+        }
+
+        /**
+         * check the addOwnerToStore() functionality in case of not initialized parameters.
+         */
+        @Test
+        void addOwnerToStoreNullParams() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addOwner(userSystem,userSystem1)).thenReturn(true);
+            when(userSystem1.addNewOwnedStore(store)).thenReturn(true);
+            Assertions.assertTrue(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
+        }
+
+        /**
+         * check the addOwnerToStore() functionality in case of failure in addNewOwnedStore and addOwner
+         */
+        @Test
+        void addOwnerToStoreNegative() {
+            // userSystem <==> ownerUser
+            // userSystem1 <==> newManagerUser
+            when(store.addOwner(userSystem,userSystem1)).thenReturn(false);
+            when(userSystem1.addNewOwnedStore(store)).thenReturn(false);
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
+        }
+
+
 
         /**
          * check the searchProductByName() functionality in case of exists product in store in the system
