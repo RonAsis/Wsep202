@@ -115,12 +115,12 @@ class TradingSystemTest {
 
         /**
          * checks handling with failure of registration
-         * this test has to run after its respective positive test
+         * this test.txt has to run after its respective positive test.txt
          */
         @Test
         void registerNewUserNegative() {
             //registration with already registered user
-            registerAsSetup(); //setup test of registration
+            registerAsSetup(); //setup test.txt of registration
             //fail: this user is already registered
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
         }
@@ -134,13 +134,13 @@ class TradingSystemTest {
                     .thenReturn(true);
             //the following register should register usernameTest as username
             // and passwordTest as password
-            registerAsSetup();  //register user test as setup for login
+            registerAsSetup();  //register user test.txt as setup for login
             boolean ans = tradingSystem.login(userSystem,false,"passwordTest");
             Assertions.assertTrue(ans);
         }
 
         /**
-         * test handling with login failure
+         * test.txt handling with login failure
          */
         @Test
         void loginRegularUserNegative(){
@@ -548,7 +548,7 @@ class TradingSystemTest {
 
         // TODO - KSENIA = go over mocks
         /**
-         * This test checks that the store's opening succeeds
+         * This test.txt checks that the store's opening succeeds
          */
         @Test
         void openStoreSuccess() {
@@ -574,7 +574,7 @@ class TradingSystemTest {
 
         // TODO - KSENIA = go over mocks
         /**
-         * This test checks that the store's opening fails
+         * This test.txt checks that the store's opening fails
          */
         @Test
         void openStoreFail(){
@@ -590,7 +590,7 @@ class TradingSystemTest {
         // ********************************** Set Up Functions For Tests ********************************** //
 
         /**
-         * sets up users for openStore test
+         * sets up users for openStore test.txt
          * @return a list of users
          */
         private Set<UserSystem> setUpUsersForOpenStoreTest(){
@@ -707,7 +707,7 @@ class TradingSystemTest {
 
         /**
          * checks handling with failure of registration
-         * this test has to run after its respective positive test
+         * this test.txt has to run after its respective positive test.txt
          */
         @Test
         void registerNewUserNegative() {
@@ -720,9 +720,9 @@ class TradingSystemTest {
         @Test
         void login() {
             //check login of regular user
-            String password = "test login";
+            String password = "test.txt login";
             UserSystem user = UserSystem.builder()
-                    .userName("test login")
+                    .userName("test.txt login")
                     .password(password)
                     .build();
             tradingSystem.registerNewUser(user);
@@ -736,13 +736,13 @@ class TradingSystemTest {
         void loginRegularUser(){
             //the following register should register usernameTest as username
             // and passwordTest as password
-            registerAsSetup();  //register user test as setup for login
+            registerAsSetup();  //register user test.txt as setup for login
             boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
             Assertions.assertTrue(ans);
         }
 
         /**
-         * test handling with login failure
+         * test.txt handling with login failure
          */
         @Test
         void loginRegularUserNegative(){

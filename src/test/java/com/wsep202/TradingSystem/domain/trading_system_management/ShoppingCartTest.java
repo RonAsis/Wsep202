@@ -38,7 +38,7 @@ class ShoppingCartTest {
     }
 
     /**
-     * This test check if the addBag method succeeds when the parameters
+     * This test.txt check if the addBag method succeeds when the parameters
      * are correct.
      */
     @Test
@@ -62,7 +62,7 @@ class ShoppingCartTest {
     }
 
     /**
-     * This test check if the addBag method fails when the parameters
+     * This test.txt check if the addBag method fails when the parameters
      * are wrong.
      */
     @Test
@@ -97,7 +97,7 @@ class ShoppingCartTest {
     }
 
     /**
-     * This test check if the removeBag method succeeds when the parameters
+     * This test.txt check if the removeBag method succeeds when the parameters
      * are correct.
      */
     @Test
@@ -116,7 +116,7 @@ class ShoppingCartTest {
     }
 
     /**
-     * This test check if the removeProduct method fails when the parameters
+     * This test.txt check if the removeProduct method fails when the parameters
      * are wrong.
      */
     @Test
@@ -139,7 +139,7 @@ class ShoppingCartTest {
     }
 
     /**
-     * This test check if the getBag method succeeds when the parameters
+     * This test.txt check if the getBag method succeeds when the parameters
      * are correct.
      */
     @Test
@@ -150,7 +150,7 @@ class ShoppingCartTest {
     }
 
     /**
-     * This test check if the getBag method fails when the parameters
+     * This test.txt check if the getBag method fails when the parameters
      * are wrong.
      */
     @Test
@@ -189,7 +189,7 @@ public class ShoppingCartIntegration {
         }
 
         /**
-         * This test check if the add & remove methods succeeds when the parameters
+         * This test.txt check if the add & remove methods succeeds when the parameters
          * are correct.
          */
          @Test void addAndRemoveSuccess(){
@@ -206,7 +206,7 @@ public class ShoppingCartIntegration {
         }
 
         /**
-         * This test check if the add & remove methods fails when the parameters
+         * This test.txt check if the add & remove methods fails when the parameters
          * are wrong.
          */
         @Test
@@ -219,7 +219,7 @@ public class ShoppingCartIntegration {
         }
 
         /**
-         * This test check if the add & get methods succeeds when the parameters
+         * This test.txt check if the add & get methods succeeds when the parameters
          * are correct.
          */
         @Test
@@ -230,7 +230,7 @@ public class ShoppingCartIntegration {
         }
 
         /**
-         * This test check if the add & get methods fails when the parameters
+         * This test.txt check if the add & get methods fails when the parameters
          * are wrong.
          */
         @Test
@@ -241,7 +241,7 @@ public class ShoppingCartIntegration {
         }
 
         /**
-         * This test check if the remove & get methods succeeds when the parameters
+         * This test.txt check if the remove & get methods succeeds when the parameters
          * are correct.
          */
         @Test
@@ -255,7 +255,7 @@ public class ShoppingCartIntegration {
         }
 
         /**
-         * This test check if the remove & get methods fails when the parameters
+         * This test.txt check if the remove & get methods fails when the parameters
          * are wrong.
          */
         @Test
@@ -277,7 +277,7 @@ public class ShoppingCartIntegration {
         }
 
         /**
-         * This test check if the add & remove & get methods succeeds when the parameters
+         * This test.txt check if the add & remove & get methods succeeds when the parameters
          * are correct.
          */
         @Test
@@ -291,7 +291,7 @@ public class ShoppingCartIntegration {
         }
 
         /**
-         * This test check if the add & remove & get methods fails when the parameters
+         * This test.txt check if the add & remove & get methods fails when the parameters
          * are wrong.
          */
         @Test
