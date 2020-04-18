@@ -43,7 +43,7 @@ class ShoppingBagTest {
         }
 
         /**
-         * This test.txt check if the addProduct method succeeds when the parameters
+         * This test check if the addProduct method succeeds when the parameters
          * are correct.
          */
         @Test
@@ -69,7 +69,7 @@ class ShoppingBagTest {
         }
 
         /**
-         * This test.txt check if the addProduct method fails when the parameters
+         * This test check if the addProduct method fails when the parameters
          * are wrong.
          */
         @Test
@@ -92,7 +92,7 @@ class ShoppingBagTest {
         }
 
         /**
-         * This test.txt check if the removeProduct method succeeds when the parameters
+         * This test check if the removeProduct method succeeds when the parameters
          * are correct.
          */
         @Test
@@ -113,7 +113,7 @@ class ShoppingBagTest {
         }
 
         /**
-         * This test.txt check if the removeProduct method fails when the parameters
+         * This test check if the removeProduct method fails when the parameters
          * are wrong.
          */
         @Test
@@ -174,7 +174,7 @@ class ShoppingBagTest {
         }
 
         /**
-         * This test.txt check if the add & remove methods succeeds when the parameters
+         * This test check if the add & remove methods succeeds when the parameters
          * are correct.
          */
         @Test
@@ -189,7 +189,7 @@ class ShoppingBagTest {
         }
 
         /**
-         * This test.txt check if the add & remove methods fails when the parameters
+         * This test check if the add & remove methods fails when the parameters
          * are wrong.
          */
         @Test

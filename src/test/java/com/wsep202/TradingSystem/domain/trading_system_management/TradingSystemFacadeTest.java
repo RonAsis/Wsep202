@@ -70,7 +70,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getStoreByAdmin(administratorUsername, storeId)).thenReturn(store);
             when(store.getReceipts()).thenReturn(receipts);
 
-            //test.txt
+            //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId);
             assertRecipes(receipts, receiptDtos);
         }
@@ -86,7 +86,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUserByAdmin(administratorUsername, username)).thenReturn(userSystem);
             when(userSystem.getReceipts()).thenReturn(receipts);
 
-            //test.txt
+            //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, username);
             assertRecipes(receipts, receiptDtos);
         }
@@ -103,7 +103,7 @@ class TradingSystemFacadeTest {
             when(userSystem.getManagerStore(storeId)).thenReturn(store);
             when(store.getReceipts()).thenReturn(receipts);
 
-            //test.txt
+            //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(managerUsername, storeId);
             assertRecipes(receipts, receiptDtos);
         }
@@ -120,7 +120,7 @@ class TradingSystemFacadeTest {
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.getReceipts()).thenReturn(receipts);
 
-            //test.txt
+            //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername, storeId);
             assertRecipes(receipts, receiptDtos);
         }
@@ -136,7 +136,7 @@ class TradingSystemFacadeTest {
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.addNewProduct(any(), any())).thenReturn(true);
 
-            //test.txt
+            //test
             Arrays.stream(ProductCategory.values()).forEach(productCategory -> {
                 String productName = "productName " + productCategory.category;
                 Assertions.assertTrue(tradingSystemFacade
@@ -177,7 +177,7 @@ class TradingSystemFacadeTest {
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.editProduct(userSystem, productSn, productName, category, amount, cost)).thenReturn(true);
 
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost));
         }
@@ -197,7 +197,7 @@ class TradingSystemFacadeTest {
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(tradingSystem.addOwnerToStore(store,userSystem, newOwner)).thenReturn(true);
 
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .addOwner(ownerUsername, storeId, newOwnerUsername));
         }
@@ -217,7 +217,7 @@ class TradingSystemFacadeTest {
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(tradingSystem.addMangerToStore(store,userSystem, newOwner)).thenReturn(true);
 
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .addManager(ownerUsername, storeId, newManagerUsername));
         }
@@ -237,7 +237,7 @@ class TradingSystemFacadeTest {
             when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
             when(store.addPermissionToManager(userSystem, managerStore, StorePermission.getStorePermission(storePermission)))
                     .thenReturn(true);
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .addPermission(ownerUsername, storeId, managerUsername, storePermission));
         }
@@ -255,7 +255,7 @@ class TradingSystemFacadeTest {
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
             when(tradingSystem.removeManager(store, userSystem, managerStore)).thenReturn(true);
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .removeManager(ownerUsername, storeId, managerUsername));
         }
@@ -269,7 +269,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(userName)).thenReturn(userSystem);
             when(userSystem.logout()).thenReturn(true);
 
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .logout(userName));
         }
@@ -296,7 +296,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.openStore(userSystem, DiscountType.getDiscountType(discountType),
                     PurchaseType.getPurchaseType(purchaseType), purchasePolicy, discountPolicy, storeName)).thenReturn(true);
 
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .openStore(ownerUsername, purchasePolicyDto, discountPolicyDto, discountType, purchaseType, storeName));
         }
@@ -310,7 +310,7 @@ class TradingSystemFacadeTest {
             when(factoryObjects.createSystemUser(userName, password, firstName, lastName)).thenReturn(userSystem);
             when(tradingSystem.registerNewUser(userSystem)).thenReturn(true);
 
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .registerUser(userName, password, firstName, lastName));
         }
@@ -325,7 +325,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(userName)).thenReturn(userSystem);
             when(tradingSystem.login(userSystem, false, password)).thenReturn(true);
 
-            //test.txt
+            //test
             Assertions.assertTrue(tradingSystemFacade
                     .login(userName, password));
         }
@@ -378,7 +378,7 @@ class TradingSystemFacadeTest {
         void searchProductByKeyWords() {
             List<Product> products = new ArrayList<>(setUpProducts());
             List<String> keyWords = new LinkedList<>();
-            keyWords.add("test.txt-key-words");
+            keyWords.add("test-key-words");
             when(tradingSystem.searchProductByKeyWords(keyWords)).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.searchProductByKeyWords(keyWords);
             assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
@@ -501,7 +501,7 @@ class TradingSystemFacadeTest {
         }
     }
 
-    ///////////////////////////////integration test.txt /////////////////////
+    ///////////////////////////////integration test /////////////////////
     @Nested
     @ContextConfiguration(classes = {TradingSystemConfiguration.class})
     @WithModelMapper(basePackageClasses = TradingSystemMapper.class)

@@ -15,7 +15,7 @@ class StoreTest {
     private UserSystem newOwner;    //role as an appointed owner in the store
     private UserSystem fakeOwner;   //role as not owner in the store
     private UserSystem owner;   //role as appointing owner in the store
-    private Store storeUT;  //unit under test.txt
+    private Store storeUT;  //unit under test
     private PurchasePolicy purchasePolicy;
     private DiscountPolicy discountPolicy;
     private Product product;    //product to add
@@ -54,7 +54,7 @@ class StoreTest {
             //owner and opener of the store
             owner = mock(UserSystem.class);
             when(owner.getUserName()).thenReturn("Michael");
-            storeUT = new Store(owner,purchasePolicy,discountPolicy,"Store under test.txt");
+            storeUT = new Store(owner,purchasePolicy,discountPolicy,"Store under test");
             product = mock(Product.class);
         }
 
@@ -133,7 +133,7 @@ class StoreTest {
         }
 
         /**
-         * test.txt handling with searching of keyword which doesn't exist
+         * test handling with searching of keyword which doesn't exist
          */
         @Test
         void searchProductByKeywordNegative(){
@@ -204,7 +204,7 @@ class StoreTest {
             //setup for remove product
             addNewProductSetUp();  //add product to the store
             Assertions.assertEquals(1,storeUT.products.size()); //verify we starts with no products in store
-            //add a product to the store which will be removed for the test.txt
+            //add a product to the store which will be removed for the test
             when(product.getProductSn()).thenReturn(12);    // let product SN to for the check which one to remove
             Assertions.assertTrue(storeUT.removeProductFromStore(owner,12));    //success: product is removed
             Assertions.assertEquals(0,storeUT.products.size()); //verify we decreased no. of products in store
@@ -218,7 +218,7 @@ class StoreTest {
             //setup for remove product
             addNewProductSetUp();  //add product to the store
             Assertions.assertEquals(1,storeUT.products.size()); //verify we starts with no products in store
-            //add a product to the store which will be removed for the test.txt
+            //add a product to the store which will be removed for the test
             when(product.getProductSn()).thenReturn(12);    // let product SN to for the check which one to remove
             Assertions.assertFalse(storeUT.removeProductFromStore(owner,4));    //fail: product not exist is not removed
             Assertions.assertEquals(1,storeUT.products.size()); //verify we decreased no. of products in store
@@ -230,7 +230,7 @@ class StoreTest {
         @Test
         void notOwnerRemoveExistsProductFromStoreNegative() {
             UserSystem notOwner = mock(UserSystem.class);   //not an owner
-            //setup for remove product. add a product to the store which will be removed for the test.txt
+            //setup for remove product. add a product to the store which will be removed for the test
             addNewProductSetUp();  //add product to the store
             Assertions.assertEquals(1,storeUT.products.size()); //verify we starts with no products in store
             //stubs
@@ -547,7 +547,7 @@ class StoreTest {
         @Test
         void showStoreInfo(){
             //success: shows the store info as string
-            Assertions.assertEquals("The store Store under test.txt has ID: " +storeUT.getStoreId()+ "",storeUT.showStoreInfo());
+            Assertions.assertEquals("The store Store under test has ID: " +storeUT.getStoreId()+ "",storeUT.showStoreInfo());
         }
 
         /**
@@ -611,7 +611,7 @@ class StoreTest {
             discountPolicy = new DiscountPolicy();
             //owner and opener of the store
             ownerRealUser = new UserSystem("Michael","micha","toti","pass");
-            storeUT = new Store(ownerRealUser,purchasePolicy,discountPolicy,"Store under test.txt");
+            storeUT = new Store(ownerRealUser,purchasePolicy,discountPolicy,"Store under test");
             product = new Product("Bamba",ProductCategory.SPORTING_GOODS,1,11,storeUT.getStoreId());
         }
 
@@ -683,7 +683,7 @@ class StoreTest {
         }
 
         /**
-         * test.txt handling with searching of keyword which doesn't exist
+         * test handling with searching of keyword which doesn't exist
          */
         @Test
         void searchProductByKeywordNegative(){
@@ -762,7 +762,7 @@ class StoreTest {
             //setup for remove product
             addNewProductSetUp();  //add product to the store
             Assertions.assertEquals(1,storeUT.products.size()); //verify we starts with no products in store
-            //add a product to the store which will be removed for the test.txt
+            //add a product to the store which will be removed for the test
             //fail: cant remove product which is not exist
             Assertions.assertFalse(storeUT.removeProductFromStore(ownerRealUser,122));    //fail: product not exist is not removed
             Assertions.assertEquals(1,storeUT.products.size()); //verify we decreased no. of products in store
@@ -773,7 +773,7 @@ class StoreTest {
          */
         @Test
         void notOwnerRemoveExistsProductFromStoreNegative() {
-            //setup for remove product. add a product to the store which will be removed for the test.txt
+            //setup for remove product. add a product to the store which will be removed for the test
             addNewProductSetUp();  //add product to the store
             Assertions.assertEquals(1,storeUT.products.size()); //verify we starts with no products in store
             //fail: only owner can remove products from his store
@@ -1061,7 +1061,7 @@ class StoreTest {
         @Test
         void showStoreInfo(){
             //success: shows the store info as string
-            Assertions.assertEquals("The store Store under test.txt has ID: " +storeUT.getStoreId()+ "",storeUT.showStoreInfo());
+            Assertions.assertEquals("The store Store under test has ID: " +storeUT.getStoreId()+ "",storeUT.showStoreInfo());
         }
 
         /**

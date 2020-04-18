@@ -105,7 +105,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt charging a customer by his shopping cart
+         * test charging a customer by his shopping cart
          */
         @Test
         void chargePositive() {
@@ -143,7 +143,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt cancel charging a customer by his shopping cart
+         * test cancel charging a customer by his shopping cart
          */
         @Test
         void cancelChargePositive() {
@@ -164,7 +164,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt fail case of cancel charging a customer by his shopping cart
+         * test fail case of cancel charging a customer by his shopping cart
          */
         @Test
         void cancelChargeNegative() {
@@ -185,7 +185,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt that when delivery request is accepted by the supply system, the external service
+         * test that when delivery request is accepted by the supply system, the external service
          * system notifies accordingly
          */
         @Test
@@ -201,7 +201,7 @@ class ExternalServiceManagementTest {
             Assertions.assertTrue(externalServiceManagement.deliver(addrInfo,cart));
         }
         /**
-         * test.txt that when delivery request is denied by the supply system, the external service
+         * test that when delivery request is denied by the supply system, the external service
          * system notifies accordingly
          */
         @Test
@@ -218,7 +218,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt that when delivery cancel request is accepted by the supply system, the external service
+         * test that when delivery cancel request is accepted by the supply system, the external service
          * system notifies accordingly
          */
         @Test
@@ -235,7 +235,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt that when delivery cancel request is failed by the supply system, the external service
+         * test that when delivery cancel request is failed by the supply system, the external service
          * system notifies accordingly
          */
         @Test
@@ -316,7 +316,7 @@ class ExternalServiceManagementTest {
 
 
         /**
-         * test.txt charging a customer by his shopping cart
+         * test charging a customer by his shopping cart
          */
         @Test
         void chargePositive() {
@@ -346,7 +346,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt cancel charge of customer
+         * test cancel charge of customer
          */
         @Test
         void cancelChargePositive() {
@@ -361,7 +361,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt handling with failure of cancel charge of customer
+         * test handling with failure of cancel charge of customer
          */
         @Test
         void cancelChargeNegative() {
@@ -377,7 +377,7 @@ class ExternalServiceManagementTest {
 
 
         /**
-         * test.txt that when delivery request is accepted by the supply system, the external service
+         * test that when delivery request is accepted by the supply system, the external service
          * system notifies accordingly
          */
         @Test
@@ -391,7 +391,7 @@ class ExternalServiceManagementTest {
             Assertions.assertTrue(externalServiceManagement.deliver(addrInfo,cart));
         }
         /**
-         * test.txt that when delivery request is denied by the supply system, the external service
+         * test that when delivery request is denied by the supply system, the external service
          * system notifies accordingly
          */
         @Test
@@ -406,7 +406,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt that when cancel delivery request is made by the supply system, the external service
+         * test that when cancel delivery request is made by the supply system, the external service
          * system notifies accordingly
          */
         @Test
@@ -421,7 +421,7 @@ class ExternalServiceManagementTest {
         }
 
         /**
-         * test.txt that when cancel delivery request is failed by the supply system, the external service
+         * test that when cancel delivery request is failed by the supply system, the external service
          * system notifies accordingly
          */
         @Test
