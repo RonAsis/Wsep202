@@ -26,6 +26,10 @@ public class GuestService {
         return tradingSystemFacade.registerUser(userName, password, firstName, lastName);
     }
 
+    public void clearDS(){
+        this.tradingSystemFacade.clearDS();
+    }
+
     /**
      * login
      */

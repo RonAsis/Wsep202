@@ -75,6 +75,15 @@ public class TradingSystem {
     }
 
     /**
+     * for tests use only
+     * clear users and stores list
+     */
+    public void clearDS(){
+        this.users.clear();
+        this.stores.clear();
+    }
+
+    /**
      * This method is used to make a login for a the user
      * @param userToLogin - the user that asks to login
      * @param isAdmin - if the user is an admin or not
@@ -117,9 +126,9 @@ public class TradingSystem {
             statusLogin = "succeeded";
         }
         if (isAdmin)
-            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to as administrator.");
+            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to login as administrator.");
         else
-            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to as regular user.");
+            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to login as regular user.");
         return suc;
     }
 
