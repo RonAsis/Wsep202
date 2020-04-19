@@ -54,13 +54,6 @@ public class TradingSystem {
         log.info("The user "+ userToRegister.getUserName()+" got encrypted password and salt");
     }
 
-    /**
-     *  TODO this method OR DELETE IT - KSENIA
-     */
-    public Receipt buyShoppingCart(UserSystem userSystem) {
-        //TODO
-        return null;
-    }
 
     /**
      * register new user in the system
@@ -71,7 +64,7 @@ public class TradingSystem {
     public boolean registerNewUser(UserSystem userToRegister) {
         //encrypt user password to store it and its salt in the system
         encryptPassword(userToRegister);
-        boolean isRegistered = isRegisteredUser(userToRegister);
+        boolean isRegistered = isRegistered(userToRegister, users);
         if (!isRegistered) {
             users.add(userToRegister);
             log.info("The user "+userToRegister.getUserName()+ " has been registered successfully.");
@@ -81,79 +74,65 @@ public class TradingSystem {
         return false;
     }
 
-    // TODO - ksenia = add comment + check the correctness of the nex login functions
-    /*public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
-        boolean isRegistered = administrators.stream()
-                .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
-        if (!isRegistered){
-
-            .error("TradingSystem.login: a non registered user tries to login");
-            return false;
-        }
-        //TODO to check encrypted user password against password received
-        return true;
-    }*/
-
     /**
-     * login a user into the system
-     * @param userToLogin   the user to login
-     * @param isAdmin   flag to tell if we login an administrator or other user
-     * @param password the inserted password to approve
-     * @return
+     * This method is used to make a login for a the user
+     * @param userToLogin - the user that asks to login
+     * @param isAdmin - if the user is an admin or not
+     * @param password - the users password
+     * @return true if the user logged-in, false if nots
      */
     public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+        if (isAdmin){
+            return loginUser(userToLogin, password, administrators, true);
+        }
+        return loginUser(userToLogin, password, users, false);
+    }
+
+
+    /**
+     * This method logs a user the system using method in externalServiceManagement that checks
+     * if the password and the user details are correct.
+     * @param userToLogin - the user to log-in
+     * @param password - the users password
+     * @param listOfUser - the list of registered users or admin users
+     * @param isAdmin - if the user is an admin or not
+     * @return true if the log-in was successful, false if there were a problem
+     */
+    private boolean loginUser(UserSystem userToLogin, String password, Set<UserSystem> listOfUser, boolean isAdmin){
+        boolean isRegistered = isRegistered(userToLogin, listOfUser);
+        if (!isRegistered){
+            log.error("not a registered user");
+            return false;
+        }
         //verify that the user's password is correct as saved in our system
         if(!externalServiceManagement.isAuthenticatedUserPassword(password,userToLogin)){
             log.warn("The user "+userToLogin.getUserName()+" failed to login.");
             return false;
         }
-        return !isAdmin ? loginRegularUser(userToLogin) : loginAdministrator(userToLogin);
-    }
-
-    private boolean loginAdministrator(UserSystem userToLogin) {
-        boolean isRegistered = isRegisteredAdministrator(userToLogin);
         boolean suc = false;
         String statusLogin = "failed";
         if (isRegistered && !userToLogin.isLogin()) {
             userToLogin.login();
             suc = true;
             statusLogin = "succeeded";
-
         }
-        log.warn("The user "+userToLogin.getUserName()+" "+statusLogin+" to as administrator.");
+        if (isAdmin)
+            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to as administrator.");
+        else
+            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to as regular user.");
         return suc;
     }
 
-    private boolean isRegisteredAdministrator(UserSystem userToRegister) {
-        return administrators.stream()
-                .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
-
-    }
-
-    private boolean loginRegularUser(UserSystem userToLogin) {
-        boolean isRegistered = isRegisteredUser(userToLogin);
-        boolean isSuccess = false;
-        String statusLogin = "failed";
-
-        if (isRegistered && !userToLogin.isLogin()) {
-            userToLogin.login();
-            isSuccess = true;
-            statusLogin = "succeeded";
-
-        }
-        log.warn("The user "+userToLogin.getUserName()+" "+statusLogin+" to as administrator.");
-        return isSuccess;
-    }
-
     /**
-     * Checks if serToRegister is registered in the system
-     * @param userToRegister
-     * @return true if there is match of such userv in the system, else false.
+     * This method is used to check if the user is registered
+     * @param userToLogin
+     * @param listOfUser
+     * @return
      */
-    private boolean isRegisteredUser(UserSystem userToRegister) {
-        return users.stream()
-                .anyMatch(user -> user.getUserName().equals(userToRegister.getUserName()));
-    }
+    private boolean isRegistered(UserSystem userToLogin, Set<UserSystem> listOfUser){
+         return listOfUser.stream()
+                 .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
+     }
 
     /**
      * get the user by its username from users list
@@ -368,44 +347,165 @@ public class TradingSystem {
                 .filter(product -> category == product.getCategory())
                 .collect(Collectors.toList());
     }
+
     /**
-     *  TODO this method - KSENIA
+     * This method is used to purchase all the products that the unregistered user added to his cart.
+     * @param shoppingCart - the users personal shopping cart
+     * @param paymentDetails - the user credit card number & expiration date
+     * @return list of receipts for stores where payment has been made
      */
-    public Receipt purchaseShoppingCart(ShoppingCart shoppingCart) {
+    public List<Receipt> purchaseShoppingCart(ShoppingCart shoppingCart, PaymentDetails paymentDetails, BillingAddress billingAddress) {
+        return purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
+    }
+
+
+    /**
+     * This method is used to purchase all the products that the registered user added to his cart.
+     * @param paymentDetails - the user credit card number & expiration date
+     * @param user - the user that made
+     * @return list of receipts for stores where payment has been made
+     */
+    public List<Receipt> purchaseShoppingCart(PaymentDetails paymentDetails,BillingAddress billingAddress, UserSystem user) {
+        return purchaseAndDeliver(paymentDetails, user.getShoppingCart(), billingAddress, user.getUserName());
+    }
+
+    /**
+     * This method makes the payment in the externalServiceManagement using the charge method.
+     * @param paymentDetails - the users credit card details
+     * @param shoppingCart - the user personal shopping cart
+     * @param billingAddress - the delivery address of the user
+     * @return a list of receipts for all of the purchases the user made
+     */
+    private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress, String customerName){
+        if(shoppingCart == null || paymentDetails == null || billingAddress == null ){
+            log.error("a store or payment details or billing address can't be null");
+            return null;
+        }
+        List<Integer> listOfStoresWherePaymentPassed = makePurchase(shoppingCart, paymentDetails);
+        if (listOfStoresWherePaymentPassed.isEmpty()){
+            log.error("no item was purchased from cart");
+            return null;
+        }
+        boolean isDelivered = deliver(shoppingCart, billingAddress, listOfStoresWherePaymentPassed);
+        if (isDelivered) {//if the delivery was approved than make the receipts and send them to the customer
+            updateProductAmount(listOfStoresWherePaymentPassed, shoppingCart);
+            return makeReceipts(listOfStoresWherePaymentPassed, shoppingCart, customerName);
+        }
+        log.error("problem with delivery, cancel payment for "+ customerName);
+        cancelPayment(listOfStoresWherePaymentPassed, shoppingCart, paymentDetails);
         return null;
     }
+
+    private List<Integer> makePurchase(ShoppingCart shoppingCart, PaymentDetails paymentDetails){
+        boolean canPurchaseShoppingBag;
+        ShoppingCart bagsToPurchase = new ShoppingCart();
+        for (Store store: shoppingCart.getShoppingBagsList().keySet()) {
+            canPurchaseShoppingBag = true;
+            ShoppingBag shoppingBag = shoppingCart.getShoppingBag(store);
+            Map<Product,Integer> productList = shoppingBag.getProductListFromStore();
+            for (Product product: productList.keySet()){ //check if there is enough products in store to make the purchase
+                if(product.getAmount() < productList.get(product)) {
+                    canPurchaseShoppingBag = false;
+                    break;
+                }
+            }
+            if (canPurchaseShoppingBag) {
+                bagsToPurchase.addBagToCart(store, shoppingBag);
+            }
+        }
+        return externalServiceManagement.charge(paymentDetails, bagsToPurchase);
+    }
+
     /**
-     *  TODO this method - KSENIA
+     * This method is used to make all the receipts for the purchases that was made by the user
+     * and make a delivery throw externalServiceManagement using the deliver method
+     * @param listOfStoreIds - the store ids that the payment in them was successful
+     * @param shoppingCart - the user shopping cart
+     * @param customerName - the name of the user, if it's a guest the name will be "Guest" if the user is registered
+     *                 the name will be his userName.
+     * @return a list of all of the receipts for all the purchases the user made
      */
-    public Receipt purchaseShoppingCart(UserSystem user) {
-        return null;
+    private List<Receipt> makeReceipts(List<Integer> listOfStoreIds, ShoppingCart shoppingCart, String customerName){
+        List<Receipt> cartReceiptList = new ArrayList<>();
+        for (int storeId: listOfStoreIds) { // make a receipt for each store purchase
+            Store receivedPaymentStore = stores.stream().filter(store -> store.getStoreId() == storeId).findFirst().get();
+            double totalPaymentToStore = shoppingCart.getShoppingBag(receivedPaymentStore).getTotalCostOfBag();
+            Receipt storeReceipt = new Receipt(storeId, customerName, totalPaymentToStore ,
+                    shoppingCart.getShoppingBag(receivedPaymentStore).getProductListFromStore());
+            cartReceiptList.add(storeReceipt);
+            shoppingCart.removeBagFromCart(receivedPaymentStore,shoppingCart.getShoppingBag(receivedPaymentStore));
+        }
+        log.info("made a list of receipts for " + customerName + " on his purchase");
+        return cartReceiptList;
+    }
+
+    private boolean deliver(ShoppingCart shoppingCart, BillingAddress billingAddress, List<Integer> listOfStoreIds){
+        ShoppingCart deliveryShoppingCart = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
+        return externalServiceManagement.deliver(billingAddress, deliveryShoppingCart);
+    }
+
+    private boolean cancelPayment(List<Integer> listOfStoreIds, ShoppingCart shoppingCart, PaymentDetails paymentDetails){
+        ShoppingCart getCreditCart = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
+        return externalServiceManagement.cancelCharge(paymentDetails, getCreditCart);
+    }
+
+    private ShoppingCart getPurchasedShoppingCart(List<Integer> listOfStoreIds, ShoppingCart shoppingCart){
+        ShoppingCart shoppingCartToReturn = new ShoppingCart(); //save only the shopping bags that needs to be delivered
+        for (int storeId: listOfStoreIds) {
+            Store storeToSend = stores.stream().filter(store -> store.getStoreId() == storeId).findFirst().get();
+            shoppingCartToReturn.addBagToCart(storeToSend, shoppingCart.getShoppingBag(storeToSend));
+        }
+        return shoppingCartToReturn;
+    }
+
+    private void updateProductAmount(List<Integer> listOfStoreIds, ShoppingCart shoppingCart){
+        ShoppingCart shoppingCartToEdit = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
+        for (Store store: shoppingCartToEdit.getShoppingBagsList().keySet()) {
+            for (Product product: shoppingCartToEdit.getShoppingBag(store).getProductListFromStore().keySet()) {
+                product.setAmount(product.getAmount()-shoppingCartToEdit.getShoppingBag(store).getProductListFromStore().get(product));
+            }
+        }
     }
 
     // TODO - KSENIA = move over all comments (things putted in log)
     /**
      * This method is used to open a new store in the system
      * @param user - the user that wants to open the store
-     * @param discountTypeObj - the type of discount that can be in the store
-     * @param purchaseTypeObj - the type of purchase that can be in the store
      * @param purchasePolicy -  a collection of purchase rules that the user has decided on for his store
      * @param discountPolicy -  a collection of discount rules that the user has decided on for his store
      * @param storeName - the name of the store that the user decided
      * @return - false if the user is not registered, and true after the new store is added to store list
      */
-    public boolean openStore(UserSystem user, DiscountType discountTypeObj, PurchaseType purchaseTypeObj, PurchasePolicy purchasePolicy,
-                             DiscountPolicy discountPolicy, String storeName) {
-        log.info("The method was called with the user who wishes to open the store, discount and purchase policies & types " +
-                "and a string of the name of the store");
-
+    public boolean openStore(UserSystem user, PurchasePolicy purchasePolicy,DiscountPolicy discountPolicy, String storeName) {
         if (!this.users.contains(user)) {//if the user is not registered to the system, he can't open a store
             log.error("A non registered user tried to open a store");
             return false;
         }
-        Store newStore = new Store(user,purchasePolicy,discountPolicy,storeName);
-        this.stores.add(newStore);
-        user.addNewOwnedStore(newStore);
-        log.info("A new store was opened in the system");
-        return true;
+        if (user == null || purchasePolicy == null || discountPolicy == null || storeName == null){
+            log.error("One of the parameters received is equal to null");
+            return false;
+        }
+        boolean isStoreExists = isStoreExists(purchasePolicy, discountPolicy, storeName);
+        if (!isStoreExists) {
+            Store newStore = new Store(user, purchasePolicy, discountPolicy, storeName);
+            this.stores.add(newStore);
+            user.addNewOwnedStore(newStore);
+            log.info("A new store '" + storeName + "' was opened in the system");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isStoreExists(PurchasePolicy purchasePolicy,DiscountPolicy discountPolicy, String storeName){
+        if (stores.size() > 0) {
+            Store store = stores.stream().filter(store1 -> store1.getStoreName().equals(storeName)).findFirst().get();
+            if (store != null && store.getStoreName().equals(storeName) && store.getPurchasePolicy().equals(purchasePolicy)
+                    && store.getDiscountPolicy().equals(discountPolicy)) {
+                log.error("this store already exists, can't open it again");
+                return true;
+            }
+        }
+        return false;
     }
 
     public Set<Store> getStoresList(){
@@ -432,7 +532,7 @@ public class TradingSystem {
             boolean addToStore = ownedStore.addManager(ownerUser, newManagerUser);
             if (addToStore) { // add to store succeed
                 addToUser = newManagerUser.addNewManageStore(ownedStore);
-                if(addToStore) // add to user succeed
+                if(addToUser) // add to user succeed
                     return true;
             }
         }
@@ -447,7 +547,7 @@ public class TradingSystem {
             boolean addToStore = ownerStore.addOwner(ownerUser, newOwnerUser);
             if (addToStore) { // add to store succeed
                 addToUser = newOwnerUser.addNewOwnedStore(ownerStore);
-                if(addToStore) // add to user succeed
+                if(addToUser) // add to user succeed
                     return true;
             }
         }
