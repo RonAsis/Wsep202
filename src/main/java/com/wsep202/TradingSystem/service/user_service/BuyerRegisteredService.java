@@ -1,10 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.service.user_service.dto.DiscountPolicyDto;
-import com.wsep202.TradingSystem.service.user_service.dto.PurchasePolicyDto;
-import com.wsep202.TradingSystem.service.user_service.dto.ReceiptDto;
-import com.wsep202.TradingSystem.service.user_service.dto.ShoppingCartDto;
+import com.wsep202.TradingSystem.service.user_service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -65,8 +62,8 @@ public class BuyerRegisteredService {
     /**
      * purchase shopping cart
      */
-    public ReceiptDto purchaseShoppingCart(String userName){
-        return tradingSystemFacade.purchaseShoppingCart(userName);
+    public ReceiptDto purchaseShoppingCart(String userName, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddress){
+        return tradingSystemFacade.purchaseShoppingCart(userName, paymentDetails, billingAddress);
     }
 
 }

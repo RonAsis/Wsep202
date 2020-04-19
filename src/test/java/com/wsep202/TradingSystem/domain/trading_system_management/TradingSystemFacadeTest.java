@@ -39,6 +39,10 @@ class TradingSystemFacadeTest {
 
         private FactoryObjects factoryObjects;
 
+        private PaymentDetails paymentDetails;
+
+        private BillingAddress billingAddress;
+
         @BeforeEach
         public void setUp() {
             store = mock(Store.class);
@@ -46,6 +50,8 @@ class TradingSystemFacadeTest {
             tradingSystem = mock(TradingSystem.class);
             factoryObjects = mock(FactoryObjects.class);
             tradingSystemFacade = new TradingSystemFacade(tradingSystem, modelMapper, factoryObjects);
+            paymentDetails = mock(PaymentDetails.class);
+            billingAddress = mock(BillingAddress.class);
         }
 
         @Test
@@ -293,8 +299,8 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
             when(modelMapper.map(purchasePolicyDto, PurchasePolicy.class)).thenReturn(purchasePolicy);
             when(modelMapper.map(discountPolicyDto, DiscountPolicy.class)).thenReturn(discountPolicy);
-            when(tradingSystem.openStore(userSystem, DiscountType.getDiscountType(discountType),
-                    PurchaseType.getPurchaseType(purchaseType), purchasePolicy, discountPolicy, storeName)).thenReturn(true);
+          //  when(tradingSystem.openStore(userSystem, DiscountType.getDiscountType(discountType),
+            //        PurchaseType.getPurchaseType(purchaseType), purchasePolicy, discountPolicy, storeName)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
@@ -476,11 +482,13 @@ class TradingSystemFacadeTest {
             //init
             ShoppingCart shoppingCart = createShoppingCart();
             ShoppingCartDto shoppingCartDto =  modelMapper.map(shoppingCart, ShoppingCartDto.class);
+            PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
+            BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
             List<Receipt> receipts = setUpReceipts();
             Receipt receipt = receipts.get(0);
 
-            when(tradingSystem.purchaseShoppingCart(any(ShoppingCart.class))).thenReturn(receipt);
-            ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto);
+            when(tradingSystem.purchaseShoppingCart(any(ShoppingCart.class),paymentDetails,billingAddress)).thenReturn(receipts);
+            ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto,paymentDetailsDto,billingAddressDto);
             assertRecipes(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
         }
 
@@ -490,13 +498,15 @@ class TradingSystemFacadeTest {
             String username = "username";
             ShoppingCart shoppingCart = createShoppingCart();
             ShoppingCartDto shoppingCartDto =  modelMapper.map(shoppingCart, ShoppingCartDto.class);
+            PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
+            BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
             List<Receipt> receipts = setUpReceipts();
             Receipt receipt = receipts.get(0);
 
             //mock
             when(tradingSystem.getUser(username)).thenReturn(userSystem);
-            when(tradingSystem.purchaseShoppingCart(userSystem)).thenReturn(receipt);
-            ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(username);
+            when(tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, userSystem)).thenReturn(receipts);
+            ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(username,paymentDetailsDto,billingAddressDto);
             assertRecipes(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
         }
     }

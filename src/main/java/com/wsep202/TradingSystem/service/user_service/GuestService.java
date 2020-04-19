@@ -2,10 +2,7 @@ package com.wsep202.TradingSystem.service.user_service;
 
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.service.user_service.dto.ProductDto;
-import com.wsep202.TradingSystem.service.user_service.dto.ReceiptDto;
-import com.wsep202.TradingSystem.service.user_service.dto.ShoppingCartDto;
-import com.wsep202.TradingSystem.service.user_service.dto.StoreDto;
+import com.wsep202.TradingSystem.service.user_service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -103,7 +100,7 @@ public class GuestService {
     /**
      * purchase shopping cart
      */
-    public ReceiptDto purchaseShoppingCart(ShoppingCartDto shoppingCart){
-        return tradingSystemFacade.purchaseShoppingCart(shoppingCart);
+    public ReceiptDto purchaseShoppingCart(ShoppingCartDto shoppingCart, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddressDto){
+        return tradingSystemFacade.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddressDto);
     }
 }

@@ -219,7 +219,7 @@ public class Store {
             if(product.isPresent()){    //update the product properties
                 product.get().setName(productName);
                 product.get().setCategory(ProductCategory.getProductCategory(category));
-                product.get().setAmount(product.get().getAmount()+amount);
+                product.get().setAmount(amount);
                 product.get().setCost(cost);
                 return true;
             }

@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -224,7 +225,7 @@ public class TradingSystemFacade {
         PurchaseType purchaseTypeObj = PurchaseType.getPurchaseType(purchaseType);
         PurchasePolicy purchasePolicy = modelMapper.map(purchasePolicyDto, PurchasePolicy.class);
         DiscountPolicy discountPolicy = modelMapper.map(discountPolicyDto, DiscountPolicy.class);
-        return tradingSystem.openStore(user, discountTypeObj, purchaseTypeObj, purchasePolicy, discountPolicy, storeName);
+        return tradingSystem.openStore(user, purchasePolicy, discountPolicy, storeName);
     }
 
     /**
@@ -399,10 +400,12 @@ public class TradingSystemFacade {
      * @param shoppingCartDto the shopping cart
      * @return the receipt
      */
-    public ReceiptDto purchaseShoppingCart(@NotNull ShoppingCartDto shoppingCartDto) {
+    public ReceiptDto purchaseShoppingCart(@NotNull ShoppingCartDto shoppingCartDto, PaymentDetailsDto paymentDetailsDto, BillingAddressDto billingAddressDto) {
         ShoppingCart shoppingCart = modelMapper.map(shoppingCartDto, ShoppingCart.class);
-        Receipt receipt = tradingSystem.purchaseShoppingCart(shoppingCart);
-        return modelMapper.map(receipt, ReceiptDto.class);
+        PaymentDetails paymentDetails = modelMapper.map(paymentDetailsDto, PaymentDetails.class);
+        BillingAddress billingAddress = modelMapper.map(billingAddressDto, BillingAddress.class);
+        List<Receipt> receipts = tradingSystem.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddress);
+        return modelMapper.map(receipts, ReceiptDto.class);
     }
 
     /**
@@ -410,10 +413,12 @@ public class TradingSystemFacade {
      * @param username - the username that want purchase shopping cart
      * @return the receipt
      */
-    public ReceiptDto purchaseShoppingCart(@NotBlank String username) {
+    public ReceiptDto purchaseShoppingCart(@NotBlank String username, PaymentDetailsDto paymentDetailsDto, BillingAddressDto billingAddressDto) {
         UserSystem user = tradingSystem.getUser(username);
-        Receipt receipt = tradingSystem.purchaseShoppingCart(user);
-        return modelMapper.map(receipt, ReceiptDto.class);
+        PaymentDetails paymentDetails = modelMapper.map(paymentDetailsDto, PaymentDetails.class);
+        BillingAddress billingAddress = modelMapper.map(billingAddressDto, BillingAddress.class);
+        List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress, user);
+        return modelMapper.map(receipts, ReceiptDto.class);
     }
 
     /////////////////////////////////// convectors ///////////////////////
