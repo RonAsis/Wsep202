@@ -57,6 +57,7 @@ public class UserSystem {
     /**
      * Show the stage of the user, logged-in or logged-out
      */
+    @Builder.Default
     private boolean isLogin = false;
     /**
      * The users personal receipts list
