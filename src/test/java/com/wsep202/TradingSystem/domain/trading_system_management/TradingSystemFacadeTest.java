@@ -523,9 +523,6 @@ class TradingSystemFacadeTest {
         @Autowired
         private TradingSystem tradingSystem;
 
-        @Autowired
-        private ExternalServiceManagement externalServiceManagement;
-
         private Set<UserSystem> userSystems;
         private  List<Receipt> receipts;
         private Set<Store> stores;
