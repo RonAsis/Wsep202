@@ -3,10 +3,15 @@ package com.wsep202.TradingSystem.domain.mapping;
 import com.github.rozidan.springboot.modelmapper.TypeMapConfigurer;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.service.user_service.dto.ProductDto;
+import com.wsep202.TradingSystem.service.user_service.dto.ReceiptDto;
 import com.wsep202.TradingSystem.service.user_service.dto.StoreDto;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class TradingSystemMapper {
 
@@ -52,6 +57,35 @@ public class TradingSystemMapper {
 
             typeMap.addMappings(mapper -> mapper.using(productCategoryStringConverter)
                     .map(ProductDto::getCategory, Product::setCategory));
+        }
+    }
+
+    @Component
+    public static class ReceiptToReceiptDto extends TypeMapConfigurer<Receipt, ReceiptDto> {
+
+        @Override
+        public void configure(TypeMap<Receipt, ReceiptDto> typeMap) {
+            typeMap.setPostConverter(context -> {
+                Map<Product, Integer> productsBought = context.getSource().getProductsBought();
+                if(Objects.nonNull(productsBought)) {
+                    Map<ProductDto, Integer> productsBoughtDto = context.getDestination().getProductsBought();
+                    Map<ProductDto, Integer> productsBoughtDtoPost = productsBoughtDto.entrySet().stream()
+                            .collect(Collectors.toMap(
+                                    entry -> {
+                                        ProductDto productDto = entry.getKey();
+                                        int productSn = productDto.getProductSn();
+                                        ProductCategory productCategory = productsBought.keySet().stream()
+                                                .filter(product -> product.getProductSn() == productSn)
+                                                .map(Product::getCategory)
+                                                .findFirst().orElse(ProductCategory.TOYS_HOBBIES);
+                                        productDto.setCategory(productCategory.category);
+                                        return productDto;
+                                    }, Map.Entry::getValue
+                            ));
+                    context.getDestination().setProductsBought(productsBoughtDtoPost);
+                }
+                return context.getDestination();
+            });
         }
     }
 }
