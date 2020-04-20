@@ -539,14 +539,13 @@ class TradingSystemFacadeTest {
                     .build();
             tradingSystem = new TradingSystem(externalServiceManagement, admin);
             tradingSystemFacade = new TradingSystemFacade(tradingSystem, new ModelMapper(), new FactoryObjects());
-            //addUsers();
-            //Optional<UserSystem> userSystemOptional = userSystems.stream().findFirst();
-            //Assertions.assertTrue(userSystemOptional.isPresent());
-            //currUser = userSystemOptional.get();
-            //receipts = setUpReceipts();
-            //currUser.setReceipts(receipts);
-
-            //addStores();
+            addUsers();
+            Optional<UserSystem> userSystemOptional = userSystems.stream().findFirst();
+            Assertions.assertTrue(userSystemOptional.isPresent());
+            currUser = userSystemOptional.get();
+            receipts = setUpReceipts();
+            currUser.setReceipts(receipts);
+            addStores();
         }
 
         private void addStores() {
@@ -558,7 +557,6 @@ class TradingSystemFacadeTest {
 
         void addUsers(){
             userSystems = setupUsers();
-            System.out.println(userSystems.stream().findFirst().get().getUserName());
             userSystems.forEach(userSystem ->
                     tradingSystem.registerNewUser(userSystem));
             currUser = userSystems.stream().findFirst().get();
@@ -786,7 +784,7 @@ class TradingSystemFacadeTest {
     private void assertProduct(Product product, ProductDto productDto) {
         Assertions.assertEquals(product.getProductSn(), productDto.getProductSn());
         Assertions.assertEquals(product.getName(), productDto.getName());
-        //Assertions.assertEquals(product.getCategory().name(), productDto.getCategory());
+        Assertions.assertEquals(product.getCategory().category, productDto.getCategory());
         Assertions.assertEquals(product.getAmount(), productDto.getAmount());
         Assertions.assertEquals(product.getCost(), productDto.getCost());
         Assertions.assertEquals(product.getRank(), productDto.getRank());
@@ -911,9 +909,7 @@ class TradingSystemFacadeTest {
                     .password("password" + counter)
                     .firstName("firstName" + counter)
                     .lastName("lastName" + counter)
-                    //.shoppingCart(new ShoppingCart())
                     .isLogin(false)
-                    //.receipts(setUpReceipts())
                     .build());
         }
         return userSystems;
