@@ -54,6 +54,12 @@
 			<artifactId>modelmapper-spring-boot-starter</artifactId>
 			<version>2.3.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+			<version>2.2.6.RELEASE</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
