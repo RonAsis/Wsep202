@@ -522,23 +522,23 @@ class TradingSystemFacadeTest {
 
         @Autowired
         private TradingSystem tradingSystem;
+
+        @Autowired
+        private ExternalServiceManagement externalServiceManagement;
+
         private Set<UserSystem> userSystems;
         private  List<Receipt> receipts;
         private Set<Store> stores;
         private UserSystem currUser;
         private UserSystem testUserSystem;
         private UserSystem admin;
-        private ExternalServiceManagement externalServiceManagement;
 
         @BeforeEach
         void setUp(){
-            externalServiceManagement = new ExternalServiceManagement();
             admin = UserSystem.builder()
                     .userName("admin")
                     .password("admin")
                     .build();
-            tradingSystem = new TradingSystem(externalServiceManagement, admin);
-            tradingSystemFacade = new TradingSystemFacade(tradingSystem, new ModelMapper(), new FactoryObjects());
             addUsers();
             Optional<UserSystem> userSystemOptional = userSystems.stream().findFirst();
             Assertions.assertTrue(userSystemOptional.isPresent());
@@ -567,6 +567,8 @@ class TradingSystemFacadeTest {
          */
         @Test
         void viewPurchaseHistoryUserPositive() {
+            List<Receipt> receipts = setUpReceipts();
+            currUser.setReceipts(receipts);
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(currUser.getUserName());
             assertReceipts(receipts, receiptDtos);
         }
