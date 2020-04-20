@@ -34,6 +34,33 @@ public class TradingSystemFacade {
     private final FactoryObjects factoryObjects;
 
     /**
+     * a function that creates a list of storeDto's from list of stores.
+     * @return - list of storeDto's.
+     */
+    public List<StoreDto> getStoresDtos() {
+        Type listType = new TypeToken<List<StoreDto>>(){}.getType();
+        return modelMapper.map(tradingSystem.getStoresList(),listType);
+    }
+
+    /**
+     * a function that creates a list of userDto's from list of users.
+     * @return - list of userDto's.
+     */
+    public List<UserSystemDto> getUsersDtos() {
+        Type listType = new TypeToken<List<UserSystemDto>>(){}.getType();
+        return modelMapper.map(tradingSystem.getUsersList(),listType);
+    }
+
+    /**
+     * a function that creates a list of userDto's from list of users.
+     * @return - list of userDto's.
+     */
+    public List<UserSystemDto> getAdministratoesDtos() {
+        Type listType = new TypeToken<List<UserSystemDto>>(){}.getType();
+        return modelMapper.map(tradingSystem.getAdministratorsList(),listType);
+    }
+
+    /**
      * view purchase history of user logged in
      * @param userName - must be logged in
      * @return all the receipt of the user

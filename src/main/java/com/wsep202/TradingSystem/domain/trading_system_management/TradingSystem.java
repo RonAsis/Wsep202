@@ -521,6 +521,14 @@ public class TradingSystem {
         return this.stores;
     }
 
+    public Set<UserSystem> getUsersList(){
+        return this.users;
+    }
+
+    public Set<UserSystem> getAdministratorsList(){
+        return this.administrators;
+    }
+
     public void setUsersList(Set<UserSystem> users){
         this.users = users;
     }

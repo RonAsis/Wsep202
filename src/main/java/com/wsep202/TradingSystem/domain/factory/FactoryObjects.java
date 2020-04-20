@@ -8,6 +8,10 @@ import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 public class FactoryObjects {
 
     public UserSystem createSystemUser(String userName, String firstName, String lastName, String password){
-        return new UserSystem(userName,firstName ,lastName , password);
+        return UserSystem.builder()
+                .userName(userName)
+                .password(password)
+                .firstName(firstName)
+                .lastName(lastName).build();
     }
 }
