@@ -557,7 +557,7 @@ public class TradingSystem {
             log.error("One of the parameters received is equal to null ore store name empty");
             return false;
         }
-        if (!this.users.contains(user)) {//if the user is not registered to the system, he can't open a store
+        if (!isRegistered(user, this.users)) {//if the user is not registered to the system, he can't open a store
             log.error("A non registered user tried to open a store");
             return false;
         }
@@ -565,6 +565,8 @@ public class TradingSystem {
         if (!isStoreExists) {
             Store newStore = new Store(user, purchasePolicy, discountPolicy, storeName);
             this.stores.add(newStore);
+            newStore.setDiscountType(DiscountType.NONE);
+            newStore.setPurchaseType(PurchaseType.BUY_IMMEDIATELY);
             user.addNewOwnedStore(newStore);
             log.info("A new store '" + storeName + "' was opened in the system");
             return true;
