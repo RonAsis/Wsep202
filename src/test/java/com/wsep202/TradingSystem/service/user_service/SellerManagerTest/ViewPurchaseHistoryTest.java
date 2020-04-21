@@ -21,4 +21,5 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 // *********** UC 5.1.1 - viewing purchase history ***********
 public class ViewPurchaseHistoryTest {
+    @Autowired
 }
