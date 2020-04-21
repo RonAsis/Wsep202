@@ -14,20 +14,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class})
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
+
+// *********** UC 2.2 - guest registration ***********
 class RegisterTest {
     @Autowired
     GuestService guestService;
-    UserSystem noyUser;
+    UserSystem userSystem;
+
     @BeforeEach
     void setUp() {
-        noyUser = new UserSystem("username","noy","asis","pass");
-
+        userSystem = new UserSystem("username","name","lname","pass");
     }
 
     @AfterEach
@@ -35,98 +35,102 @@ class RegisterTest {
         this.guestService.clearDS();
     }
 
-
-    //////////////UC 2.2////////////////////
+    /**
+     * Registering a user with an unused-valid username and details.
+     */
     @Test
-    void registerUserPositive() {
-        Assertions.assertTrue(guestService.registerUser(noyUser.getUserName(),noyUser.getFirstName()
-                ,noyUser.getLastName(),noyUser.getPassword()));
+    void validUser() {
+        Assertions.assertTrue(guestService.registerUser(userSystem.getUserName(),  userSystem.getPassword(),
+                userSystem.getFirstName(), userSystem.getLastName()));
     }
 
+    /**
+     * Registering a user with a used username.
+     */
     @Test
-    void alreadyRegisterUserNegative() {
-        registerSetup();
-        Assertions.assertFalse(guestService.registerUser(noyUser.getUserName(),noyUser.getFirstName()
-                ,noyUser.getLastName(),noyUser.getLastName()));
+    void usedUsername() {
+        registerUser(); // register the user
+        Assertions.assertFalse(guestService.registerUser(userSystem.getUserName(),  userSystem.getPassword(),
+                userSystem.getFirstName(), userSystem.getLastName())); // try to register the user again
     }
 
+    /**
+     * Registering a user with a null username.
+     */
     @Test
-    void NullUsernameRegistrationNegative() {
-
-        Assertions.assertFalse(guestService.registerUser(null,noyUser.getFirstName()
-                ,noyUser.getLastName(),noyUser.getPassword()));
+    void nullUsername() {
+        Assertions.assertFalse(guestService.registerUser(null,  userSystem.getPassword(),
+                userSystem.getFirstName(), userSystem.getLastName()));
     }
 
+    /**
+     * Registering a user with a null password.
+     */
     @Test
-    void NullPasswordRegistrationNegative() {
-        Assertions.assertFalse(guestService.registerUser(noyUser.getUserName(),noyUser.getFirstName()
-                ,noyUser.getLastName(),null));
+    void nullPassword() {
+        Assertions.assertFalse(guestService.registerUser(userSystem.getUserName(), null,
+                userSystem.getFirstName(), userSystem.getLastName()));
     }
 
+    /**
+     * Registering a user with a null first name.
+     */
     @Test
-    void emptyUsernameRegistrationNegative() {
-
-        Assertions.assertFalse(guestService.registerUser("",noyUser.getFirstName()
-                ,noyUser.getLastName(),noyUser.getPassword()));
+    void nullFirstName() {
+        Assertions.assertFalse(guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+                null, userSystem.getLastName()));
     }
 
+    /**
+     * Registering a user with a null last name.
+     */
     @Test
-    void emptyPasswordRegistrationNegative() {
-        Assertions.assertFalse(guestService.registerUser(noyUser.getUserName(),noyUser.getFirstName()
-                ,noyUser.getLastName(),""));
+    void nullLastName() {
+        Assertions.assertFalse(guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+                userSystem.getFirstName(), null));
+    }
+
+    /**
+     * Registering a user with an empty username.
+     */
+    @Test
+    void emptyUsername() {
+        Assertions.assertFalse(guestService.registerUser("", userSystem.getFirstName(),
+                userSystem.getLastName(), userSystem.getPassword()));
+    }
+
+    /**
+     * Registering a user with an empty password.
+     */
+    @Test
+    void emptyPassword() {
+        Assertions.assertFalse(guestService.registerUser(userSystem.getUserName(), "",
+                userSystem.getFirstName(), userSystem.getLastName()));
+    }
+
+    /**
+     * Registering a user with an empty first name.
+     */
+    @Test
+    void emptyFirstName() {
+        Assertions.assertFalse(guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+                "", userSystem.getLastName()));
+    }
+
+    /**
+     * Registering a user with an empty last name.
+     */
+    @Test
+    void emptyLastName() {
+        Assertions.assertFalse(guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+                userSystem.getFirstName(), ""));
     }
 
     /**
      * register user into the system
      */
-    private void registerSetup() {
-        this.guestService.registerUser(noyUser.getUserName(),noyUser.getPassword()
-                ,noyUser.getFirstName(),noyUser.getLastName());
-    }
-
-    @Test
-    void login() {
-        registerSetup();
-        Assertions.assertTrue(this.guestService.login(noyUser.getUserName(),noyUser.getPassword()));
-    }
-
-    @Test
-    void viewStoreInfo() {
-    }
-
-    @Test
-    void viewProduct() {
-    }
-
-    @Test
-    void searchProductByName() {
-    }
-
-    @Test
-    void searchProductByCategory() {
-    }
-
-    @Test
-    void searchProductByKeyWords() {
-    }
-
-    @Test
-    void filterByRangePrice() {
-    }
-
-    @Test
-    void filterByProductRank() {
-    }
-
-    @Test
-    void filterByStoreRank() {
-    }
-
-    @Test
-    void filterByStoreCategory() {
-    }
-
-    @Test
-    void purchaseShoppingCart() {
+    private void registerUser() {
+        this.guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+                userSystem.getFirstName(), userSystem.getLastName());
     }
 }
