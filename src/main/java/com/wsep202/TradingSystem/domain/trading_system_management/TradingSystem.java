@@ -115,6 +115,10 @@ public class TradingSystem {
      * @return true if the user logged-in, false if nots
      */
     public boolean login(UserSystem userToLogin, boolean isAdmin, String password) {
+        if (userToLogin == null || password == null){
+            log.error("user or password can't be null");
+            return false;
+        }
         if (isAdmin){
             return loginUser(userToLogin, password, administrators, true);
         }
@@ -399,6 +403,10 @@ public class TradingSystem {
      * @return list of receipts for stores where payment has been made
      */
     public List<Receipt> purchaseShoppingCart(PaymentDetails paymentDetails,BillingAddress billingAddress, UserSystem user) {
+        if (user == null){
+            log.error("user can't be null");
+            return null;
+        }
         return purchaseAndDeliver(paymentDetails, user.getShoppingCart(), billingAddress, user.getUserName());
     }
 
@@ -410,8 +418,8 @@ public class TradingSystem {
      * @return a list of receipts for all of the purchases the user made
      */
     private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress, String customerName){
-        if(shoppingCart == null || paymentDetails == null || billingAddress == null ){
-            log.error("a store or payment details or billing address can't be null");
+        if(shoppingCart == null || paymentDetails == null || billingAddress == null || shoppingCart.getNumOfBagsInCart() == 0 || shoppingCart.getShoppingBagsList() == null){
+            log.error("a store or payment details or billing address can't be null, cart can't be null or empty");
             return null;
         }
         List<Integer> listOfStoresWherePaymentPassed = makePurchase(shoppingCart, paymentDetails);
@@ -444,7 +452,7 @@ public class TradingSystem {
             ShoppingBag shoppingBag = shoppingCart.getShoppingBag(store);
             Map<Product,Integer> productList = shoppingBag.getProductListFromStore();
             for (Product product: productList.keySet()){ //check if there is enough products in store to make the purchase
-                if(product.getAmount() < productList.get(product)) {
+                if(product.getAmount() < productList.get(product) || !product.getPurchaseType().type.equals("Buy immediately")) {
                     canPurchaseShoppingBag = false;
                     break;
                 }
@@ -545,12 +553,12 @@ public class TradingSystem {
      * @return - false if the user is not registered, and true after the new store is added to store list
      */
     public boolean openStore(UserSystem user, PurchasePolicy purchasePolicy,DiscountPolicy discountPolicy, String storeName) {
-        if (!this.users.contains(user)) {//if the user is not registered to the system, he can't open a store
-            log.error("A non registered user tried to open a store");
+        if (user == null || purchasePolicy == null || discountPolicy == null || storeName == null || storeName.equals("")){
+            log.error("One of the parameters received is equal to null ore store name empty");
             return false;
         }
-        if (user == null || purchasePolicy == null || discountPolicy == null || storeName == null){
-            log.error("One of the parameters received is equal to null");
+        if (!this.users.contains(user)) {//if the user is not registered to the system, he can't open a store
+            log.error("A non registered user tried to open a store");
             return false;
         }
         boolean isStoreExists = isStoreExists(purchasePolicy, discountPolicy, storeName);

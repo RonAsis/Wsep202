@@ -1,5 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service.dto;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.DiscountType;
+import com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,4 +47,16 @@ public class ProductDto {
      * the storeId that connected to the store that the product exists in it.
      */
     private int storeId;
+
+    /**
+     * the type of discount with needs to be apply on the product when discount
+     * and watch it's info.
+     */
+    private DiscountType discountType = DiscountType.NONE;
+
+    /**
+     * the type of purchase with needs to be apply on the product when purchasing
+     * and watch it's info.
+     */
+    private PurchaseType purchaseType = PurchaseType.BUY_IMMEDIATELY;
 }

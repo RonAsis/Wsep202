@@ -68,6 +68,18 @@ public class Product {
     private int storeId;
 
     /**
+     * the type of discount with needs to be apply on the product when discount
+     * and watch it's info.
+     */
+    private DiscountType discountType = DiscountType.NONE;
+
+    /**
+     * the type of purchase with needs to be apply on the product when purchasing
+     * and watch it's info.
+     */
+    private PurchaseType purchaseType = PurchaseType.BUY_IMMEDIATELY;
+
+    /**
      * Product Constructor
      * @param name - product name.
      * @param category - product category.
@@ -75,6 +87,19 @@ public class Product {
      * @param cost - product cost.
      * @param storeId - the storeId to which the product is linked
      */
+    public Product(String name, ProductCategory category, int amount, double cost, int storeId,
+                   DiscountType discountType, PurchaseType purchaseType){
+        this.productSn = generateProductSn();
+        this.name = name;
+        this.category = category;
+        this.amount = amount;
+        this.cost = cost;
+        this.rank = 0;
+        this.storeId = storeId;
+        this.discountType = discountType;
+        this.purchaseType = purchaseType;
+    }
+
     public Product(String name, ProductCategory category, int amount, double cost, int storeId){
         this.productSn = generateProductSn();
         this.name = name;
