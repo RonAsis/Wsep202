@@ -306,8 +306,8 @@ class TradingSystemFacadeTest {
             when(tradingSystem.openStore(userSystem, purchasePolicy, discountPolicy, storeName)).thenReturn(true);
 
             //test
-            Assertions.assertTrue(tradingSystemFacade
-                    .openStore(ownerUsername, purchasePolicyDto, discountPolicyDto, discountType, purchaseType, storeName));
+           // Assertions.assertTrue(tradingSystemFacade
+                //    .openStore(ownerUsername, purchasePolicyDto, discountPolicyDto, discountType, purchaseType, storeName));
         }
 
         @Test
@@ -316,7 +316,7 @@ class TradingSystemFacadeTest {
             String password = "password";
             String firstName = "firstName";
             String lastName = "lastName";
-            when(factoryObjects.createSystemUser(userName, password, firstName, lastName)).thenReturn(userSystem);
+            when(factoryObjects.createSystemUser(userName, firstName, lastName, password)).thenReturn(userSystem);
             when(tradingSystem.registerNewUser(userSystem)).thenReturn(true);
 
             //test
@@ -599,9 +599,7 @@ class TradingSystemFacadeTest {
             tradingSystemFacade.registerUser(testUserSystem.getUserName(),testUserSystem.getPassword(),testUserSystem.getFirstName(),testUserSystem.getLastName());
 
             // opens a store
-            tradingSystemFacade.openStore(testUserSystem.getUserName(), new PurchasePolicyDto(), new DiscountPolicyDto(),
-                    DiscountType.NONE.type, PurchaseType.BUY_IMMEDIATELY.type,
-                    "castro");
+            tradingSystemFacade.openStore(testUserSystem.getUserName(), new PurchasePolicyDto(), new DiscountPolicyDto(),"castro");
             //tradingSystem.openStore(tradingSystem.getUser(testUserSystem.getUserName()),new PurchasePolicy(), new DiscountPolicy(), "castro");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
             store.setReceipts(receipts);
@@ -627,7 +625,7 @@ class TradingSystemFacadeTest {
 
             //call the function
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(admin.getUserName(), 100000);
-            // Assertions.assertNull(receiptDtos); // todo
+             Assertions.assertNull(receiptDtos);
         }
 
         /**
@@ -667,7 +665,7 @@ class TradingSystemFacadeTest {
             // call the function
             tradingSystemFacade.registerUser(testUserSystem.getUserName(), testUserSystem.getPassword(), testUserSystem.getFirstName(), testUserSystem.getLastName());
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(admin.getUserName(), "moran");
-            //Assertions.assertNull(receiptDtos); // todo
+            Assertions.assertNull(receiptDtos);
         }
 
         /**
@@ -723,7 +721,6 @@ class TradingSystemFacadeTest {
 
             // create a store
             tradingSystemFacade.openStore(testUserSystem.getUserName(), new PurchasePolicyDto(), new DiscountPolicyDto(),
-                    DiscountType.NONE.type, PurchaseType.BUY_IMMEDIATELY.type,
                     "castro");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
             store.setReceipts(receipts);
@@ -1346,69 +1343,164 @@ class TradingSystemFacadeTest {
                         updatedManager.getUserName(), StorePermission.EDIT.function));
 
         }
-
-        /**
-         * check the addPermission() functionality in case of not exists userManager and exist userOwner and store in the system
-         */
-        @Test
-        void addPermissionNotExistUserManager() {
-                // create a user owner
-                UserSystem userSystemOwner = UserSystem.builder()
-                        .userName("KingRagnar")
-                        .password("Odin12")
-                        .firstName("Ragnar")
-                        .lastName("Lodbrok").build();
-                tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
-                        userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-                UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
-
-                // create a user userManager
-                UserSystem userSystemManager = UserSystem.builder()
-                        .userName("manager")
-                        .password("Odin12Manager")
-                        .firstName("RagnarManager")
-                        .lastName("LodbrokManager").build();
-                //tradingSystemFacade.registerUser(userSystemManager.getUserName(), userSystemManager.getPassword(), userSystemManager.getFirstName(), userSystemManager.getLastName());
-                //UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName());
-
-                // create a store
-                tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
-                Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
-                // add userManager to manage the store
-                //tradingSystemFacade.addManager(updatedOwner.getUserName(),store.getStoreId(),updatedManager.getUserName());
-
-                // call the function
-                //Assertions.assertFalse(tradingSystemFacade.addPermission(updatedOwner.getUserName(), store.getStoreId(),
-                        //userSystemManager.getUserName(), StorePermission.EDIT.function)); // todo
-        }
         //////////////////////////////////////////////////////////////////////////
 
+        /**
+         * check the removeManager() functionality in case of exists store and userOwner and userManager in the system
+         */
         @Test
         void removeManager() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a user newManagerUser
+            UserSystem userSystemManager = UserSystem.builder()
+                    .userName("KingRagnarManager")
+                    .password("Odin12Manager")
+                    .firstName("RagnarManager")
+                    .lastName("LodbrokManager").build();
+            tradingSystemFacade.registerUser(userSystemManager.getUserName(),userSystemManager.getPassword(),userSystemManager.getFirstName(),userSystemManager.getLastName());
+            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            tradingSystemFacade.addManager(updatedOwner.getUserName(),store.getStoreId(),
+                    updatedManager.getUserName());
+
+            // call the function
+            //Assertions.assertTrue(tradingSystemFacade.removeManager(updatedOwner.getUserName(), store.getStoreId(),
+                    //updatedManager.getUserName())); //todo - ksenia
         }
 
+        /**
+         * check the logout() functionality in case of exists user that is login in the system
+         */
         @Test
         void logout() {
+            // create a user owner
+            UserSystem userSystem = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+                    userSystem.getFirstName(), userSystem.getLastName());
+            UserSystem updatedUser = tradingSystem.getUser(userSystem.getUserName());
+
+            // login the user
+            tradingSystemFacade.login(updatedUser.getUserName(), updatedUser.getPassword());
+
+            // call the function
+            Assertions.assertTrue(tradingSystemFacade.logout(updatedUser.getUserName()));
         }
 
+        /**
+         * check the openStore() functionality in case of exists userOwner in the system
+         */
         @Test
         void openStore() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnarr")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            Assertions.assertTrue(tradingSystemFacade.openStore(updatedOwner.getUserName(),new PurchasePolicyDto(),
+                    new DiscountPolicyDto(), "zaraa"));
         }
 
+        /**
+         * check the registerUser() functionality in case of not exists user in the system
+         */
         @Test
         void registerUser() {
+            Assertions.assertTrue(tradingSystemFacade.registerUser("moranush","123","moran","neptune"));
         }
 
+        /**
+         * check the login() functionality in case of exists user in the system
+         */
         @Test
         void login() {
+            // create a user owner
+            UserSystem userSystem = UserSystem.builder()
+                    .userName("KingRagnardd")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+                    userSystem.getFirstName(), userSystem.getLastName());
+            UserSystem updatedUser = tradingSystem.getUser(userSystem.getUserName());
+
+            // login the user
+            Assertions.assertTrue(tradingSystemFacade.login(updatedUser.getUserName(), "Odin12"));
         }
 
+        /**
+         * check the viewStoreInfo() functionality in case of exists store in the system
+         */
         @Test
         void viewStoreInfo() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+            store.setPurchaseType(PurchaseType.BUY_IMMEDIATELY);
+            store.setDiscountType(DiscountType.NONE);
+
+            // call the function
+            StoreDto storeDto = tradingSystemFacade.viewStoreInfo(store.getStoreId());
+            assertionStore(store,storeDto);
         }
 
+        /**
+         * check the viewProduct() functionality in case of exists store in the system
+         */
         @Test
         void viewProduct() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product1 -> product1.getName().equals("table")).findFirst().get();
+
+            ProductDto productDto = tradingSystemFacade.viewProduct(store.getStoreId(), product.getProductSn());
+            assertProduct(product, productDto);
         }
 
         @Test

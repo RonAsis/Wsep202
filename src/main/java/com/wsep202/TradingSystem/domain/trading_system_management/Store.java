@@ -1,10 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,7 +10,8 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @Slf4j
-@Data
+@Setter
+@Getter
 public class Store {
 
 
