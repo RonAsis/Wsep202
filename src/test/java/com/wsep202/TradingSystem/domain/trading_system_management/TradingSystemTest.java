@@ -47,6 +47,11 @@ class TradingSystemTest {
         private Store store;
         private Store store1;
         private Product product;
+        private PaymentDetails paymentDetails;
+        private BillingAddress billingAddress;
+        private ShoppingCart testshoppingCart;
+        private ShoppingBag testShoppingBag;
+        private Product testProduct;
 
         @BeforeEach
         void setUp() {
@@ -60,7 +65,7 @@ class TradingSystemTest {
             doNothing().when(externalServiceManagement).connect();
             userSystem = mock(UserSystem.class);
             userSystem1 = mock(UserSystem.class);
-            userSystem2 = mock(UserSystem.class);
+
             factoryObjects = new FactoryObjects();
             String username = "usernameTest";
             String password = "passwordTest";
@@ -68,7 +73,7 @@ class TradingSystemTest {
             String lName = "Banana";
             userToRegister = new UserSystem(username,fName,lName,password);
             store = mock(Store.class);
-            store1 = mock(Store.class);
+
             product = mock(Product.class);
             doNothing().when(userSystem1).setOwnedStores(new HashSet<Store>());
             doNothing().when(userSystem1).setManagedStores(new HashSet<Store>());
@@ -125,6 +130,10 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));
         }
 
+        /**
+         * This test check if the login method succeeds when the parameters
+         * are correct.
+         */
         @Test
         void loginPositive(){
             //mockup
@@ -356,8 +365,6 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
         }
 
-
-
         /**
          * check the searchProductByName() functionality in case of exists product in store in the system
          */
@@ -460,7 +467,9 @@ class TradingSystemTest {
             Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByKeyWords(keyWords), products));
         }
 
-        // TODO - RON = ADD COMMENTS
+        /**
+         * check the filterByRangePrice method, checks that the returned products are filtered by a given price
+         */
         @Test
         void filterByRangePrice() {
             List<Product> products = setUpProductsForFilterTests();
@@ -477,7 +486,9 @@ class TradingSystemTest {
             }
         }
 
-        // TODO - RON = ADD COMMENTS
+        /**
+         * check the filterByProductRank method, checks that the returned products are filtered by a given product rank
+         */
         @Test
         void filterByProductRank() {
             List<Product> products = setUpProductsForFilterTests();
@@ -491,7 +502,9 @@ class TradingSystemTest {
             }
         }
 
-        // TODO - RON = ADD COMMENTS
+        /**
+         * check the filterByStoreRank method, checks that the returned products are filtered by a given store rank
+         */
         @Test
         void filterByStoreRank() {
             //initial
@@ -521,7 +534,9 @@ class TradingSystemTest {
             }
         }
 
-        // TODO - RON = ADD COMMENTS
+        /**
+         * check the filterByStoreCategory method, checks that the returned products are filtered by a given store category
+         */
         @Test
         void filterByStoreCategory() {
             List<Product> products = setUpProductsForFilterTests();
@@ -553,6 +568,7 @@ class TradingSystemTest {
          */
         @Test
         void guestPurchaseShoppingCartNegative() {
+
         }
 
         /**
@@ -561,6 +577,9 @@ class TradingSystemTest {
          */
         @Test
         void registeredPurchaseShoppingCartPositive() {
+            setUpForPurchase();
+          //  List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress,userSystem2);
+
         }
 
         /**
@@ -571,7 +590,6 @@ class TradingSystemTest {
         void registeredPurchaseShoppingCartNegative() {
         }
 
-        // TODO - KSENIA = go over mocks
         /**
          * This test checks that the store's opening succeeds
          */
@@ -588,9 +606,9 @@ class TradingSystemTest {
             Assertions.assertNotNull(openStore);
            }
 
-        // TODO - KSENIA = go over mocks
         /**
-         * This test checks that the store's opening fails
+         * This test check if the purchaseShoppingCart method fails when the parameters
+         * are wrong.
          */
         @Test
         void openStoreFail(){
@@ -609,26 +627,40 @@ class TradingSystemTest {
 
         // ********************************** Set Up Functions For Tests ********************************** //
 
-        private void setUpPurchase(){
-            ShoppingCart shoppingCart1 = mock(ShoppingCart.class);
-            ShoppingCart shoppingCart2 = mock(ShoppingCart.class);
-            PaymentDetails paymentDetails = mock(PaymentDetails.class);
-            BillingAddress billingAddress = mock(BillingAddress.class);
-            ShoppingBag shoppingBag = mock(ShoppingBag.class);
-            Store store = mock(Store.class);
-            List<Integer> storeList = new LinkedList<>();
-            Map<Product,Integer> products = new HashMap<>();
-            storeList.add(1);
-            when(externalServiceManagement.charge(paymentDetails,shoppingCart1)).thenReturn(storeList);
-            when(shoppingCart1.getShoppingBag(store)).thenReturn(shoppingBag);
-            when(shoppingBag.getTotalCostOfBag()).thenReturn(50.25);
-            tradingSystem.insertStoreToStores(store);
-            when(store.getStoreId()).thenReturn(1);
-            when(shoppingBag.getProductListFromStore()).thenReturn(products);
-            when(shoppingCart1.removeBagFromCart(store,shoppingBag)).thenReturn(true);
-            when(new ShoppingCart()).thenReturn(shoppingCart2);
-            when(shoppingCart2.addBagToCart(store, shoppingBag)).thenReturn(true);
-            when(externalServiceManagement.deliver(billingAddress,shoppingCart2)).thenReturn(true);
+
+        /**
+         * set up all objects for purchase
+         */
+        private void setUpForPurchase(){
+            paymentDetails = mock(PaymentDetails.class);
+            billingAddress = mock(BillingAddress.class);
+            testshoppingCart = mock(ShoppingCart.class);
+            testShoppingBag = mock(ShoppingBag.class);
+            userSystem2 = mock(UserSystem.class);
+            store1 = mock(Store.class);
+            when(store1.getStoreId()).thenReturn(1);
+            tradingSystem.insertStoreToStores(store1);
+            testProduct = mock(Product.class);
+            List<Integer> listOfStoreId = new LinkedList<>();
+            listOfStoreId.add(store1.getStoreId());
+            Map<Product, Integer> productList = new HashMap<>();
+            productList.put(testProduct,1);
+            Map<Store,ShoppingBag> bagList = new HashMap<>();
+            bagList.put(store1,testShoppingBag);
+            when(testShoppingBag.getProductAmount(testProduct)).thenReturn(1);
+            when(testShoppingBag.getProductListFromStore()).thenReturn(productList);
+            when(testProduct.getAmount()).thenReturn(50);
+            doNothing().when(testProduct).setAmount(49);
+            when(userSystem2.getUserName()).thenReturn("Ragnar");
+            when(testshoppingCart.getShoppingBagsList()).thenReturn(bagList);
+            when(testshoppingCart.getShoppingBag(store1)).thenReturn(testShoppingBag);
+            when(testShoppingBag.getTotalCostOfBag()).thenReturn(12.0);
+            when(testProduct.getCost()).thenReturn(12.0);
+            when(userSystem2.getShoppingCart()).thenReturn(testshoppingCart);
+            when(testshoppingCart.removeBagFromCart(store1,testShoppingBag)).thenReturn(true);
+            when(externalServiceManagement.charge(paymentDetails,testshoppingCart)).thenReturn(listOfStoreId);
+            when(externalServiceManagement.cancelCharge(paymentDetails,testshoppingCart)).thenReturn(true);
+            when(externalServiceManagement.deliver(billingAddress,testshoppingCart)).thenReturn(true);
         }
         /**
          * sets up users for openStore test
@@ -711,16 +743,23 @@ class TradingSystemTest {
         private TradingSystem tradingSystem;
         private UserSystem userToRegister;
         private UserSystem userToOpenStore;
+        private UserSystem testUser;
         private Store store;
         private Store storeToOpen;
+        private Store storeToOpen1;
         private Product product;
         private UserSystem admin;
         private FactoryObjects factoryObjects;
-        private ShoppingCart shoppingCart;
         private Product testProduct;
-        private ShoppingBag shoppingBag;
+        private Product testProduct1;
         private PaymentDetails paymentDetails;
+        private PaymentDetails paymentDetails1;
         private BillingAddress billingAddress;
+        private BillingAddress billingAddress1;
+        private Store store1;
+        private UserSystem newManager;
+        private UserSystem storeOwner;
+        private UserSystem wrongOwner;
 
         @MockBean // for pass compilation
         private ModelMapper modelMapper;
@@ -769,7 +808,9 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister));  //second registration
         }
 
-        //TODO - KSENIA = ADD COMMENTS
+        /**
+         * check if the login method works
+         */
         @Test
         void login() {
             //check login of regular user
@@ -780,25 +821,20 @@ class TradingSystemTest {
                     .build();
             tradingSystem.registerNewUser(user);
             tradingSystem.login(user, false, password);
-            //check login of admin
-            //TODO
-        }
-
-        //TODO - KSENIA = ADD COMMENTS
-        @Test
-        void loginRegularUser(){
             //the following register should register usernameTest as username
             // and passwordTest as password
             registerAsSetup();  //register user test as setup for login
             boolean ans = tradingSystem.login(userToRegister,false,"passwordTest");
             Assertions.assertTrue(ans);
+            //check login of admin
+            //TODO
         }
 
         /**
          * test handling with login failure
          */
         @Test
-        void loginRegularUserNegative(){
+        void loginNegative(){
             String username = "username";
             String password = "password";
             String fName = "mati";
@@ -833,9 +869,6 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.logout(userToRegister));
         }
 
-        @Test
-        void getAdministratorUser() {
-        }
 
         /**
          * check the getStoreByAdmin() functionality in case of exists admin in the system
@@ -1022,7 +1055,9 @@ class TradingSystemTest {
             Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByKeyWords(keyWords), products));
         }
 
-        // TODO - RON = ADD COMMENTS
+        /**
+         * check the filterByRangePrice method, checks that the returned products are filtered by a given price
+         */
         @Test
         void filterByRangePrice() {
             List<Product> products = setUpProductsForFilterTests();
@@ -1039,7 +1074,9 @@ class TradingSystemTest {
             }
         }
 
-        // TODO - RON = ADD COMMENTS
+        /**
+         * check the filterByStoreRank method, checks that the returned products are filtered by a given store rank
+         */
         @Test
         void filterByStoreRank() {
             //initial
@@ -1067,7 +1104,9 @@ class TradingSystemTest {
             }
         }
 
-        // TODO - RON = ADD COMMENTS
+        /**
+         * check the filterByStoreCategory method, checks that the returned products are filtered by a given store category
+         */
         @Test
         void filterByStoreCategory() {
             List<Product> products = setUpProductsForFilterTests();
@@ -1084,6 +1123,10 @@ class TradingSystemTest {
             }
         }
 
+        /**
+         * This test check if the openStore method succeeds when the parameters
+         * are correct.
+         */
         @Test
         void openStoreSuccess(){
             setUpForOpenStoreSuc();
@@ -1095,6 +1138,10 @@ class TradingSystemTest {
             Assertions.assertEquals(1, tradingSystem.getStoresList().size());
         }
 
+        /**
+         * This test check if the openStore method fails when the parameters
+         * are wrong.
+         */
         @Test
         void openStoreFail(){
             setUpForOpenStoreFail();
@@ -1106,6 +1153,10 @@ class TradingSystemTest {
             Assertions.assertEquals(1, tradingSystem.getStoresList().size());
         }
 
+        /**
+         * This test check if the purchaseShoppingCart method succeeds when the parameters
+         * are correct. for guest and registered it's the same process.
+         */
         @Test
         void registeredPurchaseShoppingCartSuccess() {
             setUpForPurchaseCart();
@@ -1123,8 +1174,75 @@ class TradingSystemTest {
             Assertions.assertEquals(testProduct.getName(), receivedReceipt.getProductsBought().keySet().iterator().next().getName());
         }
 
+        /**
+         * This test check if the purchaseShoppingCart method fails when the parameters
+         * are wrong. for guest and registered it's the same process.
+         */
         @Test
         void registeredPurchaseShoppingCartFail() {
+            setUpForPurchaseCartFail();
+            //can't send a null object
+            Assertions.assertNull(tradingSystem.purchaseShoppingCart(null, billingAddress, userToOpenStore));
+            //product amount in store is 45, try to but 47
+            Assertions.assertNull(tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, userToOpenStore));
+            //card number is wrong
+            Assertions.assertNull(tradingSystem.purchaseShoppingCart(paymentDetails1, billingAddress, userToOpenStore));
+            //wrong zip code
+            Assertions.assertNull(tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress1,testUser));
+        }
+
+        /**
+         * This test check if the addManager method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addManagerSuccess(){
+            setUpAddManagerAndOwner();
+            //check that the new manager added to store
+            Assertions.assertTrue(tradingSystem.addMangerToStore(store1, storeOwner, newManager));
+            //check that the number of managers of the store is 1
+            Assertions.assertEquals(1, store1.getManagers().size());
+            //check that right manager was added
+            Assertions.assertEquals(newManager, store1.getManager(storeOwner, newManager.getUserName()));
+        }
+
+        /**
+         * This test check if the addManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addManagerFail(){
+            setUpAddManagerAndOwner();
+            //can't appoint a null manager
+            Assertions.assertFalse(tradingSystem.addMangerToStore(store1,storeOwner,null));
+            //not an owner of the store, can't appoint a manager
+            Assertions.assertFalse(tradingSystem.addMangerToStore(store1,wrongOwner,newManager));
+        }
+
+        /**
+         * This test check if the addOwner method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addOwnerSuccess(){
+            setUpAddManagerAndOwner();
+            //check that the new owner added to store
+            Assertions.assertTrue(tradingSystem.addOwnerToStore(store1, storeOwner, newManager));
+            //check that the number of owners of the store is 2
+            Assertions.assertEquals(2, store1.getOwners().size());
+        }
+
+        /**
+         * This test check if the addOwner method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addOwnerFail(){
+            setUpAddManagerAndOwner();
+            //can't appoint a null owner
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,storeOwner,null));
+            //not an owner of the store, can't appoint an owner
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,wrongOwner,newManager));
         }
 
         // ************************************ Set Up For Tests ************************************ //
@@ -1166,13 +1284,20 @@ class TradingSystemTest {
             return stores;
         }
 
+        /**
+         * setUp for openStore
+         */
         private void setUpForOpenStoreSuc(){
             userToOpenStore = getUserSystemBuild();
-            Set<UserSystem> users = new HashSet<>();
-            users.add(userToOpenStore);
-            tradingSystem.setUsersList(users);
+            //Set<UserSystem> users = new HashSet<>();
+            //users.add(userToOpenStore);
+            //tradingSystem.setUsersList(users);
+            tradingSystem.registerNewUser(userToOpenStore);
         }
 
+        /**
+         * setUp for openStore
+         */
         private void setUpForOpenStoreFail(){
             userToOpenStore = getUserSystemBuild();
             Set<UserSystem> users = new HashSet<>();
@@ -1182,14 +1307,15 @@ class TradingSystemTest {
             tradingSystem.insertStoreToStores(storeToOpen);
         }
 
+        /**
+         * setUp for purchaseCart
+         */
         private void setUpForPurchaseCart(){
             userToOpenStore = getUserSystemBuild();
-            shoppingCart = new ShoppingCart();
             storeToOpen = Store.builder()
                             .purchasePolicy(new PurchasePolicy())
                             .discountPolicy(new DiscountPolicy())
                             .storeName("MovieStore").build();
-                    //new Store(userToOpenStore,new PurchasePolicy(), new DiscountPolicy(), "MoveStore");
             tradingSystem.insertStoreToStores(storeToOpen);
             testProduct = Product.builder()
                             .name("Harry-Potter")
@@ -1197,24 +1323,83 @@ class TradingSystemTest {
                             .amount(45)
                             .cost(12.9)
                             .storeId(storeToOpen.getStoreId()).build();
-           // shoppingBag = new ShoppingBag(storeToOpen);
-           // shoppingBag.addProductToBag(testProduct,3);
-           // shoppingCart.addBagToCart(storeToOpen, shoppingBag);
             userToOpenStore.saveProductInShoppingBag(storeToOpen,testProduct,3);
             paymentDetails = new PaymentDetails(CardAction.PAY, "123456789", "12", "2024", "Israel Israeli", 237, "333333339");
             billingAddress = new BillingAddress("Israel Israeli", "Ben-Gurion 1", "Beer Sheva", "Israel","1234567");
         }
 
+        /**
+         * setUp for purchaseCart
+         */
         private void setUpForPurchaseCartFail(){
-
+            userToOpenStore = getUserSystemBuild();
+            testUser = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            storeToOpen = Store.builder()
+                    .purchasePolicy(new PurchasePolicy())
+                    .discountPolicy(new DiscountPolicy())
+                    .storeName("MovieStore").build();
+            storeToOpen1 = Store.builder()
+                    .purchasePolicy(new PurchasePolicy())
+                    .discountPolicy(new DiscountPolicy())
+                    .storeName("MovieStoreVIP").build();
+            tradingSystem.insertStoreToStores(storeToOpen);
+            tradingSystem.insertStoreToStores(storeToOpen1);
+            testProduct = Product.builder()
+                    .name("Harry-Potter")
+                    .category(ProductCategory.BOOKS_MOVIES_MUSIC)
+                    .amount(45)
+                    .cost(12.9)
+                    .storeId(storeToOpen.getStoreId()).build();
+            testProduct1 = Product.builder()
+                    .name("Hunger Games")
+                    .category(ProductCategory.BOOKS_MOVIES_MUSIC)
+                    .amount(45)
+                    .cost(12.9)
+                    .storeId(storeToOpen1.getStoreId()).build();
+            userToOpenStore.saveProductInShoppingBag(storeToOpen,testProduct,47);
+            testUser.saveProductInShoppingBag(storeToOpen1,testProduct1,5);
+            paymentDetails = new PaymentDetails(CardAction.PAY, "123456789", "12", "2024", "Israel Israeli", 237, "333333339");
+            paymentDetails1 = new PaymentDetails(CardAction.PAY, "12345", "12", "2024", "Israel Israeli", 237, "333333339");
+            billingAddress = new BillingAddress("Israel Israeli", "Ben-Gurion 1", "Beer Sheva", "Israel","1234567");
+            billingAddress1 = new BillingAddress("Ragnar Lodbrok", "Main Tent", "Kattegat", "Sweden","1");
         }
 
+        /**
+         * makes a user for tests
+         */
         private UserSystem getUserSystemBuild(){
             return UserSystem.builder()
                     .userName("coolIsrael")
                     .password("Isra123")
                     .firstName("Israel")
                     .lastName("Israeli").build();
+        }
+
+        /**
+         * set owner, user to be manager and store
+         */
+        private void setUpAddManagerAndOwner(){
+            storeOwner = getUserSystemBuild();
+            wrongOwner = UserSystem.builder()
+                    .userName("Bjorn_Ironside")
+                    .password("IronSide12")
+                    .firstName("Bjorn")
+                    .lastName("Lodbrok").build();
+            newManager = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            Set<UserSystem> usersList = new HashSet<>();
+            usersList.add(storeOwner);
+            usersList.add(newManager);
+            tradingSystem.setUsersList(usersList);
+            store1 = new Store(storeOwner, new PurchasePolicy(), new DiscountPolicy(), "MovieStore");
+            tradingSystem.insertStoreToStores(store1);
         }
     }
 }

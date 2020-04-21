@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
 import com.wsep202.TradingSystem.domain.exception.NoOwnerInStoreException;
 import org.apache.catalina.User;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -203,7 +204,9 @@ class UserSystemTest {
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////Integration//////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Integration tests for UserSystem class
@@ -213,18 +216,26 @@ class UserSystemTest {
         UserSystem testUserSystem;
         Store testStore1;
         Store testStore2;
-        ShoppingCart testShoppingCart;
+        Product testProduct1;
+        Product testProduct2;
 
 
         @BeforeEach
         void setUp() {
             testUserSystem = UserSystem.builder().build();
-            testStore1 = mock(Store.class);
-            testStore2 = mock(Store.class);
-            testShoppingCart = mock(ShoppingCart.class);
-            testUserSystem.setShoppingCart(testShoppingCart);
-            when(testStore1.getStoreId()).thenReturn(1);
-            when(testStore2.getStoreId()).thenReturn(2);
+            testStore1 = Store.builder()
+                            .storeName("MovieStore")
+                            .purchasePolicy(new PurchasePolicy())
+                            .discountPolicy(new DiscountPolicy())
+                            .build();
+            testStore2 = Store.builder()
+                    .storeName("MovieStoreVIP")
+                    .purchasePolicy(new PurchasePolicy())
+                    .discountPolicy(new DiscountPolicy())
+                    .storeId(testStore1.getStoreId()+1)
+                    .build();
+            testProduct1 = new Product("Hunger Games", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore1.getStoreId());
+            testProduct2 = new Product("Harry Potter", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore2.getStoreId());
         }
 
         /**
@@ -347,6 +358,39 @@ class UserSystemTest {
             });
             //can't remove store that was never added
             assertFalse(testUserSystem.removeManagedStore(testStore2));
+        }
+
+        @Test
+        void saveProductAndRemoveBagSuccess(){
+            //add first item to cart
+            Assertions.assertTrue(testUserSystem.saveProductInShoppingBag(testStore1, testProduct1,3));
+            //check there is 1 item in the cart after addition
+            Assertions.assertEquals(1,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+            //add second item to cart
+            Assertions.assertTrue(testUserSystem.saveProductInShoppingBag(testStore2, testProduct2,3));
+            //check there are 2 item in the cart after second addition
+            Assertions.assertEquals(2,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+            //remove first item
+            Assertions.assertTrue(testUserSystem.removeProductInShoppingBag(testStore1,testProduct1));
+            //check there is 1 item in the cart after removal
+            Assertions.assertEquals(1,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+            //remove the second item
+            Assertions.assertTrue(testUserSystem.removeProductInShoppingBag(testStore2,testProduct2));
+            //check there are no items in the cart after removal
+            Assertions.assertEquals(0,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+        }
+
+        @Test
+        void saveProductAndRemoveBagFail(){
+            assertTrue(testUserSystem.saveProductInShoppingBag(testStore1, testProduct1,3));
+            //check there is 1 item in the cart after addition
+            Assertions.assertEquals(1,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+            //wrong store and product
+            Assertions.assertFalse(testUserSystem.removeProductInShoppingBag(testStore2,testProduct2));
+            //right store wrong product
+            Assertions.assertFalse(testUserSystem.removeProductInShoppingBag(testStore1,testProduct2));
+            //wrong store right product
+            Assertions.assertFalse(testUserSystem.removeProductInShoppingBag(testStore2,testProduct1));
         }
     }
 }

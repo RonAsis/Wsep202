@@ -62,6 +62,10 @@ public class TradingSystem {
      * @return true if the registration succeeded
      */
     public boolean registerNewUser(UserSystem userToRegister) {
+        //check validity of fields of user
+        if(!allFieldsAreValidInUser(userToRegister)){
+            return false;
+        }
         //encrypt user password to store it and its salt in the system
         encryptPassword(userToRegister);
         boolean isRegistered = isRegistered(userToRegister, users);
@@ -72,6 +76,35 @@ public class TradingSystem {
         }
         log.warn("The user "+userToRegister.getUserName()+ " failed to register (user already exist).");
         return false;
+    }
+
+    /**
+     * checks if all fields in the user are valid
+     * @param user the user to check for its inputs
+     * @return true if all fields are valid
+     */
+    private boolean allFieldsAreValidInUser(UserSystem user) {
+        //verify the fields are not empty
+        boolean isValid = true;
+        if(user.getUserName()==null || user.getUserName().equals(""))
+            isValid =false;
+        else if(user.getPassword()==null || user.getPassword().equals(""))
+            isValid = false;
+        else if(user.getFirstName()==null || user.getFirstName().equals(""))
+            isValid = false;
+        else if(user.getLastName()==null || user.getLastName().equals(""))
+            isValid = false;
+        return isValid;
+    }
+
+
+    /**
+     * for tests use only
+     * clear users and stores list
+     */
+    public void clearDS(){
+        this.users.clear();
+        this.stores.clear();
     }
 
     /**
@@ -117,9 +150,9 @@ public class TradingSystem {
             statusLogin = "succeeded";
         }
         if (isAdmin)
-            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to as administrator.");
+            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to login as administrator.");
         else
-            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to as regular user.");
+            log.info("The user "+userToLogin.getUserName()+" "+statusLogin+" to login as regular user.");
         return suc;
     }
 
@@ -130,9 +163,9 @@ public class TradingSystem {
      * @return
      */
     private boolean isRegistered(UserSystem userToLogin, Set<UserSystem> listOfUser){
-         return listOfUser.stream()
-                 .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
-     }
+        return listOfUser.stream()
+                .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
+    }
 
     /**
      * get the user by its username from users list
@@ -396,6 +429,13 @@ public class TradingSystem {
         return null;
     }
 
+    /**
+     * This method is used to check which shopping can the user purchase,
+     * after checking all the cart, the bags and the payment details sent to externalServiceManagement to make the purchase.
+     * @param shoppingCart - the users personal shopping cart
+     * @param paymentDetails - the users payment details
+     * @return true if the purchase was successful, false if there where problem in the process of charging.
+     */
     private List<Integer> makePurchase(ShoppingCart shoppingCart, PaymentDetails paymentDetails){
         boolean canPurchaseShoppingBag;
         ShoppingCart bagsToPurchase = new ShoppingCart();
@@ -439,16 +479,38 @@ public class TradingSystem {
         return cartReceiptList;
     }
 
+    /**
+     * This method is used to make the delivery of the shopping bags that was purchased.
+     * The delivery happens in externalServiceManagement class.
+     * @param shoppingCart - the users personal shopping cart
+     * @param billingAddress - the users address
+     * @param listOfStoreIds - list of all store ids that the payment was successful
+     * @return true if the delivery was successful, false if there were a problem
+     */
     private boolean deliver(ShoppingCart shoppingCart, BillingAddress billingAddress, List<Integer> listOfStoreIds){
         ShoppingCart deliveryShoppingCart = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
         return externalServiceManagement.deliver(billingAddress, deliveryShoppingCart);
     }
 
+    /**
+     * This method is used If the delivery fails, then the system needs to cancel the payment on the bags that
+     * the user purchased and return the money.
+     * @param listOfStoreIds - list of store ids that the users made purchase in
+     * @param shoppingCart - the users shopping cart
+     * @param paymentDetails - the users payment details
+     * @return true when the payment was canceled
+     */
     private boolean cancelPayment(List<Integer> listOfStoreIds, ShoppingCart shoppingCart, PaymentDetails paymentDetails){
         ShoppingCart getCreditCart = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
         return externalServiceManagement.cancelCharge(paymentDetails, getCreditCart);
     }
 
+    /**
+     * This method is used to get the shopping bags that the user purchased.
+     * @param listOfStoreIds - list of store ids that the users made purchase in
+     * @param shoppingCart - the users shopping cart
+     * @return shopping cart with the bags that was purchased
+     */
     private ShoppingCart getPurchasedShoppingCart(List<Integer> listOfStoreIds, ShoppingCart shoppingCart){
         ShoppingCart shoppingCartToReturn = new ShoppingCart(); //save only the shopping bags that needs to be delivered
         for (int storeId: listOfStoreIds) {
@@ -458,16 +520,22 @@ public class TradingSystem {
         return shoppingCartToReturn;
     }
 
+    /**
+     * This method is used after the purchase of the products.
+     * The amount of the product in the store needs to be updated.
+     * @param listOfStoreIds - list of store ids that the users made purchase in
+     * @param shoppingCart - the users shopping cart
+     */
     private void updateProductAmount(List<Integer> listOfStoreIds, ShoppingCart shoppingCart){
         ShoppingCart shoppingCartToEdit = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
         for (Store store: shoppingCartToEdit.getShoppingBagsList().keySet()) {
             for (Product product: shoppingCartToEdit.getShoppingBag(store).getProductListFromStore().keySet()) {
-                product.setAmount(product.getAmount()-shoppingCartToEdit.getShoppingBag(store).getProductListFromStore().get(product));
+                product.setAmount(product.getAmount()-shoppingCartToEdit.getShoppingBag(store).getProductAmount(product));
             }
         }
     }
 
-    // TODO - KSENIA = move over all comments (things putted in log)
+
     /**
      * This method is used to open a new store in the system
      * @param user - the user that wants to open the store
@@ -496,8 +564,15 @@ public class TradingSystem {
         return false;
     }
 
+    /**
+     * This method is used to check if the store is already opened in the system
+     * @param purchasePolicy -  a collection of purchase rules that the user has decided on for his store
+     * @param discountPolicy -  a collection of discount rules that the user has decided on for his store
+     * @param storeName - the name of the store that the user decided
+     * @return false if the store does not exists in the system, else true.
+     */
     private boolean isStoreExists(PurchasePolicy purchasePolicy,DiscountPolicy discountPolicy, String storeName){
-        if (stores.size() > 0) {
+        if (stores.size() > 0) {// if the size of stores is 0, than the store does exists in system
             Store store = stores.stream().filter(store1 -> store1.getStoreName().equals(storeName)).findFirst().get();
             if (store != null && store.getStoreName().equals(storeName) && store.getPurchasePolicy().equals(purchasePolicy)
                     && store.getDiscountPolicy().equals(discountPolicy)) {
@@ -512,17 +587,21 @@ public class TradingSystem {
         return this.stores;
     }
 
+    public Set<UserSystem> getUsersList(){
+        return this.users;
+    }
+
+    public Set<UserSystem> getAdministratorsList(){
+        return this.administrators;
+    }
+
     public void setUsersList(Set<UserSystem> users){
         this.users = users;
     }
-  
+
     public void insertStoreToStores(Store store){
         stores.add(store);
     }
-
-
-
-
 
     public boolean addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
         boolean addToUser = false;

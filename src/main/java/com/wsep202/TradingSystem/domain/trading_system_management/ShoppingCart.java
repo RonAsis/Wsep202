@@ -55,15 +55,15 @@ public class ShoppingCart {
             return false;
         }
         if(shoppingBagsList.containsKey(storeOfBag)){
-            log.error("Can't add the same bag again");
+            log.error("Can't add the same bag again of store '"+ storeOfBag.getStoreName() +"'");
             return false;
         }
         shoppingBagsList.put(storeOfBag, bagToAdd);
         numOfBagsInCart += 1;
         numOfProductsInCart += bagToAdd.getNumOfProductsInBag();
         totalCartCost += bagToAdd.getTotalCostOfBag();
-        totalCartCost = Double.parseDouble(formatter.format(totalCartCost));
-        log.info("Bag was successfully added to cart");
+        fixTotalCartCost();
+        log.info("Bag was successfully added to cart from store '"+ storeOfBag.getStoreName() +"'");
         return true;
     }
 
@@ -80,15 +80,15 @@ public class ShoppingCart {
             return false;
         }
         if(!shoppingBagsList.containsKey(storeOfBag)){
-            log.error("The bag is not in the cart");
+            log.error("The bag is not in the cart from store '"+ storeOfBag.getStoreName() +"'");
             return false;
         }
         numOfBagsInCart -= 1;
         numOfProductsInCart -= bagToRemove.getNumOfProductsInBag();
         totalCartCost -= bagToRemove.getTotalCostOfBag();
-        totalCartCost = Double.parseDouble(formatter.format(totalCartCost));
+        fixTotalCartCost();
         shoppingBagsList.remove(storeOfBag);
-        log.info("Bag was successfully removed from cart");
+        log.info("Bag was successfully removed from cart from store '"+ storeOfBag.getStoreName() +"'");
         return true;
     }
 
@@ -104,10 +104,36 @@ public class ShoppingCart {
            return null;
        }
        if (shoppingBagsList.containsKey(storeOfBag)) {
-           log.info("Returns the wanted shopping bag");
+           log.info("Returns the wanted shopping bag from store '"+ storeOfBag.getStoreName() +"'");
            return shoppingBagsList.get(storeOfBag);
        }
-       log.error("The bag is not in the cart");
+       log.error("The bag is not in the cart fro store '"+ storeOfBag.getStoreName() +"'");
        return null;
+    }
+
+    public boolean removeProductInCart(Store storeOfProduct, ShoppingBag shoppingBag, Product productToRemove) {
+        if (storeOfProduct == null || shoppingBag == null || productToRemove == null){
+            log.error("store or product or shopping bag can't be null");
+            return false;
+        }
+        if (!shoppingBagsList.containsKey(storeOfProduct) || shoppingBag.getProductAmount(productToRemove) == -1){
+            log.error("product '"+ productToRemove.getName() +"' from store '"+ storeOfProduct.getStoreName() +"'");
+            return false;
+        }
+        numOfProductsInCart--;
+        totalCartCost -= (shoppingBag.getProductAmount(productToRemove)*productToRemove.getCost());
+        fixTotalCartCost();
+        if (shoppingBag.getNumOfProductsInBag() == 1){
+            numOfBagsInCart --;
+            shoppingBag.removeProductFromBag(productToRemove);
+            shoppingBagsList.remove(storeOfProduct);
+            log.info("delete an empty shopping bag from store '"+ storeOfProduct.getStoreName() +"'");
+        }
+        log.info("product '"+ productToRemove.getName() +"' was removed from cart");
+        return true;
+    }
+
+    private void fixTotalCartCost(){
+        totalCartCost = Double.parseDouble(formatter.format(totalCartCost));
     }
 }
