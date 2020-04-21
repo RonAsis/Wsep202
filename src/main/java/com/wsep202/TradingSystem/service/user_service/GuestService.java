@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Service
@@ -37,6 +38,20 @@ public class GuestService {
                          String password){
         return tradingSystemFacade.login(userName, password);
     }
+
+    /**
+     * uc 2.6 : save product in shopping bag
+     * @param username the username that want to save ShoppingBag
+     * @param storeId the storeId which the user visits in
+     * @param productSn - the sn of the product the user wish to add
+     * @param quantity - the amount of the product the user wish to add
+     * @return true if succeed
+     */
+    public boolean saveProductInShoppingBag( String username, int storeId, int productSn, int quantity) {
+        return tradingSystemFacade.saveProductInShoppingBag(username,  storeId,  productSn,  quantity);
+    }
+
+
 
     /**
      * view store data
