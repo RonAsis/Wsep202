@@ -21,4 +21,5 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 // *********** UC 6.4.2 - viewing user's purchase history ***********
 public class ViewUserPurchaseHistoryTest {
+
 }

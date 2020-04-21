@@ -120,7 +120,7 @@ public class FilterByRangePriceTest {
         Assertions.assertTrue(this.sellerOwnerService.addProduct(owner.getUserName(), storeDto.getStoreId(),
                 "motor", "motors", 20, 20));
 
-        // adding the added product to the list of products
+        // adding the added product to the list of products.
         Set<ProductDto> productDtoSet = this.buyerRegisteredService.getStoresDtos().get(0).getProducts();
         Object[] productDtoSetArrays =  productDtoSet.toArray();
         this.productDtoList = new LinkedList<>();

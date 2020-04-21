@@ -31,7 +31,6 @@ import java.util.Map;
 
 // *********** UC 3.7 - viewing personal purchase history ***********
 public class ViewPurchaseHistoryTest {
-
     @Autowired
     GuestService guestService;
     @Autowired
