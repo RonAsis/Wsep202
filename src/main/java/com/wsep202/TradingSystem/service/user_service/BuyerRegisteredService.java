@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -44,6 +45,9 @@ public class BuyerRegisteredService {
         return tradingSystemFacade.viewProduct(storeId, productId);
     }
 
+    public Map<ProductDto,Integer> watchShoppingCart(String username){
+        return tradingSystemFacade.watchShoppingCart(username);
+    }
 
     /**
      * View buyer purchase history
