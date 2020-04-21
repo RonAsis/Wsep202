@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -393,7 +394,7 @@ public class TradingSystemFacade {
      * @return true if succeed
      */
     public boolean registerUser(@NotBlank String userName,@NotBlank String password, @NotBlank String firstName,@NotBlank String lastName) {
-        UserSystem userSystem = factoryObjects.createSystemUser(userName,password, firstName, lastName);
+        UserSystem userSystem = factoryObjects.createSystemUser(userName, firstName, lastName,password);
         return tradingSystem.registerNewUser(userSystem);
     }
 
@@ -631,8 +632,32 @@ public class TradingSystemFacade {
             PaymentDetails paymentDetails = modelMapper.map(paymentDetailsDto, PaymentDetails.class);
             BillingAddress billingAddress = modelMapper.map(billingAddressDto, BillingAddress.class);
             List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress, user);
-            return modelMapper.map(receipts, ReceiptDto.class);
+            if (receipts != null){
+                return modelMapper.map(receipts, ReceiptDto.class);
+            }
+            return null;
         }catch (UserDontExistInTheSystemException e){
+            log.error("tried to purchase with not registered user");
+            return null;
+        }
+    }
+
+    /**
+     * this get products and their amount in the shopping cart of the registered user
+     * in aim to watch on shopping cart
+     * @param username
+     * @return map of products and their quantity in cart
+     */
+    public Map<ProductDto,Integer> watchShoppingCart(@NotBlank String username){
+        try{
+            UserSystem user = tradingSystem.getUser(username);
+            Map<Product,Integer> productsToWatch = user.getShoppingCart().watchShoppingCart();
+            if(productsToWatch != null){
+                return converterProductsMap(productsToWatch);
+            }
+            return null;
+        }catch (UserDontExistInTheSystemException e){
+            log.error("tried to watch on cart of not registered user");
             return null;
         }
     }
@@ -675,4 +700,10 @@ public class TradingSystemFacade {
         Type listType = new TypeToken<List<Product>>(){}.getType();
         return modelMapper.map(productDtos, listType);
     }
+
+    private Map<ProductDto,Integer> converterProductsMap(@NotNull Map<@NotNull Product,@NotNull Integer> products) {
+        Type mapType = new TypeToken<Map<ProductDto,Integer>>(){}.getType();
+        return modelMapper.map(products, mapType);
+    }
+
 }
