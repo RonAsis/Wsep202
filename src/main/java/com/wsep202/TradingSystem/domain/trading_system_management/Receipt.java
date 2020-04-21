@@ -1,6 +1,5 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.sun.jmx.mbeanserver.NamedObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

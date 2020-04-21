@@ -131,4 +131,7 @@ public class BuyerRegisteredService {
         return tradingSystemFacade.purchaseShoppingCart(userName, paymentDetails, billingAddress);
     }
 
+    public void clearDS() {
+
+    }
 }
