@@ -21,20 +21,31 @@ class ShoppingCartTest {
     ShoppingCart testShoppingCart;
     ShoppingBag testShoppingBag1;
     ShoppingBag testShoppingBag2;
+    ShoppingBag testShoppingBag3;
     Store testStore1;
     Store testStore2;
+    Store testStore3;
+    Product testProduct;
+
 
     @BeforeEach
     void setUp() {
         testShoppingCart = new ShoppingCart();
         testShoppingBag1 = mock(ShoppingBag.class);
         testShoppingBag2 = mock(ShoppingBag.class);
+        testShoppingBag3 = mock(ShoppingBag.class);
         testStore1 = mock(Store.class);
         testStore2 = mock(Store.class);
+        testStore3 = mock(Store.class);
+        testProduct = mock(Product.class);
         when(testShoppingBag1.getNumOfProductsInBag()).thenReturn(5);
         when(testShoppingBag1.getTotalCostOfBag()).thenReturn(55.25);
         when(testShoppingBag2.getNumOfProductsInBag()).thenReturn(2);
-        when(testShoppingBag1.getTotalCostOfBag()).thenReturn(99.1);
+        when(testShoppingBag2.getTotalCostOfBag()).thenReturn(99.1);
+        when(testShoppingBag3.getNumOfProductsInBag()).thenReturn(1);
+        when(testShoppingBag3.getTotalCostOfBag()).thenReturn(50.0);
+        when(testProduct.getName()).thenReturn("testProduct");
+        when(testProduct.getCost()).thenReturn(50.0);
     }
 
     /**
@@ -161,8 +172,60 @@ class ShoppingCartTest {
         //check that there is no shopping bag for a store that does not exists in cart
         assertNull(testShoppingCart.getShoppingBag(testStore2));
     }
+
+    /**
+     * This test check if the updateNumProduct method succeeds when the parameters
+     * are correct.
+     */
+    @Test
+    void removeProductInCartSuccess(){
+        setUpForRemoveProduct();
+        //before remove check there is 1 item in cart
+        assertEquals(1, testShoppingCart.getNumOfProductsInCart());
+        //before remove check there is 1 bag in cart
+        assertEquals(1, testShoppingCart.getNumOfBagsInCart());
+        //check that removal was successful
+        assertTrue(testShoppingCart.removeProductInCart(testStore3,testShoppingBag3,testProduct));
+        //check there is no items in cart
+        assertEquals(0, testShoppingCart.getNumOfProductsInCart());
+        //check there is no bags in cart
+        assertEquals(0, testShoppingCart.getNumOfBagsInCart());
+        //check that after removal the total cost of the cart is 0
+        assertEquals(0, testShoppingCart.getTotalCartCost());
+    }
+
+    /**
+     * This test check if the updateNumProduct method fails when the parameters
+     * are wrong.
+     */
+    @Test
+    void removeProductInCartFail(){
+        //can't remove null from cart
+        assertFalse(testShoppingCart.removeProductInCart(testStore3,null, testProduct));
+        //can't remove a product that does not exists in cart
+        assertFalse(testShoppingCart.removeProductInCart(testStore2,testShoppingBag2,testProduct));
+    }
+
+    /**
+     * Adds a shopping bag to the cart
+     */
+    private void setUpForRemoveProduct(){
+        Map<Product, Integer> productList = new HashMap<>();
+        productList.put(testProduct,1);
+        testShoppingBag3.setProductListFromStore(productList);
+        Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
+        shoppingBagsList.put(testStore3,testShoppingBag3);
+        testShoppingCart.setShoppingBagsList(shoppingBagsList);
+        testShoppingCart.setNumOfBagsInCart(1);
+        testShoppingCart.setNumOfProductsInCart(testShoppingBag3.getNumOfProductsInBag());
+        testShoppingCart.setTotalCartCost(testShoppingBag3.getTotalCostOfBag());
+        testShoppingCart.setNumOfProductsInCart(1);
+        when(testShoppingBag3.getProductAmount(testProduct)).thenReturn(1);
+    }
 }
-    /////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////Integration//////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Integration tests for ShoppingCart class
@@ -172,20 +235,40 @@ public class ShoppingCartIntegration {
         ShoppingCart testShoppingCart;
         ShoppingBag testShoppingBag1;
         ShoppingBag testShoppingBag2;
+        ShoppingBag testShoppingBag3;
         Store testStore1;
         Store testStore2;
+        Store testStore3;
+        Product testProduct;
+        Product testProduct2;
+        Product testProduct3;
 
         @BeforeEach
         void setUp() {
             testShoppingCart = new ShoppingCart();
-            testShoppingBag1 = mock(ShoppingBag.class);
-            testShoppingBag2 = mock(ShoppingBag.class);
-            testStore1 = mock(Store.class);
-            testStore2 = mock(Store.class);
-            when(testShoppingBag1.getNumOfProductsInBag()).thenReturn(5);
-            when(testShoppingBag1.getTotalCostOfBag()).thenReturn(55.25);
-            when(testShoppingBag2.getNumOfProductsInBag()).thenReturn(2);
-            when(testShoppingBag1.getTotalCostOfBag()).thenReturn(99.1);
+            testStore1 = Store.builder()
+                    .storeName("MovieStore")
+                    .purchasePolicy(new PurchasePolicy())
+                    .discountPolicy(new DiscountPolicy())
+                    .build();
+            testStore2 = Store.builder()
+                    .storeName("MovieStoreVIP")
+                    .purchasePolicy(new PurchasePolicy())
+                    .discountPolicy(new DiscountPolicy())
+                    .storeId(testStore1.getStoreId()+1)
+                    .build();
+            testStore3 = Store.builder()
+                    .storeName("Sports")
+                    .purchasePolicy(new PurchasePolicy())
+                    .discountPolicy(new DiscountPolicy())
+                    .storeId(testStore2.getStoreId()+1)
+                    .build();
+            testShoppingBag1 = new ShoppingBag(testStore1);
+            testShoppingBag2 = new ShoppingBag(testStore2);
+            testShoppingBag3 = new ShoppingBag(testStore3);
+            testProduct = new Product("Hunger Games", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore1.getStoreId());
+            testProduct2 = new Product("Harry Potter", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore2.getStoreId());
+            testProduct3 = new Product("Golf club", ProductCategory.SPORTING_GOODS, 100, 99.9, testStore3.getStoreId());
         }
 
         /**
@@ -282,7 +365,7 @@ public class ShoppingCartIntegration {
          */
         @Test
         void addAndRemoveAndGetSuccess(){
-            testShoppingCart.addBagToCart(testStore1,testShoppingBag1);
+            assertTrue(testShoppingCart.addBagToCart(testStore1,testShoppingBag1));
             //check that the correct bag is in the cart
             assertEquals(testShoppingBag1, testShoppingCart.getShoppingBag(testStore1));
             testShoppingCart.removeBagFromCart(testStore1,testShoppingBag1);
@@ -302,5 +385,40 @@ public class ShoppingCartIntegration {
             //can't remove a bag that does not exists in cart
             assertFalse(testShoppingCart.removeBagFromCart(testStore2,testShoppingBag2));
         }
-    }
+
+        /**
+         * This test check if the removeProduct method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void removeProductFromCurtSuccess(){
+            setUpForRemoveProduct();
+            //before remove there is 1 item in the cart (added in set up)
+            assertEquals(1, testShoppingCart.getNumOfProductsInCart());
+            //check that the remove is successful
+            assertTrue(testShoppingCart.removeProductInCart(testStore3, testShoppingBag3, testProduct3));
+            //after remove there is no items in the cart
+            assertEquals(0, testShoppingCart.getNumOfProductsInCart());
+        }
+
+        /**
+         * This test check if the removeProduct method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void removeProductFromCurtFail(){
+            //can't remove a null product
+            assertFalse(testShoppingCart.removeProductInCart(testStore2, testShoppingBag2, null));
+            //can't remove a product that does not exists
+            assertFalse(testShoppingCart.removeProductInCart(testStore2, testShoppingBag2, testProduct2));
+        }
+
+        /**
+         * set up for remove test, put a product to remove later
+         */
+        private void setUpForRemoveProduct(){
+                testShoppingBag3.addProductToBag(testProduct3,2);
+                testShoppingCart.addBagToCart(testStore3, testShoppingBag3);
+            }
+        }
 }

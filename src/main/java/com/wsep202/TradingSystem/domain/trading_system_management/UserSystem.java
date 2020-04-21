@@ -102,11 +102,11 @@ public class UserSystem {
             return false;
         }
         if (!listOfStores.contains(storeToAdd)){
-            log.info("added a new owned OR managed store to the user");
+            log.info("added a new owned OR managed store '"+ storeToAdd.getStoreName() +"' to the user '"+ userName +"'");
             listOfStores.add(storeToAdd);
             return true;
         }
-        log.error("can't add an existing store");
+        log.error("can't add an existing store '"+ storeToAdd.getStoreName() +"'");
         return false;
     }
 
@@ -121,11 +121,11 @@ public class UserSystem {
             return false;
         }
         if (!managedStores.contains(storeToRemove)){
-            log.error("the store is not managed by this user");
+            log.error("store '"+ storeToRemove.getStoreName() +"' is not managed by this user '"+ userName +"'");
             return false;
         }
         managedStores.remove(storeToRemove);
-        log.info("store was removed from managed store list");
+        log.info("store '"+ storeToRemove.getStoreName() +"' was removed from managed store list");
         return true;
     }
 
@@ -179,12 +179,12 @@ public class UserSystem {
         if (shoppingCart.getShoppingBag(storeOfProduct) == null){
             ShoppingBag storeShoppingBag = new ShoppingBag(storeOfProduct);
             boolean isAdded = storeShoppingBag.addProductToBag(productToAdd, amountOfProduct);
-            log.info("try to add the product to a new shopping bug");
+            log.info("add the product '"+ productToAdd.getName() +"' to a new shopping bug");
             if(isAdded)
                 return shoppingCart.addBagToCart(storeOfProduct,storeShoppingBag);
             return false;
         }
-        log.info("try to add the product to an existing shopping bug");
+        log.info("add the product '"+ productToAdd.getName() +"' to an existing shopping bug");
         return shoppingCart.getShoppingBag(storeOfProduct).addProductToBag(productToAdd, amountOfProduct);
     }
 
@@ -197,10 +197,15 @@ public class UserSystem {
      */
     public boolean removeProductInShoppingBag(Store storeOfProduct, Product productToRemove) {
         if(shoppingCart.getShoppingBag(storeOfProduct) == null){
-            log.error("the product is not in cart");
+            log.error("the product '"+ productToRemove.getName() +"' is not in cart");
             return false;
         }
-        log.info("try to remove a product from cart");
-        return shoppingCart.getShoppingBag(storeOfProduct).removeProductFromBag(productToRemove);
+        boolean isProductRemoved = shoppingCart.removeProductInCart(storeOfProduct, shoppingCart.getShoppingBag(storeOfProduct), productToRemove);
+        if (isProductRemoved){
+            log.info("product '" + productToRemove.getName() + "' was removed");
+            return true;
+        }
+        log.error("product '" + productToRemove.getName() + "' was not removed");
+        return false;
     }
 }

@@ -24,6 +24,7 @@ class ShoppingBagTest {
         Product testProduct2;
         Product testProduct3;
         Product testProduct4;
+        Product testProduct5;
 
         @BeforeEach
         void setUp() {
@@ -32,6 +33,7 @@ class ShoppingBagTest {
             testProduct2 = mock(Product.class);
             testProduct3 = mock(Product.class);
             testProduct4 = mock(Product.class);
+            testProduct5 = mock(Product.class);
             testShoppingBag = new ShoppingBag(testStore1);
             when(testStore1.getStoreId()).thenReturn(1);
             when(testProduct2.getCost()).thenReturn(1999.99);
@@ -40,6 +42,12 @@ class ShoppingBagTest {
             when(testProduct3.getStoreId()).thenReturn(1);
             when(testProduct4.getCost()).thenReturn(100.50);
             when(testProduct4.getStoreId()).thenReturn(2);
+            when(testProduct.getAmount()).thenReturn(50);
+            when(testProduct2.getAmount()).thenReturn(50);
+            when(testProduct3.getAmount()).thenReturn(50);
+            when(testProduct4.getAmount()).thenReturn(50);
+            when(testProduct5.getAmount()).thenReturn(5);
+            when(testProduct3.getStoreId()).thenReturn(1);
         }
 
         /**
@@ -89,6 +97,8 @@ class ShoppingBagTest {
             assertFalse(testShoppingBag.addProductToBag(testProduct3, 0));
             //check that product amount needs to be greater than 0
             assertFalse(testShoppingBag.addProductToBag(testProduct3, -1));
+            //not enough products in store
+            assertFalse(testShoppingBag.addProductToBag(testProduct5,10));
         }
 
         /**
@@ -132,6 +142,42 @@ class ShoppingBagTest {
         }
 
         /**
+         * This test check if the getProductAmount method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void getProductAmountSuccess(){
+            setUpForProductAmount();
+            //check that the amount is correct
+            assertEquals(2, testShoppingBag.getProductAmount(testProduct3));
+            //check that the amount is correct
+            assertEquals(5, testShoppingBag.getProductAmount(testProduct4));
+        }
+
+        /**
+         * This test check if the getProductAmount method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void getProductAmountFail(){
+            setUpForProductAmount();
+            //can't have a null product
+            assertEquals(-1, testShoppingBag.getProductAmount(null));
+            //product is not in the bag
+            assertEquals(-1, testShoppingBag.getProductAmount(testProduct));
+        }
+
+        /**
+         * set up products in bag for getProductAmount method
+         */
+        private void setUpForProductAmount(){
+            Map<Product,Integer> productList = new HashMap<>();
+            productList.put(testProduct3, 2);
+            productList.put(testProduct4, 5);
+            testShoppingBag.setProductListFromStore(productList);
+        }
+
+        /**
          * set products in the shoppingBag for remove method
          */
         private void setUpForRemove() {
@@ -143,7 +189,9 @@ class ShoppingBagTest {
             testShoppingBag.setTotalCostOfBag((testProduct2.getCost() * 2) + (testProduct3.getCost() * 2));
         }
     }
-    ///////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////Integration//////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Integration tests for ShoppingBag class
      */
@@ -158,19 +206,16 @@ class ShoppingBagTest {
 
         @BeforeEach
         void setUp() {
-            testStore1 = mock(Store.class);
-            testProduct = mock(Product.class);
-            testProduct2 = mock(Product.class);
-            testProduct3 = mock(Product.class);
-            testProduct4 = mock(Product.class);
+            testStore1 = Store.builder()
+                    .storeName("MovieStore")
+                    .purchasePolicy(new PurchasePolicy())
+                    .discountPolicy(new DiscountPolicy())
+                    .build();
+            testProduct = new Product("Hunger Games", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore1.getStoreId());
+            testProduct2 = new Product("Harry Potter", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore1.getStoreId());
+            testProduct3 = new Product("Games of Thrones", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 14.9, testStore1.getStoreId());
+            testProduct4 = new Product("The Hobbit", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 10.9, testStore1.getStoreId());
             testShoppingBag = new ShoppingBag(testStore1);
-            when(testStore1.getStoreId()).thenReturn(1);
-            when(testProduct2.getCost()).thenReturn(1999.99);
-            when(testProduct2.getStoreId()).thenReturn(1);
-            when(testProduct3.getCost()).thenReturn(199.85);
-            when(testProduct3.getStoreId()).thenReturn(1);
-            when(testProduct4.getCost()).thenReturn(100.50);
-            when(testProduct4.getStoreId()).thenReturn(2);
         }
 
         /**
@@ -202,6 +247,33 @@ class ShoppingBagTest {
             testShoppingBag.addProductToBag(testProduct2,2);
             //can't remove a product that was never added
             assertFalse(testShoppingBag.removeProductFromBag(testProduct3));
+            //try to add 50 products when the amount in store is 45
+            assertFalse(testShoppingBag.addProductToBag(testProduct4, 50));
         }
+
+        /**
+         * This test check if the getProductAmount method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void getProductAmountSuccess(){
+            testShoppingBag.addProductToBag(testProduct, 4);
+            //check that the amount is correct
+            assertEquals(4, testShoppingBag.getProductAmount(testProduct));
+        }
+
+        /**
+         * This test check if the getProductAmount method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void getProductAmountFail(){
+            testShoppingBag.addProductToBag(testProduct, 4);
+            //can't have a null product
+            assertEquals(-1, testShoppingBag.getProductAmount(null));
+            //product is not in the bag
+            assertEquals(-1, testShoppingBag.getProductAmount(testProduct3));
+        }
+
     }
 }
