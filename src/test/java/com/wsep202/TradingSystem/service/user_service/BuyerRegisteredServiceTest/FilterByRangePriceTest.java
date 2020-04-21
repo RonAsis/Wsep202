@@ -154,4 +154,5 @@ public class FilterByRangePriceTest {
             this.productDtoList.add((ProductDto) productDtoSetArrays[i]);
         }
     }
+
 }

@@ -151,4 +151,5 @@ public class FilterByProductRankTest {
             this.productDtoList.add((ProductDto) productDtoSetArrays[i]);
         }
     }
+
 }

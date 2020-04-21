@@ -22,4 +22,22 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 // *********** UC 6.4.2 - viewing user's purchase history ***********
 public class ViewUserPurchaseHistoryTest {
 
+    @BeforeEach
+    void setUp() {
+
+    }
+    @AfterEach
+    void tearDown() {
+
+    }
+
+    /**
+     * filter a valid list, rank = 0
+     * productDtoList has one product, that's ranked 0.
+     */
+    @Test
+    void filterValidListReturnAllProducts() {
+    }
+
+
 }

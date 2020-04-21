@@ -156,4 +156,5 @@ public class FilterByStoreCategoryTest {
             this.productDtoList.add((ProductDto) productDtoSetArrays[i]);
         }
     }
+
 }

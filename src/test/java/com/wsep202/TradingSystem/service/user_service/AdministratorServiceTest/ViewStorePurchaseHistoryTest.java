@@ -23,4 +23,21 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class ViewStorePurchaseHistoryTest {
 @Autowired
     GuestService guestService;
+    @BeforeEach
+    void setUp() {
+
+    }
+    @AfterEach
+    void tearDown() {
+
+    }
+
+    /**
+     * filter a valid list, rank = 0
+     * productDtoList has one product, that's ranked 0.
+     */
+    @Test
+    void filterValidListReturnAllProducts() {
+    }
+
 }

@@ -72,4 +72,5 @@ public class LogoutTest {
         this.guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
                 userSystem.getFirstName(), userSystem.getLastName());
     }
+
 }
