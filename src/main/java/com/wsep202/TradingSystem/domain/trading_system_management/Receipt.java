@@ -15,6 +15,10 @@ import java.util.*;
 @Data
 public class Receipt {
 
+    private static int receiptSnAcc = 0;
+
+    private int receiptSn;
+
     /**
      * the storeId that connected to the store in which the purchase happened.
      */
@@ -52,9 +56,18 @@ public class Receipt {
      */
     public Receipt(int storeId, String userName, double amountToPay, Map<Product, Integer> products){
         purchaseDate = new Date(); // sets the current date
+        this.receiptSn = getReceiptIdAcc();
         this.storeId = storeId;
         this.userName = userName;
         this.amountToPay = amountToPay;
         this.productsBought = products;
+    }
+
+    /**
+     * get and accumilate the receipt id accumulator
+     * @return the receipt serial number
+     */
+    private int getReceiptIdAcc(){
+        return receiptSnAcc++;
     }
 }

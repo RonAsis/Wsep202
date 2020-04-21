@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
 import com.wsep202.TradingSystem.service.user_service.dto.*;
@@ -61,7 +62,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(userNameTest)).thenReturn(userSystem);
             when(userSystem.getReceipts()).thenReturn(receipts);
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(userNameTest);
-            assertRecipes(receipts, receiptDtos);
+            assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -78,7 +79,7 @@ class TradingSystemFacadeTest {
 
             //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId);
-            assertRecipes(receipts, receiptDtos);
+            assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -94,7 +95,7 @@ class TradingSystemFacadeTest {
 
             //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, username);
-            assertRecipes(receipts, receiptDtos);
+            assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -111,7 +112,7 @@ class TradingSystemFacadeTest {
 
             //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(managerUsername, storeId);
-            assertRecipes(receipts, receiptDtos);
+            assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -128,7 +129,7 @@ class TradingSystemFacadeTest {
 
             //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername, storeId);
-            assertRecipes(receipts, receiptDtos);
+            assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -299,8 +300,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
             when(modelMapper.map(purchasePolicyDto, PurchasePolicy.class)).thenReturn(purchasePolicy);
             when(modelMapper.map(discountPolicyDto, DiscountPolicy.class)).thenReturn(discountPolicy);
-          //  when(tradingSystem.openStore(userSystem, DiscountType.getDiscountType(discountType),
-            //        PurchaseType.getPurchaseType(purchaseType), purchasePolicy, discountPolicy, storeName)).thenReturn(true);
+            when(tradingSystem.openStore(userSystem, purchasePolicy, discountPolicy, storeName)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
@@ -489,7 +489,7 @@ class TradingSystemFacadeTest {
 
             when(tradingSystem.purchaseShoppingCart(any(ShoppingCart.class),paymentDetails,billingAddress)).thenReturn(receipts);
             ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto,paymentDetailsDto,billingAddressDto);
-            assertRecipes(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
+            assertReceipts(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
         }
 
         @Test
@@ -507,11 +507,10 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(username)).thenReturn(userSystem);
             when(tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, userSystem)).thenReturn(receipts);
             ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(username,paymentDetailsDto,billingAddressDto);
-            assertRecipes(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
+            assertReceipts(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
         }
     }
-
-    ///////////////////////////////integration test /////////////////////
+    // ******************************* integration test ******************************* //
     @Nested
     @ContextConfiguration(classes = {TradingSystemConfiguration.class})
     @WithModelMapper(basePackageClasses = TradingSystemMapper.class)
@@ -527,42 +526,86 @@ class TradingSystemFacadeTest {
         private Set<UserSystem> userSystems;
         private  List<Receipt> receipts;
         private Set<Store> stores;
+        private UserSystem currUser;
+        private UserSystem testUserSystem;
+        private UserSystem admin;
 
         @BeforeEach
         void setUp(){
+            admin = UserSystem.builder()
+                    .userName("admin")
+                    .password("admin")
+                    .build();
             addUsers();
+            Optional<UserSystem> userSystemOptional = userSystems.stream().findFirst();
+            Assertions.assertTrue(userSystemOptional.isPresent());
+            currUser = userSystemOptional.get();
             receipts = setUpReceipts();
+            currUser.setReceipts(receipts);
             addStores();
-
         }
 
         private void addStores() {
-//            stores = setUpStores();
-//            stores.forEach(store ->
-//                    tradingSystem.op);
+            stores = setUpStores();
+            stores.forEach(store ->
+                    tradingSystem.openStore(currUser, store.getPurchasePolicy(), store.getDiscountPolicy(), store.getStoreName())
+            );
         }
 
         void addUsers(){
             userSystems = setupUsers();
             userSystems.forEach(userSystem ->
                     tradingSystem.registerNewUser(userSystem));
+            currUser = userSystems.stream().findFirst().get();
+        }
+
+        /**
+         * check the viewPurchaseHistoryUser() functionality in case of exists user in the system
+         */
+        @Test
+        void viewPurchaseHistoryUserPositive() {
+            List<Receipt> receipts = setUpReceipts();
+            currUser.setReceipts(receipts);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(currUser.getUserName());
+            assertReceipts(receipts, receiptDtos);
+        }
+
+        /**
+         * check the viewPurchaseHistoryUser() functionality in case of not exists user in the system
+         */
+        @Test
+        void viewPurchaseHistoryUserNotExist() {
+            Assertions.assertThrows(UserDontExistInTheSystemException.class, () -> {
+                List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory("userNotExist");
+                assertReceipts(receipts, receiptDtos);
+            });
+        }
+
+        /**
+         * check the viewPurchaseHistoryAdministratorOfStore() functionality in case of exists admin and store in the system
+         */
+        @Test
+        void viewPurchaseHistoryAdministratorOfStorePositive() {
+            testUserSystem = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(testUserSystem.getUserName(),testUserSystem.getPassword(),testUserSystem.getFirstName(),testUserSystem.getLastName());
+            tradingSystem.openStore(tradingSystem.getUser(testUserSystem.getUserName()),new PurchasePolicy(), new DiscountPolicy(), "castro");
+            /*stores.forEach(store ->
+                    tradingSystem.openStore(currUser, store.getPurchasePolicy(), store.getDiscountPolicy(), store.getStoreName())
+            );*/
+            Optional<Store> storeOptional = stores.stream().findFirst();
+            Assertions.assertTrue(storeOptional.isPresent());
+            Store store = storeOptional.get();
+            store.setReceipts(receipts);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(admin.getUserName(), store.getStoreId());
+            assertReceipts(receipts, receiptDtos);
         }
 
         @Test
-        void viewPurchaseHistoryUser() {
-            Optional<UserSystem> userSystemOptional = userSystems.stream().findFirst();
-            Assertions.assertTrue(userSystemOptional.isPresent());
-            UserSystem userSystem = userSystemOptional.get();
-            userSystem.setReceipts(receipts);
-            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(userSystem.getUserName());
-            assertRecipes(receipts, receiptDtos);
-
-            //clean all
-            userSystem.setReceipts(new LinkedList<>());
-        }
-
-        @Test
-        void viewPurchaseHistoryAdministratorOfStore() {
+        void viewPurchaseHistoryAdministratorOfStoreNegative() {
 
         }
 
@@ -605,6 +648,7 @@ class TradingSystemFacadeTest {
         @Test
         void removeManager() {
         }
+        //////////////////////////////////////////////////////////////////////////
 
         @Test
         void logout() {
@@ -678,8 +722,7 @@ class TradingSystemFacadeTest {
         void testPurchaseShoppingCart() {
         }
     }
-
-    ///////////////////////////////////////// assert functions ///////////////////////////
+    // ******************************* assert functions ******************************* //
     private void assertUserSystem(Set<UserSystem> userSystems, Set<UserSystemDto> userSystemDtos) {
         if (Objects.nonNull(userSystems)) {
             userSystems.forEach(userSystemExpected -> {
@@ -694,7 +737,7 @@ class TradingSystemFacadeTest {
                 assertSetStore(userSystemExpected.getOwnedStores(), userSystemDto.getOwnedStores());
                 assertSetStore(userSystemExpected.getManagedStores(), userSystemDto.getManagedStores());
                 assertShoppingCart(userSystemExpected.getShoppingCart(), userSystemDto.getShoppingCart());
-                assertRecipes(userSystemExpected.getReceipts(), userSystemDto.getReceipts());
+                assertReceipts(userSystemExpected.getReceipts(), userSystemDto.getReceipts());
             });
         }
     }
@@ -724,7 +767,8 @@ class TradingSystemFacadeTest {
     }
 
     private void assertPurchasePolicy(PurchasePolicy purchasePolicy, PurchasePolicyDto purchasePolicy1) {
-        //TODO when PurchasePolicy and PurchasePolicyDto are ready
+        Assertions.assertEquals(purchasePolicy.getWhoCanBuyStatus(), purchasePolicy1.getWhoCanBuyStatus());
+        Assertions.assertEquals(purchasePolicy.isAllAllowed(), purchasePolicy1.isAllAllowed());
     }
 
     private void assertProducts(Set<Product> products, Set<ProductDto> productsDtos) {
@@ -733,7 +777,6 @@ class TradingSystemFacadeTest {
                     .findFirst();
             Assertions.assertTrue(productDtoOptional.isPresent());
             assertProduct(product, productDtoOptional.get());
-
         });
     }
 
@@ -748,18 +791,51 @@ class TradingSystemFacadeTest {
     }
 
     private void assertDiscountPolicy(DiscountPolicy discountPolicy, DiscountPolicyDto discountPolicy1) {
-        //TODO when discountPolicy and DiscountPolicyDto are ready
+        Assertions.assertEquals(discountPolicy.getWhoCanBuyStatus(), discountPolicy1.getWhoCanBuyStatus());
+        Assertions.assertEquals(discountPolicy.isAllAllowed(), discountPolicy1.isAllAllowed());
     }
 
-    private void assertRecipes(List<Receipt> receipts, List<ReceiptDto> receiptDtos) {
+    private void assertReceipts(List<Receipt> receipts, List<ReceiptDto> receiptDtos) {
         if(Objects.nonNull(receipts)) {
             Assertions.assertEquals(receipts.size(), receiptDtos.size());
             receipts.forEach(
                     receipt -> {
-                        //TODO - compare the receipts
+                        Optional<ReceiptDto> receiptDtoOpt = receiptDtos.stream()
+                                .filter(receiptDto -> receiptDto.getReceiptSn() == receipt.getReceiptSn())
+                                .findFirst();
+                        Assertions.assertTrue(receiptDtoOpt.isPresent());
+                        ReceiptDto receiptDto = receiptDtoOpt.get();
+                        assertionReceipt(receipt, receiptDto);
                     }
             );
         }
+    }
+
+    private void assertionReceipt(Receipt receipt, ReceiptDto receiptDto) {
+        Assertions.assertEquals(receipt.getReceiptSn(), receiptDto.getReceiptSn());
+        Assertions.assertEquals(receipt.getStoreId(), receiptDto.getStoreId());
+        Assertions.assertEquals(receipt.getUserName(), receiptDto.getUserName());
+        //Assertions.assertEquals(receipt.getPurchaseDate(), receiptDto.getPurchaseDate());
+        Assertions.assertEquals(receipt.getAmountToPay(), receiptDto.getAmountToPay());
+        assertMapProducts(receipt.getProductsBought(), receiptDto.getProductsBought());
+    }
+
+    private void assertMapProducts(Map<Product,Integer> products, Map<ProductDto, Integer> productsDtos) {
+        products.keySet().forEach(product -> {
+            Optional<ProductDto> productDtoOptional = productsDtos.keySet().stream().filter(productDto ->
+                    productDto.getProductSn() == product.getProductSn())
+                    .findFirst();
+            Assertions.assertTrue(productDtoOptional.isPresent());
+            assertProduct(product, productDtoOptional.get());
+            Assertions.assertEquals(products.get(product).intValue(),productsDtos.get(productDtoOptional.get()).intValue());
+        });
+        /*products.get(product).forEach(quantityProduct -> {
+            Optional<Integer> quantityProductDtoOptional = productsDtos.values().stream().filter(quantityProductDto ->
+                    quantityProductDto.intValue() == quantityProduct.intValue())
+                    .findFirst();
+            Assertions.assertTrue(quantityProductDtoOptional.isPresent());
+            Assertions.assertEquals(quantityProduct, quantityProductDtoOptional);
+        });*/
     }
 
     private void assertionStore(Store store, StoreDto storeDto) {
@@ -771,16 +847,22 @@ class TradingSystemFacadeTest {
         Assertions.assertEquals(store.getDiscountType().type, storeDto.getDiscountType());
         Assertions.assertEquals(store.getPurchaseType().type, storeDto.getPurchaseType());
         assertUserSystem(store.getOwners(), storeDto.getOwners());
-        assertRecipes(store.getReceipts(), storeDto.getReceipts());
+        assertReceipts(store.getReceipts(), storeDto.getReceipts());
         Assertions.assertEquals(store.getRank(), storeDto.getRank());
     }
 
-    //////////////////////////////////setup//////////////////////////////////////////
+// ******************************* set up ******************************* //
 
     private List<Receipt> setUpReceipts() {
         List<Receipt> receipts = new ArrayList<>();
         for (int counter = 0; counter <= 10; counter++) {
-            receipts.add(Receipt.builder() //TODO - when Receipt will be ready
+            receipts.add(Receipt.builder()
+                    .receiptSn(counter)
+                    .storeId(counter)
+                    .userName("username" + counter)
+                    .purchaseDate(new Date())
+                    .amountToPay(counter)
+                    .productsBought(createMapOfProducts())
                     .build());
         }
         return receipts;
@@ -790,14 +872,30 @@ class TradingSystemFacadeTest {
         Set<Product> products = new HashSet<>();
         for (int counter = 0; counter <= 10; counter++) {
             products.add(Product.builder()
-                    .name("productName" + counter)
-                    .amount(counter)
-                    .category(ProductCategory.values()[counter % ProductCategory.values().length])
                     .productSn(counter)
-                    .storeId(counter)
+                    .name("productName" + counter)
+                    .category(ProductCategory.values()[counter % ProductCategory.values().length])
+                    .amount(counter)
                     .cost(counter)
                     .rank(counter)
+                    .storeId(counter)
                     .build());
+        }
+        return products;
+    }
+
+    private Map<Product, Integer> createMapOfProducts() {
+        Map<Product, Integer> products = new HashMap<>();
+        for (int counter = 1; counter <= 10; counter++) {
+            products.put((Product.builder()
+                    .productSn(counter)
+                    .name("productName" + counter)
+                    .category(ProductCategory.values()[counter % ProductCategory.values().length])
+                    .amount(counter+1)
+                    .cost(counter)
+                    .rank(counter)
+                    .storeId(counter)
+                    .build()), counter);
         }
         return products;
     }
@@ -806,15 +904,11 @@ class TradingSystemFacadeTest {
         Set<UserSystem> userSystems = new HashSet<>();
         for (int counter = 0; counter <= 10; counter++) {
             userSystems.add(UserSystem.builder()
+                    .userName("username" + counter)
+                    .password("password" + counter)
                     .firstName("firstName" + counter)
                     .lastName("lastName" + counter)
-                    .userName("username" + counter)
                     .isLogin(false)
-                    .password("password" + counter)
-                    .receipts(setUpReceipts())
-                    .shoppingCart(new ShoppingCart())
-                    .ownedStores(setUpStores())
-                    .managedStores(setUpStores())
                     .build());
         }
         return userSystems;
@@ -874,7 +968,6 @@ class TradingSystemFacadeTest {
                 .build();
     }
 
-    // TODO -RON - FIX THE CODE IN COMMENT INORDER TO 'SHOPPING BAG' CHANCES
     private ShoppingCart createShoppingCart() {
         //create shoppingBags
         Map<Integer, Integer> shoppingBagMap = new HashMap<>();
@@ -894,7 +987,7 @@ class TradingSystemFacadeTest {
 
     }
 
-    /////////////////////////////////General /////////////////////////////////
+    // ******************************* General ******************************* //
     private List<ProductDto> convertProductDtoList(List<Product> products) {
         Type listType = new TypeToken<List<ProductDto>>(){}.getType();
         return modelMapper.map(products, listType);

@@ -13,7 +13,7 @@ public class SecuritySystem {
     //secure random number generator (RNG) implementing the default random number algorithm
     private static final SecureRandom RAND = new SecureRandom();
     //amount of iteration to repeat on hashing
-    private static final int ITERATIONS = 65536;
+    private static final int ITERATIONS = 10;
     private static final int KEY_LENGTH = 512;
     //the following algorithm create hash password in length of 512 bits
     private static final String ALGORITHM = "PBKDF2WithHmacSHA512";

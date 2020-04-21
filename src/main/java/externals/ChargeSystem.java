@@ -23,4 +23,16 @@ public class ChargeSystem {
     private boolean isValidCardNumber(String creditCardNumber) {
         return creditCardNumber.length()==9;
     }
+
+    /**
+     * get refund from the store for the payed price
+     * @param storename store to get refund from
+     * @param refundSum the payed price
+     * @param paymentDetails
+     * @return true for successful refund
+     */
+    public boolean cancelCharge(String storename, double refundSum, PaymentDetails paymentDetails){
+        //temporarily check if it possible to refund
+        return refundSum > 0;
+    }
 }

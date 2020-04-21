@@ -15,6 +15,11 @@ import java.util.*;
 public class ReceiptDto {
 
     /**
+     * the receipt serial number
+     */
+    private int receiptSn;
+
+    /**
      * the storeId that connected to the store in which the purchase happened.
      */
     private int storeId;
