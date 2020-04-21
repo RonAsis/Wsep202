@@ -29,7 +29,7 @@ import java.util.*;
 @WithModelMapper
 
 // *********** UC 2.5.2.4 (inherited from guest) - filtering by store rank ***********
-public class FilterByStoreRankTest { 
+public class FilterByStoreRankTest {
     @Autowired
     GuestService guestService;
     @Autowired
