@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -103,7 +104,7 @@ public class ShoppingCart {
            log.error("Can't return shopping of a null store");
            return null;
        }
-       if (shoppingBagsList.containsKey(storeOfBag)) {
+       if (shoppingBagsList.size() > 0 && shoppingBagsList.containsKey(storeOfBag)) {
            log.info("Returns the wanted shopping bag from store '"+ storeOfBag.getStoreName() +"'");
            return shoppingBagsList.get(storeOfBag);
        }
@@ -132,6 +133,33 @@ public class ShoppingCart {
         log.info("product '"+ productToRemove.getName() +"' was removed from cart");
         return true;
     }
+
+    /**
+     * This method is used to get all the products in shopping cart
+     * @return map of products and there amounts
+     */
+    public Map<Product,Integer> watchShoppingCart(){
+        Map<Product,Integer> allProducts = new HashMap<>();
+        for(ShoppingBag shoppingBag: shoppingBagsList.values()){
+            for (Product product: shoppingBag.getProductListFromStore().keySet()){
+                if(isVisibleDiscount(product)){
+                    applyVisibleDiscount(product);
+                }
+                //else if hidden discount..
+                allProducts.put(product,shoppingBag.getProductAmount(product));
+            }
+        }
+        return allProducts;
+    }
+
+    private void applyVisibleDiscount(Product product) {
+     //TODO for next version
+    }
+
+    private boolean isVisibleDiscount(Product product) {
+        return product.getDiscountType().type.equals("visible discount");
+    }
+
 
     private void fixTotalCartCost(){
         totalCartCost = Double.parseDouble(formatter.format(totalCartCost));

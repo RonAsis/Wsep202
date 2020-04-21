@@ -10,6 +10,7 @@ import com.wsep202.TradingSystem.domain.exception.StoreDontExistsException;
 import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
+import org.apache.catalina.User;
 import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,7 +66,7 @@ class TradingSystemTest {
             doNothing().when(externalServiceManagement).connect();
             userSystem = mock(UserSystem.class);
             userSystem1 = mock(UserSystem.class);
-
+            userSystem2 = mock(UserSystem.class);
             factoryObjects = new FactoryObjects();
             String username = "usernameTest";
             String password = "passwordTest";
@@ -73,7 +74,7 @@ class TradingSystemTest {
             String lName = "Banana";
             userToRegister = new UserSystem(username,fName,lName,password);
             store = mock(Store.class);
-
+            store1 = mock(Store.class);
             product = mock(Product.class);
             doNothing().when(userSystem1).setOwnedStores(new HashSet<Store>());
             doNothing().when(userSystem1).setManagedStores(new HashSet<Store>());
@@ -106,12 +107,14 @@ class TradingSystemTest {
         void registerNewUserPositive() {
             //mockup
             userToRegister = mock(UserSystem.class);
-            when(userToRegister.getPassword()).thenReturn("");
+            when(userToRegister.getPassword()).thenReturn("12");
             when(externalServiceManagement.getEncryptedPasswordAndSalt(userToRegister.getPassword()))
             .thenReturn(new PasswordSaltPair("pass","salt"));
             doNothing().when(userToRegister).setPassword("pass");
             doNothing().when(userToRegister).setSalt("salt");
             when(userToRegister.getUserName()).thenReturn("usernameTest");
+            when(userToRegister.getFirstName()).thenReturn("usersFirstName");
+            when(userToRegister.getLastName()).thenReturn("usersLastName");
             //setup
             //the following user details are necessary for the login tests
             //success: registration done. valid user details
@@ -136,6 +139,7 @@ class TradingSystemTest {
          */
         @Test
         void loginPositive(){
+            setUpLogin();
             //mockup
             when(userSystem.getUserName()).thenReturn("usernameTest");
             doNothing().when(userSystem).login();
@@ -623,10 +627,21 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.openStore(userSystem2, null, new DiscountPolicy(), "Castro"));
             //can't open a store that is already exists
             Assertions.assertFalse(tradingSystem.openStore(userSystem2,store1.getPurchasePolicy(),store1.getDiscountPolicy(),store1.getStoreName()));
+            //name of store can't be empty
+            Assertions.assertFalse(tradingSystem.openStore(userSystem2, store1.getPurchasePolicy(),store1.getDiscountPolicy(), ""));
         }
 
         // ********************************** Set Up Functions For Tests ********************************** //
 
+
+        /**
+         *
+         */
+        private void setUpLogin(){
+            Set<UserSystem> userList = new HashSet<>();
+            userList.add(userSystem);
+            tradingSystem.setUsersList(userList);
+        }
 
         /**
          * set up all objects for purchase
@@ -687,12 +702,14 @@ class TradingSystemTest {
         private void registerAsSetup(){
             //mockup
             userToRegister = mock(UserSystem.class);
-            when(userToRegister.getPassword()).thenReturn("");
+            when(userToRegister.getPassword()).thenReturn("12");
             when(externalServiceManagement.getEncryptedPasswordAndSalt(userToRegister.getPassword()))
                     .thenReturn(new PasswordSaltPair("pass","salt"));
             doNothing().when(userToRegister).setPassword("pass");
             doNothing().when(userToRegister).setSalt("salt");
             when(userToRegister.getUserName()).thenReturn("usernameTest");
+            when(userToRegister.getFirstName()).thenReturn("firstNameTest");
+            when(userToRegister.getLastName()).thenReturn("lastNameTest");
             //setup
             //the following user details are necessary for the login tests
             tradingSystem.registerNewUser(userToRegister);
@@ -1322,7 +1339,9 @@ class TradingSystemTest {
                             .category(ProductCategory.BOOKS_MOVIES_MUSIC)
                             .amount(45)
                             .cost(12.9)
-                            .storeId(storeToOpen.getStoreId()).build();
+                            .storeId(storeToOpen.getStoreId())
+                            .discountType(DiscountType.NONE)
+                            .purchaseType(PurchaseType.BUY_IMMEDIATELY).build();
             userToOpenStore.saveProductInShoppingBag(storeToOpen,testProduct,3);
             paymentDetails = new PaymentDetails(CardAction.PAY, "123456789", "12", "2024", "Israel Israeli", 237, "333333339");
             billingAddress = new BillingAddress("Israel Israeli", "Ben-Gurion 1", "Beer Sheva", "Israel","1234567");
@@ -1353,13 +1372,17 @@ class TradingSystemTest {
                     .category(ProductCategory.BOOKS_MOVIES_MUSIC)
                     .amount(45)
                     .cost(12.9)
-                    .storeId(storeToOpen.getStoreId()).build();
+                    .storeId(storeToOpen.getStoreId())
+                    .discountType(DiscountType.NONE)
+                    .purchaseType(PurchaseType.BUY_IMMEDIATELY).build();
             testProduct1 = Product.builder()
                     .name("Hunger Games")
                     .category(ProductCategory.BOOKS_MOVIES_MUSIC)
                     .amount(45)
                     .cost(12.9)
-                    .storeId(storeToOpen1.getStoreId()).build();
+                    .storeId(storeToOpen1.getStoreId())
+                    .discountType(DiscountType.NONE)
+                    .purchaseType(PurchaseType.BUY_IMMEDIATELY).build();
             userToOpenStore.saveProductInShoppingBag(storeToOpen,testProduct,47);
             testUser.saveProductInShoppingBag(storeToOpen1,testProduct1,5);
             paymentDetails = new PaymentDetails(CardAction.PAY, "123456789", "12", "2024", "Israel Israeli", 237, "333333339");
