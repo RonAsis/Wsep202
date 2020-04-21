@@ -1,7 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,8 +13,7 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @Slf4j
-@Setter
-@Getter
+@Data
 public class Store {
 
 
@@ -96,6 +98,12 @@ public class Store {
             appointedOwners.putIfAbsent(owner, new HashSet<>());
             appointedOwners.get(owner).add(willBeOwner);
             appointed = true;
+            log.info("The user: "+willBeOwner.getUserName()+" added as appointed owner by the owner: "+owner.getUserName()+ "" +
+                    " for the store:"+ this.storeName);
+        }
+        if(!appointed){
+            log.error("The user: "+willBeOwner.getUserName()+" couldn't be appointed as owner by: "+ owner.getUserName()+" " +
+                    "for the store: "+this.storeName);
         }
         return appointed;
     }
@@ -104,15 +112,20 @@ public class Store {
      * add a new owner to be owner of this store
      * @param ownerStore
      * @param newOwnerUser
-     * @return
+     * @return true if succeeded to add owner for the store
      */
     public boolean addOwner(UserSystem ownerStore, UserSystem newOwnerUser) {
         //appoint new user to be owner
         boolean isAppointedToOwner =  appointAdditionOwner(ownerStore,newOwnerUser);
         if(isAppointedToOwner){ //appointing succeeded
             owners.add(newOwnerUser);    //add the new owner to the owners list
+            log.info("The user: "+newOwnerUser.getUserName()+" added as an owner to the store: "+this.storeName+
+                    " by: "+ownerStore.getUserName());
             return true;
         }
+        log.error("The user: "+newOwnerUser.getUserName()+" couldn't be added as an owner to the " +
+                "store: "+this.storeName+
+                " by: "+ownerStore.getUserName());
         return false;
     }
 
@@ -129,6 +142,13 @@ public class Store {
             appointedManagers.putIfAbsent(owner, new HashSet<>());
             appointedManagers.get(owner).add(mangerStore);
             appointed = true;
+            log.info("The user: "+mangerStore.getAppointedManager().getUserName()+" added as appointed manager by the owner: "+owner.getUserName()+ "" +
+                    " for the store:"+ this.storeName);
+        }
+        if(!appointed){
+            log.error("The user: "+mangerStore.getAppointedManager().getUserName()+" couldn't be appointed as manager" +
+                    " by: "+ owner.getUserName()+" " +
+                    "for the store: "+this.storeName);
         }
         return appointed;
     }
@@ -145,10 +165,15 @@ public class Store {
             boolean isAppointedToManager = appointAdditionManager(ownerStore,newManager);
             if(isAppointedToManager){       //the manager appointed to manage the store successfully
                 managers.add(newManager);
+                log.info("The user: "+newManagerUser.getUserName()+" added as a manager to the store: "+this.storeName+
+                        " by: "+ownerStore.getUserName());
                 return true;
             }
         }
         //the addition of manager failed
+        log.error("The user: "+newManagerUser.getUserName()+" couldn't be added as a manager to the store: "
+                +this.storeName+
+                " by: "+ownerStore.getUserName());
         return false;
     }
 
@@ -161,14 +186,22 @@ public class Store {
             }
             appointed = true;
         }
+        if (appointed){
+            log.info("The owner: "+owner.getUserName()+" removed: "+mangerStore.getAppointedManager().getUserName()+"" +
+                    " from appointed managers of the store: "+this.storeName);
+        }
+        else {
+            log.error("The owner: "+owner.getUserName()+"failed to remove: "+mangerStore.getAppointedManager().getUserName()+"" +
+                    " from appointed managers of the store: "+this.storeName);
+        }
         return appointed;
     }
 
     /**
-     *
-     * @param ownerStore
-     * @param user
-     * @return
+     * remove user from the store's managers
+     * @param ownerStore the removing owner
+     * @param user the removed manager
+     * @return true for successful operation
      */
     public boolean removeManager(UserSystem ownerStore, UserSystem user) {
         if (isOwner(ownerStore)) {  //the user is able to remove his appointments
@@ -177,7 +210,14 @@ public class Store {
             //remove from appointed managers Set
             boolean isRemovedFromAppointedManagers = removeAppointManager(ownerStore,manager);
             if(isRemovedFromAppointedManagers) {
-                return managers.remove(manager);   //remove from managers list as well
+                boolean removed = managers.remove(manager);   //remove from managers list as well
+                if(removed){
+                    log.info(ownerStore.getUserName()+" removed: "+user.getUserName()+"" +
+                            " from the store: "+storeName+ " managers successfully");
+                    return true;
+                }
+                log.error(ownerStore.getUserName()+" failed to remove: "+user.getUserName()+"" +
+                        " from the store: "+storeName);
             }
         }
         //couldn't remove manager
@@ -194,8 +234,10 @@ public class Store {
     public boolean addNewProduct(UserSystem user, Product product){
         if(isOwner(user)) {  //verify the user is owner of the store
             products.add(product);
+            log.info("The product: "+product.getName()+" added to the store: "+this.storeName);
             return true;
         }
+        log.error("The product: "+product.getName()+" failed to add to the store: "+this.storeName);
         return false;
     }
 
@@ -219,9 +261,11 @@ public class Store {
                 product.get().setCategory(ProductCategory.getProductCategory(category));
                 product.get().setAmount(amount);
                 product.get().setCost(cost);
+                log.info("The product "+productName+" edited successfully");
                 return true;
             }
         }
+        log.error("Failed to edit the product: "+productName);
         return false;
     }
 
@@ -235,9 +279,13 @@ public class Store {
         if(isOwner(user)){  //only owner can remove products from its store
             int sizeOfProducts = products.size();
             products.removeIf(product -> product.getProductSn()==productSn);
-            return sizeOfProducts > products.size() ? true : false; //verify the product removed
+            if(sizeOfProducts > products.size()){
+                log.info("The product with id: "+ productSn+ " was removed successfully");
+                return true;
+            }
         }
         //the user is not an owner of the store so can't remove
+        log.error("The product with id: "+ productSn+ " wasn't removed.");
         return false;
     }
 
@@ -252,11 +300,22 @@ public class Store {
      * otherwise false
      */
     public boolean addPermissionToManager(UserSystem ownerStore, UserSystem user, StorePermission storePermission) {
-        if(!isOwner(ownerStore))    //verify the editor is owner in the store
+        if(!isOwner(ownerStore)) {    //verify the editor is owner in the store
+            log.error("couldn't add permission:" + storePermission.function + " " +
+                    "to: " + user.getUserName() + " by " + ownerStore.getUserName());
             return false;
+        }
         //holds the manager appointed by the received owner to be manager in this store
         MangerStore manager = getManagerObject(ownerStore,user.getUserName());
-        return manager.addStorePermission(storePermission);    //add the permission
+        boolean added = manager.addStorePermission(storePermission);    //add the permission
+        if(!added){
+            log.error("couldn't add permission:" + storePermission.function + " " +
+                    "to: " + user.getUserName() + " by " + ownerStore.getUserName());
+            return false;
+        }
+        log.info("Permission:" + storePermission.function + " added" +
+                "to: " + user.getUserName() + " by " + ownerStore.getUserName());
+        return true;
     }
 
     /**
@@ -268,12 +327,21 @@ public class Store {
      */
     public boolean removePermissionFromManager(UserSystem ownerStore, UserSystem user, StorePermission storePermission) {
         if(!isOwner(ownerStore)) {    //verify the editor is owner in the store
+            log.error("couldn't add permission:" + storePermission.function + " " +
+                    "to: " + user.getUserName() + " by " + ownerStore.getUserName());
             return false;
         }
         //holds the manager appointed by the received owner to be manager in this store
         MangerStore manager = getManagerObject(ownerStore,user.getUserName());
-        return manager.removeStorePermission(storePermission);    //add the permission
-
+        boolean removed = manager.removeStorePermission(storePermission);    //add the permission
+        if(!removed){
+            log.error("couldn't remove permission:" + storePermission.function + " " +
+                    "to: " + user.getUserName() + " by " + ownerStore.getUserName());
+            return false;
+        }
+        log.info("Permission:" + storePermission.function + " removed" +
+                "to: " + user.getUserName() + " by " + ownerStore.getUserName());
+        return true;
     }
 
 
@@ -284,9 +352,11 @@ public class Store {
      */
     public List<Receipt> managerViewReceipts(UserSystem user) {
         if(isManager(user)){
+            log.info(user.getUserName()+" manager viewed the store purchase history.");
             return receipts;
         }
         else {
+            log.error(user.getUserName()+" cannot see the purchase history, he is not manager in the store.");
             throw new NoManagerInStoreException(user.getUserName(), storeId);
         }
     }
@@ -298,9 +368,11 @@ public class Store {
      */
     public List<Receipt> ownerViewReceipts(UserSystem user) {
         if(isOwner(user)){
+            log.info(user.getUserName()+" owner viewed the store purchase history.");
             return receipts;
         }
         else {
+            log.error(user.getUserName()+" cannot see the purchase history, he is not owner in the store.");
             throw new NoManagerInStoreException(user.getUserName(), storeId);
         }
     }
@@ -310,6 +382,7 @@ public class Store {
      * @return
      */
     public String showStoreInfo(){
+        log.info("store info is presented");
         return "The store "+storeName+ " has ID: "+getStoreId();
     }
 
@@ -318,6 +391,7 @@ public class Store {
      * @return
      */
     public String showProductsInStoreInfo(){
+        log.info("store's products info is presented");
         String productsInStoreInfo = "";
         for(Product product: this.products){
             productsInStoreInfo+=product.showProductInfo()+"\n";
@@ -392,7 +466,6 @@ public class Store {
         return ownersContains(user);
     }
 
-    //TODO ADDED by MORAN THE QUEEN. Moran, tu eres reina!
 
     /**
      * search a product by a given productName
@@ -400,6 +473,7 @@ public class Store {
      * @return - the product who has name equals to productName
      */
     public Set<Product> searchProductByName(String productName){
+        log.info("search product by name: "+productName+" has been performed");
         return products.stream()
                 .filter(product -> product.getName().equals(productName))
                 .collect(Collectors.toSet());
@@ -411,6 +485,7 @@ public class Store {
      * @return - the product who has category equals to productCategory
      */
     public Set<Product> searchProductByCategory(ProductCategory productCategory){
+        log.info("search product by category: "+productCategory.category+" has been performed");
         return products.stream()
                 .filter(product -> product.getCategory().category.equals(productCategory.category))
                 .collect(Collectors.toSet());
@@ -422,6 +497,7 @@ public class Store {
      * @return - the product who has keyWords contained in product name
      */
     public Set<Product> searchProductByKeyWords(List<String> keyWords){
+        log.info("search product by keyword: "+keyWords+" has been performed");
         return products.stream()
                 .map(product -> product.productNameThatContainsKeyWords(keyWords)).filter(product -> product!=null)
                 .collect(Collectors.toSet());
