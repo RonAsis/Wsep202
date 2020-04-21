@@ -68,13 +68,13 @@ public class TradingSystemFacade {
      * @return all the receipt of the user
      */
     public List<ReceiptDto> viewPurchaseHistory(@NotBlank String userName) {
-       try{
-           UserSystem user = tradingSystem.getUser(userName);   //get registered user by his username
-           List<Receipt> receipts = user.getReceipts(); //get user receipts
-           return convertReceiptDtoList(receipts);
-       }catch (UserDontExistInTheSystemException exception){
-           return null;
-       }
+        try{
+            UserSystem user = tradingSystem.getUser(userName);   //get registered user by his username
+            List<Receipt> receipts = user.getReceipts(); //get user receipts
+            return convertReceiptDtoList(receipts);
+        }catch (UserDontExistInTheSystemException exception){
+            return null;
+        }
     }
 
     /**
@@ -89,7 +89,7 @@ public class TradingSystemFacade {
             Store store = tradingSystem.getStoreByAdmin(administratorUsername, storeId);
             List<Receipt> receipts = store.getReceipts();
             return convertReceiptDtoList(receipts);
-        }catch (NotAdministratorException exception){   //admin with received name doesn't exist in system.
+        }catch (NotAdministratorException | StoreDontExistsException exception){   //admin with received name doesn't exist in system.
             return null;
         }
     }
@@ -101,12 +101,12 @@ public class TradingSystemFacade {
      * @return all the receipt of the user
      */
     public List<ReceiptDto> viewPurchaseHistory( @NotBlank String administratorUsername,@NotBlank  String userName) {
-       try{
-           UserSystem userByAdmin = tradingSystem.getUserByAdmin(administratorUsername, userName);
-           return convertReceiptDtoList(userByAdmin.getReceipts());
-       }catch (NotAdministratorException exception){
-           return null;
-       }
+        try{
+            UserSystem userByAdmin = tradingSystem.getUserByAdmin(administratorUsername, userName);
+            return convertReceiptDtoList(userByAdmin.getReceipts());
+        }catch (NotAdministratorException | UserDontExistInTheSystemException exception){
+            return null;
+        }
     }
 
     /**
@@ -137,16 +137,16 @@ public class TradingSystemFacade {
      * @return all the receipt of the store
      */
     public List<ReceiptDto> viewPurchaseHistoryOfOwner(@NotBlank String ownerUserName, int storeId) {
-       try{
-           UserSystem user = tradingSystem.getUser(ownerUserName);
-           try{
-               return convertReceiptDtoList(user.getOwnerStore(storeId).getReceipts());
-           }catch (NoOwnerInStoreException exception2){ //user is not an owner of store with id storeId
-               return null;
-           }
-       }catch (UserDontExistInTheSystemException exception1){   //user is not registered in the system
-           return null;
-       }
+        try{
+            UserSystem user = tradingSystem.getUser(ownerUserName);
+            try{
+                return convertReceiptDtoList(user.getOwnerStore(storeId).getReceipts());
+            }catch (NoOwnerInStoreException exception2){ //user is not an owner of store with id storeId
+                return null;
+            }
+        }catch (UserDontExistInTheSystemException exception1){   //user is not registered in the system
+            return null;
+        }
 
     }
 
@@ -358,28 +358,16 @@ public class TradingSystemFacade {
      * @param usernameOwner - the user that open the store
      * @param purchasePolicyDto - the purchase policy
      * @param discountPolicyDto - the discount Policy
-     * @param discountType - the discount type
-     * @param purchaseType - the purchase type
      * @param storeName - the name of the new store
      * @return true if succeed
      */
-    public boolean openStore(@NotBlank String usernameOwner, @NotNull PurchasePolicyDto purchasePolicyDto, @NotNull DiscountPolicyDto discountPolicyDto,
-                             @NotBlank String discountType, @NotBlank String purchaseType, @NotBlank String storeName) {
+    public boolean openStore(@NotBlank String usernameOwner, @NotNull PurchasePolicyDto purchasePolicyDto,
+                             @NotNull DiscountPolicyDto discountPolicyDto, @NotBlank String storeName) {
         try{
             UserSystem user = tradingSystem.getUser(usernameOwner);
-            try{
-                DiscountType discountTypeObj = DiscountType.getDiscountType(discountType);
-                try{
-                    PurchaseType purchaseTypeObj = PurchaseType.getPurchaseType(purchaseType);
-                    PurchasePolicy purchasePolicy = modelMapper.map(purchasePolicyDto, PurchasePolicy.class);
-                    DiscountPolicy discountPolicy = modelMapper.map(discountPolicyDto, DiscountPolicy.class);
-                    return tradingSystem.openStore(user, purchasePolicy, discountPolicy, storeName);
-                }catch (PurchaseTypeDontExistException e1){
-                    return false;
-                }
-            }catch (DiscountTypeDontExistException e){
-                return false;
-            }
+            PurchasePolicy purchasePolicy = modelMapper.map(purchasePolicyDto, PurchasePolicy.class);
+            DiscountPolicy discountPolicy = modelMapper.map(discountPolicyDto, DiscountPolicy.class);
+            return tradingSystem.openStore(user, purchasePolicy, discountPolicy, storeName);
         }catch (UserDontExistInTheSystemException e){
             return false;
         }
@@ -578,7 +566,7 @@ public class TradingSystemFacade {
             ShoppingCart shoppingCart = user.getShoppingCart();
             return modelMapper.map(shoppingCart, ShoppingCartDto.class);
         }catch (UserDontExistInTheSystemException e){
-           return null;
+            return null;
         }
     }
 
