@@ -2,10 +2,8 @@ package com.wsep202.TradingSystem.service.user_service.AdministratorServiceTest;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
