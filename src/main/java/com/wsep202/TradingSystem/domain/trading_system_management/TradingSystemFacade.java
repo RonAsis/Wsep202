@@ -56,7 +56,7 @@ public class TradingSystemFacade {
      * a function that creates a list of userDto's from list of users.
      * @return - list of userDto's.
      */
-    public List<UserSystemDto> getAdministratoesDtos() {
+    public List<UserSystemDto> getAdministratorsDtos() {
         Type listType = new TypeToken<List<UserSystemDto>>(){}.getType();
         return modelMapper.map(tradingSystem.getAdministratorsList(),listType);
     }

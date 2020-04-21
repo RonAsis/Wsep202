@@ -131,7 +131,35 @@ public class BuyerRegisteredService {
         return tradingSystemFacade.purchaseShoppingCart(userName, paymentDetails, billingAddress);
     }
 
-    public void clearDS() {
-
+    /**
+     * a function that returns the list of stores that are saved in the system
+     * @return - list of StoreDto's.
+     */
+    public List<StoreDto> getStoresDtos() {
+        return this.tradingSystemFacade.getStoresDtos();
     }
+
+    /**
+     * a function that returns the list of users that are saved in the system
+     * @return - list of UserSystemDto's.
+     */
+    public List<UserSystemDto> getUsersDtos() {
+        return this.tradingSystemFacade.getUsersDtos();
+    }
+
+    /**
+     * a function that returns the list of administrators that are saved in the system
+     * @return - list of UserSystemDto's.
+     */
+    public List<UserSystemDto> getAdministratorsDtos() {
+        return this.tradingSystemFacade.getAdministratorsDtos();
+    }
+
+    /**
+     * a function to clear the data structures
+     */
+    public void clearDS(){
+        this.tradingSystemFacade.clearDS();
+    }
+
 }

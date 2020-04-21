@@ -27,10 +27,6 @@ public class GuestService {
         return tradingSystemFacade.registerUser(userName, password, firstName, lastName);
     }
 
-    public void clearDS(){
-        this.tradingSystemFacade.clearDS();
-    }
-
     /**
      * login
      */
@@ -122,4 +118,35 @@ public class GuestService {
     public ReceiptDto purchaseShoppingCart(ShoppingCartDto shoppingCart, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddressDto){
         return tradingSystemFacade.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddressDto);
     }
+    /**
+     * a function that returns the list of stores that are saved in the system
+     * @return - list of StoreDto's.
+     */
+    public List<StoreDto> getStoresDtos() {
+        return this.tradingSystemFacade.getStoresDtos();
+    }
+
+    /**
+     * a function that returns the list of users that are saved in the system
+     * @return - list of UserSystemDto's.
+     */
+    public List<UserSystemDto> getUsersDtos() {
+        return this.tradingSystemFacade.getUsersDtos();
+    }
+
+    /**
+     * a function that returns the list of administrators that are saved in the system
+     * @return - list of UserSystemDto's.
+     */
+    public List<UserSystemDto> getAdministratorsDtos() {
+        return this.tradingSystemFacade.getAdministratorsDtos();
+    }
+
+    /**
+     * a function to clear the data structures
+     */
+    public void clearDS(){
+        this.tradingSystemFacade.clearDS();
+    }
+
 }

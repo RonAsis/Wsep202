@@ -14,22 +14,15 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AdministratorService {
+public class SellerManagerService {
 
     private final TradingSystemFacade tradingSystemFacade;
 
     /**
      * View store purchase history
      */
-    public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, int storeId){
-        return tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId);
-    }
-
-    /**
-     * View buyer purchase history
-     */
-    public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, String userName){
-        return tradingSystemFacade.viewPurchaseHistory(administratorUsername, userName);
+    public List<ReceiptDto> viewPurchaseHistory(String userName, int storeId){
+        return tradingSystemFacade.viewPurchaseHistoryOfManager(userName, storeId);
     }
 
     /**
@@ -62,5 +55,6 @@ public class AdministratorService {
     public void clearDS(){
         this.tradingSystemFacade.clearDS();
     }
+
 
 }
