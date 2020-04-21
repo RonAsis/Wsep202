@@ -21,7 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 // *********** UC 6.4.1 - viewing store's purchase history ***********
 public class ViewStorePurchaseHistoryTest {
-@Autowired
+    @Autowired
     GuestService guestService;
     @BeforeEach
     void setUp() {
