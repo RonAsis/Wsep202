@@ -393,7 +393,7 @@ public class TradingSystemFacade {
      * @return true if succeed
      */
     public boolean registerUser(@NotBlank String userName,@NotBlank String password, @NotBlank String firstName,@NotBlank String lastName) {
-        UserSystem userSystem = factoryObjects.createSystemUser(userName,password, firstName, lastName);
+        UserSystem userSystem = factoryObjects.createSystemUser(userName, firstName, lastName,password);
         return tradingSystem.registerNewUser(userSystem);
     }
 

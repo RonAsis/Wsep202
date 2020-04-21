@@ -287,7 +287,7 @@ class TradingSystemFacadeTest {
             String ownerUsername = "ownerUsername";
             PurchasePolicyDto purchasePolicyDto = PurchasePolicyDto.builder().build();
             DiscountPolicyDto discountPolicyDto = DiscountPolicyDto.builder().build();
-            String discountType = DiscountType.OPEN_DISCOUNT.type;
+            String discountType = DiscountType.VISIBLE_DISCOUNT.type;
             String purchaseType = PurchaseType.BUY_IMMEDIATELY.type;
             String storeName = "storeName";
 
@@ -919,7 +919,7 @@ class TradingSystemFacadeTest {
         for (int counter = 0; counter <= 10; counter++) {
             stores.add(Store.builder()
                     .storeId(counter)
-                    .discountType(DiscountType.OPEN_DISCOUNT)
+                    .discountType(DiscountType.VISIBLE_DISCOUNT)
                     .purchaseType(PurchaseType.BUY_IMMEDIATELY)
                     .storeName("storeName" + counter)
                     .rank(counter)
@@ -947,7 +947,7 @@ class TradingSystemFacadeTest {
                 .owners(owners)
                 .storeName(storeName)
                 .discountPolicy(discountPolicy)
-                .discountType(DiscountType.OPEN_DISCOUNT)
+                .discountType(DiscountType.VISIBLE_DISCOUNT)
                 .products(products)
                 .receipts(receipts)
                 .rank(rank)
