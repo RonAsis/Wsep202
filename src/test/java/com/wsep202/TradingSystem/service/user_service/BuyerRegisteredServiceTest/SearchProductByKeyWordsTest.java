@@ -119,8 +119,8 @@ public class SearchProductByKeyWordsTest {
                 owner.getFirstName(), owner.getLastName()));
 
         // opening a new store, owned by owner
-        Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(), new PurchasePolicyDto(), new DiscountPolicyDto(),
-                "Open discount", "Buy immediately", "storeName"));
+        Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
+                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName"));
 
         // getting the storeDto of the store the owner opened
         this.storeDto = this.buyerRegisteredService.getStoresDtos().get(0);
