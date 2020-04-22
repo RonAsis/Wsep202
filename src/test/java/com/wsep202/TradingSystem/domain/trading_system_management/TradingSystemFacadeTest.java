@@ -5,6 +5,7 @@ import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
 import com.wsep202.TradingSystem.service.user_service.dto.*;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
