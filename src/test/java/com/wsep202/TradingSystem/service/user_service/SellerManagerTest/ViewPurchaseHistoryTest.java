@@ -160,6 +160,6 @@ public class ViewPurchaseHistoryTest {
         this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
                 paymentDetailsDto, billingAddress);
         Assertions.assertNotNull(this.receiptDto);
-        Assertions.assertEquals(amount,this.receiptDto.get(0).getProductsBought().get(this.productDto));
+        Assertions.assertEquals(amount, this.receiptDto.get(0).getProductBoughtAmountByProductSn(this.productDto.getProductSn()));
     }
 }

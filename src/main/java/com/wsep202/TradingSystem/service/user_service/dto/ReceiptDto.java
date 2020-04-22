@@ -1,15 +1,13 @@
 package com.wsep202.TradingSystem.service.user_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReceiptDto {
@@ -43,4 +41,13 @@ public class ReceiptDto {
      * a list of all the products that the user bought in this purchase.
      */
     private Map<ProductDto,Integer> productsBought = new HashMap<>();
+
+    public Integer getProductBoughtAmountByProductSn(int productSn){
+        for (ProductDto productDto: productsBought.keySet()){
+            if (productDto.getProductSn() == productSn){
+                return productsBought.get(productDto);
+            }
+        }
+        return null;
+    }
 }
