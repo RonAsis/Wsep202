@@ -2,10 +2,6 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
-import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
-import com.wsep202.TradingSystem.domain.exception.NoOwnerInStoreException;
-import com.wsep202.TradingSystem.domain.exception.StoreDontExistsException;
-import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
 import com.wsep202.TradingSystem.service.user_service.dto.*;
@@ -15,11 +11,9 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.parameters.P;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.validation.constraints.AssertTrue;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -498,21 +492,8 @@ class TradingSystemFacadeTest {
         }
 
         @Test
-        void testPurchaseShoppingCart() {
-            //init
-            String username = "username";
-            ShoppingCart shoppingCart = createShoppingCart();
-            ShoppingCartDto shoppingCartDto =  modelMapper.map(shoppingCart, ShoppingCartDto.class);
-            PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
-            BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
-            List<Receipt> receipts = setUpReceipts();
-            Receipt receipt = receipts.get(0);
+        void purchaseShoppingCartTest() {
 
-            //mock
-            when(tradingSystem.getUser(username)).thenReturn(userSystem);
-            when(tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, userSystem)).thenReturn(receipts);
-            ReceiptDto receiptDto = tradingSystemFacade.purchaseShoppingCart(username,paymentDetailsDto,billingAddressDto);
-            assertReceipts(Collections.singletonList(receipt), Collections.singletonList(receiptDto));
         }
     }
     // ******************************* integration test ******************************* //
@@ -2047,7 +2028,6 @@ class TradingSystemFacadeTest {
         Assertions.assertEquals(receipt.getReceiptSn(), receiptDto.getReceiptSn());
         Assertions.assertEquals(receipt.getStoreId(), receiptDto.getStoreId());
         Assertions.assertEquals(receipt.getUserName(), receiptDto.getUserName());
-        //Assertions.assertEquals(receipt.getPurchaseDate(), receiptDto.getPurchaseDate());
         Assertions.assertEquals(receipt.getAmountToPay(), receiptDto.getAmountToPay());
         assertMapProducts(receipt.getProductsBought(), receiptDto.getProductsBought());
     }

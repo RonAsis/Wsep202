@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -35,13 +36,14 @@ public class TradingSystemFacade {
      */
     private final FactoryObjects factoryObjects;
 
+
+    //////////////////////////////////////for private use /////////////////////////////////////////
     /**
      * a function that creates a list of storeDto's from list of stores.
      * @return - list of storeDto's.
      */
     public List<StoreDto> getStoresDtos() {
-        Type listType = new TypeToken<List<StoreDto>>(){}.getType();
-        return modelMapper.map(tradingSystem.getStoresList(),listType);
+        return convertStoresSet(tradingSystem.getStoresList());
     }
 
     /**
@@ -49,8 +51,7 @@ public class TradingSystemFacade {
      * @return - list of userDto's.
      */
     public List<UserSystemDto> getUsersDtos() {
-        Type listType = new TypeToken<List<UserSystemDto>>(){}.getType();
-        return modelMapper.map(tradingSystem.getUsersList(),listType);
+        return convertUsersSet(tradingSystem.getUsers());
     }
 
     /**
@@ -58,10 +59,10 @@ public class TradingSystemFacade {
      * @return - list of userDto's.
      */
     public List<UserSystemDto> getAdministratorsDtos() {
-        Type listType = new TypeToken<List<UserSystemDto>>(){}.getType();
-        return modelMapper.map(tradingSystem.getAdministratorsList(),listType);
+        return convertUsersSet(tradingSystem.getAdministrators());
     }
 
+    ///////////////////////////////////////////////////////////////////////////////
     /**
      * view purchase history of user logged in
      * @param userName - must be logged in
@@ -72,8 +73,8 @@ public class TradingSystemFacade {
             UserSystem user = tradingSystem.getUser(userName);   //get registered user by his username
             List<Receipt> receipts = user.getReceipts(); //get user receipts
             return convertReceiptDtoList(receipts);
-        }catch (UserDontExistInTheSystemException exception){
-            log.error(userName+" tried to view his purchase history and failed");
+        }catch (TradingSystemException e){
+            log.error("Tried to view his purchase history and failed", e);
             return null;
         }
     }
@@ -90,8 +91,8 @@ public class TradingSystemFacade {
             Store store = tradingSystem.getStoreByAdmin(administratorUsername, storeId);
             List<Receipt> receipts = store.getReceipts();
             return convertReceiptDtoList(receipts);
-        }catch (NotAdministratorException | StoreDontExistsException exception){   //admin with received name doesn't exist in system.
-            log.error(administratorUsername+" tried to view purchase history of store: "+storeId+" and failed");
+        }catch (TradingSystemException e){
+            log.error("Tried to view purchase history of store failed", e);
             return null;
         }
     }
@@ -106,8 +107,8 @@ public class TradingSystemFacade {
         try{
             UserSystem userByAdmin = tradingSystem.getUserByAdmin(administratorUsername, userName);
             return convertReceiptDtoList(userByAdmin.getReceipts());
-        }catch (NotAdministratorException | UserDontExistInTheSystemException exception){
-            log.error(administratorUsername+" tried to view purchase history of user: "+userName+" and failed");
+        }catch (TradingSystemException e){
+            log.error("Tried to view purchase history of user and failed", e);
             return null;        }
     }
 
@@ -118,18 +119,12 @@ public class TradingSystemFacade {
      * @return all the receipt of the store
      */
     public List<ReceiptDto> viewPurchaseHistoryOfManager(@NotBlank String managerUsername, int storeId) {
-        try{
+        try {
             //get the registered user with username
             UserSystem mangerStore = tradingSystem.getUser(managerUsername);
-            try{
-                //return the receipts of the store belongs to the received manager
-                return convertReceiptDtoList(mangerStore.getManagerStore(storeId).getReceipts());
-            }catch (NoManagerInStoreException exception2){  //the user is not manager of the store received
-                log.error(managerUsername+" is not a manager so cant see purchase history of store: "+storeId);
-                return null;
-            }
-        }catch (UserDontExistInTheSystemException exception1){ //the user is not registered in the system
-            log.error(managerUsername+" is not a registered so cant see purchase history of store: "+storeId);
+            return convertReceiptDtoList(mangerStore.getManagerStore(storeId).getReceipts());
+        }catch (TradingSystemException e){
+            log.error("The user is not a manager of the store ,so cant see purchase history of store", e);
             return null;
         }
     }
@@ -141,16 +136,11 @@ public class TradingSystemFacade {
      * @return all the receipt of the store
      */
     public List<ReceiptDto> viewPurchaseHistoryOfOwner(@NotBlank String ownerUserName, int storeId) {
-        try{
+        try {
             UserSystem user = tradingSystem.getUser(ownerUserName);
-            try{
-                return convertReceiptDtoList(user.getOwnerStore(storeId).getReceipts());
-            }catch (NoOwnerInStoreException exception2){ //user is not an owner of store with id storeId
-                log.error(ownerUserName+" is not an owner of store: "+storeId+" so cant see history");
-                return null;
-            }
-        }catch (UserDontExistInTheSystemException exception1){   //user is not registered in the system
-            log.error(ownerUserName+" is not registered user so cant see history of store: "+storeId);
+            return convertReceiptDtoList(user.getOwnerStore(storeId).getReceipts());
+        }catch (TradingSystemException e) {
+            log.error("Can't see history of the store", e);
             return null;
         }
     }
@@ -170,24 +160,13 @@ public class TradingSystemFacade {
                                int amount, double cost) {
         try{
             UserSystem user = tradingSystem.getUser(ownerUsername); //get registered user with ownerUsername
-            try{
-                Store ownerStore = user.getOwnerStore(storeId); //verify he owns store with storeId
-                try{
-                    //convert to a category we can add to the product
-                    ProductCategory productCategory = ProductCategory.getProductCategory(category);
-                    Product product = new Product(productName, productCategory, amount, cost, storeId);
-                    return ownerStore.addNewProduct(user, product);
-                }catch (CategoryDoesntExistException exception2){   //invalid category received
-                    log.error("add product: "+category+" not exist as category");
-                    return false;
-                }
-
-            }catch (NoOwnerInStoreException exception1){    //the user is not an owner in the store
-                log.error("addProduct: "+ownerUsername+" is not owner in store "+storeId);
-                return false;
-            }
-        }catch (UserDontExistInTheSystemException exception){   //the user is not registered in the system
-            log.error("addProduct: "+ownerUsername + "is not registered.");
+            Store ownerStore = user.getOwnerStore(storeId); //verify he owns store with storeId
+            //convert to a category we can add to the product
+            ProductCategory productCategory = ProductCategory.getProductCategory(category);
+            Product product = new Product(productName, productCategory, amount, cost, storeId);
+            return ownerStore.addNewProduct(user, product);
+        }catch (TradingSystemException e) {
+            log.error("add product failed", e);
             return false;
         }
     }
@@ -202,15 +181,10 @@ public class TradingSystemFacade {
     public boolean deleteProductFromStore(@NotBlank String ownerUsername, int storeId, int productSn) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername); //get the registered user
-            try{
-                Store ownerStore = user.getOwnerStore(storeId); //verify he is owner of the store
-                return ownerStore.removeProductFromStore(user, productSn);
-            }catch (NoOwnerInStoreException exception2){    //the user is not an owner in the storeId
-                log.error("deleteProduct: "+ownerUsername +" is not owner of store "+storeId);
-                return false;
-            }
-        }catch (UserDontExistInTheSystemException exception){   //user not registered in the system
-            log.error("deleteProduct: "+ownerUsername+" is not registered");
+            Store ownerStore = user.getOwnerStore(storeId); //verify he is owner of the store
+            return ownerStore.removeProductFromStore(user, productSn);
+        }catch (TradingSystemException e) {
+            log.error("deleteProduct from store failed", e);
             return false;
         }
     }
@@ -230,15 +204,10 @@ public class TradingSystemFacade {
                                @NotBlank String category, int amount, double cost) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername);
-            try{
-                Store ownerStore = user.getOwnerStore(storeId);
-                return ownerStore.editProduct(user, productSn, productName, category, amount, cost);
-            }catch (NoOwnerInStoreException exception1){
-                log.error("editProduct: "+ownerUsername+" is not owner of store: "+storeId);
-                return false;
-            }
-        }catch (UserDontExistInTheSystemException exception){
-            log.error("editProduct: "+ownerUsername+" is not registered");
+            Store ownerStore = user.getOwnerStore(storeId);
+            return ownerStore.editProduct(user, productSn, productName, category, amount, cost);
+        }catch (TradingSystemException e) {
+            log.error("editProduct failed",e);
             return false;
         }
     }
@@ -251,18 +220,13 @@ public class TradingSystemFacade {
      * @return true if succeed
      */
     public boolean addOwner(@NotBlank String ownerUsername, int storeId, @NotBlank String newOwnerUsername) {
-        try{
+        try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
             UserSystem newOwnerUser = tradingSystem.getUser(newOwnerUsername);
-            try{
-                Store ownerStore = ownerUser.getOwnerStore(storeId);
-                return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUser);
-            }catch (NoOwnerInStoreException exception1){
-                log.error("addOwner: "+ownerUsername+" is no owner in store: "+storeId);
-                return false;
-            }
-        }catch (UserDontExistInTheSystemException exception){
-            log.error("addOwner: "+ownerUsername+" is not registered");
+            Store ownerStore = ownerUser.getOwnerStore(storeId);
+            return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUser);
+        }catch (TradingSystemException e) {
+            log.error("Add owner failed",e);
             return false;
         }
     }
@@ -275,18 +239,13 @@ public class TradingSystemFacade {
      * @return true if succeed
      */
     public boolean addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername) {
-        try{
+        try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
             UserSystem newManagerUser = tradingSystem.getUser(newManagerUsername);
-            try{
-                Store ownedStore = ownerUser.getOwnerStore(storeId);
-                return tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUser);
-            }catch (NoOwnerInStoreException e1){
-                log.error("addOwner: "+ownerUsername+" is no owner in store: "+storeId);
-                return false;
-            }
-        }catch (UserDontExistInTheSystemException e){
-            log.error("addOwner: "+ownerUsername+" is not registered");
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            return tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUser);
+        }catch (TradingSystemException e) {
+            log.error("Add manager failed",e);
             return false;
         }
     }
@@ -302,33 +261,14 @@ public class TradingSystemFacade {
     public boolean addPermission(@NotBlank String ownerUsername, int storeId, @NotBlank  String managerUserName,@NotBlank  String permission) {
         try{
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername);
-            try{
-                Store ownedStore = ownerUser.getOwnerStore(storeId);
-                try{
-                    UserSystem managerStore = ownedStore.getManager(ownerUser, managerUserName);
-                    try{
-                        StorePermission storePermission = StorePermission.getStorePermission(permission);
-                        return ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
-                    }catch (PermissionException e4){
-                        log.error("addPermission: permission "+permission+" doesn't exist");
-                        return false;
-                    }
-
-                }catch (NoManagerInStoreException e3){
-                    log.error(managerUserName+ "is not manager in store:"+storeId);
-                    return false;
-                }
-
-            }catch (NoOwnerInStoreException e2){
-                log.error(ownerUsername+ "is not owner in store "+storeId);
-                return false;
-            }
-
-        }catch (UserDontExistInTheSystemException e1){
-            log.error("addPermission: user not registered error");
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUserName);
+            StorePermission storePermission = StorePermission.getStorePermission(permission);
+            return ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
+        }catch (TradingSystemException e) {
+            log.error("Add permission failed",e);
             return false;
         }
-
     }
 
     /**
@@ -341,25 +281,13 @@ public class TradingSystemFacade {
     public boolean removeManager(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUsername) {
         try{
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername); //get registered user
-            try{
-                Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
-                try {
-                    //get the manager to renove and remove him
-                    UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
-                    return tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
-                }catch (NoManagerInStoreException e2){
-                    log.error(managerUsername+" is not manager in store"+ storeId);
-                    return false;
-                }
-            }catch (NoOwnerInStoreException e1){
-                log.error(ownerUsername+ " is not owner in store "+storeId);
-                return false;
-            }
-        }catch (UserDontExistInTheSystemException e){
-            log.error("removeManager: no registered user error");
+            Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
+            return tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
+        }catch (TradingSystemException e) {
+            log.error("Add permission failed",e);
             return false;
         }
-
     }
 
     /**
@@ -372,8 +300,8 @@ public class TradingSystemFacade {
             UserSystem user = tradingSystem.getUser(username);
             log.info("the user "+username+" logged out.");
             return user.logout();
-        }catch (UserDontExistInTheSystemException e){ //cant logout not registered user
-            log.error(username+" failed to logout.");
+        }catch (TradingSystemException e) {
+            log.error("Failed to logout",e);
             return false;
         }
     }
@@ -393,8 +321,8 @@ public class TradingSystemFacade {
             PurchasePolicy purchasePolicy = modelMapper.map(purchasePolicyDto, PurchasePolicy.class);
             DiscountPolicy discountPolicy = modelMapper.map(discountPolicyDto, DiscountPolicy.class);
             return tradingSystem.openStore(user, purchasePolicy, discountPolicy, storeName);
-        }catch (UserDontExistInTheSystemException e){
-            log.error("failed to opem store: "+ storeName);
+        }catch (TradingSystemException e) {
+            log.error("failed to open store", e);
             return false;
         }
     }
@@ -424,8 +352,8 @@ public class TradingSystemFacade {
         try{
             UserSystem user = tradingSystem.getUser(userName);  //get the  registered user with that username
             return tradingSystem.login(user, false, password);
-        }catch (UserDontExistInTheSystemException e){
-            log.error("failed to login: "+userName);
+        }catch (TradingSystemException e) {
+            log.error("failed to login",e);
             return false;
         }
     }
@@ -439,8 +367,8 @@ public class TradingSystemFacade {
         try{
             Store store = tradingSystem.getStore(storeId);
             return modelMapper.map(store, StoreDto.class);
-        }catch (StoreDontExistsException e){
-            log.error("failed to see store info of store:"+ storeId);
+        }catch (TradingSystemException e) {
+            log.error("failed to see store info ",e);
             return null;
         }
     }
@@ -454,18 +382,12 @@ public class TradingSystemFacade {
     public ProductDto viewProduct(int storeId, int productId) {
         try{
             Store store = tradingSystem.getStore(storeId);
-            try{
-                Product product = store.getProduct(productId);
-                return modelMapper.map(product, ProductDto.class);
-            }catch (ProductDoesntExistException e1){
-                log.error("viewProduct: product with id "+productId+"isn't exist in store "+storeId);
-                return null;
-            }
-        }catch (StoreDontExistsException e){
-            log.error("store "+storeId+" doesn't exist");
+            Product product = store.getProduct(productId);
+            return modelMapper.map(product, ProductDto.class);
+        }catch (TradingSystemException e) {
+            log.error("view product failed", e);
             return null;
         }
-
     }
 
     /**
@@ -490,8 +412,8 @@ public class TradingSystemFacade {
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             List<Product> products = tradingSystem.searchProductByCategory(productCategory);
             return convertProductDtoList(products);
-        }catch (CategoryDoesntExistException e){
-            log.error("category doesn't exist: "+category);
+        }catch (TradingSystemException e) {
+            log.error("failed search product by category", e);
             return null;
         }
     }
@@ -554,17 +476,16 @@ public class TradingSystemFacade {
      * @return list of all the products filtered by the category
      */
     public List<ProductDto> filterByStoreCategory(@NotNull List<@NotNull ProductDto> productDtos,@NotBlank String category) {
-        log.info("filter products by category "+category);
-        List<Product> products = converterProductsList(productDtos);
         try{
+            log.info("filter products by category "+category);
+            List<Product> products = converterProductsList(productDtos);
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             List<Product> productsFiltered = tradingSystem.filterByStoreCategory(products, productCategory);
             return convertProductDtoList(productsFiltered);
-        }catch (CategoryDoesntExistException e){
-            log.error("category "+category+" doesn't exist");
+        }catch (TradingSystemException e) {
+            log.error("filter by store category", e);
             return null;
         }
-
     }
 
     /**
@@ -576,25 +497,15 @@ public class TradingSystemFacade {
      * @return true if succeed
      */
     public boolean saveProductInShoppingBag(@NotBlank String username, int storeId, int productSn, int amount) {
-        log.info("save product "+productSn+"in bag of store "+storeId);
-        try{
+        try {
+            log.info("save product " + productSn + "in bag of store " + storeId);
             UserSystem user = tradingSystem.getUser(username);
-            try{
-                Store store = tradingSystem.getStore(storeId);
-                try{
-                    Product product = store.getProduct(productSn);
-                    return user.saveProductInShoppingBag(store, product, amount);
-                }catch (ProductDoesntExistException e2){
-                    log.error("saveInBag: product: "+productSn+" doesn't exist");
-                    return false;
-                }
-            }catch (StoreDontExistsException e1){
-                log.error("saveInBag: store: "+storeId+" doesn't exist");
-                return false;
-            }
+            Store store = tradingSystem.getStore(storeId);
+            Product product = store.getProduct(productSn);
+            return user.saveProductInShoppingBag(store, product, amount);
 
-        }catch (UserDontExistInTheSystemException e){
-            log.error("saveInBag: user: "+username+" doesn't exist");
+        }catch (TradingSystemException e){
+            log.error("saveInBag",e);
             return false;
         }
     }
@@ -609,8 +520,8 @@ public class TradingSystemFacade {
             UserSystem user = tradingSystem.getUser(username);
             ShoppingCart shoppingCart = user.getShoppingCart();
             return modelMapper.map(shoppingCart, ShoppingCartDto.class);
-        }catch (UserDontExistInTheSystemException e){
-            log.error("view products in shopping bag: user: "+username+ " is not registered");
+        }catch (TradingSystemException e){
+            log.error("view products in shopping bag", e);
             return null;
         }
     }
@@ -625,21 +536,11 @@ public class TradingSystemFacade {
     public boolean removeProductInShoppingBag(@NotBlank String username, int storeId, int productSn) {
         try{
             UserSystem user = tradingSystem.getUser(username);
-            try{
-                Store store = tradingSystem.getStore(storeId);
-                try{
-                    Product product = store.getProduct(productSn);
-                    return user.removeProductInShoppingBag(store, product);
-                }catch (ProductDoesntExistException e2){
-                    log.error("product: "+productSn+ " not exist in store: "+storeId);
-                    return false;
-                }
-            }catch (StoreDontExistsException e1){
-                log.error("store: "+storeId+ " not exist");
-                return false;
-            }
-        }catch (UserDontExistInTheSystemException e){
-            log.error("user "+username+" not exist");
+            Store store = tradingSystem.getStore(storeId);
+            Product product = store.getProduct(productSn);
+            return user.removeProductInShoppingBag(store, product);
+        }catch (TradingSystemException e){
+            log.error("Remove product in shopping bag failed", e);
             return false;
         }
     }
@@ -649,7 +550,9 @@ public class TradingSystemFacade {
      * @param shoppingCartDto the shopping cart
      * @return the receipt
      */
-    public ReceiptDto purchaseShoppingCart(@NotNull ShoppingCartDto shoppingCartDto, PaymentDetailsDto paymentDetailsDto, BillingAddressDto billingAddressDto) {
+    public ReceiptDto purchaseShoppingCart(@NotNull ShoppingCartDto shoppingCartDto,
+                                           PaymentDetailsDto paymentDetailsDto,
+                                           BillingAddressDto billingAddressDto) {
         ShoppingCart shoppingCart = modelMapper.map(shoppingCartDto, ShoppingCart.class);
         PaymentDetails paymentDetails = modelMapper.map(paymentDetailsDto, PaymentDetails.class);
         BillingAddress billingAddress = modelMapper.map(billingAddressDto, BillingAddress.class);
@@ -662,18 +565,17 @@ public class TradingSystemFacade {
      * @param username - the username that want purchase shopping cart
      * @return the receipt
      */
-    public ReceiptDto purchaseShoppingCart(@NotBlank String username, PaymentDetailsDto paymentDetailsDto, BillingAddressDto billingAddressDto) {
+    public ReceiptDto purchaseShoppingCart(@NotBlank String username,
+                                           PaymentDetailsDto paymentDetailsDto,
+                                           BillingAddressDto billingAddressDto) {
         try{
             UserSystem user = tradingSystem.getUser(username);
             PaymentDetails paymentDetails = modelMapper.map(paymentDetailsDto, PaymentDetails.class);
             BillingAddress billingAddress = modelMapper.map(billingAddressDto, BillingAddress.class);
             List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress, user);
-            if (receipts != null){
-                return modelMapper.map(receipts, ReceiptDto.class);
-            }
-            return null;
-        }catch (UserDontExistInTheSystemException e){
-            log.error("tried to purchase with not registered user");
+            return Objects.nonNull(receipts)? modelMapper.map(receipts, ReceiptDto.class) : null;
+        }catch (TradingSystemException e){
+            log.error("tried to purchase cart failed", e);
             return null;
         }
     }
@@ -681,19 +583,16 @@ public class TradingSystemFacade {
     /**
      * this get products and their amount in the shopping cart of the registered user
      * in aim to watch on shopping cart
-     * @param username
+     * @param username - the username
      * @return map of products and their quantity in cart
      */
     public Map<ProductDto,Integer> watchShoppingCart(@NotBlank String username){
         try{
             UserSystem user = tradingSystem.getUser(username);
             Map<Product,Integer> productsToWatch = user.getShoppingCart().watchShoppingCart();
-            if(productsToWatch != null){
-                return converterProductsMap(productsToWatch);
-            }
-            return null;
-        }catch (UserDontExistInTheSystemException e){
-            log.error("tried to watch on cart of not registered user");
+            return Objects.nonNull(productsToWatch) ? converterProductsMap(productsToWatch) : null;
+        }catch (TradingSystemException e){
+            log.error("watch shopping cart failed", e);
             return null;
         }
     }
@@ -740,6 +639,20 @@ public class TradingSystemFacade {
     private Map<ProductDto,Integer> converterProductsMap(@NotNull Map<@NotNull Product,@NotNull Integer> products) {
         Type mapType = new TypeToken<Map<ProductDto,Integer>>(){}.getType();
         return modelMapper.map(products, mapType);
+    }
+
+    public List<StoreDto> convertStoresSet(Set<Store> stores) {
+        Type setType = new TypeToken<List<StoreDto>>(){}.getType();
+        return modelMapper.map(stores,setType);
+    }
+
+    /**
+     * a function that creates a list of userDto's from list of users.
+     * @return - list of userDto's.
+     */
+    public List<UserSystemDto> convertUsersSet(Set<UserSystem> userSystems) {
+        Type listType = new TypeToken<List<UserSystemDto>>(){}.getType();
+        return modelMapper.map(userSystems,listType);
     }
 
 }

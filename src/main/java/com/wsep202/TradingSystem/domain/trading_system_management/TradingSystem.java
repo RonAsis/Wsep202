@@ -641,11 +641,11 @@ public class TradingSystem {
         return this.stores;
     }
 
-    public Set<UserSystem> getUsersList(){
+    public Set<UserSystem> getUsers(){
         return this.users;
     }
 
-    public Set<UserSystem> getAdministratorsList(){
+    public Set<UserSystem> getAdministrators(){
         return this.administrators;
     }
 

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ShoppingBagTest {
+class ShoppingBagTest extends TradingSystemTest {
 
     /**
      * unit tests for ShoppingBag class
