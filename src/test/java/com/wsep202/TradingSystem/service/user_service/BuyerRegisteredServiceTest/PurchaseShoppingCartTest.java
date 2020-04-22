@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.service.user_service.BuyerRegisteredServiceTes
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.domain.trading_system_management.CardAction;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
@@ -35,6 +36,8 @@ public class PurchaseShoppingCartTest {
     UserSystem userSystem;
     StoreDto storeDto;
     private ProductDto productDto;
+    private ReceiptDto receiptDto;
+    private UserSystem owner;
 
 
     @BeforeEach
@@ -75,35 +78,32 @@ public class PurchaseShoppingCartTest {
                 new PaymentDetailsDto(), new BillingAddressDto()));
     }
 
-//    /**
-//     * purchase shopping cart of a registered user with a product in his shopping cart
-//     */
-//    @Test
-//    void purchaseShoppingCartRegisteredUser() {
-//        registerUser();
-//        addProductToShoppingCart();
-//        System.out.println("HGDHGdfddb");
-//        Assertions.assertNotNull(this.buyerRegisteredService.purchaseShoppingCart(this.userSystem.getUserName(),
-//                new PaymentDetailsDto(), new BillingAddressDto()));
-//    }
-//
-//    private void addProductToShoppingCart() {
-//        openStoreAndAddProducts();
-//        System.out.println( this.storeDto.getStoreId());
-//        System.out.println( this.productDto.getProductSn());
-//        System.out.println( this.userSystem.getUserName());
-//
-//        Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(this.userSystem.getUserName(),
-//                this.storeDto.getStoreId(), this.productDto.getProductSn(), 1));
-//        System.out.println("333333333");
-//    }
+    /**
+     * purchase shopping cart of a not registered user
+     */
+    @Test
+    void purchaseEmptyShoppingCartNotRegisteredUser() {
+        registerUser();
+        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCart(this.userSystem.getUserName()+"Not",
+                new PaymentDetailsDto(), new BillingAddressDto()));
+    }
 
+    /**
+     * purchase shopping cart of a registered user with a product in his shopping cart
+     */
+    @Test
+    void purchaseShoppingCartRegisteredUser() {
+        registerUser();
+        buyProduct();
+        Assertions.assertNotNull(this.buyerRegisteredService.purchaseShoppingCart(this.userSystem.getUserName(),
+                new PaymentDetailsDto(), new BillingAddressDto()));
+    }
 
     /**
      * opening a new store and adding a product to it
      */
     void openStoreAndAddProducts(){
-        UserSystem owner = new UserSystem("owner","name","lname","pass");
+        this.owner = new UserSystem("owner","name","lname","pass");
         // registering the owner
         Assertions.assertTrue(this.guestService.registerUser(owner.getUserName(), owner.getPassword(),
                 owner.getFirstName(), owner.getLastName()));
@@ -131,5 +131,23 @@ public class PurchaseShoppingCartTest {
                 userSystem.getFirstName(), userSystem.getLastName());
     }
 
+    /**
+     * buying a product from the store
+     */
+    void buyProduct(){
+        openStoreAndAddProducts();
+        int amount = 1;
+        Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(this.owner.getUserName(),
+                this.storeDto.getStoreId(), this.productDto.getProductSn(), amount));
+
+        BillingAddressDto billingAddress = new BillingAddressDto(this.owner.getFirstName()+" "+this.owner.getLastName(),
+                "address", "city", "country", "1234567");
+        PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
+                "year", "Cardholder", 798, "id");
+        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
+                paymentDetailsDto, billingAddress);
+        Assertions.assertNotNull(this.receiptDto);
+        Assertions.assertEquals(amount,this.receiptDto.getProductsBought().get(this.productDto));
+    }
 
 }
