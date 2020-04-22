@@ -27,8 +27,7 @@ import java.util.Set;
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
 
-// *********** UC 2.8 - purchasing shopping cart ***********
-public class PurchaseShoppingCartTest {
+public class SaveProductInShoppingBagTest {
     @Autowired
     GuestService guestService;
     @Autowired
@@ -43,6 +42,7 @@ public class PurchaseShoppingCartTest {
     PaymentDetailsDto paymentDetailsDto;
     BillingAddressDto billingAddressDto;
     private ReceiptDto receiptDto;
+    private UserSystem owner;
 
     @BeforeEach
     void setUp() {
@@ -61,37 +61,43 @@ public class PurchaseShoppingCartTest {
     }
 
     /**
-     * purchase an empty shopping cart
+     * invalid store
      */
     @Test
-    void purchaseEmptyShoppingCart() {
-        Assertions.assertNull(this.guestService.purchaseShoppingCart(this.shoppingCartDto,
-                this.paymentDetailsDto, this.billingAddressDto));
+    void purchaseShoppingCartInvalidStore() {
+        openStoreAndAddProducts();
+        Assertions.assertFalse(this.guestService.saveProductInShoppingBag("notUser",
+                this.storeDto.getStoreId()+5, this.productDto.getProductSn(), 1));
     }
 
     /**
-     * purchase shopping with invalid payment details
+     * invalid store
+     * invalid product
      */
     @Test
-    void purchaseShoppingCartInvalidPaymentDetails() {
-        Assertions.assertNull(this.guestService.purchaseShoppingCart(this.shoppingCartDto,
-                null, this.billingAddressDto));
+    void purchaseShoppingCartInvalidStoreInvalidProduct() {
+        openStoreAndAddProducts();
+        Assertions.assertFalse(this.guestService.saveProductInShoppingBag("notUser",
+                this.storeDto.getStoreId()+5, this.productDto.getProductSn()+5, 1));
     }
 
+
     /**
-     * purchase shopping with invalid billing address
+     * invalid product
      */
     @Test
-    void purchaseShoppingCartInvalidBillingAddress() {
-        Assertions.assertNull(this.guestService.purchaseShoppingCart(this.shoppingCartDto,
-                this.paymentDetailsDto, null));
+    void purchaseShoppingCartInvalidProduct() {
+        openStoreAndAddProducts();
+        Assertions.assertFalse(this.guestService.saveProductInShoppingBag("notUser",
+                this.storeDto.getStoreId(), this.productDto.getProductSn()+5, 1));
     }
+
 
     /**
      * opening a new store and adding a product to it
      */
     void openStoreAndAddProducts(){
-        UserSystem owner = new UserSystem("owner","name","lname","pass");
+        this.owner = new UserSystem("owner","name","lname","pass");
         // registering the owner
         Assertions.assertTrue(this.guestService.registerUser(owner.getUserName(), owner.getPassword(),
                 owner.getFirstName(), owner.getLastName()));
@@ -111,22 +117,4 @@ public class PurchaseShoppingCartTest {
         this.productDto = (ProductDto) this.buyerRegisteredService.getStoresDtos().get(0).getProducts().toArray()[0];
     }
 
-//    /**
-//     * buying a product from the store
-//     */
-//    void buyProduct(){
-//        openStoreAndAddProducts();
-//        int amount = 1;
-//        Assertions.assertTrue(this.guestService.saveProductInShoppingBag(
-//                this.storeDto.getStoreId(), this.productDto.getProductSn(), amount));
-//
-//        BillingAddressDto billingAddress = new BillingAddressDto(this.owner.getFirstName()+" "+this.owner.getLastName(),
-//                "address", "city", "country", "1234567");
-//        PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
-//                "year", "Cardholder", 798, "id");
-//        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
-//                paymentDetailsDto, billingAddress);
-//        Assertions.assertNotNull(this.receiptDto);
-//        Assertions.assertEquals(amount,this.receiptDto.getProductsBought().get(this.productDto));
-//    }
 }

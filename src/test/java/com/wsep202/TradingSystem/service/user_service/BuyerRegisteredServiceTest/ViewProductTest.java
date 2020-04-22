@@ -53,6 +53,7 @@ public class ViewProductTest {
      */
     @Test
     void viewValidProductInValidStore() {
+        registerUser();
         openStoreAndAddProducts();
         ProductDto returnedProduct = buyerRegisteredService.viewProduct(this.productDto.getStoreId(), this.productDto.getProductSn());
 
@@ -70,8 +71,10 @@ public class ViewProductTest {
      */
     @Test
     void viewValidProductInInvalidStore() {
+        registerUser();
         openStoreAndAddProducts();
-        ProductDto returnedProduct = buyerRegisteredService.viewProduct(this.storeDto.getStoreId()+5, this.productDto.getProductSn());
+        ProductDto returnedProduct = buyerRegisteredService.viewProduct(
+                this.storeDto.getStoreId()+5, this.productDto.getProductSn());
         Assertions.assertNull(returnedProduct);
     }
 
@@ -80,8 +83,10 @@ public class ViewProductTest {
      */
     @Test
     void viewInvalidProductInValidStore() {
+        registerUser();
         openStoreAndAddProducts();
-        ProductDto returnedProduct = buyerRegisteredService.viewProduct(this.storeDto.getStoreId(), this.productDto.getProductSn()+5);
+        ProductDto returnedProduct = buyerRegisteredService.viewProduct(
+                this.storeDto.getStoreId(), this.productDto.getProductSn()+5);
         Assertions.assertNull(returnedProduct);
     }
 
@@ -90,10 +95,13 @@ public class ViewProductTest {
      */
     @Test
     void viewInvalidProductInInvalidStore() {
+        registerUser();
         openStoreAndAddProducts();
-        ProductDto returnedProduct = buyerRegisteredService.viewProduct(this.storeDto.getStoreId()+5, this.productDto.getProductSn()+5);
+        ProductDto returnedProduct = buyerRegisteredService.viewProduct(
+                this.storeDto.getStoreId()+5, this.productDto.getProductSn()+5);
         Assertions.assertNull(returnedProduct);
     }
+
 
     /**
      * opening a new store and adding a product to it
@@ -117,5 +125,13 @@ public class ViewProductTest {
 
         // getting the productDto of the added product
         this.productDto = (ProductDto) this.buyerRegisteredService.getStoresDtos().get(0).getProducts().toArray()[0];
+    }
+
+    /**
+     * register user into the system
+     */
+    private void registerUser() {
+        this.guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+                userSystem.getFirstName(), userSystem.getLastName());
     }
 }
