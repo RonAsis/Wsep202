@@ -57,8 +57,8 @@ public class OpenStoreTest {
      */
     @Test
     void openStoreNoOwner() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore("", new PurchasePolicyDto(), new DiscountPolicyDto(),
-                "Open discount", "Buy immediately", "storeName"));
+        Assertions.assertFalse(this.buyerRegisteredService.openStore("",
+                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName"));
     }
 
     /**
@@ -66,8 +66,8 @@ public class OpenStoreTest {
      */
     @Test
     void openStoreInvalidOwner() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore("notAUser", new PurchasePolicyDto(), new DiscountPolicyDto(),
-                "Open discount", "Buy immediately", "storeName"));
+        Assertions.assertFalse(this.buyerRegisteredService.openStore("notAUser",
+                new PurchasePolicyDto(), new DiscountPolicyDto(),"storeName"));
     }
 
     /**
@@ -75,26 +75,8 @@ public class OpenStoreTest {
      */
     @Test
     void openStoreEmptyStoreName() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore(this.owner.getUserName(), new PurchasePolicyDto(), new DiscountPolicyDto(),
-                "Open discount", "Buy immediately", ""));
-    }
-
-    /**
-     * open a store with invalid discount type
-     */
-    @Test
-    void openStoreInvalidDiscountType() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore(this.owner.getUserName(), new PurchasePolicyDto(), new DiscountPolicyDto(),
-                "Not right", "Buy immediately", "storeName"));
-    }
-
-    /**
-     * open a store with invalid purchase type
-     */
-    @Test
-    void openStoreInvalidPurchaseType() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore(this.owner.getUserName(), new PurchasePolicyDto(), new DiscountPolicyDto(),
-                "Open discount", "Not right", "storeName"));
+        Assertions.assertFalse(this.buyerRegisteredService.openStore(this.owner.getUserName(),
+                new PurchasePolicyDto(), new DiscountPolicyDto(), ""));
     }
 
 //    /**
