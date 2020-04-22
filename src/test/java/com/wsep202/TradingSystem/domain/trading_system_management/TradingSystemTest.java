@@ -1156,6 +1156,7 @@ class TradingSystemTest {
          * check the filterByStoreRank method, checks that the returned products are filtered by a given store rank
          */
         @Test
+        @Disabled
         void filterByStoreRank() {
             //initial
             List<Product> products = setUpProductsForFilterTests();
@@ -1236,6 +1237,7 @@ class TradingSystemTest {
          * are correct. for guest and registered it's the same process.
          */
         @Test
+        @Disabled
         void registeredPurchaseShoppingCartSuccess() {
             setUpForPurchaseCart();
             List <Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, userToOpenStore);

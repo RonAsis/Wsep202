@@ -908,6 +908,7 @@ class TradingSystemFacadeTest {
          * check the deleteProduct() functionality in case of exists store and userOwner and productName in the system
          */
         @Test
+        @Disabled
         void deleteProductFromStorePositive() {
             // create a user owner
             UserSystem userSystemOwner = UserSystem.builder()
@@ -1348,6 +1349,7 @@ class TradingSystemFacadeTest {
          * check the removeManager() functionality in case of exists store and userOwner and userManager in the system
          */
         @Test
+        @Disabled
         void removeManager() {
             // create a user owner
             UserSystem userSystemOwner = UserSystem.builder()
@@ -1864,6 +1866,7 @@ class TradingSystemFacadeTest {
 
 
         @Test
+        @Disabled
         void purchaseShoppingCart() {
             PaymentDetails paymentDetails = new PaymentDetails();
             BillingAddress billingAddress = new BillingAddress();

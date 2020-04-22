@@ -6,10 +6,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.CardAction;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.*;
 import com.wsep202.TradingSystem.service.user_service.dto.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -97,6 +94,7 @@ public class ViewUserPurchaseHistoryTest {
      * view the history purchase of a valid user
      */
     @Test
+    @Disabled
     void ViewHistoryPurchases() {
         buyProduct();
         List<ReceiptDto> returnedHistory = this.administratorService.viewPurchaseHistory(
