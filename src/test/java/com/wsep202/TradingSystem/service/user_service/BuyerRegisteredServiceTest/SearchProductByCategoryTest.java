@@ -58,7 +58,7 @@ public class SearchProductByCategoryTest {
     void searchAndReturnAllProducts() {
         openStoreAndAddProducts();
         String productCategory = "motors";
-        Assertions.assertEquals(this.productDtoList, guestService.searchProductByCategory(productCategory));
+        Assertions.assertEquals(this.productDtoList, buyerRegisteredService.searchProductByCategory(productCategory));
     }
 
     /**
@@ -68,7 +68,7 @@ public class SearchProductByCategoryTest {
     void searchAndReturnEmptyList() {
         openStoreAndAddProducts();
         String productCategory = "electronics";
-        Assertions.assertEquals(new LinkedList<>(), guestService.searchProductByCategory(productCategory));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.searchProductByCategory(productCategory));
     }
 
     /**
@@ -77,7 +77,7 @@ public class SearchProductByCategoryTest {
     @Test
     void searchWithNoProducts() {
         String productCategory = "electronics";
-        Assertions.assertEquals(new LinkedList<>(), guestService.searchProductByCategory(productCategory));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.searchProductByCategory(productCategory));
     }
 
     /**
@@ -94,7 +94,7 @@ public class SearchProductByCategoryTest {
                 products.add(productDto);
             }
         }
-        List<ProductDto> returnedProducts = guestService.searchProductByCategory("motors");
+        List<ProductDto> returnedProducts = buyerRegisteredService.searchProductByCategory("motors");
         boolean sizesEqual = products.size() == returnedProducts.size();
         Assertions.assertTrue(sizesEqual);
         if (sizesEqual){

@@ -94,7 +94,7 @@ public class FilterByProductRankTest {
 //                products.add(this.productDtoList.get(i));
 //            }
 //        }
-//        Assertions.assertEquals(products, guestService.filterByProductRank(this.productDtoList, rank));
+//        Assertions.assertEquals(products, buyerRegisteredService.filterByProductRank(this.productDtoList, rank));
 //    }
 
     /**

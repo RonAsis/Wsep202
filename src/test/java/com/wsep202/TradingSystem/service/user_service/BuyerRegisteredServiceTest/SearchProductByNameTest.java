@@ -58,7 +58,7 @@ public class SearchProductByNameTest {
     void searchAndReturnAllProducts() {
         openStoreAndAddProducts();
         String productName = this.productDtoList.get(0).getName();
-        Assertions.assertEquals(this.productDtoList, guestService.searchProductByName(productName));
+        Assertions.assertEquals(this.productDtoList, buyerRegisteredService.searchProductByName(productName));
     }
 
     /**
@@ -68,7 +68,7 @@ public class SearchProductByNameTest {
     void searchAndReturnEmptyList() {
         openStoreAndAddProducts();
         String productName = this.productDtoList.get(0).getName()+" different";
-        Assertions.assertEquals(new LinkedList<>(), guestService.searchProductByName(productName));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.searchProductByName(productName));
     }
 
     /**
@@ -77,7 +77,7 @@ public class SearchProductByNameTest {
     @Test
     void searchWithNoProducts() {
         String productName = "empty";
-        Assertions.assertEquals(new LinkedList<>(), guestService.searchProductByName(productName));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.searchProductByName(productName));
     }
 
     /**
@@ -95,7 +95,7 @@ public class SearchProductByNameTest {
                     products.add(this.productDtoList.get(i));
             }
         }
-        List<ProductDto> returnedProducts = guestService.searchProductByName(productName);
+        List<ProductDto> returnedProducts = buyerRegisteredService.searchProductByName(productName);
         boolean sizesEqual = products.size() == returnedProducts.size();
         Assertions.assertTrue(sizesEqual);
         if (sizesEqual){
