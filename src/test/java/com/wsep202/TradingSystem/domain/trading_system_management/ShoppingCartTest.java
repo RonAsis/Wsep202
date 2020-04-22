@@ -26,6 +26,7 @@ class ShoppingCartTest {
     Store testStore2;
     Store testStore3;
     Product testProduct;
+    Product testProduct1;
 
 
     @BeforeEach
@@ -38,14 +39,23 @@ class ShoppingCartTest {
         testStore2 = mock(Store.class);
         testStore3 = mock(Store.class);
         testProduct = mock(Product.class);
+        testProduct1 = mock(Product.class);
         when(testShoppingBag1.getNumOfProductsInBag()).thenReturn(5);
         when(testShoppingBag1.getTotalCostOfBag()).thenReturn(55.25);
         when(testShoppingBag2.getNumOfProductsInBag()).thenReturn(2);
         when(testShoppingBag2.getTotalCostOfBag()).thenReturn(99.1);
         when(testShoppingBag3.getNumOfProductsInBag()).thenReturn(1);
         when(testShoppingBag3.getTotalCostOfBag()).thenReturn(50.0);
+        when(testShoppingBag3.getStoreOfProduct()).thenReturn(testStore3);
+        when(testShoppingBag3.getProductAmount(testProduct)).thenReturn(1);
+        when(testShoppingBag2.getStoreOfProduct()).thenReturn(testStore3);
+        when(testShoppingBag1.getStoreOfProduct()).thenReturn(testStore3);
+        when(testStore1.getStoreId()).thenReturn(1);
+        when(testStore2.getStoreId()).thenReturn(2);
+        when(testStore3.getStoreId()).thenReturn(3);
         when(testProduct.getName()).thenReturn("testProduct");
         when(testProduct.getCost()).thenReturn(50.0);
+        when(testProduct.getStoreId()).thenReturn(3);
     }
 
     /**
@@ -206,18 +216,40 @@ class ShoppingCartTest {
         assertFalse(testShoppingCart.removeProductInCart(testStore2,testShoppingBag2,testProduct));
     }
 
+    /**
+     * This test check if the watchShoppingCart method succeeds when the parameters
+     * are correct.
+     */
     @Test
     void watchShoppingCartSuc(){
-        
+        setUpWatch();
+        Map<Product, Integer> returnedProducts = testShoppingCart.watchShoppingCart();
+        assertTrue(returnedProducts.containsKey(testProduct));
     }
 
+    /**
+     * This test check if the watchShoppingCart method fails when the parameters
+     * are wrong.
+     */
     @Test
     void watchShoppingCartFail(){
-
+        setUpWatch();
+        Map<Product, Integer> returnedProducts = testShoppingCart.watchShoppingCart();
+        assertFalse(returnedProducts.containsKey(testProduct1));
     }
 
+        /**
+         * set up product and shopping bag for watchShoppingCart test
+         */
     private void setUpWatch(){
-
+        Map<Product, Integer> products = new HashMap<>();
+        products.put(testProduct,1);
+        testShoppingBag3.setProductListFromStore(products);
+        when(testShoppingBag3.getProductListFromStore()).thenReturn(products);
+        when(testProduct.getDiscountType()).thenReturn(DiscountType.VISIBLE_DISCOUNT);
+        Map<Store,ShoppingBag> bags= new HashMap<>();
+        bags.put(testStore3,testShoppingBag3);
+        testShoppingCart.setShoppingBagsList(bags);
     }
 
     /**
