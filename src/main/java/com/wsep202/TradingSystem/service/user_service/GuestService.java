@@ -151,7 +151,7 @@ public class GuestService {
      * @param billingAddressDto - the destination to deliver the purchases
      * @return
      */
-    public ReceiptDto purchaseShoppingCart(ShoppingCartDto shoppingCart, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddressDto){
+    public List<ReceiptDto> purchaseShoppingCart(ShoppingCartDto shoppingCart, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddressDto){
         return tradingSystemFacade.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddressDto);
     }
     /**
