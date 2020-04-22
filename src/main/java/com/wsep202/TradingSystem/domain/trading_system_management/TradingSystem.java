@@ -477,11 +477,10 @@ public class TradingSystem {
                             " will not be purchased");
                     break;
                 }
-            }
-            if (canPurchaseShoppingBag) {
                 bagsToPurchase.addBagToCart(store, shoppingBag);
                 log.info("transfer shopping bag from store '"+ store.getStoreName() +"' to charging system");
             }
+
         }
         return externalServiceManagement.charge(paymentDetails, bagsToPurchase);
     }
