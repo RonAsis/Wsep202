@@ -15,9 +15,11 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.parameters.P;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.validation.constraints.AssertTrue;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -543,8 +545,6 @@ class TradingSystemFacadeTest {
             Optional<UserSystem> userSystemOptional = userSystems.stream().findFirst();
             Assertions.assertTrue(userSystemOptional.isPresent());
             currUser = userSystemOptional.get();
-            receipts = setUpReceipts();
-            currUser.setReceipts(receipts);
             //addStores();
         }
 
@@ -570,7 +570,10 @@ class TradingSystemFacadeTest {
          */
         @Test
         void viewPurchaseHistoryUserPositive() {
+            receipts = setUpReceipts();
+            currUser.setReceipts(receipts);
             //call the function
+            tradingSystem.getUser(currUser.getUserName()).setReceipts(receipts);
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(currUser.getUserName());
             assertReceipts(receipts, receiptDtos);
         }
@@ -602,6 +605,7 @@ class TradingSystemFacadeTest {
             tradingSystemFacade.openStore(testUserSystem.getUserName(), new PurchasePolicyDto(), new DiscountPolicyDto(),"castro");
             //tradingSystem.openStore(tradingSystem.getUser(testUserSystem.getUserName()),new PurchasePolicy(), new DiscountPolicy(), "castro");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+            receipts = setUpReceipts();
             store.setReceipts(receipts);
 
             // call the function
@@ -1377,8 +1381,8 @@ class TradingSystemFacadeTest {
                     updatedManager.getUserName());
 
             // call the function
-            //Assertions.assertTrue(tradingSystemFacade.removeManager(updatedOwner.getUserName(), store.getStoreId(),
-                    //updatedManager.getUserName())); //todo - ksenia
+            Assertions.assertTrue(tradingSystemFacade.removeManager(updatedOwner.getUserName(), store.getStoreId(),
+                    updatedManager.getUserName()));
         }
 
         /**
@@ -1494,6 +1498,7 @@ class TradingSystemFacadeTest {
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
 
+            // add a product
             tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "table",
                     ProductCategory.HOME_GARDEN.category, 10,100);
             Product product = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
@@ -1503,52 +1508,450 @@ class TradingSystemFacadeTest {
             assertProduct(product, productDto);
         }
 
+        /**
+         * check the searchProductByName() functionality in case of exists product in the system
+         */
         @Test
         void searchProductByName() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product1 -> product1.getName().equals("table")).findFirst().get();
+
+            //call the function
+            List<ProductDto> productDtoList = tradingSystemFacade.searchProductByName(product.getName());
+            assertProduct(product, productDtoList.get(0));
         }
 
+        /**
+         * check the searchProductByCategory() functionality in case of exists product in the system
+         */
         @Test
         void searchProductByCategory() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "pic",
+                    ProductCategory.COLLECTIBLES_ART.category, 10,100);
+            Product product = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product1 -> product1.getName().equals("pic")).findFirst().get();
+
+            //call the function
+            List<ProductDto> productDtoList = tradingSystemFacade.searchProductByCategory(product.getCategory().category);
+            assertProduct(product, productDtoList.get(0));
         }
 
+        /**
+         * check the searchProductByKeyWords() functionality in case of exists product in the system
+         */
         @Test
         void searchProductByKeyWords() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "phone",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product1 -> product1.getName().equals("phone")).findFirst().get();
+
+            //call the function
+            List<String> listKeyWords  = new ArrayList<>();
+            listKeyWords.add(product.getName());
+            List<ProductDto> productDtoList = tradingSystemFacade.searchProductByKeyWords(listKeyWords);
+            assertProduct(product, productDtoList.get(0));
         }
 
+        /**
+         * check the filterByRangePrice() functionality in case of exists products in the system
+         */
         @Test
         void filterByRangePrice() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product1
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product1 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+
+            // add a product2
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "desk",
+                    ProductCategory.HOME_GARDEN.category, 10,50);
+            Product product2 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("desk")).findFirst().get();
+
+            // arrange the actual list to be returned
+            List<ProductDto> productsToFilter = new ArrayList<>();
+            productsToFilter.add(new ProductDto(product1.getProductSn(), product1.getName(),product1.getCategory().category, product1.getAmount(),
+                    product1.getCost(),product1.getRank(),product1.getStoreId(), product1.getDiscountType(), product1.getPurchaseType()));
+            productsToFilter.add(new ProductDto(product2.getProductSn(), product2.getName(),product2.getCategory().category, product2.getAmount(),
+                    product2.getCost(),product2.getRank(),product2.getStoreId(), product2.getDiscountType(), product2.getPurchaseType()));
+            // call the function
+            List<ProductDto> productsFilteredActual = tradingSystemFacade.filterByRangePrice(productsToFilter,50,100);
+
+            // arrange the expected list to be returned
+            List<ProductDto> productsExpected = new ArrayList<>();
+            productsExpected.add(new ProductDto(product1.getProductSn(), product1.getName(),product1.getCategory().category, product1.getAmount(),
+                    product1.getCost(),product1.getRank(),product1.getStoreId(), product1.getDiscountType(), product1.getPurchaseType()));
+            productsExpected.add(new ProductDto(product2.getProductSn(), product2.getName(),product2.getCategory().category, product2.getAmount(),
+                    product2.getCost(),product2.getRank(),product2.getStoreId(), product2.getDiscountType(), product2.getPurchaseType()));
+
+            Assertions.assertEquals(productsExpected, productsFilteredActual);
         }
 
+        /**
+         * check the filterByProductRank() functionality in case of exists products in the system
+         */
         @Test
         void filterByProductRank() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product1
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product1 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+            product1.setRank(3);
+
+            // add a product2
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "desk",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product2 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("desk")).findFirst().get();
+            product2.setRank(5);
+
+            // arrange the actual list to be returned
+            List<ProductDto> productsToFilter = new ArrayList<>();
+            productsToFilter.add(new ProductDto(product1.getProductSn(), product1.getName(),product1.getCategory().category, product1.getAmount(),
+                    product1.getCost(),product1.getRank(),product1.getStoreId(), product1.getDiscountType(), product1.getPurchaseType()));
+            productsToFilter.add(new ProductDto(product2.getProductSn(), product2.getName(),product2.getCategory().category, product2.getAmount(),
+                    product2.getCost(),product2.getRank(),product2.getStoreId(), product2.getDiscountType(), product2.getPurchaseType()));
+            // call the function
+            List<ProductDto> productsFilteredActual = tradingSystemFacade.filterByProductRank(productsToFilter,5);
+
+            // arrange the expected list to be returned
+            List<ProductDto> productsExpected = new ArrayList<>();
+            productsExpected.add(new ProductDto(product2.getProductSn(), product2.getName(),product2.getCategory().category, product2.getAmount(),
+                    product2.getCost(),product2.getRank(),product2.getStoreId(), product2.getDiscountType(), product2.getPurchaseType()));
+
+            Assertions.assertEquals(productsExpected, productsFilteredActual);
         }
 
+        /**
+         * check the filterByStoreRank() functionality in case of exists products in the system
+         */
         @Test
         void filterByStoreRank() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store1
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store1 = this.tradingSystem.getStoresList().stream().filter(store3 -> store3.getStoreName().equals("castro")).findFirst().get();
+            store1.setRank(3);
+            // create a store2
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "dutiMoti");
+            Store store2 = this.tradingSystem.getStoresList().stream().filter(store3 -> store3.getStoreName().equals("dutiMoti")).findFirst().get();
+            store2.setRank(5);
+
+            // add a product1 for store1
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store1.getStoreId(), "table",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product1 = this.tradingSystem.getStoresList().stream().filter(store3 -> store3.getStoreId()==store1.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+            // add a product1 for store2
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store2.getStoreId(), "table",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product2 = this.tradingSystem.getStoresList().stream().filter(store3 -> store3.getStoreId()==store2.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+
+            // arrange the actual list to be returned
+            List<ProductDto> productsToFilter = new ArrayList<>();
+            productsToFilter.add(new ProductDto(product1.getProductSn(), product1.getName(),product1.getCategory().category, product1.getAmount(),
+                    product1.getCost(),product1.getRank(),product1.getStoreId(), product1.getDiscountType(), product1.getPurchaseType()));
+            productsToFilter.add(new ProductDto(product2.getProductSn(), product2.getName(),product2.getCategory().category, product2.getAmount(),
+                    product2.getCost(),product2.getRank(),product2.getStoreId(), product2.getDiscountType(), product2.getPurchaseType()));
+            // call the function
+            List<ProductDto> productsFilteredActual = tradingSystemFacade.filterByStoreRank(productsToFilter,5);
+
+            // arrange the expected list to be returned
+            List<ProductDto> productsExpected = new ArrayList<>();
+            productsExpected.add(new ProductDto(product2.getProductSn(), product2.getName(),product2.getCategory().category, product2.getAmount(),
+                    product2.getCost(),product2.getRank(),product2.getStoreId(), product2.getDiscountType(), product2.getPurchaseType()));
+
+            Assertions.assertEquals(productsExpected, productsFilteredActual);
+
         }
 
+        /**
+         * check the filterByStoreCategory() functionality in case of exists products in the system
+         */
         @Test
         void filterByStoreCategory() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product1
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HEALTH.category, 10,100);
+            Product product1 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+
+            // add a product2
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "desk",
+                    ProductCategory.HOME_GARDEN.category, 10,100);
+            Product product2 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("desk")).findFirst().get();
+
+            // arrange the actual list to be returned
+            List<ProductDto> productsToFilter = new ArrayList<>();
+            productsToFilter.add(new ProductDto(product1.getProductSn(), product1.getName(),product1.getCategory().category, product1.getAmount(),
+                    product1.getCost(),product1.getRank(),product1.getStoreId(), product1.getDiscountType(), product1.getPurchaseType()));
+            productsToFilter.add(new ProductDto(product2.getProductSn(), product2.getName(),product2.getCategory().category, product2.getAmount(),
+                    product2.getCost(),product2.getRank(),product2.getStoreId(), product2.getDiscountType(), product2.getPurchaseType()));
+            // call the function
+            List<ProductDto> productsFilteredActual = tradingSystemFacade.filterByStoreCategory(productsToFilter,ProductCategory.HOME_GARDEN.category);
+
+            // arrange the expected list to be returned
+            List<ProductDto> productsExpected = new ArrayList<>();
+            productsExpected.add(new ProductDto(product2.getProductSn(), product2.getName(),product2.getCategory().category, product2.getAmount(),
+                    product2.getCost(),product2.getRank(),product2.getStoreId(), product2.getDiscountType(), product2.getPurchaseType()));
+
+            Assertions.assertEquals(productsExpected, productsFilteredActual);
         }
 
         @Test
         void saveProductInShoppingBag() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product1
+            tradingSystemFacade.addProduct(userSystemOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HEALTH.category, 10,100);
+            Product product1 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+
+            Assertions.assertTrue(tradingSystemFacade.saveProductInShoppingBag(userSystemOwner.getUserName(), store.getStoreId(), product1.getProductSn(), 1));
         }
 
         @Test
         void viewProductsInShoppingCart() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            ShoppingCart shoppingCart = createShoppingCart();
+
+            ShoppingCartDto shoppingCartDto = tradingSystemFacade.viewProductsInShoppingCart(userSystemOwner.getUserName());
+            assertShoppingCart(shoppingCart, shoppingCartDto);
         }
 
         @Test
         void removeProductInShoppingBag() {
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product1
+            tradingSystemFacade.addProduct(updatedOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HEALTH.category, 10,100);
+            Product product1 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+
+            // add the product to the shopping bag
+            updatedOwner.saveProductInShoppingBag(store,product1, 1);
+
+            Assertions.assertTrue(tradingSystemFacade.removeProductInShoppingBag(updatedOwner.getUserName(), store.getStoreId(), product1.getProductSn()));
         }
+
 
         @Test
         void purchaseShoppingCart() {
+            PaymentDetails paymentDetails = new PaymentDetails();
+            BillingAddress billingAddress = new BillingAddress();
+
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product1
+            tradingSystemFacade.addProduct(updatedOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HEALTH.category, 10,100);
+            Product product1 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+
+            // add the product to the shopping bag
+            updatedOwner.saveProductInShoppingBag(store,product1, 1);
+
+
+            ShoppingCartDto shoppingCartDto =  modelMapper.map(updatedOwner.getShoppingCart(), ShoppingCartDto.class);
+            PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
+            BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
+            ReceiptDto actualReceipt = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto, paymentDetailsDto, billingAddressDto);
+
+            Map<Product, Integer> productsBought = new HashMap<>();
+            productsBought.put(product1, 1);
+            Receipt expectedReceipt = new Receipt(store.getStoreId(), updatedOwner.getUserName(), product1.getCost(),productsBought);
+
+            assertionReceipt(expectedReceipt, actualReceipt);
         }
 
         @Test
         void testPurchaseShoppingCart() {
+            PaymentDetails paymentDetails = new PaymentDetails();
+            BillingAddress billingAddress = new BillingAddress();
+
+            // create a user owner
+            UserSystem userSystemOwner = UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+            tradingSystemFacade.registerUser(userSystemOwner.getUserName(),userSystemOwner.getPassword(),
+                    userSystemOwner.getFirstName(),userSystemOwner.getLastName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+
+            // create a store
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+
+            // add a product1
+            tradingSystemFacade.addProduct(updatedOwner.getUserName(), store.getStoreId(), "table",
+                    ProductCategory.HEALTH.category, 10,100);
+            Product product1 = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreId()==store.getStoreId())
+                    .findFirst().get().products.stream().filter(product3 -> product3.getName().equals("table")).findFirst().get();
+
+            // add the product to the shopping bag
+            updatedOwner.saveProductInShoppingBag(store,product1, 1);
+
+
+            ShoppingCartDto shoppingCartDto =  modelMapper.map(updatedOwner.getShoppingCart(), ShoppingCartDto.class);
+            PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
+            BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
+            ReceiptDto actualReceipt = tradingSystemFacade.purchaseShoppingCart(updatedOwner.getUserName(), paymentDetailsDto, billingAddressDto);
+
+            Map<Product, Integer> productsBought = new HashMap<>();
+            productsBought.put(product1, 1);
+            Receipt expectedReceipt = new Receipt(store.getStoreId(), updatedOwner.getUserName(), product1.getCost(),productsBought);
+
+            assertionReceipt(expectedReceipt, actualReceipt);
         }
     }
     // ******************************* assert functions ******************************* //
