@@ -36,7 +36,7 @@ public class TradingSystem {
         this.externalServiceManagement.connect();    //connect to the externals
         encryptPassword(admin);
         administrators = new HashSet<>(Collections.singletonList(admin));
-        this.stores = stores;
+      //  this.stores = stores; TODO for next version
         users = new HashSet<>();
         externalServiceManagement.connect();
     }
@@ -502,6 +502,7 @@ public class TradingSystem {
             Receipt storeReceipt = new Receipt(storeId, customerName, totalPaymentToStore ,
                     shoppingCart.getShoppingBag(receivedPaymentStore).getProductListFromStore());
             cartReceiptList.add(storeReceipt);
+            receivedPaymentStore.addReceipt(storeReceipt);
             shoppingCart.removeBagFromCart(receivedPaymentStore,shoppingCart.getShoppingBag(receivedPaymentStore));
         }
         log.info("made a list of receipts for " + customerName + " on his purchase");
