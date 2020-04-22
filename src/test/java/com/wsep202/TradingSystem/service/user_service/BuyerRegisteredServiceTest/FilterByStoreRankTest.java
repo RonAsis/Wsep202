@@ -58,7 +58,7 @@ public class FilterByStoreRankTest {
     @Test
     void filterValidListReturnAllProducts() {
         openStoreAndAddProducts();
-        Assertions.assertEquals(this.productDtoList, guestService.filterByStoreRank(this.productDtoList, 0));
+        Assertions.assertEquals(this.productDtoList, buyerRegisteredService.filterByStoreRank(this.productDtoList, 0));
     }
 
     /**
@@ -68,7 +68,7 @@ public class FilterByStoreRankTest {
     @Test
     void filterValidListReturnEmptyList() {
         openStoreAndAddProducts();
-        Assertions.assertEquals(new LinkedList<>(), guestService.filterByStoreRank(this.productDtoList, 5));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.filterByStoreRank(this.productDtoList, 5));
     }
 
     /**
@@ -77,7 +77,7 @@ public class FilterByStoreRankTest {
     @Test
     void filterEmptyList() {
         List<ProductDto> products = new LinkedList<>();
-        Assertions.assertEquals(new LinkedList<>(), guestService.filterByStoreRank(products, 0));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.filterByStoreRank(products, 0));
     }
 
 //    /**
@@ -97,7 +97,7 @@ public class FilterByStoreRankTest {
 //                products.add(this.productDtoList.get(i));
 //            }
 //        }
-//        Assertions.assertEquals(products, guestService.filterByProductRank(this.productDtoList, rank));
+//        Assertions.assertEquals(products, buyerRegisteredService.filterByProductRank(this.productDtoList, rank));
 //    }
 
     /**

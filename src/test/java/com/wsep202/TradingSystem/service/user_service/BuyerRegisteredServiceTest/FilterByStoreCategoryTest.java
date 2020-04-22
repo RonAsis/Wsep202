@@ -60,7 +60,7 @@ public class FilterByStoreCategoryTest {
     void filterValidListReturnAllProducts() {
         openStoreAndAddProducts();
         String productCategory = "motors";
-        Assertions.assertEquals(this.productDtoList, guestService.filterByStoreCategory(this.productDtoList, productCategory));
+        Assertions.assertEquals(this.productDtoList, buyerRegisteredService.filterByStoreCategory(this.productDtoList, productCategory));
     }
 
     /**
@@ -71,7 +71,7 @@ public class FilterByStoreCategoryTest {
     void filterValidListReturnEmptyList() {
         openStoreAndAddProducts();
         String productCategory = "electronics";
-        Assertions.assertEquals(new LinkedList<>(), guestService.filterByStoreCategory(this.productDtoList, productCategory));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.filterByStoreCategory(this.productDtoList, productCategory));
     }
 
     /**
@@ -81,7 +81,7 @@ public class FilterByStoreCategoryTest {
     void filterEmptyList() {
         String productCategory = "electronics";
         List<ProductDto> products = new LinkedList<>();
-        Assertions.assertEquals(new LinkedList<>(), guestService.filterByStoreCategory(products, productCategory));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.filterByStoreCategory(products, productCategory));
     }
 
     /**
@@ -99,7 +99,7 @@ public class FilterByStoreCategoryTest {
                 products.add(this.productDtoList.get(i));
             }
         }
-        Assertions.assertEquals(products, guestService.filterByStoreCategory(this.productDtoList, productCategory));
+        Assertions.assertEquals(products, buyerRegisteredService.filterByStoreCategory(this.productDtoList, productCategory));
     }
 
     /**

@@ -59,7 +59,7 @@ public class FilterByRangePriceTest {
     @Test
     void filterValidListReturnAllProducts() {
         openStoreAndAddProducts();
-        Assertions.assertEquals(this.productDtoList, guestService.filterByRangePrice(this.productDtoList, 0, 100));
+        Assertions.assertEquals(this.productDtoList, buyerRegisteredService.filterByRangePrice(this.productDtoList, 0, 100));
     }
 
     /**
@@ -69,7 +69,7 @@ public class FilterByRangePriceTest {
     @Test
     void filterValidListReturnEmptyList() {
         openStoreAndAddProducts();
-        Assertions.assertEquals(new LinkedList<>(), guestService.filterByRangePrice(this.productDtoList, 0, 10));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.filterByRangePrice(this.productDtoList, 0, 10));
     }
 
     /**
@@ -78,7 +78,7 @@ public class FilterByRangePriceTest {
     @Test
     void filterEmptyList() {
         List<ProductDto> products = new LinkedList<>();
-        Assertions.assertEquals(new LinkedList<>(), guestService.filterByRangePrice(products, 0, 100));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.filterByRangePrice(products, 0, 100));
     }
 
     /**
@@ -97,7 +97,7 @@ public class FilterByRangePriceTest {
                 products.add(this.productDtoList.get(i));
             }
         }
-        Assertions.assertEquals(products, guestService.filterByRangePrice(this.productDtoList, min, max));
+        Assertions.assertEquals(products, buyerRegisteredService.filterByRangePrice(this.productDtoList, min, max));
     }
 
     /**

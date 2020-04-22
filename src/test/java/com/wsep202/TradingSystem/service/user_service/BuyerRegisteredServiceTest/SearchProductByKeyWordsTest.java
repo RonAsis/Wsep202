@@ -59,7 +59,7 @@ public class SearchProductByKeyWordsTest {
         openStoreAndAddProducts();
         List<String> keyWords = new ArrayList<>();
         keyWords.add(this.productDtoList.get(0).getName());
-        Assertions.assertEquals(this.productDtoList, guestService.searchProductByKeyWords(keyWords));
+        Assertions.assertEquals(this.productDtoList, buyerRegisteredService.searchProductByKeyWords(keyWords));
     }
 
     /**
@@ -70,7 +70,7 @@ public class SearchProductByKeyWordsTest {
         openStoreAndAddProducts();
         List<String> keyWords = new ArrayList<>();
         keyWords.add("this isn't the product's name");
-        Assertions.assertEquals(new LinkedList<>(), guestService.searchProductByKeyWords(keyWords));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.searchProductByKeyWords(keyWords));
     }
 
     /**
@@ -80,7 +80,7 @@ public class SearchProductByKeyWordsTest {
     void searchWithNoProducts() {
         List<String> keyWords = new ArrayList<>();
         keyWords.add("there are no products");
-        Assertions.assertEquals(new LinkedList<>(), guestService.searchProductByKeyWords(keyWords));
+        Assertions.assertEquals(new LinkedList<>(), buyerRegisteredService.searchProductByKeyWords(keyWords));
     }
 
     /**
@@ -101,7 +101,7 @@ public class SearchProductByKeyWordsTest {
                 }
             }
         }
-        List<ProductDto> returnedProducts = guestService.searchProductByKeyWords(keyWords);
+        List<ProductDto> returnedProducts = buyerRegisteredService.searchProductByKeyWords(keyWords);
         boolean sizesEqual = products.size() == returnedProducts.size();
         Assertions.assertTrue(sizesEqual);
         if (sizesEqual){
