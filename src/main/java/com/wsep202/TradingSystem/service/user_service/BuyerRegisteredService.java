@@ -183,7 +183,7 @@ public class BuyerRegisteredService {
      * @param billingAddress the destination of the delivery
      * @return
      */
-    public ReceiptDto purchaseShoppingCart(String userName, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddress){
+    public List<ReceiptDto> purchaseShoppingCart(String userName, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddress){
         return tradingSystemFacade.purchaseShoppingCart(userName, paymentDetails, billingAddress);
     }
 

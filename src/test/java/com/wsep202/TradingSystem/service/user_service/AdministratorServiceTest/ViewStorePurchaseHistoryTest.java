@@ -141,8 +141,8 @@ public class ViewStorePurchaseHistoryTest {
                 "address", "city", "country", "1234567");
         PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
                 "year", "Cardholder", 798, "id");
-        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
-                paymentDetailsDto, billingAddress);
+//        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
+//                paymentDetailsDto, billingAddress);//todo
         Assertions.assertNotNull(this.receiptDto);
         Assertions.assertEquals(amount,this.receiptDto.getProductsBought().get(this.productDto));
     }

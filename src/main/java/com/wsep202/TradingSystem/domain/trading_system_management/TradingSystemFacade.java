@@ -72,7 +72,7 @@ public class TradingSystemFacade {
         try{
             UserSystem user = tradingSystem.getUser(userName);   //get registered user by his username
             List<Receipt> receipts = user.getReceipts(); //get user receipts
-            return convertReceiptDtoList(receipts);
+            return convertReceiptList(receipts);
         }catch (TradingSystemException e){
             log.error("Tried to view his purchase history and failed", e);
             return null;
@@ -90,7 +90,7 @@ public class TradingSystemFacade {
             //get the store if the user has admin permissions (it is admin)
             Store store = tradingSystem.getStoreByAdmin(administratorUsername, storeId);
             List<Receipt> receipts = store.getReceipts();
-            return convertReceiptDtoList(receipts);
+            return convertReceiptList(receipts);
         }catch (TradingSystemException e){
             log.error("Tried to view purchase history of store failed", e);
             return null;
@@ -106,7 +106,7 @@ public class TradingSystemFacade {
     public List<ReceiptDto> viewPurchaseHistory( @NotBlank String administratorUsername,@NotBlank  String userName) {
         try{
             UserSystem userByAdmin = tradingSystem.getUserByAdmin(administratorUsername, userName);
-            return convertReceiptDtoList(userByAdmin.getReceipts());
+            return convertReceiptList(userByAdmin.getReceipts());
         }catch (TradingSystemException e){
             log.error("Tried to view purchase history of user and failed", e);
             return null;        }
@@ -122,7 +122,7 @@ public class TradingSystemFacade {
         try {
             //get the registered user with username
             UserSystem mangerStore = tradingSystem.getUser(managerUsername);
-            return convertReceiptDtoList(mangerStore.getManagerStore(storeId).getReceipts());
+            return convertReceiptList(mangerStore.getManagerStore(storeId).getReceipts());
         }catch (TradingSystemException e){
             log.error("The user is not a manager of the store ,so cant see purchase history of store", e);
             return null;
@@ -138,7 +138,7 @@ public class TradingSystemFacade {
     public List<ReceiptDto> viewPurchaseHistoryOfOwner(@NotBlank String ownerUserName, int storeId) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUserName);
-            return convertReceiptDtoList(user.getOwnerStore(storeId).getReceipts());
+            return convertReceiptList(user.getOwnerStore(storeId).getReceipts());
         }catch (TradingSystemException e) {
             log.error("Can't see history of the store", e);
             return null;
@@ -565,7 +565,7 @@ public class TradingSystemFacade {
      * @param username - the username that want purchase shopping cart
      * @return the receipt
      */
-    public ReceiptDto purchaseShoppingCart(@NotBlank String username,
+    public List<ReceiptDto> purchaseShoppingCart(@NotBlank String username,
                                            PaymentDetailsDto paymentDetailsDto,
                                            BillingAddressDto billingAddressDto) {
         try{
@@ -573,7 +573,7 @@ public class TradingSystemFacade {
             PaymentDetails paymentDetails = modelMapper.map(paymentDetailsDto, PaymentDetails.class);
             BillingAddress billingAddress = modelMapper.map(billingAddressDto, BillingAddress.class);
             List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress, user);
-            return Objects.nonNull(receipts)? modelMapper.map(receipts, ReceiptDto.class) : null;
+            return Objects.nonNull(receipts)? convertReceiptList(receipts) : null;
         }catch (TradingSystemException e){
             log.error("tried to purchase cart failed", e);
             return null;
@@ -611,7 +611,7 @@ public class TradingSystemFacade {
      * @param receipts - list of receipts
      * @return list of ReceiptDto
      */
-    private List<ReceiptDto> convertReceiptDtoList(@NotNull List<@NotNull Receipt> receipts) {
+    private List<ReceiptDto> convertReceiptList(@NotNull List<@NotNull Receipt> receipts) {
         Type listType = new TypeToken<List<ReceiptDto>>(){}.getType();
         return modelMapper.map(receipts, listType);
     }
