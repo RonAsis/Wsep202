@@ -17,6 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
@@ -54,7 +56,7 @@ public class WatchShoppingCartTest {
      */
     @Test
     void viewEmptyShoppingCart() {
-        Assertions.assertNull(this.buyerRegisteredService.watchShoppingCart(this.userSystem.getUserName()));
+        Assertions.assertEquals(new HashMap<>(), this.buyerRegisteredService.watchShoppingCart(this.userSystem.getUserName()));
 
     }
 

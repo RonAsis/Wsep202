@@ -39,7 +39,7 @@ public class ViewStorePurchaseHistoryTest {
     UserSystem owner;
     UserSystemDto admin;
     ProductDto productDto;
-    ReceiptDto receiptDto;
+    List<ReceiptDto> receiptDto;
 
     @BeforeEach
     void setUp() {
@@ -100,7 +100,7 @@ public class ViewStorePurchaseHistoryTest {
         buyProduct();
         List<ReceiptDto> returnedHistory = this.administratorService.viewPurchaseHistory(
                 this.admin.getUserName(), this.storeDto.getStoreId());
-        Assertions.assertEquals(this.receiptDto.getReceiptSn(), returnedHistory.get(0).getReceiptSn());
+        Assertions.assertEquals(this.receiptDto.get(0).getReceiptSn(), returnedHistory.get(0).getReceiptSn());
     }
 
 
@@ -141,9 +141,9 @@ public class ViewStorePurchaseHistoryTest {
                 "address", "city", "country", "1234567");
         PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
                 "year", "Cardholder", 798, "id");
-//        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
-//                paymentDetailsDto, billingAddress);//todo
+        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
+                paymentDetailsDto, billingAddress);
         Assertions.assertNotNull(this.receiptDto);
-        Assertions.assertEquals(amount,this.receiptDto.getProductsBought().get(this.productDto));
+        Assertions.assertEquals(amount, this.receiptDto.get(0).getProductsBought().get(this.productDto));
     }
 }

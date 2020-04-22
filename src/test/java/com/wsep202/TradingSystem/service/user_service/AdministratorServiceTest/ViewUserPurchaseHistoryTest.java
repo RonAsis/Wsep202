@@ -40,7 +40,7 @@ public class ViewUserPurchaseHistoryTest {
     UserSystem owner;
     UserSystemDto admin;
     ProductDto productDto;
-    ReceiptDto receiptDto;
+    List<ReceiptDto> receiptDto;
 
     @BeforeEach
     void setUp() {
@@ -101,7 +101,7 @@ public class ViewUserPurchaseHistoryTest {
         buyProduct();
         List<ReceiptDto> returnedHistory = this.administratorService.viewPurchaseHistory(
                 this.admin.getUserName(), this.owner.getUserName());
-        Assertions.assertEquals(this.receiptDto.getReceiptSn(), returnedHistory.get(0).getReceiptSn());
+        Assertions.assertEquals(this.receiptDto.get(0).getReceiptSn(), returnedHistory.get(0).getReceiptSn());
     }
 
 
@@ -145,7 +145,7 @@ public class ViewUserPurchaseHistoryTest {
         this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
                 paymentDetailsDto, billingAddress);
         Assertions.assertNotNull(this.receiptDto);
-        Assertions.assertEquals(amount,this.receiptDto.getProductsBought().get(this.productDto));
+        Assertions.assertEquals(amount,this.receiptDto.get(0).getProductsBought().get(this.productDto));
     }
 
 }

@@ -19,6 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
 @SpringBootTest(args = {"admin","admin"})
@@ -36,7 +38,7 @@ public class PurchaseShoppingCartTest {
     UserSystem userSystem;
     StoreDto storeDto;
     private ProductDto productDto;
-    private ReceiptDto receiptDto;
+    private List<ReceiptDto> receiptDto;
     private UserSystem owner;
 
 
@@ -147,7 +149,7 @@ public class PurchaseShoppingCartTest {
         this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
                 paymentDetailsDto, billingAddress);
         Assertions.assertNotNull(this.receiptDto);
-        Assertions.assertEquals(amount,this.receiptDto.getProductsBought().get(this.productDto));
+        Assertions.assertEquals(amount,this.receiptDto.get(0).getProductsBought().get(this.productDto));
     }
 
 }

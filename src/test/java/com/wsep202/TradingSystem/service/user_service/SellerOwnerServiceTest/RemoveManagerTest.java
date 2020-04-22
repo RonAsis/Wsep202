@@ -135,6 +135,7 @@ public class RemoveManagerTest {
      */
     @Test
     void removeValidManagerByNotAppointee() {
+        registerSecondOwnerAndAddAppointAsOwner();
         Assertions.assertFalse(this.sellerOwnerService.removeManager(this.ownerNotAppointee.getUserName(),
                 this.storeDto.getStoreId(), this.oldManager.getUserName()));
     }
