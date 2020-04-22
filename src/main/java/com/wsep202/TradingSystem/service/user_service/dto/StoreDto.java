@@ -26,8 +26,6 @@ public class StoreDto {
 
     private String purchaseType;
 
-    private Set<UserSystemDto> owners ;
-
     private List<ReceiptDto> receipts;
 
     private int rank;
