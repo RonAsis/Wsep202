@@ -359,6 +359,10 @@ public class Store {
         }
     }
 
+    public boolean addReceipt(Receipt receipt){
+        return this.receipts.add(receipt);
+    }
+
     /**
      * owner can see the store purchase history
      * @param user
