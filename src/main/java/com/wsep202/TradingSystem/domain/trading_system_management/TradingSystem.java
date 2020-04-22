@@ -410,7 +410,7 @@ public class TradingSystem {
      * @param paymentDetails - the user credit card number & expiration date
      * @return list of receipts for stores where payment has been made
      */
-    public List<Receipt> purchaseShoppingCart(ShoppingCart shoppingCart, PaymentDetails paymentDetails, BillingAddress billingAddress) {
+    public List<Receipt> purchaseShoppingCartGuest(ShoppingCart shoppingCart, PaymentDetails paymentDetails, BillingAddress billingAddress) {
         return purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
     }
 

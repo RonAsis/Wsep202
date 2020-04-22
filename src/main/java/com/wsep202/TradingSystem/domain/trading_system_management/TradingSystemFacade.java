@@ -589,7 +589,7 @@ public class TradingSystemFacade {
         ShoppingCart shoppingCart = Objects.nonNull(shoppingCartDto) ? modelMapper.map(shoppingCartDto, ShoppingCart.class) : null;
         PaymentDetails paymentDetails = Objects.nonNull(paymentDetailsDto) ? modelMapper.map(paymentDetailsDto, PaymentDetails.class) : null;
         BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
-        List<Receipt> receipts = tradingSystem.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddress);
+        List<Receipt> receipts = tradingSystem.purchaseShoppingCartGuest(shoppingCart, paymentDetails, billingAddress);
         return Objects.nonNull(receipts) ? convertReceiptList(receipts) : null;
     }
 
@@ -649,8 +649,7 @@ public class TradingSystemFacade {
      * @return list of ReceiptDto
      */
     private List<ReceiptDto> convertReceiptList(@NotNull List<@NotNull Receipt> receipts) {
-        Type listType = new TypeToken<List<ReceiptDto>>() {
-        }.getType();
+        Type listType = new TypeToken<List<ReceiptDto>>() {}.getType();
         return modelMapper.map(receipts, listType);
     }
 

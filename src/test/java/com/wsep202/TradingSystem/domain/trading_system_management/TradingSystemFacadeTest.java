@@ -480,15 +480,16 @@ class TradingSystemFacadeTest {
         @Test
         void purchaseShoppingCart() {
             //init
+            String username = "username";
             PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
             BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
             List<Receipt> receiptsExpected = setUpReceipts();
             List<ReceiptDto> receiptDtos = convertReceiptDtoList(receiptsExpected);
             //mock
-            when(tradingSystem.getUser(userSystem.getUserName())).thenReturn(userSystem);
-            when(tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, userSystem)).thenReturn(receiptsExpected);
+            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(tradingSystem.purchaseShoppingCart(any(), any(), any())).thenReturn(receiptsExpected);
 
-            List<ReceiptDto> receiptDtoAcutal = tradingSystemFacade.purchaseShoppingCart(userSystem.getUserName(), paymentDetailsDto, billingAddressDto);
+            List<ReceiptDto> receiptDtoAcutal = tradingSystemFacade.purchaseShoppingCart(username, paymentDetailsDto, billingAddressDto);
             assertReceipts(receiptsExpected, receiptDtoAcutal);
         }
 
@@ -501,7 +502,7 @@ class TradingSystemFacadeTest {
             BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
             List<Receipt> receiptsExpected = setUpReceipts();
             //mock
-            when(tradingSystem.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddress)).thenReturn(receiptsExpected);
+            when(tradingSystem.purchaseShoppingCartGuest(any(), any(), any())).thenReturn(receiptsExpected);
 
             List<ReceiptDto> receiptDtoActual = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto, paymentDetailsDto, billingAddressDto);
             assertReceipts(receiptsExpected, receiptDtoActual);
