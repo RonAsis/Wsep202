@@ -42,7 +42,7 @@ public class ViewStoreInfoTest {
 
     @AfterEach
     void tearDown() {
-        this.guestService.clearDS();
+        this.buyerRegisteredService.clearDS();
     }
 
     /**
@@ -51,7 +51,7 @@ public class ViewStoreInfoTest {
     @Test
     void viewValidStoreInfo() {
         openStore();
-        StoreDto returnedStoreDto = this.guestService.viewStoreInfo(this.storeDto.getStoreId());
+        StoreDto returnedStoreDto = this.buyerRegisteredService.viewStoreInfo(this.storeDto.getStoreId());
 
         // comparing all of the store's fields
         Assertions.assertEquals(this.storeDto.getStoreId(), returnedStoreDto.getStoreId()); // id
@@ -72,16 +72,6 @@ public class ViewStoreInfoTest {
             }
         }
 
-//        Object[] actualStoreOwners = this.storeDto.getOwners().toArray(); // storeOwners
-//        Object[] mightBeStoreOwners = returnedStoreDto.getOwners().toArray();
-//        Assertions.assertEquals(actualStoreOwners.length, mightBeStoreOwners.length);
-//        if (actualStoreOwners.length == mightBeStoreOwners.length){
-//            for (int i = 0; i < actualStoreOwners.length; i++) {
-//                Assertions.assertEquals(((UserSystemDto) actualStoreOwners[i]).getUserName(),
-//                        ((UserSystemDto) mightBeStoreOwners[i]).getUserName());
-//            }
-//        }
-
         Object[] actualStoreReceipts = this.storeDto.getReceipts().toArray(); // storeReceipts
         Object[] mightBeStoreReceipts = returnedStoreDto.getReceipts().toArray();
         Assertions.assertEquals(actualStoreReceipts.length, mightBeStoreReceipts.length);
@@ -97,7 +87,7 @@ public class ViewStoreInfoTest {
      */
     @Test
     void viewInvalidStoreInfo() {
-        StoreDto returnedStoreDto = this.guestService.viewStoreInfo(5);
+        StoreDto returnedStoreDto = this.buyerRegisteredService.viewStoreInfo(5);
         Assertions.assertNull(returnedStoreDto);
     }
 
@@ -114,6 +104,6 @@ public class ViewStoreInfoTest {
         Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
                 new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName"));
         // getting the storeDto of the store the owner opened
-        this.storeDto = this.guestService.getStoresDtos().get(0); // getting the storeDto of the store the owner opened
+        this.storeDto = this.buyerRegisteredService.getStoresDtos().get(0); // getting the storeDto of the store the owner opened
     }
 }
