@@ -62,13 +62,12 @@ public class TradingSystem {
      * @return true if the registration succeeded
      */
     public boolean registerNewUser(UserSystem userToRegister) {
-        //check validity of fields of user
-        if(!allFieldsAreValidInUser(userToRegister)){
+        boolean isRegistered = isRegistered(userToRegister, users);
+        if(!allFieldsAreValidInUser(userToRegister)){ //check validity of fields of user
             return false;
         }
-        //encrypt user password to store it and its salt in the system
-        encryptPassword(userToRegister);
-        boolean isRegistered = isRegistered(userToRegister, users);
+        log.info("user "+ userToRegister.getUserName() +" has valid fields");
+        encryptPassword(userToRegister); //encrypt user password to store it and its salt in the system
         if (!isRegistered) {
             users.add(userToRegister);
             log.info("The user "+userToRegister.getUserName()+ " has been registered successfully.");
@@ -86,14 +85,22 @@ public class TradingSystem {
     private boolean allFieldsAreValidInUser(UserSystem user) {
         //verify the fields are not empty
         boolean isValid = true;
-        if(user.getUserName()==null || user.getUserName().equals(""))
-            isValid =false;
-        else if(user.getPassword()==null || user.getPassword().equals(""))
+        if(user.getUserName()==null || user.getUserName().equals("")) {
+            log.error("user name is empty or null");
             isValid = false;
-        else if(user.getFirstName()==null || user.getFirstName().equals(""))
+        }
+        else if(user.getPassword()==null || user.getPassword().equals("")) {
+            log.error("user "+ user.getUserName() +"'s password is empty or null");
             isValid = false;
-        else if(user.getLastName()==null || user.getLastName().equals(""))
+        }
+        else if(user.getFirstName()==null || user.getFirstName().equals("")) {
+            log.error("user "+ user.getUserName() +"'s first name is empty or null");
             isValid = false;
+        }
+        else if(user.getLastName()==null || user.getLastName().equals("")) {
+            log.error("user "+ user.getUserName() +"'s last name is empty or null");
+            isValid = false;
+        }
         return isValid;
     }
 
@@ -138,7 +145,7 @@ public class TradingSystem {
     private boolean loginUser(UserSystem userToLogin, String password, Set<UserSystem> listOfUser, boolean isAdmin){
         boolean isRegistered = isRegistered(userToLogin, listOfUser);
         if (!isRegistered){
-            log.error("not a registered user");
+            log.error("user "+ userToLogin.getUserName() +" is not a registered user");
             return false;
         }
         //verify that the user's password is correct as saved in our system
@@ -162,18 +169,22 @@ public class TradingSystem {
 
     /**
      * This method is used to check if the user is registered
-     * @param userToLogin
-     * @param listOfUser
-     * @return
+     * @param userToLogin - the user that needs to be checked if he is registered
+     * @param listOfUser - the list that needs to contain the user
+     * @return true if the user exists, false if the user does not exists
      */
     private boolean isRegistered(UserSystem userToLogin, Set<UserSystem> listOfUser){
+        if (listOfUser.size() == 0 || userToLogin == null){
+            log.error("user can't be null or size of list greater than 0");
+            return false;
+        }
         return listOfUser.stream()
                 .anyMatch(user -> user.getUserName().equals(userToLogin.getUserName()));
     }
 
     /**
      * get the user by its username from users list
-     * @param username
+     * @param username - user's user name to check
      * @return
      */
     private Optional<UserSystem> getUserOpt(String username) {
@@ -184,10 +195,14 @@ public class TradingSystem {
 
     /**
      * logout the user from the system
-     * @param user
+     * @param user - the user that asks to log out
      * @return true if logged out, otherwise false
      */
     public boolean logout(UserSystem user) {
+        if (user == null){
+            log.error("user cant be null");
+            return false;
+        }
         if(user.isLogin()){
             user.logout();
             log.info("The user "+user.getUserName()+" logged out successfully.");
@@ -200,7 +215,7 @@ public class TradingSystem {
     /**
      * returns the User system object match the received string in case its an admin user
      * otherwise throw exception
-     * @param administratorUsername
+     * @param administratorUsername - admins user name
      * @return administrator type user
      */
     public UserSystem getAdministratorUser(String administratorUsername) {
@@ -238,10 +253,10 @@ public class TradingSystem {
      */
     public Store getStoreByAdmin(String administratorUsername, int storeId) {
         if (isAdmin(administratorUsername)) {
-            log.info("Admin exists --> calls to 'getStore(storeId)' function.");
+            log.info("Admin "+ administratorUsername +" exists --> calls to 'getStore(storeId)' function.");
             return getStore(storeId);
         }
-        log.error("Admin isn't exist --> throws 'NotAdministratorException(administratorUsername)' exception!");
+        log.error("Admin "+ administratorUsername +" isn't exist --> throws 'NotAdministratorException(administratorUsername)' exception!");
         throw new NotAdministratorException(administratorUsername);
     }
 
@@ -269,6 +284,10 @@ public class TradingSystem {
      */
     public UserSystem getUser(String username) throws UserDontExistInTheSystemException {
         Optional<UserSystem> userOpt = getUserOpt(username);
+        if (userOpt == null){
+            log.error("User: " + username + " isn't exist in the Trading System.");
+            return userOpt.orElseThrow(() -> new UserDontExistInTheSystemException(username));
+        }
         if (userOpt.isPresent())
             log.info("User: " + username + " exists in the Trading System.");
         else
@@ -284,10 +303,10 @@ public class TradingSystem {
      */
     public UserSystem getUserByAdmin(String administratorUsername, String userName) {
         if (isAdmin(administratorUsername)) {
-            log.info("Admin exists --> calls to 'getUser(userName)' function.");
+            log.info("Admin "+ administratorUsername +" exists --> calls to 'getUser(userName)' function.");
             return getUser(userName);
         }
-        log.error("Admin isn't exist --> throws 'NotAdministratorException(administratorUsername)' exception!");
+        log.error("Admin "+ administratorUsername +" isn't exist --> throws 'NotAdministratorException(administratorUsername)' exception!");
         throw new NotAdministratorException(administratorUsername);
     }
 
@@ -424,7 +443,7 @@ public class TradingSystem {
         }
         List<Integer> listOfStoresWherePaymentPassed = makePurchase(shoppingCart, paymentDetails);
         if (listOfStoresWherePaymentPassed.isEmpty()){
-            log.error("no item was purchased from cart");
+            log.error("no item was purchased from cart for user "+ customerName);
             return null;
         }
         boolean isDelivered = deliver(shoppingCart, billingAddress, listOfStoresWherePaymentPassed);
@@ -432,7 +451,7 @@ public class TradingSystem {
             updateProductAmount(listOfStoresWherePaymentPassed, shoppingCart);
             return makeReceipts(listOfStoresWherePaymentPassed, shoppingCart, customerName);
         }
-        log.error("problem with delivery, cancel payment for "+ customerName);
+        log.error("problem with delivery, cancel payment for "+ customerName + " canceling purchase");
         cancelPayment(listOfStoresWherePaymentPassed, shoppingCart, paymentDetails);
         return null;
     }
@@ -454,11 +473,14 @@ public class TradingSystem {
             for (Product product: productList.keySet()){ //check if there is enough products in store to make the purchase
                 if(product.getAmount() < productList.get(product) || !product.getPurchaseType().type.equals("Buy immediately")) {
                     canPurchaseShoppingBag = false;
+                    log.error("not enough '"+ product.getName() +"' in stock, shopping bag from store '"+ store.getStoreName() +"'" +
+                            " will not be purchased");
                     break;
                 }
             }
             if (canPurchaseShoppingBag) {
                 bagsToPurchase.addBagToCart(store, shoppingBag);
+                log.info("transfer shopping bag from store '"+ store.getStoreName() +"' to charging system");
             }
         }
         return externalServiceManagement.charge(paymentDetails, bagsToPurchase);
@@ -539,6 +561,7 @@ public class TradingSystem {
         for (Store store: shoppingCartToEdit.getShoppingBagsList().keySet()) {
             for (Product product: shoppingCartToEdit.getShoppingBag(store).getProductListFromStore().keySet()) {
                 product.setAmount(product.getAmount()-shoppingCartToEdit.getShoppingBag(store).getProductAmount(product));
+                log.info("amount of product '"+ product.getName() +"' was updated");
             }
         }
     }
@@ -557,8 +580,8 @@ public class TradingSystem {
             log.error("One of the parameters received is equal to null ore store name empty");
             return false;
         }
-        if (!this.users.contains(user)) {//if the user is not registered to the system, he can't open a store
-            log.error("A non registered user tried to open a store");
+        if (!isRegistered(user,users)) {//if the user is not registered to the system, he can't open a store
+            log.error("A non registered user "+ user.getUserName() +" tried to open a store '"+ storeName +"'");
             return false;
         }
         boolean isStoreExists = isStoreExists(purchasePolicy, discountPolicy, storeName);
@@ -566,14 +589,15 @@ public class TradingSystem {
             Store newStore = new Store(user, purchasePolicy, discountPolicy, storeName);
             this.stores.add(newStore);
             user.addNewOwnedStore(newStore);
-            log.info("A new store '" + storeName + "' was opened in the system");
+            log.info("A new store '" + storeName + "' was opened in the system, "+ user.getUserName() +" is the owner");
             return true;
         }
         return false;
     }
 
     /**
-     * This method is used to check if the store is already opened in the system
+     * This method is used to check if the store is already opened in the system,
+     * used only in when open store.
      * @param purchasePolicy -  a collection of purchase rules that the user has decided on for his store
      * @param discountPolicy -  a collection of discount rules that the user has decided on for his store
      * @param storeName - the name of the store that the user decided
@@ -581,14 +605,33 @@ public class TradingSystem {
      */
     private boolean isStoreExists(PurchasePolicy purchasePolicy,DiscountPolicy discountPolicy, String storeName){
         if (stores.size() > 0) {// if the size of stores is 0, than the store does exists in system
-            Store store = stores.stream().filter(store1 -> store1.getStoreName().equals(storeName)).findFirst().get();
-            if (store != null && store.getStoreName().equals(storeName) && store.getPurchasePolicy().equals(purchasePolicy)
-                    && store.getDiscountPolicy().equals(discountPolicy)) {
-                log.error("this store already exists, can't open it again");
-                return true;
+            Optional<Store> storeOptional = stores.stream().filter(store1 -> store1.getStoreName().equals(storeName)).findFirst();
+            if(storeOptional.isPresent()) {
+                Store store = storeOptional.get();
+                if (store != null && store.getStoreName().equals(storeName) && store.getPurchasePolicy().equals(purchasePolicy)
+                        && store.getDiscountPolicy().equals(discountPolicy)) {
+                    log.error("this store already exists, can't open it again");
+                    return true;
+                }
             }
+            else
+                return false;
         }
         return false;
+    }
+
+    /**
+     * This method is used to check if a store exists
+     * @param storeToCheck - the store that needs to be check
+     * @return true if the store exists
+     */
+    private boolean isStoreExists(Store storeToCheck){
+        if (storeToCheck == null || stores.size() == 0){
+            log.error("store can't be null or store list needs to have at least 1 store");
+            return false;
+        }
+        return stores.stream()
+                .anyMatch(store -> store.getStoreId() == storeToCheck.getStoreId());
     }
 
     public Set<Store> getStoresList(){
@@ -611,31 +654,52 @@ public class TradingSystem {
         stores.add(store);
     }
 
+    /**
+     * This method is used to add a new manager to an existing store
+     * @param ownedStore - The store to which you want to add a manager
+     * @param ownerUser - owner of the store
+     * @param newManagerUser - the user that needs to be added as a manager
+     * @return true if the addition was successful, false if there were a problem
+     */
     public boolean addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
         boolean addToUser = false;
-        if(ownedStore == null || ownerUser == null || newManagerUser == null) // error
+        if(ownedStore == null || ownerUser == null || newManagerUser == null) { // error
+            log.error("store or users can't be null");
             return false;
+        }
         else{
             boolean addToStore = ownedStore.addManager(ownerUser, newManagerUser);
             if (addToStore) { // add to store succeed
                 addToUser = newManagerUser.addNewManageStore(ownedStore);
                 if(addToUser) // add to user succeed
+                    log.info("user "+ newManagerUser.getUserName() +" was added as manager in store '"+ ownedStore.getStoreName() +"'");
                     return true;
             }
         }
         return false;
     }
 
+    /**
+     * This method is used to add a new owner to an existing store
+     * @param ownerStore - The store to which you want to add a manager
+     * @param ownerUser - owner of the store
+     * @param newOwnerUser - the user that needs to be added as an owner
+     * @return true if the addition was successful, false if there were a problem
+     */
     public boolean addOwnerToStore(Store ownerStore, UserSystem ownerUser, UserSystem newOwnerUser) {
         boolean addToUser = false;
-        if(ownerStore == null || ownerUser == null || newOwnerUser == null) // error
+        if(ownerStore == null || ownerUser == null || newOwnerUser == null) { // error
+            log.error("store or users can't be null");
             return false;
+        }
         else{
             boolean addToStore = ownerStore.addOwner(ownerUser, newOwnerUser);
             if (addToStore) { // add to store succeed
                 addToUser = newOwnerUser.addNewOwnedStore(ownerStore);
-                if(addToUser) // add to user succeed
+                if(addToUser) { // add to user succeed
+                    log.info("user "+ newOwnerUser.getUserName() +" was added as manager in store '"+ ownerStore.getStoreName() +"'");
                     return true;
+                }
             }
         }
         return false;
@@ -646,13 +710,25 @@ public class TradingSystem {
      * @param ownedStore - the store
      * @param ownerUser - the owner of the store that want remove the manager
      * @param managerStore - the manager that want to remove
-     * @return true if succ else false
+     * @return true if manager was removed, else false
      */
     public boolean removeManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore) {
-        if(ownedStore.removeManager(ownerUser, managerStore)){
-            //ownerUser
-            //TODO
-        }
-        return false;
+       if (ownedStore == null || ownerUser == null || managerStore == null){
+           log.error("user or store can't be null");
+           return false;
+       }
+       if (isRegistered(ownerUser,users) && isRegistered(managerStore, users)){
+            if (isStoreExists(ownedStore)){
+                boolean isRemoved = ownedStore.removeManager(ownerUser, managerStore);
+                if (isRemoved){
+                    log.info("user "+ managerStore.getUserName() +" from store '"+ ownedStore.getStoreName() +"");
+                    return true;
+                }
+            }
+            log.error("store '"+ ownedStore.getStoreName() +"' does not exists in system");
+            return false;
+       }
+        log.error("user "+ ownerUser.getUserName() +" or user "+ managerStore.getUserName() +" is not registered");
+       return false;
     }
 }

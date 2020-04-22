@@ -631,6 +631,32 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.openStore(userSystem2, store1.getPurchasePolicy(),store1.getDiscountPolicy(), ""));
         }
 
+        /**
+         * This test check if the removeManager method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void removeManagerSuccess(){
+            setUpUsersForRemoveManagerSuc();
+            //check that remove success
+            Assertions.assertTrue(tradingSystem.removeManager(store1, userSystem, userSystem2));
+        }
+
+        /**
+         * This test check if the removeManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void removeManagerFail(){
+            setUpUsersForRemoveManager();
+            //can't remove from null store
+            Assertions.assertFalse(tradingSystem.removeManager(null,userSystem2,userSystem));
+            //store does not exists
+            Assertions.assertFalse(tradingSystem.removeManager(store,userSystem2,userSystem));
+            //1 users is not registered
+            Assertions.assertFalse(tradingSystem.removeManager(store1,userSystem1,userSystem));
+        }
+
         // ********************************** Set Up Functions For Tests ********************************** //
 
 
@@ -682,6 +708,7 @@ class TradingSystemTest {
          */
         private void setUpUsersForOpenStoreTestSuc(){
             Set<UserSystem> users = new HashSet<>();
+            when(userSystem2.getUserName()).thenReturn("UserSystem2");
             users.add(userSystem2);
             tradingSystem.setUsersList(users);
         }
@@ -695,6 +722,40 @@ class TradingSystemTest {
             when(store1.getPurchasePolicy()).thenReturn(new PurchasePolicy());
             tradingSystem.insertStoreToStores(store1);
         }
+
+        /**
+         * sets up store for removeManager test
+         */
+        private void setUpUsersForRemoveManager(){
+            when(store1.getStoreName()).thenReturn("castro");
+            when(store1.getDiscountPolicy()).thenReturn(new DiscountPolicy());
+            when(store1.getPurchasePolicy()).thenReturn(new PurchasePolicy());
+            tradingSystem.insertStoreToStores(store1);
+            Set<UserSystem> users = new HashSet<>();
+            when(userSystem2.getUserName()).thenReturn("UserSystem2");
+            when(userSystem.getUserName()).thenReturn("UserSystem");
+            users.add(userSystem2);
+            users.add(userSystem);
+            tradingSystem.setUsersList(users);
+        }
+
+        /**
+         * sets up store for removeManager test
+         */
+        private void setUpUsersForRemoveManagerSuc(){
+            when(store1.getStoreName()).thenReturn("castro");
+            when(store1.getDiscountPolicy()).thenReturn(new DiscountPolicy());
+            when(store1.getPurchasePolicy()).thenReturn(new PurchasePolicy());
+            tradingSystem.insertStoreToStores(store1);
+            Set<UserSystem> users = new HashSet<>();
+            when(userSystem2.getUserName()).thenReturn("UserSystem2");
+            when(userSystem.getUserName()).thenReturn("UserSystem");
+            users.add(userSystem2);
+            users.add(userSystem);
+            tradingSystem.setUsersList(users);
+            when(store1.removeManager(userSystem,userSystem2)).thenReturn(true);
+        }
+
 
         /**
          * setup of successful pre registration
@@ -1262,6 +1323,33 @@ class TradingSystemTest {
             Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,wrongOwner,newManager));
         }
 
+        /**
+         * This test check if the removeManager method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void removeManagerSuccess(){
+            setUpUsersForRemoveManagerSuc();
+            tradingSystem.addMangerToStore(store1, storeOwner, newManager);
+            //check that remove success
+            Assertions.assertTrue(tradingSystem.removeManager(store1, storeOwner, newManager));
+        }
+
+        /**
+         * This test check if the removeManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void removeManagerFail(){
+       //     setUpUsersForRemoveManager();
+            //can't remove from null store
+            Assertions.assertFalse(tradingSystem.removeManager(null,storeOwner,newManager));
+            //store does not exists
+            Assertions.assertFalse(tradingSystem.removeManager(store,storeOwner,newManager));
+            //1 users is not registered
+            Assertions.assertFalse(tradingSystem.removeManager(store1,wrongOwner,newManager));
+        }
+
         // ************************************ Set Up For Tests ************************************ //
 
         /**
@@ -1352,11 +1440,7 @@ class TradingSystemTest {
          */
         private void setUpForPurchaseCartFail(){
             userToOpenStore = getUserSystemBuild();
-            testUser = UserSystem.builder()
-                    .userName("KingRagnar")
-                    .password("Odin12")
-                    .firstName("Ragnar")
-                    .lastName("Lodbrok").build();
+            testUser = getUser();
             storeToOpen = Store.builder()
                     .purchasePolicy(new PurchasePolicy())
                     .discountPolicy(new DiscountPolicy())
@@ -1407,22 +1491,67 @@ class TradingSystemTest {
          */
         private void setUpAddManagerAndOwner(){
             storeOwner = getUserSystemBuild();
-            wrongOwner = UserSystem.builder()
-                    .userName("Bjorn_Ironside")
-                    .password("IronSide12")
-                    .firstName("Bjorn")
-                    .lastName("Lodbrok").build();
-            newManager = UserSystem.builder()
-                    .userName("KingRagnar")
-                    .password("Odin12")
-                    .firstName("Ragnar")
-                    .lastName("Lodbrok").build();
+            wrongOwner = getWrongOwner();
+            newManager = getUser();
             Set<UserSystem> usersList = new HashSet<>();
             usersList.add(storeOwner);
             usersList.add(newManager);
             tradingSystem.setUsersList(usersList);
             store1 = new Store(storeOwner, new PurchasePolicy(), new DiscountPolicy(), "MovieStore");
             tradingSystem.insertStoreToStores(store1);
+        }
+
+        private UserSystem getWrongOwner(){
+            return UserSystem.builder()
+                    .userName("Bjorn_Ironside")
+                    .password("IronSide12")
+                    .firstName("Bjorn")
+                    .lastName("Lodbrok").build();
+        }
+
+        private UserSystem getUser(){
+            return UserSystem.builder()
+                    .userName("KingRagnar")
+                    .password("Odin12")
+                    .firstName("Ragnar")
+                    .lastName("Lodbrok").build();
+        }
+
+        /**
+         * sets up store for removeManager test
+         */
+        private void setUpUsersForRemoveManager(){
+            storeOwner = getUserSystemBuild();
+            newManager = getUser();
+            wrongOwner = getWrongOwner();
+            //tradingSystem.insertStoreToStores(store1);
+            Set<UserSystem> users = new HashSet<>();
+            users.add(storeOwner);
+            users.add(newManager);
+            tradingSystem.setUsersList(users);
+           // tradingSystem.openStore(storeOwner,new PurchasePolicy(), new DiscountPolicy(), "castro");
+            //tradingSystem.openStore(wrongOwner,new PurchasePolicy(), new DiscountPolicy(), "zara");
+            //store1 = tradingSystem.getStore(0);
+            store = Store.builder()
+                    .purchasePolicy(new PurchasePolicy())
+                    .discountPolicy(new DiscountPolicy())
+                    .storeName("MovieStore")
+                    .storeId(store1.getStoreId()+1).build();
+        }
+
+        /**
+         * sets up store for removeManager test
+         */
+        private void setUpUsersForRemoveManagerSuc(){
+            storeOwner = getUser();
+            newManager = getWrongOwner();
+            //tradingSystem.insertStoreToStores(store1);
+            Set<UserSystem> users = new HashSet<>();
+            users.add(storeOwner);
+            users.add(newManager);
+            tradingSystem.setUsersList(users);
+            tradingSystem.openStore(storeOwner,new PurchasePolicy(), new DiscountPolicy(), "castro");
+            store1 = storeOwner.getOwnedStores().iterator().next();
         }
     }
 }

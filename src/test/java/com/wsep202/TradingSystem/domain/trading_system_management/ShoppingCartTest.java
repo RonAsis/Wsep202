@@ -206,6 +206,20 @@ class ShoppingCartTest {
         assertFalse(testShoppingCart.removeProductInCart(testStore2,testShoppingBag2,testProduct));
     }
 
+    @Test
+    void watchShoppingCartSuc(){
+        
+    }
+
+    @Test
+    void watchShoppingCartFail(){
+
+    }
+
+    private void setUpWatch(){
+
+    }
+
     /**
      * Adds a shopping bag to the cart
      */
@@ -413,6 +427,29 @@ public class ShoppingCartIntegration {
             assertFalse(testShoppingCart.removeProductInCart(testStore2, testShoppingBag2, testProduct2));
         }
 
+        @Test
+        void watchShoppingCartSuc(){
+            //add products to cart
+            testShoppingBag3.addProductToBag(testProduct3,3);
+            testShoppingBag2.addProductToBag(testProduct2,2);
+            testShoppingCart.addBagToCart(testStore3,testShoppingBag3);
+            testShoppingCart.addBagToCart(testStore2,testShoppingBag2);
+            Map<Product,Integer> products = testShoppingCart.watchShoppingCart();
+            //check that the products that was added are the returned products
+            assertTrue(products.containsKey(testProduct3));
+            assertTrue(products.containsKey(testProduct2));
+        }
+
+        @Test
+        void watchShoppingCartFail(){
+            //add products to cart
+            testShoppingBag3.addProductToBag(testProduct3,3);
+            testShoppingCart.addBagToCart(testStore3,testShoppingBag3);
+            Map<Product,Integer> products = testShoppingCart.watchShoppingCart();
+            //false for product that was never added
+            assertFalse(products.containsKey(testProduct2));
+        }
+
         /**
          * set up for remove test, put a product to remove later
          */
@@ -420,5 +457,6 @@ public class ShoppingCartIntegration {
                 testShoppingBag3.addProductToBag(testProduct3,2);
                 testShoppingCart.addBagToCart(testStore3, testShoppingBag3);
             }
-        }
+
+}
 }
