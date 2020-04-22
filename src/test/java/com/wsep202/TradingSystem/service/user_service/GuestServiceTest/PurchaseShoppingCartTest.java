@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class})
+@ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
 

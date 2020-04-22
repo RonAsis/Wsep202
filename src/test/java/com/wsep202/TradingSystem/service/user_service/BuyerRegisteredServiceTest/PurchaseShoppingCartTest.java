@@ -40,11 +40,18 @@ public class PurchaseShoppingCartTest {
     private ProductDto productDto;
     private List<ReceiptDto> receiptDto;
     private UserSystem owner;
+    private BillingAddressDto billingAddressDto;
+    private PaymentDetailsDto paymentDetailsDto;
 
 
     @BeforeEach
     void setUp() {
         userSystem = new UserSystem("username", "name", "lname", "pass");
+        this.billingAddressDto = new BillingAddressDto(this.userSystem.getFirstName()+" "+this.userSystem.getLastName(),
+                "address", "city", "country", "1234567");
+        this.paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
+                "year", "Cardholder", 798, "id");
+
     }
 
     @AfterEach
@@ -96,9 +103,12 @@ public class PurchaseShoppingCartTest {
     @Test
     void purchaseShoppingCartRegisteredUser() {
         registerUser();
-        buyProduct();
-        Assertions.assertNotNull(this.buyerRegisteredService.purchaseShoppingCart(this.userSystem.getUserName(),
-                new PaymentDetailsDto(), new BillingAddressDto()));
+        int amount = 1;
+        addToCart(amount);
+        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.userSystem.getUserName(),
+                this.paymentDetailsDto, this.billingAddressDto);
+        Assertions.assertNotNull(this.receiptDto);
+        Assertions.assertEquals(amount, this.receiptDto.get(0).getProductBoughtAmountByProductSn(this.productDto.getProductSn()));
     }
 
     /**
@@ -134,22 +144,11 @@ public class PurchaseShoppingCartTest {
     }
 
     /**
-     * buying a product from the store
+     * adding a product to the cart
      */
-    void buyProduct(){
+    void addToCart(int amount){
         openStoreAndAddProducts();
-        int amount = 1;
-        Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(this.owner.getUserName(),
+        Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(this.userSystem.getUserName(),
                 this.storeDto.getStoreId(), this.productDto.getProductSn(), amount));
-
-        BillingAddressDto billingAddress = new BillingAddressDto(this.owner.getFirstName()+" "+this.owner.getLastName(),
-                "address", "city", "country", "1234567");
-        PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
-                "year", "Cardholder", 798, "id");
-        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
-                paymentDetailsDto, billingAddress);
-        Assertions.assertNotNull(this.receiptDto);
-        Assertions.assertEquals(amount,this.receiptDto.get(0).getProductsBought().get(this.productDto));
     }
-
 }

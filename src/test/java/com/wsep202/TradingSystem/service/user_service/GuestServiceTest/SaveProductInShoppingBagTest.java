@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class})
+@ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
 
@@ -64,7 +64,7 @@ public class SaveProductInShoppingBagTest {
      * invalid store
      */
     @Test
-    void purchaseShoppingCartInvalidStore() {
+    void SaveProductInShoppingCartInvalidStore() {
         openStoreAndAddProducts();
         Assertions.assertFalse(this.guestService.saveProductInShoppingBag("notUser",
                 this.storeDto.getStoreId()+5, this.productDto.getProductSn(), 1));
@@ -75,7 +75,7 @@ public class SaveProductInShoppingBagTest {
      * invalid product
      */
     @Test
-    void purchaseShoppingCartInvalidStoreInvalidProduct() {
+    void SaveProductInShoppingCartInvalidStoreInvalidProduct() {
         openStoreAndAddProducts();
         Assertions.assertFalse(this.guestService.saveProductInShoppingBag("notUser",
                 this.storeDto.getStoreId()+5, this.productDto.getProductSn()+5, 1));
@@ -86,7 +86,7 @@ public class SaveProductInShoppingBagTest {
      * invalid product
      */
     @Test
-    void purchaseShoppingCartInvalidProduct() {
+    void SaveProductInShoppingCartInvalidProduct() {
         openStoreAndAddProducts();
         Assertions.assertFalse(this.guestService.saveProductInShoppingBag("notUser",
                 this.storeDto.getStoreId(), this.productDto.getProductSn()+5, 1));
