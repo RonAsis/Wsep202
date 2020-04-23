@@ -2,9 +2,9 @@ package com.wsep202.TradingSystem.domain.mapping;
 
 import com.github.rozidan.springboot.modelmapper.TypeMapConfigurer;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.service.user_service.dto.ProductDto;
-import com.wsep202.TradingSystem.service.user_service.dto.ReceiptDto;
-import com.wsep202.TradingSystem.service.user_service.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.ReceiptDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;

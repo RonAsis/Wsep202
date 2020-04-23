@@ -2,24 +2,17 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 
 //import Externals.PasswordSaltPair;
-import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.exception.NotAdministratorException;
-import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
 import com.wsep202.TradingSystem.domain.exception.StoreDontExistsException;
 import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
-import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
-import org.apache.catalina.User;
-import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.invocation.InvocationOnMock;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.parameters.P;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 

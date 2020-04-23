@@ -1,11 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
-import com.wsep202.TradingSystem.service.user_service.dto.*;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import com.wsep202.TradingSystem.dto.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;

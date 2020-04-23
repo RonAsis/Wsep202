@@ -1,4 +1,4 @@
-package com.wsep202.TradingSystem.domain.config;
+package com.wsep202.TradingSystem.config;
 
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement;

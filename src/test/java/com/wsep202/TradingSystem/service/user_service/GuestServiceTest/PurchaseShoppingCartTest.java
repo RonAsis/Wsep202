@@ -1,13 +1,13 @@
 package com.wsep202.TradingSystem.service.user_service.GuestServiceTest;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.trading_system_management.CardAction;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-import com.wsep202.TradingSystem.service.user_service.dto.*;
+import com.wsep202.TradingSystem.dto.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,10 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
@@ -65,7 +61,7 @@ public class PurchaseShoppingCartTest {
      */
     @Test
     void purchaseEmptyShoppingCart() {
-        Assertions.assertNull(this.guestService.purchaseShoppingCart(this.shoppingCartDto,
+        Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(this.shoppingCartDto,
                 this.paymentDetailsDto, this.billingAddressDto));
     }
 
@@ -74,7 +70,7 @@ public class PurchaseShoppingCartTest {
      */
     @Test
     void purchaseShoppingCartInvalidPaymentDetails() {
-        Assertions.assertNull(this.guestService.purchaseShoppingCart(this.shoppingCartDto,
+        Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(this.shoppingCartDto,
                 null, this.billingAddressDto));
     }
 
@@ -83,7 +79,7 @@ public class PurchaseShoppingCartTest {
      */
     @Test
     void purchaseShoppingCartInvalidBillingAddress() {
-        Assertions.assertNull(this.guestService.purchaseShoppingCart(this.shoppingCartDto,
+        Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(this.shoppingCartDto,
                 this.paymentDetailsDto, null));
     }
 

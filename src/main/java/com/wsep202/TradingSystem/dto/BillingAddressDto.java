@@ -1,4 +1,4 @@
-package com.wsep202.TradingSystem.service.user_service.dto;
+package com.wsep202.TradingSystem.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,7 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.service.user_service.dto.*;
+import com.wsep202.TradingSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -183,7 +183,7 @@ public class BuyerRegisteredService {
      * @param billingAddress the destination of the delivery
      * @return
      */
-    public List<ReceiptDto> purchaseShoppingCart(String userName, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddress){
+    public List<ReceiptDto> purchaseShoppingCartBuyer(String userName, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddress){
         return tradingSystemFacade.purchaseShoppingCart(userName, paymentDetails, billingAddress);
     }
 

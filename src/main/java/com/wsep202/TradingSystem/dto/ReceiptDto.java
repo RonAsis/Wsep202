@@ -1,9 +1,7 @@
-package com.wsep202.TradingSystem.service.user_service.dto;
+package com.wsep202.TradingSystem.dto;
 
 import lombok.*;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 @Getter

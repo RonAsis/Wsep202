@@ -1,14 +1,14 @@
 package com.wsep202.TradingSystem.service.user_service.SellerManagerTest;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.trading_system_management.CardAction;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerManagerService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-import com.wsep202.TradingSystem.service.user_service.dto.*;
+import com.wsep202.TradingSystem.dto.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +61,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchases() {
-        List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistory(
+        List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistoryOfManager(
                 this.manager.getUserName(), this.storeDto.getStoreId());
         Assertions.assertEquals(new LinkedList<>(), returnedHistory);
     }
@@ -72,7 +72,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidManager() {
-        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistory(
+        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
                 this.manager.getUserName()+"Not", this.storeDto.getStoreId()));
     }
 
@@ -81,7 +81,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidStore() {
-        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistory(
+        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
                 this.manager.getUserName(), this.storeDto.getStoreId()+5));
     }
 
@@ -91,7 +91,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidStoreInvalidManager() {
-        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistory(
+        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
                 this.manager.getUserName()+"Not", this.storeDto.getStoreId()+5));
     }
 
@@ -101,7 +101,7 @@ public class ViewPurchaseHistoryTest {
     @Test
     void ViewHistoryPurchases() {
         buyProduct();
-        List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistory(
+        List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistoryOfManager(
                 this.manager.getUserName(), this.storeDto.getStoreId());
         Assertions.assertEquals(this.receiptDto.get(0).getReceiptSn(), returnedHistory.get(0).getReceiptSn());
     }
@@ -157,7 +157,7 @@ public class ViewPurchaseHistoryTest {
                 "address", "city", "country", "1234567");
         PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
                 "year", "Cardholder", 798, "id");
-        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
+        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCartBuyer(this.owner.getUserName(),
                 paymentDetailsDto, billingAddress);
         Assertions.assertNotNull(this.receiptDto);
         Assertions.assertEquals(amount, this.receiptDto.get(0).getProductBoughtAmountByProductSn(this.productDto.getProductSn()));

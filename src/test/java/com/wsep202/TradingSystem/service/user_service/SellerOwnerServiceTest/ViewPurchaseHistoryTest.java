@@ -1,14 +1,13 @@
 package com.wsep202.TradingSystem.service.user_service.SellerOwnerServiceTest;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
-import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.trading_system_management.CardAction;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-import com.wsep202.TradingSystem.service.user_service.dto.*;
+import com.wsep202.TradingSystem.dto.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +56,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchases() {
-        List<ReceiptDto> returnedHistory = this.sellerOwnerService.viewPurchaseHistory(
+        List<ReceiptDto> returnedHistory = this.sellerOwnerService.viewPurchaseHistoryOfOwner(
                 this.owner.getUserName(), this.storeDto.getStoreId());
         Assertions.assertEquals(new LinkedList<>(), returnedHistory);
     }
@@ -68,7 +67,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidOwner() {
-        Assertions.assertNull(this.sellerOwnerService.viewPurchaseHistory(
+        Assertions.assertNull(this.sellerOwnerService.viewPurchaseHistoryOfOwner(
                 this.owner.getUserName()+"Not", this.storeDto.getStoreId()));
     }
 
@@ -77,7 +76,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidStore() {
-        Assertions.assertNull(this.sellerOwnerService.viewPurchaseHistory(
+        Assertions.assertNull(this.sellerOwnerService.viewPurchaseHistoryOfOwner(
                 this.owner.getUserName(), this.storeDto.getStoreId()+5));
     }
 
@@ -87,7 +86,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidStoreInvalidOwner() {
-        Assertions.assertNull(this.sellerOwnerService.viewPurchaseHistory(
+        Assertions.assertNull(this.sellerOwnerService.viewPurchaseHistoryOfOwner(
                 this.owner.getUserName()+"Not", this.storeDto.getStoreId()+5));
     }
 
@@ -97,7 +96,7 @@ public class ViewPurchaseHistoryTest {
     @Test
     void ViewHistoryPurchases() {
         buyProduct();
-        List<ReceiptDto> returnedHistory = this.sellerOwnerService.viewPurchaseHistory(
+        List<ReceiptDto> returnedHistory = this.sellerOwnerService.viewPurchaseHistoryOfOwner(
                 this.owner.getUserName(), this.storeDto.getStoreId());
         Assertions.assertEquals(this.receiptDto.get(0).getReceiptSn(), returnedHistory.get(0).getReceiptSn());
     }
@@ -138,7 +137,7 @@ public class ViewPurchaseHistoryTest {
                 "address", "city", "country", "1234567");
         PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
                 "year", "Cardholder", 798, "id");
-        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.owner.getUserName(),
+        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCartBuyer(this.owner.getUserName(),
                 paymentDetailsDto, billingAddress);
         Assertions.assertNotNull(this.receiptDto);
         Assertions.assertEquals(amount, this.receiptDto.get(0).getProductBoughtAmountByProductSn(this.productDto.getProductSn()));

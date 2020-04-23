@@ -2,12 +2,11 @@ package com.wsep202.TradingSystem.service.user_service;
 
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.service.user_service.dto.*;
+import com.wsep202.TradingSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Service
@@ -42,19 +41,6 @@ public class GuestService {
                          String password){
         return tradingSystemFacade.login(userName, password);
     }
-
-    /**
-     * uc 2.6 : save product in shopping bag
-     * @param username the username that want to save ShoppingBag
-     * @param storeId the storeId which the user visits in
-     * @param productSn - the sn of the product the user wish to add
-     * @param quantity - the amount of the product the user wish to add
-     * @return true if succeed
-     */
-    public boolean saveProductInShoppingBag( String username, int storeId, int productSn, int quantity) {
-        return tradingSystemFacade.saveProductInShoppingBag(username,  storeId,  productSn,  quantity);
-    }
-
 
     /**
      * view store info by store id
@@ -151,7 +137,7 @@ public class GuestService {
      * @param billingAddressDto - the destination to deliver the purchases
      * @return
      */
-    public List<ReceiptDto> purchaseShoppingCart(ShoppingCartDto shoppingCart, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddressDto){
+    public List<ReceiptDto> purchaseShoppingCartGuest(ShoppingCartDto shoppingCart, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddressDto){
         return tradingSystemFacade.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddressDto);
     }
     /**

@@ -1,15 +1,15 @@
 package com.wsep202.TradingSystem.service.user_service.SellerOwnerServiceTest;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-import com.wsep202.TradingSystem.service.user_service.dto.DiscountPolicyDto;
-import com.wsep202.TradingSystem.service.user_service.dto.ProductDto;
-import com.wsep202.TradingSystem.service.user_service.dto.PurchasePolicyDto;
-import com.wsep202.TradingSystem.service.user_service.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.DiscountPolicyDto;
+import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.PurchasePolicyDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +53,7 @@ public class RemoveProductTest {
      */
     @Test
     void removeValidProduct() {
-        Assertions.assertTrue(this.sellerOwnerService.removeProduct(this.owner.getUserName(),
+        Assertions.assertTrue(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName(),
                 this.storeDto.getStoreId(), this.productDto.getProductSn()));
     }
 
@@ -62,9 +62,9 @@ public class RemoveProductTest {
      */
     @Test
     void removeValidProductTwice() {
-        Assertions.assertTrue(this.sellerOwnerService.removeProduct(this.owner.getUserName(),
+        Assertions.assertTrue(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName(),
                 this.storeDto.getStoreId(), this.productDto.getProductSn()));
-        Assertions.assertFalse(this.sellerOwnerService.removeProduct(this.owner.getUserName(),
+        Assertions.assertFalse(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName(),
                 this.storeDto.getStoreId(), this.productDto.getProductSn()));
     }
 
@@ -74,7 +74,7 @@ public class RemoveProductTest {
      */
     @Test
     void removeValidProductInvalidOwner() {
-        Assertions.assertFalse(this.sellerOwnerService.removeProduct(this.owner.getUserName()+"Not",
+        Assertions.assertFalse(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName()+"Not",
                 this.storeDto.getStoreId(), this.productDto.getProductSn()));
     }
 
@@ -84,7 +84,7 @@ public class RemoveProductTest {
      */
     @Test
     void removeValidProductInvalidStore() {
-        Assertions.assertFalse(this.sellerOwnerService.removeProduct(this.owner.getUserName(),
+        Assertions.assertFalse(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName(),
                 this.storeDto.getStoreId()+5, this.productDto.getProductSn()));
     }
 
@@ -95,7 +95,7 @@ public class RemoveProductTest {
      */
     @Test
     void removeValidProductInvalidOwnerInvalidStore() {
-        Assertions.assertFalse(this.sellerOwnerService.removeProduct(this.owner.getUserName()+"Not",
+        Assertions.assertFalse(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName()+"Not",
                 this.storeDto.getStoreId()+5, this.productDto.getProductSn()));
     }
 
@@ -104,7 +104,7 @@ public class RemoveProductTest {
      */
     @Test
     void removeInvalidProduct() {
-        Assertions.assertFalse(this.sellerOwnerService.removeProduct(this.owner.getUserName(),
+        Assertions.assertFalse(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName(),
                 this.storeDto.getStoreId(), this.productDto.getProductSn()+5));
     }
 
@@ -114,7 +114,7 @@ public class RemoveProductTest {
      */
     @Test
     void removeInvalidProductInvalidOwner() {
-        Assertions.assertFalse(this.sellerOwnerService.removeProduct(this.owner.getUserName()+"Not",
+        Assertions.assertFalse(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName()+"Not",
                 this.storeDto.getStoreId(), this.productDto.getProductSn()+5));
     }
 
@@ -124,7 +124,7 @@ public class RemoveProductTest {
      */
     @Test
     void removeInvalidProductInvalidStore() {
-        Assertions.assertFalse(this.sellerOwnerService.removeProduct(this.owner.getUserName(),
+        Assertions.assertFalse(this.sellerOwnerService.deleteProductFromStore(this.owner.getUserName(),
                 this.storeDto.getStoreId()+5, this.productDto.getProductSn()+5));
     }
 

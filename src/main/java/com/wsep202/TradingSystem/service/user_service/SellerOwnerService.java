@@ -1,10 +1,9 @@
 package com.wsep202.TradingSystem.service.user_service;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.Receipt;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
-import com.wsep202.TradingSystem.service.user_service.dto.ReceiptDto;
-import com.wsep202.TradingSystem.service.user_service.dto.StoreDto;
-import com.wsep202.TradingSystem.service.user_service.dto.UserSystemDto;
+import com.wsep202.TradingSystem.dto.ReceiptDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.UserSystemDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,7 @@ public class SellerOwnerService {
     /**
      * View store purchase history
      */
-    public List<ReceiptDto> viewPurchaseHistory(String ownerUsername, int storeId){
+    public List<ReceiptDto> viewPurchaseHistoryOfOwner(String ownerUsername, int storeId){
         return tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername,storeId);
     }
 
@@ -35,7 +34,7 @@ public class SellerOwnerService {
     /**
      * remove product
      */
-    public boolean removeProduct(String ownerUsername, int storeId, int productSn){
+    public boolean deleteProductFromStore(String ownerUsername, int storeId, int productSn){
         return tradingSystemFacade.deleteProductFromStore(ownerUsername, storeId, productSn);
     }
 

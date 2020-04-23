@@ -1,15 +1,14 @@
 package com.wsep202.TradingSystem.service.user_service.SellerOwnerServiceTest;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-import com.wsep202.TradingSystem.service.user_service.dto.DiscountPolicyDto;
-import com.wsep202.TradingSystem.service.user_service.dto.ProductDto;
-import com.wsep202.TradingSystem.service.user_service.dto.PurchasePolicyDto;
-import com.wsep202.TradingSystem.service.user_service.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.DiscountPolicyDto;
+import com.wsep202.TradingSystem.dto.PurchasePolicyDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

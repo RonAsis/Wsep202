@@ -1,14 +1,13 @@
 package com.wsep202.TradingSystem.service.user_service.BuyerRegisteredServiceTest;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.domain.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.trading_system_management.CardAction;
-import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-import com.wsep202.TradingSystem.service.user_service.dto.*;
+import com.wsep202.TradingSystem.dto.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +63,7 @@ public class PurchaseShoppingCartTest {
      */
     @Test
     void purchaseShoppingCartEmptyUsername() {
-        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCart("",
+        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCartBuyer("",
                 new PaymentDetailsDto(), new BillingAddressDto()));
     }
 
@@ -73,7 +72,7 @@ public class PurchaseShoppingCartTest {
      */
     @Test
     void purchaseShoppingCartUserNotRegistered() {
-        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCart("not registered",
+        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCartBuyer("not registered",
                 new PaymentDetailsDto(), new BillingAddressDto()));
     }
 
@@ -83,7 +82,7 @@ public class PurchaseShoppingCartTest {
     @Test
     void purchaseEmptyShoppingCartRegisteredUser() {
         registerUser();
-        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCart(this.userSystem.getUserName(),
+        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCartBuyer(this.userSystem.getUserName(),
                 new PaymentDetailsDto(), new BillingAddressDto()));
     }
 
@@ -93,7 +92,7 @@ public class PurchaseShoppingCartTest {
     @Test
     void purchaseEmptyShoppingCartNotRegisteredUser() {
         registerUser();
-        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCart(this.userSystem.getUserName()+"Not",
+        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCartBuyer(this.userSystem.getUserName()+"Not",
                 new PaymentDetailsDto(), new BillingAddressDto()));
     }
 
@@ -105,7 +104,7 @@ public class PurchaseShoppingCartTest {
         registerUser();
         int amount = 1;
         addToCart(amount);
-        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCart(this.userSystem.getUserName(),
+        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCartBuyer(this.userSystem.getUserName(),
                 this.paymentDetailsDto, this.billingAddressDto);
         Assertions.assertNotNull(this.receiptDto);
         Assertions.assertEquals(amount, this.receiptDto.get(0).getProductBoughtAmountByProductSn(this.productDto.getProductSn()));

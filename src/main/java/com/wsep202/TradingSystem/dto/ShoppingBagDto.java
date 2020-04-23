@@ -1,7 +1,5 @@
-package com.wsep202.TradingSystem.service.user_service.dto;
+package com.wsep202.TradingSystem.dto;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import com.wsep202.TradingSystem.domain.trading_system_management.Store;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
