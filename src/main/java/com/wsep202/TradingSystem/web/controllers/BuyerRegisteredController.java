@@ -3,30 +3,35 @@ package com.wsep202.TradingSystem.web.controllers;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
-@Controller
-@RequiredArgsConstructor
 @Slf4j
+@RestController
+@RequestMapping(PublicApiPaths.BUYER_REG_PATH)
+@Api(value = "API to buyer registered", produces = "application/json")
+@RequiredArgsConstructor
 public class BuyerRegisteredController {
 
     private final BuyerRegisteredService buyerRegisteredService;
 
     /**
      * logout username from the system
+     *
      * @param userName user to logout
      */
-    @MessageMapping("/logout")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/logout")
-    public boolean logout(String userName){
+    @ApiOperation(value = "logout")
+    @PutMapping("logout/{userName}")
+    public boolean logout(@PathVariable String userName) {
         return buyerRegisteredService.logout(userName);
     }
 
@@ -37,9 +42,12 @@ public class BuyerRegisteredController {
      * @param discountPolicy each store has policy for discount on products
      * @param storeName - store name
      */
-    @MessageMapping("/open-store")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/open-store")
-    public boolean openStore(String usernameOwner, PurchasePolicyDto purchasePolicy, DiscountPolicyDto discountPolicy, String storeName){
+    @ApiOperation(value = "open store")
+    @PostMapping("open-store/{usernameOwner}/{storeName}")
+    public boolean openStore(@PathVariable String usernameOwner,
+                             @RequestBody PurchasePolicyDto purchasePolicy,
+                             @RequestBody DiscountPolicyDto discountPolicy,
+                             @PathVariable String storeName){
         return buyerRegisteredService.openStore(usernameOwner, purchasePolicy, discountPolicy, storeName);
     }
 
@@ -47,9 +55,9 @@ public class BuyerRegisteredController {
      * watching on personal shopping cart of user
      * @param username identify user
      */
-    @MessageMapping("/watch-shopping-cart")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/watch-shopping-cart")
-    public Map<ProductDto,Integer> watchShoppingCart(String username){
+    @ApiOperation(value = "watch shopping cart")
+    @GetMapping("watch-shopping-cart/{username}")
+    public Map<ProductDto,Integer> watchShoppingCart(@PathVariable String username){
         return buyerRegisteredService.watchShoppingCart(username);
     }
 
@@ -57,32 +65,35 @@ public class BuyerRegisteredController {
      * View buyer purchase history
      * @param userName of the user the history belongs to
      */
-    @MessageMapping("/view-purchase-history")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/view-purchase-history")
-    public List<ReceiptDto> viewPurchaseHistory(String userName){
+    @ApiOperation(value = "view purchase history")
+    @GetMapping("view-purchase-history/{userName}")
+    public List<ReceiptDto> viewPurchaseHistory(@PathVariable String userName){
         return buyerRegisteredService.viewPurchaseHistory(userName);
     }
 
     /**
-     *      * save product in shopping bag
+     * save product in shopping bag
      * @param userName the username of the user which save in his bag
      * @param storeId store belobgs to the bag
      * @param productSn the identifier of the product
      * @param amount quantity to save
      */
-    @MessageMapping("/save-product-in-shopping-bag")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/save-product-in-shopping-bag")
-    public boolean saveProductInShoppingBag(String userName, int storeId, int productSn, int amount){
+    @ApiOperation(value = "save product in shopping bag")
+    @PostMapping("save-product-in-shopping-bag/{userName}/{storeId}/{productSn}/{amount}")
+    public boolean saveProductInShoppingBag(@PathVariable String userName,
+                                            @PathVariable int storeId,
+                                            @PathVariable int productSn,
+                                            @PathVariable int amount){
         return buyerRegisteredService.saveProductInShoppingBag(userName, storeId, productSn, amount);
     }
 
     /**
-     *      * view product in shopping bag
+     *view product in shopping bag
      * @param userName the user the bag belongs to
      */
-    @MessageMapping("/view-product-in-shopping-bag")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/view-product-in-shopping-bag")
-    public ShoppingCartDto viewProductsInShoppingCart(String userName){
+    @ApiOperation(value = "view products-in-shopping cart")
+    @GetMapping("view-product-in-shopping-cart/{userName}")
+    public ShoppingCartDto viewProductsInShoppingCart(@PathVariable String userName){
         return buyerRegisteredService.viewProductsInShoppingCart(userName);
     }
 
@@ -92,9 +103,11 @@ public class BuyerRegisteredController {
      * @param storeId the store belongs to the product
      * @param productSn identifier of product
      */
-    @MessageMapping("/remove-product-in-shopping-bag")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/remove-product-in-shopping-bag")
-    public boolean removeProductInShoppingBag(String userName, int storeId, int productSn){
+    @ApiOperation(value = "remove product in shopping bag")
+    @PostMapping("remove-product-in-shopping-bag/{userName}/{storeId}/{productSn}")
+    public boolean removeProductInShoppingBag(@PathVariable String userName,
+                                              @PathVariable int storeId,
+                                              @PathVariable int productSn){
         return buyerRegisteredService.removeProductInShoppingBag(userName, storeId, productSn);
     }
 
@@ -104,9 +117,12 @@ public class BuyerRegisteredController {
      * @param paymentDetails info to charge of the user
      * @param billingAddress the destination of the delivery
      */
+    @ApiOperation(value = "purchase shopping cart buyer")
+    @PutMapping("purchase-shopping-cart-buyer/{userName}")
     @MessageMapping("/purchase-shopping-cart-buyer")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/purchase-shopping-cart-buyer")
-    public List<ReceiptDto> purchaseShoppingCartBuyer(String userName, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddress){
+    public List<ReceiptDto> purchaseShoppingCartBuyer(@PathVariable String userName,
+                                                      @RequestBody PaymentDetailsDto paymentDetails,
+                                                      @RequestBody BillingAddressDto billingAddress){
         return buyerRegisteredService.purchaseShoppingCartBuyer(userName, paymentDetails, billingAddress);
     }
 

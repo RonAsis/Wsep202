@@ -3,18 +3,20 @@ package com.wsep202.TradingSystem.web.controllers;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
-@RequiredArgsConstructor
+//@Controller
 @Slf4j
+@RestController
+@RequestMapping(PublicApiPaths.GUEST_PATH)
+@Api(value = "API to guest", produces = "application/json")
+@RequiredArgsConstructor
 public class GuestController {
 
     private final GuestService guestService;
@@ -22,22 +24,22 @@ public class GuestController {
      * register user to the system
      * @param userName user to register - unique
      */
-    @MessageMapping("/register-user")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/register-user")
-    public boolean registerUser(String userName,
-                                String password,
-                                String firstName,
-                                String lastName){
+    @ApiOperation(value = "register user")
+    @PostMapping("register-user/{userName}/{password}/{firstName}/{lastName}")
+    public boolean registerUser(@PathVariable String userName,
+                                @PathVariable String password,
+                                @PathVariable String firstName,
+                                @PathVariable String lastName){
         return guestService.registerUser(userName, password, firstName, lastName);
     }
 
     /**
      * login user to the system
      */
-    @MessageMapping("/login")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/login")
-    public boolean login(String userName,
-                         String password){
+    @ApiOperation(value = "login")
+    @PutMapping("login/{userName}/{password}")
+    public boolean login(@PathVariable String userName,
+                         @PathVariable String password){
         return guestService.login(userName, password);
     }
 
@@ -45,9 +47,9 @@ public class GuestController {
      * see store information
      * @param storeId
      */
-    @MessageMapping("/view-store-info")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/view-store-info")
-    public StoreDto viewStoreInfo(int storeId){
+    @ApiOperation(value = "login")
+    @GetMapping("view-store-info/{storeId}")
+    public StoreDto viewStoreInfo(@PathVariable int storeId){
         return guestService.viewStoreInfo(storeId);
     }
 
@@ -57,9 +59,10 @@ public class GuestController {
      * @param productId - product to see
      * @return
      */
-    @MessageMapping("/view-product")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/view-product")
-    public ProductDto viewProduct(int storeId, int productId){
+    @ApiOperation(value = "view product")
+    @GetMapping("view-product/{storeId}/{productId}")
+    public ProductDto viewProduct(@PathVariable int storeId,
+                                  @PathVariable int productId){
         return guestService.viewProduct(storeId, productId);
     }
 
@@ -67,9 +70,9 @@ public class GuestController {
      * search product by productName
      * @param productName - criteria for search
      */
-    @MessageMapping("/search-product-by-name")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/search-product-by-name")
-    public List<ProductDto> searchProductByName(String productName){
+    @ApiOperation(value = "search product by name")
+    @GetMapping("search-product-by-name/{productName}")
+    public List<ProductDto> searchProductByName(@PathVariable String productName){
         return guestService.searchProductByName(productName);
     }
 
@@ -77,9 +80,9 @@ public class GuestController {
      * search product by category
      * @param category criteria for search
      */
-    @MessageMapping("/search-product-by-category")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/search-product-by-category")
-    public List<ProductDto> searchProductByCategory(String category){
+    @ApiOperation(value = "search product by category")
+    @GetMapping("search-product-by-category/{category}")
+    public List<ProductDto> searchProductByCategory(@PathVariable String category){
         return guestService.searchProductByCategory(category);
     }
 
@@ -87,9 +90,9 @@ public class GuestController {
      * search product by KeyWords
      * @param keyWords criteria for search
      */
-    @MessageMapping("/search-product-by-keywords")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/search-product-by-keywords")
-    public List<ProductDto> searchProductByKeyWords(List<String> keyWords){
+    @ApiOperation(value = "search product by keywords")
+    @GetMapping("search-product-by-keywords/{keywords}")
+    public List<ProductDto> searchProductByKeyWords(@RequestBody List<String> keyWords){
         return guestService.searchProductByKeyWords(keyWords);
     }
 
@@ -99,9 +102,11 @@ public class GuestController {
      * @param min low threshold
      * @param max threshold
      */
-    @MessageMapping("/filter-by-range-price")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/filter-by-range-price")
-    public List<ProductDto> filterByRangePrice(List<ProductDto> products, double min, double max){
+    @ApiOperation(value = "filter product by price")
+    @GetMapping("filter-by-range-price/{min}/{max}")
+    public List<ProductDto> filterByRangePrice(@RequestBody List<ProductDto> products,
+                                               @PathVariable  double min,
+                                               @PathVariable  double max){
         return guestService.filterByRangePrice(products, min, max);
     }
 
@@ -111,9 +116,10 @@ public class GuestController {
      * @param rank filter by rank of product
      * @return
      */
-    @MessageMapping("/filter-by-product-rank")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/filter-by-product-rank")
-    public List<ProductDto> filterByProductRank(List<ProductDto> products, int rank){
+    @ApiOperation(value = "filter product by product rank")
+    @GetMapping("filter-by-product-rank/{rank}")
+    public List<ProductDto> filterByProductRank(@RequestBody List<ProductDto> products,
+                                                @PathVariable int rank){
         return guestService.filterByProductRank(products, rank);
     }
 
@@ -122,9 +128,10 @@ public class GuestController {
      * @param products to filter
      * @param rank filter by rank of store
      */
-    @MessageMapping("/filter-by-store-rank")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/filter-by-store-rank")
-    public List<ProductDto> filterByStoreRank(List<ProductDto> products, int rank){
+    @ApiOperation(value = "filter product by store rank")
+    @GetMapping("filter-by-store-rank/{rank}")
+    public List<ProductDto> filterByStoreRank(@RequestBody List<ProductDto> products,
+                                              @PathVariable int rank){
         return guestService.filterByStoreRank(products, rank);
     }
 
@@ -133,21 +140,24 @@ public class GuestController {
      * @param products to filter
      * @param category filter criteria
      */
-    @MessageMapping("/filter-by-store-category")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/filter-by-store-category")
-    public List<ProductDto> filterByStoreCategory(List<ProductDto> products, String category){
+    @ApiOperation(value = "filter product by category")
+    @GetMapping("filter-by-store-rank/{category}")
+    public List<ProductDto> filterByStoreCategory(@RequestBody List<ProductDto> products,
+                                                  @PathVariable String category){
         return guestService.filterByStoreCategory(products, category);
     }
 
     /**
      * purchase shopping cart
-     * @param shoppingCart includes the bags of each store the user selected
-     * @param paymentDetails    - charging info of the user
+     * @param shoppingCartDto includes the bags of each store the user selected
+     * @param paymentDetailsDto    - charging info of the user
      * @param billingAddressDto - the destination to deliver the purchases
      */
-    @MessageMapping("/purchase-shopping-cart-guest")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/purchase-shopping-cart-guest")
-    public List<ReceiptDto> purchaseShoppingCartGuest(ShoppingCartDto shoppingCart, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddressDto){
-        return guestService.purchaseShoppingCartGuest(shoppingCart, paymentDetails, billingAddressDto);
+    @ApiOperation(value = "purchase shopping cart guest")
+    @PostMapping("purchase-shopping-cart-guest")
+    public List<ReceiptDto> purchaseShoppingCartGuest(@RequestBody ShoppingCartDto shoppingCartDto,
+                                                      @RequestBody PaymentDetailsDto paymentDetailsDto,
+                                                      @RequestBody  BillingAddressDto billingAddressDto){
+        return guestService.purchaseShoppingCartGuest(shoppingCartDto, paymentDetailsDto, billingAddressDto);
     }
 }

@@ -3,27 +3,32 @@ package com.wsep202.TradingSystem.web.controllers;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.service.user_service.SellerManagerService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
-@RequiredArgsConstructor
 @Slf4j
+@RestController
+@RequestMapping(PublicApiPaths.SELLER_MANAGER_PATH)
+@Api(value = "API to seller manager", produces = "application/json")
+@RequiredArgsConstructor
 public class SellerManagerController {
 
     private final SellerManagerService sellerManagerService;
     /**
      * View store purchase history
      */
-    @MessageMapping("/view-purchase-history-of-manager")
-    @SendTo(PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + "/view-purchase-history-of-manager")
-    public List<ReceiptDto> viewPurchaseHistoryOfManager(String userName, int storeId){
+    @ApiOperation(value = "view purchase history of manager")
+    @GetMapping("view-purchase-history-of-manager/{userName}/{storeId}")
+    public List<ReceiptDto> viewPurchaseHistoryOfManager(@PathVariable String userName,
+                                                         @PathVariable int storeId){
         return sellerManagerService.viewPurchaseHistoryOfManager(userName, storeId);
     }
 
