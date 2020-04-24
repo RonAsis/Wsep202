@@ -47,7 +47,7 @@ public class FilterByStoreRankTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

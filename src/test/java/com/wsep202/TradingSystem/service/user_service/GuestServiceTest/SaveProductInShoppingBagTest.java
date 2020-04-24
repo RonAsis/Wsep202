@@ -53,7 +53,7 @@ public class SaveProductInShoppingBagTest {
 
     @AfterEach
     void tearDown() {
-        this.guestService.clearDS();
+
     }
 
     /**

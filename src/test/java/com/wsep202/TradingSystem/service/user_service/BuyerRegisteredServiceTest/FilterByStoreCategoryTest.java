@@ -49,7 +49,7 @@ public class FilterByStoreCategoryTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

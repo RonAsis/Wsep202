@@ -47,7 +47,7 @@ public class FilterByProductRankTest {
 
     @AfterEach
     void tearDown() {
-        this.guestService.clearDS();
+
     }
 
     /**

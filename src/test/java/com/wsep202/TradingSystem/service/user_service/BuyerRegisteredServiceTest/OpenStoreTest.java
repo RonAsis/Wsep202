@@ -47,7 +47,7 @@ public class OpenStoreTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

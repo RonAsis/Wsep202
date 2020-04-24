@@ -44,7 +44,7 @@ public class ViewProductTest {
 
     @AfterEach
     void tearDown() {
-        this.guestService.clearDS();
+
     }
 
     /**

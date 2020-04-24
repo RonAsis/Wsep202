@@ -46,7 +46,7 @@ public class ViewProductsInShoppingCartTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

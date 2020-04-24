@@ -46,8 +46,7 @@ public class AddPermissionTest {
     }
 
     @AfterEach
-    void tearDown() {
-        this.sellerOwnerService.clearDS();
+    void tearDown(){
     }
     /**
      * add a valid permission, that is already permitted

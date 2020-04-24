@@ -73,7 +73,7 @@ public class TradingSystem {
             log.info("The user "+userToRegister.getUserName()+ " has been registered successfully.");
             return true;
         }
-        log.warn("The user "+userToRegister.getUserName()+ " failed to register (user already exist).");
+        log.info("The user "+userToRegister.getUserName()+ " failed to register (user already exist).");
         return false;
     }
 
@@ -86,33 +86,24 @@ public class TradingSystem {
         //verify the fields are not empty
         boolean isValid = true;
         if(user.getUserName()==null || user.getUserName().equals("")) {
-            log.error("user name is empty or null");
+            log.info("user name is empty or null");
             isValid = false;
         }
         else if(user.getPassword()==null || user.getPassword().equals("")) {
-            log.error("user "+ user.getUserName() +"'s password is empty or null");
+            log.info("user "+ user.getUserName() +"'s password is empty or null");
             isValid = false;
         }
         else if(user.getFirstName()==null || user.getFirstName().equals("")) {
-            log.error("user "+ user.getUserName() +"'s first name is empty or null");
+            log.info("user "+ user.getUserName() +"'s first name is empty or null");
             isValid = false;
         }
         else if(user.getLastName()==null || user.getLastName().equals("")) {
-            log.error("user "+ user.getUserName() +"'s last name is empty or null");
+            log.info("user "+ user.getUserName() +"'s last name is empty or null");
             isValid = false;
         }
         return isValid;
     }
 
-
-    /**
-     * for tests use only
-     * clear users and stores list
-     */
-    public void clearDS(){
-        this.users.clear();
-        this.stores.clear();
-    }
 
     /**
      * This method is used to make a login for a the user
@@ -145,12 +136,12 @@ public class TradingSystem {
     private boolean loginUser(UserSystem userToLogin, String password, Set<UserSystem> listOfUser, boolean isAdmin){
         boolean isRegistered = isRegistered(userToLogin, listOfUser);
         if (!isRegistered){
-            log.error("user "+ userToLogin.getUserName() +" is not a registered user");
+            log.info("user "+ userToLogin.getUserName() +" is not a registered user");
             return false;
         }
         //verify that the user's password is correct as saved in our system
         if(!externalServiceManagement.isAuthenticatedUserPassword(password,userToLogin)){
-            log.warn("The user "+userToLogin.getUserName()+" failed to login.");
+            log.info("The user "+userToLogin.getUserName()+" failed to login.");
             return false;
         }
         boolean suc = false;
@@ -175,7 +166,7 @@ public class TradingSystem {
      */
     private boolean isRegistered(UserSystem userToLogin, Set<UserSystem> listOfUser){
         if (listOfUser.size() == 0 || userToLogin == null){
-            log.error("user can't be null or size of list greater than 0");
+            log.info("user can't be null or size of list greater than 0");
             return false;
         }
         return listOfUser.stream()
@@ -200,7 +191,7 @@ public class TradingSystem {
      */
     public boolean logout(UserSystem user) {
         if (user == null){
-            log.error("user cant be null");
+            log.info("user cant be null");
             return false;
         }
         if(user.isLogin()){
@@ -208,7 +199,7 @@ public class TradingSystem {
             log.info("The user "+user.getUserName()+" logged out successfully.");
             return true;
         }
-        log.warn("The user "+user.getUserName()+ " failed to logout");
+        log.info("The user "+user.getUserName()+ " failed to logout");
         return false;
     }
 
@@ -728,10 +719,10 @@ public class TradingSystem {
                     return true;
                 }
             }
-            log.error("store '"+ ownedStore.getStoreName() +"' does not exists in system");
+            log.info("store '"+ ownedStore.getStoreName() +"' does not exists in system");
             return false;
        }
-        log.error("user "+ ownerUser.getUserName() +" or user "+ managerStore.getUserName() +" is not registered");
+        log.info("user "+ ownerUser.getUserName() +" or user "+ managerStore.getUserName() +" is not registered");
        return false;
     }
 }

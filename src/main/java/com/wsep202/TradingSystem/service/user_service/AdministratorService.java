@@ -55,11 +55,6 @@ public class AdministratorService {
         return this.tradingSystemFacade.getAdministratorsDtos();
     }
 
-    /**
-     * a function to clear the data structures
-     */
-    public void clearDS(){
-        this.tradingSystemFacade.clearDS();
-    }
+
 
 }

@@ -45,7 +45,7 @@ public class RemoveProductTest {
 
     @AfterEach
     void tearDown() {
-        this.sellerOwnerService.clearDS();
+
     }
 
     /**

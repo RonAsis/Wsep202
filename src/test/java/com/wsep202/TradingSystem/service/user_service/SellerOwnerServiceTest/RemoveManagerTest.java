@@ -46,7 +46,7 @@ public class RemoveManagerTest {
 
     @AfterEach
     void tearDown() {
-        this.sellerOwnerService.clearDS();
+
     }
 
     /**

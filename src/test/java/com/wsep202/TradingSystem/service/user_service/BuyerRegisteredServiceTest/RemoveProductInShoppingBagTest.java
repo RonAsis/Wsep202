@@ -43,7 +43,7 @@ public class RemoveProductInShoppingBagTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

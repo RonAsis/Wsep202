@@ -45,7 +45,7 @@ public class AddManagerTest {
 
     @AfterEach
     void tearDown() {
-        this.sellerOwnerService.clearDS();
+
     }
 
     /**

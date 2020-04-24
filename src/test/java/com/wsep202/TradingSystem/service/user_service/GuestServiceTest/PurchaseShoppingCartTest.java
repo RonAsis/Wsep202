@@ -53,7 +53,7 @@ public class PurchaseShoppingCartTest {
 
     @AfterEach
     void tearDown() {
-        this.guestService.clearDS();
+
     }
 
     /**

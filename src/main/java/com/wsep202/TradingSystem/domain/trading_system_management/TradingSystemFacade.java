@@ -631,14 +631,6 @@ public class TradingSystemFacade {
             return null;
         }
     }
-    /////////////////////////////////test utilities////////////////////////
-
-    /**
-     * This method is used for the tear down section in the acceptance tests
-     */
-    public void clearDS() {
-        this.tradingSystem.clearDS();
-    }
 
     //////////////////////////////// converters ///////////////////////////
 

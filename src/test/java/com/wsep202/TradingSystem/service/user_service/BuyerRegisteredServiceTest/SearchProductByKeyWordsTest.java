@@ -47,7 +47,7 @@ public class SearchProductByKeyWordsTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

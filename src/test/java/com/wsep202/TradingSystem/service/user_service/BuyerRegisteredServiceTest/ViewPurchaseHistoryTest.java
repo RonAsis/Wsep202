@@ -45,7 +45,7 @@ public class ViewPurchaseHistoryTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

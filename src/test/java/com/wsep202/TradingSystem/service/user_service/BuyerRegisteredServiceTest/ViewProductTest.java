@@ -45,7 +45,7 @@ public class ViewProductTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

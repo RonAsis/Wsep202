@@ -46,7 +46,7 @@ public class WatchShoppingCartTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

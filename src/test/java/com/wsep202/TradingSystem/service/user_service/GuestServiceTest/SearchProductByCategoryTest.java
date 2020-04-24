@@ -47,7 +47,7 @@ public class SearchProductByCategoryTest {
 
     @AfterEach
     void tearDown() {
-        this.guestService.clearDS();
+
     }
 
     /**

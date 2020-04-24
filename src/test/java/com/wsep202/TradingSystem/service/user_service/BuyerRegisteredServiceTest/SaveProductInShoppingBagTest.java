@@ -42,7 +42,7 @@ public class SaveProductInShoppingBagTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+
     }
 
     /**

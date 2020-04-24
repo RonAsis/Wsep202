@@ -45,7 +45,7 @@ public class AddOwnerTest {
 
     @AfterEach
     void tearDown() {
-        this.sellerOwnerService.clearDS();
+
     }
 
     /**

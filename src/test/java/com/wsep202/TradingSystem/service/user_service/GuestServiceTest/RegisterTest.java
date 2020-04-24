@@ -32,7 +32,7 @@ class RegisterTest {
 
     @AfterEach
     void tearDown() {
-        this.guestService.clearDS();
+
     }
 
     /**
