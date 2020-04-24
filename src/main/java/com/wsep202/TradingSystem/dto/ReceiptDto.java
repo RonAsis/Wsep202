@@ -38,7 +38,7 @@ public class ReceiptDto {
     /**
      * a list of all the products that the user bought in this purchase.
      */
-    private Map<ProductDto,Integer> productsBought = new HashMap<>();
+    private Map<ProductDto,Integer> productsBought;
 
     public Integer getProductBoughtAmountByProductSn(int productSn){
         for (ProductDto productDto: productsBought.keySet()){

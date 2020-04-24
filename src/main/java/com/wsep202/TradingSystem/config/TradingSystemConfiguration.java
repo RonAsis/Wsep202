@@ -7,6 +7,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemF
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,11 +15,19 @@ import org.springframework.context.annotation.Configuration;
 public class TradingSystemConfiguration {
 
     @Bean
-    public TradingSystem tradingSystem(FactoryObjects factoryObjects, ApplicationArguments applicationArguments) {
+    @ConditionalOnMissingBean
+    public ExternalServiceManagement externalServiceManagement(){
+        return new ExternalServiceManagement();
+    }
+
+    @Bean
+    public TradingSystem tradingSystem(FactoryObjects factoryObjects,
+                                       ApplicationArguments applicationArguments,
+                                       ExternalServiceManagement externalServiceManagement) {
         String usernameAdmin = applicationArguments.getSourceArgs()[0];
         String password = applicationArguments.getSourceArgs()[1];
         UserSystem admin = factoryObjects.createSystemUser(usernameAdmin, password, "admin", "admin");
-        return new TradingSystem(new ExternalServiceManagement(),admin);
+        return new TradingSystem(externalServiceManagement,admin);
     }
 
     @Bean

@@ -1,10 +1,13 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
+import com.wsep202.TradingSystem.config.TestConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
 import com.wsep202.TradingSystem.dto.*;
+import com.wsep202.TradingSystem.helprTests.AssertionHelperTest;
+import com.wsep202.TradingSystem.helprTests.ExternalServiceManagementMock;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
@@ -62,7 +65,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(userNameTest)).thenReturn(userSystem);
             when(userSystem.getReceipts()).thenReturn(receipts);
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(userNameTest);
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -79,7 +82,7 @@ class TradingSystemFacadeTest {
 
             //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId);
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -95,7 +98,7 @@ class TradingSystemFacadeTest {
 
             //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, username);
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -112,7 +115,7 @@ class TradingSystemFacadeTest {
 
             //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(managerUsername, storeId);
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -129,7 +132,7 @@ class TradingSystemFacadeTest {
 
             //test
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername, storeId);
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         @Test
@@ -345,7 +348,7 @@ class TradingSystemFacadeTest {
             //mock
             when(tradingSystem.getStore(storeId)).thenReturn(store);
             StoreDto storeDto = tradingSystemFacade.viewStoreInfo(storeId);
-            assertionStore(store, storeDto);
+            AssertionHelperTest.assertionStore(store, storeDto);
         }
 
         @Test
@@ -359,7 +362,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getStore(storeId)).thenReturn(store);
             when(store.getProduct(productId)).thenReturn(product);
             ProductDto productDto = tradingSystemFacade.viewProduct(storeId, productId);
-            assertProduct(product, productDto);
+            AssertionHelperTest.assertProduct(product, productDto);
         }
 
         @Test
@@ -368,7 +371,7 @@ class TradingSystemFacadeTest {
             String productName = "productName";
             when(tradingSystem.searchProductByName(productName)).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.searchProductByName(productName);
-            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
@@ -377,7 +380,7 @@ class TradingSystemFacadeTest {
             List<Product> products = new ArrayList<>(setUpProducts());
             when(tradingSystem.searchProductByCategory(ProductCategory.getProductCategory(category))).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.searchProductByCategory(category);
-            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
@@ -387,7 +390,7 @@ class TradingSystemFacadeTest {
             keyWords.add("test-key-words");
             when(tradingSystem.searchProductByKeyWords(keyWords)).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.searchProductByKeyWords(keyWords);
-            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
@@ -398,7 +401,7 @@ class TradingSystemFacadeTest {
             List<ProductDto> productsDtoArg = convertProductDtoList(products);
             when(tradingSystem.filterByRangePrice(products, minPrice, maxPrice)).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.filterByRangePrice(productsDtoArg, minPrice, maxPrice);
-            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
@@ -408,7 +411,7 @@ class TradingSystemFacadeTest {
             List<ProductDto> productsDtoArg = convertProductDtoList(products);
             when(tradingSystem.filterByProductRank(products, rank)).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.filterByProductRank(productsDtoArg, rank);
-            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
@@ -418,7 +421,7 @@ class TradingSystemFacadeTest {
             List<ProductDto> productsDtoArg = convertProductDtoList(products);
             when(tradingSystem.filterByStoreRank(products, rank)).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.filterByStoreRank(productsDtoArg, rank);
-            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
@@ -428,7 +431,7 @@ class TradingSystemFacadeTest {
             List<ProductDto> productsDtoArg = convertProductDtoList(products);
             when(tradingSystem.filterByStoreCategory(products, ProductCategory.getProductCategory(category))).thenReturn(products);
             List<ProductDto> productDtos = tradingSystemFacade.filterByStoreCategory(productsDtoArg, category);
-            assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test
@@ -458,7 +461,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.getUser(username)).thenReturn(userSystem);
             when(userSystem.getShoppingCart()).thenReturn(shoppingCart);
             ShoppingCartDto shoppingCartDto = tradingSystemFacade.viewProductsInShoppingCart(username);
-            assertShoppingCart(shoppingCart, shoppingCartDto);
+            AssertionHelperTest.assertShoppingCart(shoppingCart, shoppingCartDto);
         }
 
         @Test
@@ -490,7 +493,7 @@ class TradingSystemFacadeTest {
             when(tradingSystem.purchaseShoppingCart(any(), any(), any())).thenReturn(receiptsExpected);
 
             List<ReceiptDto> receiptDtoAcutal = tradingSystemFacade.purchaseShoppingCart(username, paymentDetailsDto, billingAddressDto);
-            assertReceipts(receiptsExpected, receiptDtoAcutal);
+            AssertionHelperTest.assertReceipts(receiptsExpected, receiptDtoAcutal);
         }
 
         @Test
@@ -505,13 +508,13 @@ class TradingSystemFacadeTest {
             when(tradingSystem.purchaseShoppingCartGuest(any(), any(), any())).thenReturn(receiptsExpected);
 
             List<ReceiptDto> receiptDtoActual = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto, paymentDetailsDto, billingAddressDto);
-            assertReceipts(receiptsExpected, receiptDtoActual);
+            AssertionHelperTest.assertReceipts(receiptsExpected, receiptDtoActual);
         }
     }
 
     // ******************************* integration test ******************************* //
     @Nested
-    @ContextConfiguration(classes = {TradingSystemConfiguration.class})
+    @ContextConfiguration(classes = {TestConfig.class, TradingSystemConfiguration.class})
     @WithModelMapper(basePackageClasses = TradingSystemMapper.class)
     @SpringBootTest(args = {"admin", "admin"})
     public class TradingSystemFacadeTestIntegration {
@@ -521,6 +524,9 @@ class TradingSystemFacadeTest {
 
         @Autowired
         private TradingSystem tradingSystem;
+
+        @Autowired
+        private ExternalServiceManagementMock externalServiceManagementMock;
 
         private Set<UserSystem> userSystems;
         private List<Receipt> receipts;
@@ -569,7 +575,7 @@ class TradingSystemFacadeTest {
             //call the function
             tradingSystem.getUser(currUser.getUserName()).setReceipts(receipts);
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(currUser.getUserName());
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         /**
@@ -604,7 +610,7 @@ class TradingSystemFacadeTest {
 
             // call the function
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(admin.getUserName(), store.getStoreId());
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         /**
@@ -644,7 +650,7 @@ class TradingSystemFacadeTest {
 
             //call the function
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(admin.getUserName(), testUserSystem.getUserName());
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         /**
@@ -701,7 +707,7 @@ class TradingSystemFacadeTest {
 
             // call the function
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(userSystemManager.getUserName(), store.getStoreId());
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         /**
@@ -774,7 +780,7 @@ class TradingSystemFacadeTest {
 
             // call the function
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfOwner(updatedOwner.getUserName(), store.getStoreId());
-            assertReceipts(receipts, receiptDtos);
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
         /**
@@ -1472,7 +1478,7 @@ class TradingSystemFacadeTest {
 
             // call the function
             StoreDto storeDto = tradingSystemFacade.viewStoreInfo(store.getStoreId());
-            assertionStore(store, storeDto);
+            AssertionHelperTest.assertionStore(store, storeDto);
         }
 
         /**
@@ -1501,7 +1507,7 @@ class TradingSystemFacadeTest {
                     .findFirst().get().products.stream().filter(product1 -> product1.getName().equals("table")).findFirst().get();
 
             ProductDto productDto = tradingSystemFacade.viewProduct(store.getStoreId(), product.getProductSn());
-            assertProduct(product, productDto);
+            AssertionHelperTest.assertProduct(product, productDto);
         }
 
         /**
@@ -1531,7 +1537,7 @@ class TradingSystemFacadeTest {
 
             //call the function
             List<ProductDto> productDtoList = tradingSystemFacade.searchProductByName(product.getName());
-            assertProduct(product, productDtoList.get(0));
+            AssertionHelperTest.assertProduct(product, productDtoList.get(0));
         }
 
         /**
@@ -1561,7 +1567,7 @@ class TradingSystemFacadeTest {
 
             //call the function
             List<ProductDto> productDtoList = tradingSystemFacade.searchProductByCategory(product.getCategory().category);
-            assertProduct(product, productDtoList.get(0));
+            AssertionHelperTest.assertProduct(product, productDtoList.get(0));
         }
 
         /**
@@ -1593,7 +1599,7 @@ class TradingSystemFacadeTest {
             List<String> listKeyWords = new ArrayList<>();
             listKeyWords.add(product.getName());
             List<ProductDto> productDtoList = tradingSystemFacade.searchProductByKeyWords(listKeyWords);
-            assertProduct(product, productDtoList.get(0));
+            AssertionHelperTest.assertProduct(product, productDtoList.get(0));
         }
 
         /**
@@ -1836,7 +1842,7 @@ class TradingSystemFacadeTest {
             ShoppingCart shoppingCart = setUpShoppingCart();
 
             ShoppingCartDto shoppingCartDto = tradingSystemFacade.viewProductsInShoppingCart(userSystemOwner.getUserName());
-            assertShoppingCart(shoppingCart, shoppingCartDto);
+            AssertionHelperTest.assertShoppingCart(shoppingCart, shoppingCartDto);
         }
 
         @Test
@@ -1935,125 +1941,7 @@ class TradingSystemFacadeTest {
     }
 
 
-    // ******************************* assert functions ******************************* //
-    private void assertUserSystem(Set<UserSystem> userSystems, Set<UserSystemDto> userSystemDtos) {
-        if (Objects.nonNull(userSystems)) {
-            userSystems.forEach(userSystemExpected -> {
-                Optional<UserSystemDto> userSystemOptional = userSystemDtos.stream()
-                        .filter(userSystem1 -> userSystem1.getUserName().equals(userSystemExpected.getUserName()))
-                        .findFirst();
-                Assertions.assertTrue(userSystemOptional.isPresent());
-                UserSystemDto userSystemDto = userSystemOptional.get();
-                Assertions.assertEquals(userSystemExpected.getUserName(), userSystemDto.getUserName());
-                Assertions.assertEquals(userSystemExpected.getFirstName(), userSystemDto.getFirstName());
-                Assertions.assertEquals(userSystemExpected.getLastName(), userSystemDto.getLastName());
-                assertSetStore(userSystemExpected.getOwnedStores(), userSystemDto.getOwnedStores());
-                assertSetStore(userSystemExpected.getManagedStores(), userSystemDto.getManagedStores());
-                assertShoppingCart(userSystemExpected.getShoppingCart(), userSystemDto.getShoppingCart());
-                assertReceipts(userSystemExpected.getReceipts(), userSystemDto.getReceipts());
-            });
-        }
-    }
 
-    private void assertShoppingCart(ShoppingCart shoppingCartExpected, ShoppingCartDto shoppingCartActual) {
-        shoppingCartExpected.getShoppingBagsList().forEach((storeKey, shoppingBagExpected) -> {
-            Map.Entry<StoreDto, ShoppingBagDto> storeDtoShoppingBagDtoEntry = shoppingCartActual.getShoppingBagsList().entrySet().stream()
-                    .filter(entry -> entry.getKey().getStoreId() == storeKey.getStoreId())
-                    .findFirst().orElseThrow(RuntimeException::new);
-            ShoppingBagDto shoppingBagDto = storeDtoShoppingBagDtoEntry.getValue();
-            Assertions.assertNotNull(shoppingBagDto);
-            //Assertions.assertEquals(shoppingBagExpected.getProductListFromStore(), shoppingBagDto.getProductListFromStore());
-        });
-    }
-
-    private void assertSetStore(Set<Store> stores, Set<StoreDto> storeDtos) {
-        stores.forEach(
-                storeExpected -> {
-                    Optional<StoreDto> storeDtoOpt = storeDtos.stream()
-                            .filter(storeDto -> storeDto.getStoreId() == storeExpected.getStoreId())
-                            .findFirst();
-                    Assertions.assertTrue(storeDtoOpt.isPresent());
-                    StoreDto storeDto = storeDtoOpt.get();
-                    assertionStore(storeExpected, storeDto);
-                }
-        );
-    }
-
-    private void assertPurchasePolicy(PurchasePolicy purchasePolicy, PurchasePolicyDto purchasePolicy1) {
-        Assertions.assertEquals(purchasePolicy.getWhoCanBuyStatus(), purchasePolicy1.getWhoCanBuyStatus());
-        Assertions.assertEquals(purchasePolicy.isAllAllowed(), purchasePolicy1.isAllAllowed());
-    }
-
-    private void assertProducts(Set<Product> products, Set<ProductDto> productsDtos) {
-        products.forEach(product -> {
-            Optional<ProductDto> productDtoOptional = productsDtos.stream().filter(productDto -> productDto.getProductSn() == product.getProductSn())
-                    .findFirst();
-            Assertions.assertTrue(productDtoOptional.isPresent());
-            assertProduct(product, productDtoOptional.get());
-        });
-    }
-
-    private void assertProduct(Product product, ProductDto productDto) {
-        Assertions.assertEquals(product.getProductSn(), productDto.getProductSn());
-        Assertions.assertEquals(product.getName(), productDto.getName());
-        Assertions.assertEquals(product.getCategory().category, productDto.getCategory());
-        Assertions.assertEquals(product.getAmount(), productDto.getAmount());
-        Assertions.assertEquals(product.getCost(), productDto.getCost());
-        Assertions.assertEquals(product.getRank(), productDto.getRank());
-        Assertions.assertEquals(product.getStoreId(), productDto.getStoreId());
-    }
-
-    private void assertDiscountPolicy(DiscountPolicy discountPolicy, DiscountPolicyDto discountPolicy1) {
-        Assertions.assertEquals(discountPolicy.getWhoCanBuyStatus(), discountPolicy1.getWhoCanBuyStatus());
-        Assertions.assertEquals(discountPolicy.isAllAllowed(), discountPolicy1.isAllAllowed());
-    }
-
-    private void assertReceipts(List<Receipt> receipts, List<ReceiptDto> receiptDtos) {
-        if (Objects.nonNull(receipts)) {
-            Assertions.assertEquals(receipts.size(), receiptDtos.size());
-            receipts.forEach(
-                    receipt -> {
-                        Optional<ReceiptDto> receiptDtoOpt = receiptDtos.stream()
-                                .filter(receiptDto -> receiptDto.getReceiptSn() == receipt.getReceiptSn())
-                                .findFirst();
-                        Assertions.assertTrue(receiptDtoOpt.isPresent());
-                        ReceiptDto receiptDto = receiptDtoOpt.get();
-                        assertionReceipt(receipt, receiptDto);
-                    }
-            );
-        }
-    }
-
-    private void assertionReceipt(Receipt receipt, ReceiptDto receiptDto) {
-        Assertions.assertEquals(receipt.getReceiptSn(), receiptDto.getReceiptSn());
-        Assertions.assertEquals(receipt.getStoreId(), receiptDto.getStoreId());
-        Assertions.assertEquals(receipt.getUserName(), receiptDto.getUserName());
-        Assertions.assertEquals(receipt.getAmountToPay(), receiptDto.getAmountToPay());
-        assertMapProducts(receipt.getProductsBought(), receiptDto.getProductsBought());
-    }
-
-    private void assertMapProducts(Map<Product, Integer> products, Map<ProductDto, Integer> productsDtos) {
-        products.keySet().forEach(product -> {
-            Optional<ProductDto> productDtoOptional = productsDtos.keySet().stream().filter(productDto ->
-                    productDto.getProductSn() == product.getProductSn())
-                    .findFirst();
-            Assertions.assertTrue(productDtoOptional.isPresent());
-            assertProduct(product, productDtoOptional.get());
-            Assertions.assertEquals(products.get(product).intValue(), productsDtos.get(productDtoOptional.get()).intValue());
-        });
-    }
-
-    private void assertionStore(Store store, StoreDto storeDto) {
-        Assertions.assertEquals(store.getStoreId(), storeDto.getStoreId());
-        Assertions.assertEquals(store.getStoreName(), storeDto.getStoreName());
-        assertProducts(store.getProducts(), storeDto.getProducts());
-        assertPurchasePolicy(store.getPurchasePolicy(), storeDto.getPurchasePolicy());
-        assertDiscountPolicy(store.getDiscountPolicy(), storeDto.getDiscountPolicy());
-        Assertions.assertEquals(store.getDiscountType().type, storeDto.getDiscountType());
-        Assertions.assertEquals(store.getPurchaseType().type, storeDto.getPurchaseType());
-        assertReceipts(store.getReceipts(), storeDto.getReceipts());
-        Assertions.assertEquals(store.getRank(), storeDto.getRank());
-    }
 
 // ******************************* set up ******************************* //
 
