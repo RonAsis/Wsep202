@@ -12,6 +12,7 @@ import java.util.*;
 @Builder
 @AllArgsConstructor
 @Data
+@NoArgsConstructor
 public class Receipt {
 
     private static int receiptSnAcc = 0;

@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.DecimalFormat;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 @Data
 @Slf4j
+@NoArgsConstructor
 public class ShoppingBag {
 
     //private Map<Integer, Integer> mapProductSnToAmount;

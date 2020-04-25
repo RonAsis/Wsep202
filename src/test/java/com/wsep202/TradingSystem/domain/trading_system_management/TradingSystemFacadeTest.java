@@ -914,7 +914,6 @@ class TradingSystemFacadeTest {
          * check the deleteProduct() functionality in case of exists store and userOwner and productName in the system
          */
         @Test
-        @Disabled
         void deleteProductFromStorePositive() {
             // create a user owner
             UserSystem userSystemOwner = UserSystem.builder()
@@ -1355,11 +1354,10 @@ class TradingSystemFacadeTest {
          * check the removeManager() functionality in case of exists store and userOwner and userManager in the system
          */
         @Test
-        @Disabled
         void removeManager() {
             // create a user owner
             UserSystem userSystemOwner = UserSystem.builder()
-                    .userName("KingRagnar")
+                    .userName("KingRagnarr")
                     .password("Odin12")
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
@@ -1369,7 +1367,7 @@ class TradingSystemFacadeTest {
 
             // create a user newManagerUser
             UserSystem userSystemManager = UserSystem.builder()
-                    .userName("KingRagnarManager")
+                    .userName("KingRagnarManagerr")
                     .password("Odin12Manager")
                     .firstName("RagnarManager")
                     .lastName("LodbrokManager").build();
@@ -1377,8 +1375,8 @@ class TradingSystemFacadeTest {
             UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName());
 
             // create a store
-            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
-            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
+            tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castroo");
+            Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castroo")).findFirst().get();
 
             tradingSystemFacade.addManager(updatedOwner.getUserName(), store.getStoreId(),
                     updatedManager.getUserName());
@@ -1872,7 +1870,6 @@ class TradingSystemFacadeTest {
 
 
         @Test
-        @Disabled
         void purchaseShoppingCart() {
             PaymentDetails paymentDetails = new PaymentDetails();
             BillingAddress billingAddress = new BillingAddress();
