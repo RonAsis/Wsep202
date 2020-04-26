@@ -259,14 +259,22 @@ class ExternalServiceManagementTest {
     public class ExternalServiceManagementTestIntegration{
         @BeforeEach
         void setUp() {
+
+
             externalServiceManagement = new ExternalServiceManagement();
-            securitySystem = new SecuritySystem();
+            //configure mock for security system
+            securitySystem = mock(SecuritySystem.class);
             String passwordAfterHash = "hashedPassword";
             String passwordTest = "password";
             String saltTest = "salt";
-            supplySystem = new SupplySystem();
+            when(securitySystem.generateSalt(512)).thenReturn(Optional.of(saltTest));
+            when(securitySystem.hashPassword(passwordTest,saltTest)).thenReturn(Optional.of(passwordAfterHash));
+            //configure mock for supply system
+            supplySystem = mock(SupplySystem.class);
 
-            chargeSystem = new ChargeSystem();
+            //configure mock for charge system
+            chargeSystem = mock(ChargeSystem.class);
+
             paymentDetails = new PaymentDetails();
             user = new UserSystem("username","luis","enrique",passwordTest);
             store = new Store(user,new PurchasePolicy(),new DiscountPolicy(),"keter");
@@ -285,7 +293,7 @@ class ExternalServiceManagementTest {
          */
         @Test
         void getEncryptedPasswordAndSalt() {
-            //success: the method encript the password and returns it as pair object and not null
+            //success: the method encrypt the password and returns it as pair object and not null
             Assertions.assertTrue(externalServiceManagement.getEncryptedPasswordAndSalt(user.getPassword()) instanceof PasswordSaltPair);
             Assertions.assertNotNull(externalServiceManagement.getEncryptedPasswordAndSalt(user.getPassword()));
         }

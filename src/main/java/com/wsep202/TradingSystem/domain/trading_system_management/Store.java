@@ -100,7 +100,7 @@ public class Store {
                     " for the store:"+ this.storeName);
         }
         if(!appointed){
-            log.error("The user: "+willBeOwner.getUserName()+" couldn't be appointed as owner by: "+ owner.getUserName()+" " +
+            log.info("The user: "+willBeOwner.getUserName()+" couldn't be appointed as owner by: "+ owner.getUserName()+" " +
                     "for the store: "+this.storeName);
         }
         return appointed;
@@ -121,7 +121,7 @@ public class Store {
                     " by: "+ownerStore.getUserName());
             return true;
         }
-        log.error("The user: "+newOwnerUser.getUserName()+" couldn't be added as an owner to the " +
+        log.info("The user: "+newOwnerUser.getUserName()+" couldn't be added as an owner to the " +
                 "store: "+this.storeName+
                 " by: "+ownerStore.getUserName());
         return false;
@@ -144,7 +144,7 @@ public class Store {
                     " for the store:"+ this.storeName);
         }
         if(!appointed){
-            log.error("The user: "+mangerStore.getAppointedManager().getUserName()+" couldn't be appointed as manager" +
+            log.info("The user: "+mangerStore.getAppointedManager().getUserName()+" couldn't be appointed as manager" +
                     " by: "+ owner.getUserName()+" " +
                     "for the store: "+this.storeName);
         }
@@ -169,7 +169,7 @@ public class Store {
             }
         }
         //the addition of manager failed
-        log.error("The user: "+newManagerUser.getUserName()+" couldn't be added as a manager to the store: "
+        log.info("The user: "+newManagerUser.getUserName()+" couldn't be added as a manager to the store: "
                 +this.storeName+
                 " by: "+ownerStore.getUserName());
         return false;
@@ -189,7 +189,7 @@ public class Store {
                     " from appointed managers of the store: "+this.storeName);
         }
         else {
-            log.error("The owner: "+owner.getUserName()+"failed to remove: "+mangerStore.getAppointedManager().getUserName()+"" +
+            log.info("The owner: "+owner.getUserName()+"failed to remove: "+mangerStore.getAppointedManager().getUserName()+"" +
                     " from appointed managers of the store: "+this.storeName);
         }
         return appointed;
@@ -214,7 +214,7 @@ public class Store {
                             " from the store: "+storeName+ " managers successfully");
                     return true;
                 }
-                log.error(ownerStore.getUserName()+" failed to remove: "+user.getUserName()+"" +
+                log.info(ownerStore.getUserName()+" failed to remove: "+user.getUserName()+"" +
                         " from the store: "+storeName);
             }
         }
@@ -235,7 +235,7 @@ public class Store {
             log.info("The product: "+product.getName()+" added to the store: "+this.storeName);
             return true;
         }
-        log.error("The product: "+product.getName()+" failed to add to the store: "+this.storeName);
+        log.info("The product: "+product.getName()+" failed to add to the store: "+this.storeName);
         return false;
     }
 
@@ -263,7 +263,7 @@ public class Store {
                 return true;
             }
         }
-        log.error("Failed to edit the product: "+productName);
+        log.info("Failed to edit the product: "+productName);
         return false;
     }
 
@@ -283,7 +283,7 @@ public class Store {
             }
         }
         //the user is not an owner of the store so can't remove
-        log.error("The product with id: "+ productSn+ " wasn't removed.");
+        log.info("The product with id: "+ productSn+ " wasn't removed.");
         return false;
     }
 
@@ -307,7 +307,7 @@ public class Store {
         MangerStore manager = getManagerObject(ownerStore,user.getUserName());
         boolean added = manager.addStorePermission(storePermission);    //add the permission
         if(!added){
-            log.error("couldn't add permission:" + storePermission.function + " " +
+            log.info("couldn't add permission:" + storePermission.function + " " +
                     "to: " + user.getUserName() + " by " + ownerStore.getUserName());
             return false;
         }
@@ -325,7 +325,7 @@ public class Store {
      */
     public boolean removePermissionFromManager(UserSystem ownerStore, UserSystem user, StorePermission storePermission) {
         if(!isOwner(ownerStore)) {    //verify the editor is owner in the store
-            log.error("couldn't add permission:" + storePermission.function + " " +
+            log.info("couldn't add permission:" + storePermission.function + " " +
                     "to: " + user.getUserName() + " by " + ownerStore.getUserName());
             return false;
         }
@@ -333,7 +333,7 @@ public class Store {
         MangerStore manager = getManagerObject(ownerStore,user.getUserName());
         boolean removed = manager.removeStorePermission(storePermission);    //add the permission
         if(!removed){
-            log.error("couldn't remove permission:" + storePermission.function + " " +
+            log.info("couldn't remove permission:" + storePermission.function + " " +
                     "to: " + user.getUserName() + " by " + ownerStore.getUserName());
             return false;
         }
