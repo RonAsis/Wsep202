@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -20,88 +21,88 @@ public class SellerOwnerService {
     /**
      * View store purchase history
      */
-    public List<ReceiptDto> viewPurchaseHistoryOfOwner(String ownerUsername, int storeId){
-        return tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername,storeId);
+    public List<ReceiptDto> viewPurchaseHistoryOfStoreOwner(String ownerUsername,
+                                                            int storeId,
+                                                            UUID uuid){
+        return tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername,storeId, uuid);
     }
 
     /**
      * add product
      */
-    public boolean addProduct(String ownerUsername, int storeId, String productName, String category, int amount, double cost ){
-         return tradingSystemFacade.addProduct(ownerUsername, storeId, productName, category, amount, cost);
+    public boolean addProduct(String ownerUsername,
+                              int storeId,
+                              String productName,
+                              String category,
+                              int amount,
+                              double cost,
+                              UUID uuid){
+         return tradingSystemFacade.addProduct(ownerUsername, storeId, productName, category, amount, cost, uuid);
     }
 
     /**
      * remove product
      */
-    public boolean deleteProductFromStore(String ownerUsername, int storeId, int productSn){
-        return tradingSystemFacade.deleteProductFromStore(ownerUsername, storeId, productSn);
+    public boolean deleteProductFromStore(String ownerUsername,
+                                          int storeId,
+                                          int productSn,
+                                          UUID uuid){
+        return tradingSystemFacade.deleteProductFromStore(ownerUsername, storeId, productSn, uuid);
     }
 
     /**
      * edit product
      */
-    public boolean editProduct(String ownerUsername, int storeId,int productSn, String productName, String category, int amount, double cost ){
-        return tradingSystemFacade.editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost);
+    public boolean editProduct(String ownerUsername,
+                               int storeId,
+                               int productSn,
+                               String productName,
+                               String category,
+                               int amount,
+                               double cost,
+                               UUID uuid){
+        return tradingSystemFacade.editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost, uuid);
     }
 
     /**
      * add owner
      */
-    public boolean addOwner(String ownerUsername, int storeId, String newOwnerUsername){
-        return tradingSystemFacade.addOwner(ownerUsername, storeId, newOwnerUsername);
+    public boolean addOwner(String ownerUsername,
+                            int storeId,
+                            String newOwnerUsername,
+                            UUID uuid){
+        return tradingSystemFacade.addOwner(ownerUsername, storeId, newOwnerUsername, uuid);
     }
 
     /**
      * remove manager
      */
-    public boolean removeManager(String ownerUsername, int storeId, String newManagerUsername){
-        return tradingSystemFacade.removeManager(ownerUsername, storeId, newManagerUsername);
+    public boolean removeManager(String ownerUsername,
+                                 int storeId,
+                                 String newManagerUsername,
+                                 UUID uuid){
+        return tradingSystemFacade.removeManager(ownerUsername, storeId, newManagerUsername, uuid);
     }
 
     /**
      * add permission
      */
-    public boolean addPermission(String ownerUsername, int storeId, String newManagerUsername, String permission){
-        return tradingSystemFacade.addPermission(ownerUsername, storeId, newManagerUsername, permission);
+    public boolean addPermission(String ownerUsername,
+                                 int storeId,
+                                 String newManagerUsername,
+                                 String permission,
+                                 UUID uuid){
+        return tradingSystemFacade.addPermission(ownerUsername, storeId, newManagerUsername, permission, uuid);
     }
 
     /**
      * add manager
      */
-    public boolean addManager(String ownerUsername, int storeId, String newManagerUsername){
-        return tradingSystemFacade.addManager(ownerUsername, storeId, newManagerUsername);
-    }
-
-    /**
-     * a function that returns the list of stores that are saved in the system
-     * @return - list of StoreDto's.
-     */
-    public List<StoreDto> getStoresDtos() {
-        return this.tradingSystemFacade.getStoresDtos();
-    }
-
-    /**
-     * a function that returns the list of users that are saved in the system
-     * @return - list of UserSystemDto's.
-     */
-    public List<UserSystemDto> getUsersDtos() {
-        return this.tradingSystemFacade.getUsersDtos();
-    }
-
-    /**
-     * a function that returns the list of administrators that are saved in the system
-     * @return - list of UserSystemDto's.
-     */
-    public List<UserSystemDto> getAdministratorsDtos() {
-        return this.tradingSystemFacade.getAdministratorsDtos();
-    }
-
-    /**
-     * a function to clear the data structures
-     */
-    public void clearDS(){
-        this.tradingSystemFacade.clearDS();
+    public boolean addManager(String ownerUsername,
+                              int storeId,
+                              String newManagerUsername,
+                              UUID uuid){
+        return tradingSystemFacade.addManager(ownerUsername, storeId, newManagerUsername, uuid);
     }
 
 }

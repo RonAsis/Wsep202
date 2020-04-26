@@ -7,12 +7,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -28,8 +26,9 @@ public class SellerManagerController {
     @ApiOperation(value = "view purchase history of manager")
     @GetMapping("view-purchase-history-of-manager/{userName}/{storeId}")
     public List<ReceiptDto> viewPurchaseHistoryOfManager(@PathVariable String userName,
-                                                         @PathVariable int storeId){
-        return sellerManagerService.viewPurchaseHistoryOfManager(userName, storeId);
+                                                         @PathVariable int storeId,
+                                                         @RequestBody UUID uuid){
+        return sellerManagerService.viewPurchaseHistoryOfManager(userName, storeId, uuid);
     }
 
 }

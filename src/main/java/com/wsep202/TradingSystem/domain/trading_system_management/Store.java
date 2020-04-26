@@ -39,11 +39,6 @@ public class Store {
     //The set purchase policy for the store
     private DiscountPolicy discountPolicy;
 
-
-    private DiscountType discountType;
-
-    private PurchaseType purchaseType;
-
     //owners of the store
     private Set<UserSystem> owners ;
 
@@ -57,20 +52,17 @@ public class Store {
     //the store rank
     private int rank;
 
-    public Store(UserSystem owner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy
-            , String storeName){
+    public Store(UserSystem owner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy,String storeName){
         receipts = new LinkedList<>();
         appointedOwners = new HashMap<>();
         appointedManagers = new HashMap<>();
         products = new HashSet<>();
         owners = new HashSet<>();
-        managers = new HashSet<MangerStore>();
+        managers = new HashSet<>();
         this.storeName = storeName;
         owners.add(owner);
         this.discountPolicy = discountPolicy;
         this.purchasePolicy = purchasePolicy;
-        this.discountType = discountType;
-        this.purchaseType = purchaseType;
         this.storeId = getStoreIdAcc();
         this.rank = 0;
     }

@@ -114,14 +114,14 @@ public class ViewProductTest {
 
         // opening a new store, owned by owner
         Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
-                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName"));
+                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName", uuid));
 
         // getting the storeDto of the store the owner opened
         this.storeDto = this.buyerRegisteredService.getStoresDtos().get(0);
 
         // adding a product to the owner's store
         Assertions.assertTrue(this.sellerOwnerService.addProduct(owner.getUserName(), storeDto.getStoreId(),
-                "motor", "motors", 20, 20));
+                "motor", "motors", 20, 20, uuid));
 
         // getting the productDto of the added product
         this.productDto = (ProductDto) this.buyerRegisteredService.getStoresDtos().get(0).getProducts().toArray()[0];

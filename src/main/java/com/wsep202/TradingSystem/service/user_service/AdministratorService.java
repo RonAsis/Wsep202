@@ -7,8 +7,10 @@ import com.wsep202.TradingSystem.dto.UserSystemDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -20,46 +22,15 @@ public class AdministratorService {
     /**
      * View store purchase history
      */
-    public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, int storeId){
-        return tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId);
+    public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, int storeId, UUID uuid){
+        return tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId, uuid);
     }
 
     /**
      * View buyer purchase history
      */
-    public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, String userName){
-        return tradingSystemFacade.viewPurchaseHistory(administratorUsername, userName);
-    }
-
-    /**
-     * a function that returns the list of stores that are saved in the system
-     * @return - list of StoreDto's.
-     */
-    public List<StoreDto> getStoresDtos() {
-        return this.tradingSystemFacade.getStoresDtos();
-    }
-
-    /**
-     * a function that returns the list of users that are saved in the system
-     * @return - list of UserSystemDto's.
-     */
-    public List<UserSystemDto> getUsersDtos() {
-        return this.tradingSystemFacade.getUsersDtos();
-    }
-
-    /**
-     * a function that returns the list of administrators that are saved in the system
-     * @return - list of UserSystemDto's.
-     */
-    public List<UserSystemDto> getAdministratorsDtos() {
-        return this.tradingSystemFacade.getAdministratorsDtos();
-    }
-
-    /**
-     * a function to clear the data structures
-     */
-    public void clearDS(){
-        this.tradingSystemFacade.clearDS();
+    public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, String userName, UUID uuid){
+        return tradingSystemFacade.viewPurchaseHistory(administratorUsername, userName, uuid);
     }
 
 }

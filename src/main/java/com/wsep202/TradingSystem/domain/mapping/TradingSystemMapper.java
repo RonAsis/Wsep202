@@ -22,15 +22,15 @@ public class TradingSystemMapper {
             Converter<DiscountType, String> discountTypeStringConverter =
                     ctx -> ctx.getSource() == null ? null : ctx.getSource().type;
 
-            typeMap.addMappings(mapper -> mapper.using(discountTypeStringConverter)
-                    .map(Store::getDiscountType, StoreDto::setDiscountType));
-
-            //
-            Converter<PurchaseType, String> purchaseTypeStringConverter =
-                    ctx -> ctx.getSource() == null ? null : ctx.getSource().type;
-
-            typeMap.addMappings(mapper -> mapper.using(purchaseTypeStringConverter)
-                    .map(Store::getPurchaseType, StoreDto::setPurchaseType));
+//            typeMap.addMappings(mapper -> mapper.using(discountTypeStringConverter)
+//                    .map(Store::getDiscountType, StoreDto::setDiscountType));
+//
+//            //
+//            Converter<PurchaseType, String> purchaseTypeStringConverter =
+//                    ctx -> ctx.getSource() == null ? null : ctx.getSource().type;
+//
+//            typeMap.addMappings(mapper -> mapper.using(purchaseTypeStringConverter)
+//                    .map(Store::getPurchaseType, StoreDto::setPurchaseType));
 
 
         }

@@ -118,14 +118,14 @@ public class ViewStorePurchaseHistoryTest {
 
         // opening a new store, owned by owner
         Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
-                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName"));
+                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName", uuid));
 
         // getting the storeDto of the store the owner opened
         this.storeDto = this.guestService.getStoresDtos().get(0);
 
         // adding a product to the owner's store
         Assertions.assertTrue(this.sellerOwnerService.addProduct(owner.getUserName(), storeDto.getStoreId(),
-                "motor", "motors", 20, 20));
+                "motor", "motors", 20, 20, uuid));
 
         // getting the productDto of the added product
         this.productDto = (ProductDto) this.guestService.getStoresDtos().get(0).getProducts().toArray()[0];
@@ -138,14 +138,14 @@ public class ViewStorePurchaseHistoryTest {
     void buyProduct(){
         int amount = 1;
         Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(this.owner.getUserName(),
-                this.storeDto.getStoreId(), this.productDto.getProductSn(), amount));
+                this.storeDto.getStoreId(), this.productDto.getProductSn(), amount, uuid));
 
         BillingAddressDto billingAddress = new BillingAddressDto(this.owner.getFirstName()+" "+this.owner.getLastName(),
                 "address", "city", "country", "1234567");
         PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
                 "year", "Cardholder", 798, "id");
         this.receiptDto = this.buyerRegisteredService.purchaseShoppingCartBuyer(this.owner.getUserName(),
-                paymentDetailsDto, billingAddress);
+                paymentDetailsDto, billingAddress, uuid);
         Assertions.assertNotNull(this.receiptDto);
         Assertions.assertEquals(amount, this.receiptDto.get(0).getProductBoughtAmountByProductSn(this.productDto.getProductSn()));
     }

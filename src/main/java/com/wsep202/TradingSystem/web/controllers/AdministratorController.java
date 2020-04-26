@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -29,8 +30,9 @@ public class AdministratorController {
     @GetMapping("view-purchase-history-store/{administratorUsername}/{storeId}")
     public List<ReceiptDto> viewPurchaseHistory(
             @PathVariable String administratorUsername,
-            @PathVariable int storeId) {
-        return administratorService.viewPurchaseHistory(administratorUsername, storeId);
+            @PathVariable int storeId,
+            @RequestBody UUID uuid) {
+        return administratorService.viewPurchaseHistory(administratorUsername, storeId, uuid);
     }
 
     /**
@@ -39,7 +41,8 @@ public class AdministratorController {
     @ApiOperation(value = "View Purchase History User")
     @GetMapping("view-purchase-history-user/{administratorUsername}/{userName}")
     public List<ReceiptDto> viewPurchaseHistory(@PathVariable String administratorUsername,
-                                                @PathVariable String userName) {
-        return administratorService.viewPurchaseHistory(administratorUsername, userName);
+                                                @PathVariable String userName,
+                                                @RequestBody UUID uuid) {
+        return administratorService.viewPurchaseHistory(administratorUsername, userName,uuid);
     }
 }

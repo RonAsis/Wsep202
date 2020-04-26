@@ -24,123 +24,123 @@ public class LoginTest {
     @Autowired
     GuestService guestService;
     UserSystem userSystem;
-
-    @BeforeEach
-    void setUp() {
-        userSystem = new UserSystem("username","name","lname","pass");
-    }
-
-    @AfterEach
-    void tearDown() {
-        this.guestService.clearDS();
-    }
-
-    /**
-     * log a registered user in to the system.
-     */
-    @Test
-    void loginRegisteredUser() {
-        registerUser();
-        Assertions.assertTrue(this.guestService.login(userSystem.getUserName(), userSystem.getPassword()));
-    }
-
-    /**
-     * log a registered user with invalid password in to the system.
-     */
-    @Test
-    void loginRegisteredUserInValidPassword() {
-        registerUser();
-        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), userSystem.getPassword()+"invalid"));
-    }
-
-    /**
-     * log a registered user with invalid username in to the system.
-     */
-    @Test
-    void loginRegisteredUserInValidUsername() {
-        registerUser();
-        Assertions.assertFalse(this.guestService.login(userSystem.getUserName()+"invalid", userSystem.getPassword()));
-    }
-
-    /**
-     * log a registered user with null username in to the system.
-     */
-    @Test
-    void loginRegisteredUserNullUsername() {
-        registerUser();
-        Assertions.assertFalse(this.guestService.login(null, userSystem.getPassword()));
-    }
-
-    /**
-     * log a registered user with null password in to the system.
-     */
-    @Test
-    void loginRegisteredUserNullPassword() {
-        registerUser();
-        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), null));
-    }
-    /**
-     * log a registered user with empty username in to the system.
-     */
-    @Test
-    void loginRegisteredUserEmptyUsername() {
-        registerUser();
-        Assertions.assertFalse(this.guestService.login("", userSystem.getPassword()));
-    }
-
-    /**
-     * log a registered user with empty password in to the system.
-     */
-    @Test
-    void loginRegisteredUserEmptyPassword() {
-        registerUser();
-        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), ""));
-    }
-
-    /**
-     * log an unregistered user in to the system.
-     */
-    @Test
-    void loginUnregisteredUser() {
-        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), userSystem.getPassword()));
-    }
-
-    /**
-     * log an unregistered user with null username in to the system.
-     */
-    @Test
-    void loginUnregisteredUserNullUsername() {
-        Assertions.assertFalse(this.guestService.login(null, userSystem.getPassword()));
-    }
-
-    /**
-     * log an unregistered user with null password in to the system.
-     */
-    @Test
-    void loginUnregisteredUserNullPassword() {
-        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), null));
-    }
-    /**
-     * log an unregistered user with empty username in to the system.
-     */
-    @Test
-    void loginUnregisteredUserEmptyUsername() {
-        Assertions.assertFalse(this.guestService.login("", userSystem.getPassword()));
-    }
-
-    /**
-     * log an unregistered user with empty password in to the system.
-     */
-    @Test
-    void loginUnregisteredUserEmptyPassword() {
-        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), ""));
-    }
-
-    /**
-     * register user into the system
-     */
-    private void registerUser() {
-        Assertions.assertTrue(this.guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
-                userSystem.getFirstName(), userSystem.getLastName()));
-    }
+//
+//    @BeforeEach
+//    void setUp() {
+//        userSystem = new UserSystem("username","name","lname","pass");
+//    }
+//
+//    @AfterEach
+//    void tearDown() {
+//        this.guestService.clearDS();
+//    }
+//
+//    /**
+//     * log a registered user in to the system.
+//     */
+//    @Test
+//    void loginRegisteredUser() {
+//        registerUser();
+//        Assertions.assertTrue(this.guestService.login(userSystem.getUserName(), userSystem.getPassword()));
+//    }
+//
+//    /**
+//     * log a registered user with invalid password in to the system.
+//     */
+//    @Test
+//    void loginRegisteredUserInValidPassword() {
+//        registerUser();
+//        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), userSystem.getPassword()+"invalid"));
+//    }
+//
+//    /**
+//     * log a registered user with invalid username in to the system.
+//     */
+//    @Test
+//    void loginRegisteredUserInValidUsername() {
+//        registerUser();
+//        Assertions.assertFalse(this.guestService.login(userSystem.getUserName()+"invalid", userSystem.getPassword()));
+//    }
+//
+//    /**
+//     * log a registered user with null username in to the system.
+//     */
+//    @Test
+//    void loginRegisteredUserNullUsername() {
+//        registerUser();
+//        Assertions.assertFalse(this.guestService.login(null, userSystem.getPassword()));
+//    }
+//
+//    /**
+//     * log a registered user with null password in to the system.
+//     */
+//    @Test
+//    void loginRegisteredUserNullPassword() {
+//        registerUser();
+//        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), null));
+//    }
+//    /**
+//     * log a registered user with empty username in to the system.
+//     */
+//    @Test
+//    void loginRegisteredUserEmptyUsername() {
+//        registerUser();
+//        Assertions.assertFalse(this.guestService.login("", userSystem.getPassword()));
+//    }
+//
+//    /**
+//     * log a registered user with empty password in to the system.
+//     */
+//    @Test
+//    void loginRegisteredUserEmptyPassword() {
+//        registerUser();
+//        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), ""));
+//    }
+//
+//    /**
+//     * log an unregistered user in to the system.
+//     */
+//    @Test
+//    void loginUnregisteredUser() {
+//        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), userSystem.getPassword()));
+//    }
+//
+//    /**
+//     * log an unregistered user with null username in to the system.
+//     */
+//    @Test
+//    void loginUnregisteredUserNullUsername() {
+//        Assertions.assertFalse(this.guestService.login(null, userSystem.getPassword()));
+//    }
+//
+//    /**
+//     * log an unregistered user with null password in to the system.
+//     */
+//    @Test
+//    void loginUnregisteredUserNullPassword() {
+//        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), null));
+//    }
+//    /**
+//     * log an unregistered user with empty username in to the system.
+//     */
+//    @Test
+//    void loginUnregisteredUserEmptyUsername() {
+//        Assertions.assertFalse(this.guestService.login("", userSystem.getPassword()));
+//    }
+//
+//    /**
+//     * log an unregistered user with empty password in to the system.
+//     */
+//    @Test
+//    void loginUnregisteredUserEmptyPassword() {
+//        Assertions.assertFalse(this.guestService.login(userSystem.getUserName(), ""));
+//    }
+//
+//    /**
+//     * register user into the system
+//     */
+//    private void registerUser() {
+//        Assertions.assertTrue(this.guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
+//                userSystem.getFirstName(), userSystem.getLastName()));
+//    }
 }

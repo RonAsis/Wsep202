@@ -30,11 +30,6 @@ class RegisterTest {
         userSystem = new UserSystem("username","name","lname","pass");
     }
 
-    @AfterEach
-    void tearDown() {
-        this.guestService.clearDS();
-    }
-
     /**
      * Registering a user with an unused-valid username and details.
      */

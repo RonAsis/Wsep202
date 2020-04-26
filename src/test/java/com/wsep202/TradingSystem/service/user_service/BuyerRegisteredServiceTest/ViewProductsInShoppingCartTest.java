@@ -46,7 +46,7 @@ public class ViewProductsInShoppingCartTest {
 
     @AfterEach
     void tearDown() {
-        this.buyerRegisteredService.clearDS();
+//        this.buyerRegisteredService.clearDS();
     }
 
     /**
@@ -54,7 +54,7 @@ public class ViewProductsInShoppingCartTest {
      */
     @Test
     void viewShoppingCartNotRegisteredUser() {
-        Assertions.assertNull(this.buyerRegisteredService.viewProductsInShoppingCart(this.userSystem.getUserName()));
+        Assertions.assertNull(this.buyerRegisteredService.watchShoppingCart(this.userSystem.getUserName(), uuid));
     }
 
     /**
@@ -62,7 +62,7 @@ public class ViewProductsInShoppingCartTest {
      */
     @Test
     void viewShoppingCartNotRegisteredEmptyUsername() {
-        Assertions.assertNull(this.buyerRegisteredService.viewProductsInShoppingCart(""));
+        Assertions.assertNull(this.buyerRegisteredService.watchShoppingCart("", uuid));
     }
 
     /**
@@ -75,7 +75,7 @@ public class ViewProductsInShoppingCartTest {
         Map<StoreDto, ShoppingBagDto> shoppingBagList = new HashMap<>();
         shoppingCartDto.setShoppingBagsList(shoppingBagList);
         Assertions.assertEquals(shoppingCartDto,
-                this.buyerRegisteredService.viewProductsInShoppingCart(this.userSystem.getUserName()));
+                this.buyerRegisteredService.watchShoppingCart(this.userSystem.getUserName(), uuid));
     }
 
     /**
@@ -89,14 +89,14 @@ public class ViewProductsInShoppingCartTest {
 
         // opening a new store, owned by owner
         Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
-                new PurchasePolicyDto(), new DiscountPolicyDto(),"storeName"));
+                new PurchasePolicyDto(), new DiscountPolicyDto(),"storeName", uuid));
 
         // getting the storeDto of the store the owner opened
         this.storeDto = this.buyerRegisteredService.getStoresDtos().get(0);
 
         // adding a product to the owner's store
         Assertions.assertTrue(this.sellerOwnerService.addProduct(owner.getUserName(), storeDto.getStoreId(),
-                "motor", "motors", 20, 20));
+                "motor", "motors", 20, 20, uuid));
         // getting the productDto of the added product
 
         this.productDto = (ProductDto) this.buyerRegisteredService.getStoresDtos().get(0).getProducts().toArray()[0];

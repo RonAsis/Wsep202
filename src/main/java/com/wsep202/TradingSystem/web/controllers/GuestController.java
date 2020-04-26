@@ -5,13 +5,14 @@ import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
-//@Controller
 @Slf4j
 @RestController
 @RequestMapping(PublicApiPaths.GUEST_PATH)
@@ -38,8 +39,8 @@ public class GuestController {
      */
     @ApiOperation(value = "login")
     @PutMapping("login/{userName}/{password}")
-    public boolean login(@PathVariable String userName,
-                         @PathVariable String password){
+    public Pair<UUID, Boolean> login(@PathVariable String userName,
+                                    @PathVariable String password){
         return guestService.login(userName, password);
     }
 

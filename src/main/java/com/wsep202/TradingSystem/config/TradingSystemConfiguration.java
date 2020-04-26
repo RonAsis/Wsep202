@@ -1,10 +1,7 @@
 package com.wsep202.TradingSystem.config;
 
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
-import com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement;
-import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem;
-import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
+import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,6 +13,12 @@ public class TradingSystemConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public TradingSystemDao tradingSystemDao(){
+        return new TradingSystemDaoImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public ExternalServiceManagement externalServiceManagement(){
         return new ExternalServiceManagement();
     }
@@ -23,11 +26,12 @@ public class TradingSystemConfiguration {
     @Bean
     public TradingSystem tradingSystem(FactoryObjects factoryObjects,
                                        ApplicationArguments applicationArguments,
-                                       ExternalServiceManagement externalServiceManagement) {
+                                       ExternalServiceManagement externalServiceManagement,
+                                       TradingSystemDao tradingSystemDao) {
         String usernameAdmin = applicationArguments.getSourceArgs()[0];
         String password = applicationArguments.getSourceArgs()[1];
         UserSystem admin = factoryObjects.createSystemUser(usernameAdmin, password, "admin", "admin");
-        return new TradingSystem(externalServiceManagement,admin);
+        return new TradingSystem(externalServiceManagement,admin, tradingSystemDao);
     }
 
     @Bean

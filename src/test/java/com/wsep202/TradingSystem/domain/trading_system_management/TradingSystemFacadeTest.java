@@ -63,7 +63,7 @@ class TradingSystemFacadeTest {
         void viewPurchaseHistoryUser() {
             List<Receipt> receipts = setUpReceipts();
             String userNameTest = "userNameTest";
-            when(tradingSystem.getUser(userNameTest)).thenReturn(userSystem);
+            when(tradingSystem.getUser(userNameTest, uuid)).thenReturn(userSystem);
             when(userSystem.getReceipts()).thenReturn(receipts);
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(userNameTest);
             AssertionHelperTest.assertReceipts(receipts, receiptDtos);
@@ -78,7 +78,7 @@ class TradingSystemFacadeTest {
             int storeId = 1;
 
             //mock
-            when(tradingSystem.getStoreByAdmin(administratorUsername, storeId)).thenReturn(store);
+            when(tradingSystem.getStoreByAdmin(administratorUsername, storeId, uuid)).thenReturn(store);
             when(store.getReceipts()).thenReturn(receipts);
 
             //test
@@ -94,7 +94,7 @@ class TradingSystemFacadeTest {
             String username = "usernameTest";
 
             //mock
-            when(tradingSystem.getUserByAdmin(administratorUsername, username)).thenReturn(userSystem);
+            when(tradingSystem.getUserByAdmin(administratorUsername, username, uuid)).thenReturn(userSystem);
             when(userSystem.getReceipts()).thenReturn(receipts);
 
             //test
@@ -110,12 +110,12 @@ class TradingSystemFacadeTest {
             int storeId = 1;
 
             //mock
-            when(tradingSystem.getUser(managerUsername)).thenReturn(userSystem);
+            when(tradingSystem.getUser(managerUsername, uuid)).thenReturn(userSystem);
             when(userSystem.getManagerStore(storeId)).thenReturn(store);
             when(store.getReceipts()).thenReturn(receipts);
 
             //test
-            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(managerUsername, storeId);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(managerUsername, storeId, uuid);
             AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
@@ -127,7 +127,7 @@ class TradingSystemFacadeTest {
             int storeId = 1;
 
             //mock
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.getReceipts()).thenReturn(receipts);
 
@@ -143,7 +143,7 @@ class TradingSystemFacadeTest {
             int storeId = 1;
 
             //mock
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.addNewProduct(any(), any())).thenReturn(true);
 
@@ -164,7 +164,7 @@ class TradingSystemFacadeTest {
             int productSn = 1;
 
             //mock
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.removeProductFromStore(userSystem, productSn)).thenReturn(true);
 
@@ -184,13 +184,13 @@ class TradingSystemFacadeTest {
             double cost = 3434;
 
             //mock
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.editProduct(userSystem, productSn, productName, category, amount, cost)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
-                    .editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost));
+                    .editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost, uuid));
         }
 
         @Test
@@ -203,14 +203,14 @@ class TradingSystemFacadeTest {
 
             //mock
             UserSystem newOwner = mock(UserSystem.class);
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
-            when(tradingSystem.getUser(newOwnerUsername)).thenReturn(newOwner);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
+            when(tradingSystem.getUser(newOwnerUsername, uuid)).thenReturn(newOwner);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(tradingSystem.addOwnerToStore(store, userSystem, newOwner)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
-                    .addOwner(ownerUsername, storeId, newOwnerUsername));
+                    .addOwner(ownerUsername, storeId, newOwnerUsername, uuid));
         }
 
         @Test
@@ -223,14 +223,14 @@ class TradingSystemFacadeTest {
 
             //mock
             UserSystem newOwner = mock(UserSystem.class);
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
-            when(tradingSystem.getUser(newManagerUsername)).thenReturn(newOwner);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
+            when(tradingSystem.getUser(newManagerUsername, uuid)).thenReturn(newOwner);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(tradingSystem.addMangerToStore(store, userSystem, newOwner)).thenReturn(true);
 
             //test
             Assertions.assertTrue(tradingSystemFacade
-                    .addManager(ownerUsername, storeId, newManagerUsername));
+                    .addManager(ownerUsername, storeId, newManagerUsername, uuid));
         }
 
         @Test
@@ -243,14 +243,14 @@ class TradingSystemFacadeTest {
 
             //mock
             UserSystem managerStore = mock(UserSystem.class);
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
             when(store.addPermissionToManager(userSystem, managerStore, StorePermission.getStorePermission(storePermission)))
                     .thenReturn(true);
             //test
             Assertions.assertTrue(tradingSystemFacade
-                    .addPermission(ownerUsername, storeId, managerUsername, storePermission));
+                    .addPermission(ownerUsername, storeId, managerUsername, storePermission, uuid));
         }
 
         @Test
@@ -262,13 +262,13 @@ class TradingSystemFacadeTest {
 
             //mock
             UserSystem managerStore = mock(UserSystem.class);
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
             when(userSystem.getOwnerStore(storeId)).thenReturn(store);
             when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
             when(tradingSystem.removeManager(store, userSystem, managerStore)).thenReturn(true);
             //test
             Assertions.assertTrue(tradingSystemFacade
-                    .removeManager(ownerUsername, storeId, managerUsername));
+                    .removeManager(ownerUsername, storeId, managerUsername, uuid));
         }
 
         @Test
@@ -277,7 +277,7 @@ class TradingSystemFacadeTest {
             String userName = "username";
 
             //mock
-            when(tradingSystem.getUser(userName)).thenReturn(userSystem);
+            when(tradingSystem.getUser(userName, uuid)).thenReturn(userSystem);
             when(userSystem.logout()).thenReturn(true);
 
             //test
@@ -301,7 +301,7 @@ class TradingSystemFacadeTest {
             PurchasePolicy purchasePolicy = mock(PurchasePolicy.class);
             DiscountPolicy discountPolicy = mock(DiscountPolicy.class);
 
-            when(tradingSystem.getUser(ownerUsername)).thenReturn(userSystem);
+            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
             when(modelMapper.map(purchasePolicyDto, PurchasePolicy.class)).thenReturn(purchasePolicy);
             when(modelMapper.map(discountPolicyDto, DiscountPolicy.class)).thenReturn(discountPolicy);
             when(tradingSystem.openStore(userSystem, purchasePolicy, discountPolicy, storeName)).thenReturn(true);
@@ -332,7 +332,7 @@ class TradingSystemFacadeTest {
             String password = "password";
 
             //mock
-            when(tradingSystem.getUser(userName)).thenReturn(userSystem);
+            when(tradingSystem.getUser(userName, uuid)).thenReturn(userSystem);
             when(tradingSystem.login(userSystem, false, password)).thenReturn(true);
 
             //test
@@ -445,7 +445,7 @@ class TradingSystemFacadeTest {
 
             //mock
             Product product = mock(Product.class);
-            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(tradingSystem.getUser(username, uuid)).thenReturn(userSystem);
             when(tradingSystem.getStore(storeId)).thenReturn(store);
             when(store.getProduct(productSn)).thenReturn(product);
             when(userSystem.saveProductInShoppingBag(store, product, amount)).thenReturn(true);
@@ -459,7 +459,7 @@ class TradingSystemFacadeTest {
             String username = "username";
             ShoppingCart shoppingCart = setUpShoppingCart();
             //mock
-            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(tradingSystem.getUser(username, uuid)).thenReturn(userSystem);
             when(userSystem.getShoppingCart()).thenReturn(shoppingCart);
             ShoppingCartDto shoppingCartDto = tradingSystemFacade.viewProductsInShoppingCart(username);
             AssertionHelperTest.assertShoppingCart(shoppingCart, shoppingCartDto);
@@ -474,7 +474,7 @@ class TradingSystemFacadeTest {
 
             //mock
             Product product = mock(Product.class);
-            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(tradingSystem.getUser(username, uuid)).thenReturn(userSystem);
             when(tradingSystem.getStore(storeId)).thenReturn(store);
             when(store.getProduct(productSn)).thenReturn(product);
             when(userSystem.removeProductInShoppingBag(store, product)).thenReturn(true);
@@ -490,7 +490,7 @@ class TradingSystemFacadeTest {
             List<Receipt> receiptsExpected = setUpReceipts();
             List<ReceiptDto> receiptDtos = convertReceiptDtoList(receiptsExpected);
             //mock
-            when(tradingSystem.getUser(username)).thenReturn(userSystem);
+            when(tradingSystem.getUser(username, uuid)).thenReturn(userSystem);
             when(tradingSystem.purchaseShoppingCart(any(), any(), any())).thenReturn(receiptsExpected);
 
             List<ReceiptDto> receiptDtoAcutal = tradingSystemFacade.purchaseShoppingCart(username, paymentDetailsDto, billingAddressDto);
@@ -574,7 +574,7 @@ class TradingSystemFacadeTest {
             receipts = setUpReceipts();
             currUser.setReceipts(receipts);
             //call the function
-            tradingSystem.getUser(currUser.getUserName()).setReceipts(receipts);
+            tradingSystem.getUser(currUser.getUserName(), uuid).setReceipts(receipts);
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(currUser.getUserName());
             AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
@@ -647,7 +647,7 @@ class TradingSystemFacadeTest {
             tradingSystemFacade.registerUser(testUserSystem.getUserName(), testUserSystem.getPassword(), testUserSystem.getFirstName(), testUserSystem.getLastName());
             List<Receipt> receipts = setUpReceipts();
             testUserSystem.setReceipts(receipts);
-            tradingSystem.getUser(testUserSystem.getUserName()).setReceipts(receipts);
+            tradingSystem.getUser(testUserSystem.getUserName(), uuid).setReceipts(receipts);
 
             //call the function
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(admin.getUserName(), testUserSystem.getUserName());
@@ -687,8 +687,8 @@ class TradingSystemFacadeTest {
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
             List<Receipt> receipts = setUpReceipts();
             userSystemOwner.setReceipts(receipts);
-            tradingSystem.getUser(userSystemOwner.getUserName()).setReceipts(receipts);
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            tradingSystem.getUser(userSystemOwner.getUserName(), uuid).setReceipts(receipts);
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a user manager
             UserSystem userSystemManager = UserSystem.builder()
@@ -698,16 +698,16 @@ class TradingSystemFacadeTest {
                     .lastName("LodbrokManager").build();
             tradingSystemFacade.registerUser(userSystemManager.getUserName(), userSystemManager.getPassword(), userSystemManager.getFirstName(), userSystemManager.getLastName());
             userSystemManager.setReceipts(receipts);
-            tradingSystem.getUser(userSystemManager.getUserName()).setReceipts(receipts);
+            tradingSystem.getUser(userSystemManager.getUserName(), uuid).setReceipts(receipts);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
             store.setReceipts(receipts);
-            tradingSystemFacade.addManager(updatedOwner.getUserName(), store.getStoreId(), userSystemManager.getUserName());
+            tradingSystemFacade.addManager(updatedOwner.getUserName(), store.getStoreId(), userSystemManager.getUserName(), uuid);
 
             // call the function
-            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(userSystemManager.getUserName(), store.getStoreId());
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(userSystemManager.getUserName(), store.getStoreId(), uuid);
             AssertionHelperTest.assertReceipts(receipts, receiptDtos);
         }
 
@@ -729,11 +729,11 @@ class TradingSystemFacadeTest {
                     "castro");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
             store.setReceipts(receipts);
-            tradingSystemFacade.addManager(testUserSystem.getUserName(), store.getStoreId(), testUserSystem.getUserName());
+            tradingSystemFacade.addManager(testUserSystem.getUserName(), store.getStoreId(), testUserSystem.getUserName(), uuid);
 
             UserSystem moran = new UserSystem("Moran", "moran", "neptune", "momo");
             // call the function
-            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(moran.getUserName(), store.getStoreId());
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(moran.getUserName(), store.getStoreId(), uuid);
             Assertions.assertNull(receiptDtos);
             //assertReceipts(receipts, receiptDtos);
         }
@@ -752,7 +752,7 @@ class TradingSystemFacadeTest {
             tradingSystemFacade.registerUser(testUserSystem.getUserName(), testUserSystem.getPassword(), testUserSystem.getFirstName(), testUserSystem.getLastName());
 
             // call the function
-            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(testUserSystem.getUserName(), 1);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(testUserSystem.getUserName(), 1, uuid);
             Assertions.assertNull(receiptDtos);
             //assertReceipts(receipts, receiptDtos);
         }
@@ -771,8 +771,8 @@ class TradingSystemFacadeTest {
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
             List<Receipt> receipts = setUpReceipts();
             userSystemOwner.setReceipts(receipts);
-            tradingSystem.getUser(userSystemOwner.getUserName()).setReceipts(receipts);
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            tradingSystem.getUser(userSystemOwner.getUserName(), uuid).setReceipts(receipts);
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -798,8 +798,8 @@ class TradingSystemFacadeTest {
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
             List<Receipt> receipts = setUpReceipts();
             userSystemOwner.setReceipts(receipts);
-            tradingSystem.getUser(userSystemOwner.getUserName()).setReceipts(receipts);
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            tradingSystem.getUser(userSystemOwner.getUserName(), uuid).setReceipts(receipts);
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -826,8 +826,8 @@ class TradingSystemFacadeTest {
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
             List<Receipt> receipts = setUpReceipts();
             userSystemOwner.setReceipts(receipts);
-            tradingSystem.getUser(userSystemOwner.getUserName()).setReceipts(receipts);
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            tradingSystem.getUser(userSystemOwner.getUserName(), uuid).setReceipts(receipts);
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // call the function
             List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfOwner(updatedOwner.getUserName(), 100000);
@@ -847,7 +847,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -871,7 +871,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a product and call the function
             //Product product = new Product("table", ProductCategory.HOME_GARDEN, 10, 100, 100000);
@@ -898,7 +898,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -923,7 +923,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -951,7 +951,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a product adding it to the system
             //Product product = new Product("table", ProductCategory.HOME_GARDEN, 10,100,store.getStoreId());
@@ -982,7 +982,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1012,7 +1012,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1025,7 +1025,7 @@ class TradingSystemFacadeTest {
 
             // call to the function
             Assertions.assertTrue(tradingSystemFacade.editProduct(updatedOwner.getUserName(), store.getStoreId(),
-                    store.products.stream().findFirst().get().getProductSn(), "table" + "vnjfkvj", ProductCategory.HOME_GARDEN.category, 10 + 10, 100));
+                    store.products.stream().findFirst().get().getProductSn(), "table" + "vnjfkvj", ProductCategory.HOME_GARDEN.category, 10 + 10, 100, uuid));
         }
 
         /**
@@ -1040,7 +1040,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1053,7 +1053,7 @@ class TradingSystemFacadeTest {
 
             // call to the function
             Assertions.assertFalse(tradingSystemFacade.editProduct(updatedOwner.getUserName(), 100000, 1,
-                    "table" + "vnjfkvj", ProductCategory.HOME_GARDEN.category, 10 + 10, 100));
+                    "table" + "vnjfkvj", ProductCategory.HOME_GARDEN.category, 10 + 10, 100, uuid));
 
         }
 
@@ -1076,7 +1076,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1089,7 +1089,7 @@ class TradingSystemFacadeTest {
 
             // call to the function
             Assertions.assertFalse(tradingSystemFacade.editProduct(testUserSystem.getUserName(), store.getStoreId(), 1,
-                    "table" + "vnjfkvj", ProductCategory.HOME_GARDEN.category, 10 + 10, 100));
+                    "table" + "vnjfkvj", ProductCategory.HOME_GARDEN.category, 10 + 10, 100, uuid));
         }
 
         /**
@@ -1104,7 +1104,7 @@ class TradingSystemFacadeTest {
                     .firstName("Ragnar")
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(), userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a new user owner
             UserSystem userSystemOwnerNew = UserSystem.builder()
@@ -1114,7 +1114,7 @@ class TradingSystemFacadeTest {
                     .lastName("LodbrokOwnerNew").build();
             tradingSystemFacade.registerUser(userSystemOwnerNew.getUserName(), userSystemOwnerNew.getPassword(),
                     userSystemOwnerNew.getFirstName(), userSystemOwnerNew.getLastName());
-            UserSystem updatedOwnerNew = tradingSystem.getUser(userSystemOwnerNew.getUserName());
+            UserSystem updatedOwnerNew = tradingSystem.getUser(userSystemOwnerNew.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1122,7 +1122,7 @@ class TradingSystemFacadeTest {
 
             // call the function
             Assertions.assertTrue(tradingSystemFacade.addOwner(updatedOwner.getUserName(), store.getStoreId(),
-                    updatedOwnerNew.getUserName()));
+                    updatedOwnerNew.getUserName(), uuid));
         }
 
         /**
@@ -1139,7 +1139,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a new user owner
             UserSystem userSystemOwnerNew = UserSystem.builder()
@@ -1149,11 +1149,11 @@ class TradingSystemFacadeTest {
                     .lastName("LodbrokOwnerNew").build();
             tradingSystemFacade.registerUser(userSystemOwnerNew.getUserName(), userSystemOwnerNew.getPassword(),
                     userSystemOwnerNew.getFirstName(), userSystemOwnerNew.getLastName());
-            UserSystem updatedOwnerNew = tradingSystem.getUser(userSystemOwnerNew.getUserName());
+            UserSystem updatedOwnerNew = tradingSystem.getUser(userSystemOwnerNew.getUserName(), uuid);
 
             // call the function
             Assertions.assertFalse(tradingSystemFacade.addOwner(updatedOwner.getUserName(), 1000000,
-                    updatedOwnerNew.getUserName()));
+                    updatedOwnerNew.getUserName(), uuid));
 
         }
 
@@ -1171,7 +1171,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a new user owner
             UserSystem userSystemOwnerNew = UserSystem.builder()
@@ -1186,7 +1186,7 @@ class TradingSystemFacadeTest {
 
             // call the function
             Assertions.assertFalse(tradingSystemFacade.addOwner(updatedOwner.getUserName(), store.getStoreId(),
-                    userSystemOwnerNew.getUserName()));
+                    userSystemOwnerNew.getUserName(), uuid));
         }
 
         /**
@@ -1202,7 +1202,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a user newManagerUser
             UserSystem userSystemManager = UserSystem.builder()
@@ -1211,7 +1211,7 @@ class TradingSystemFacadeTest {
                     .firstName("RagnarManager")
                     .lastName("LodbrokManager").build();
             tradingSystemFacade.registerUser(userSystemManager.getUserName(), userSystemManager.getPassword(), userSystemManager.getFirstName(), userSystemManager.getLastName());
-            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName());
+            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1219,7 +1219,7 @@ class TradingSystemFacadeTest {
 
             // call the function
             Assertions.assertTrue(tradingSystemFacade.addManager(updatedOwner.getUserName(), store.getStoreId(),
-                    updatedManager.getUserName()));
+                    updatedManager.getUserName(), uuid));
         }
 
         /**
@@ -1236,7 +1236,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a user newManagerUser
             UserSystem userSystemManager = UserSystem.builder()
@@ -1245,11 +1245,11 @@ class TradingSystemFacadeTest {
                     .firstName("RagnarManager")
                     .lastName("LodbrokManager").build();
             tradingSystemFacade.registerUser(userSystemManager.getUserName(), userSystemManager.getPassword(), userSystemManager.getFirstName(), userSystemManager.getLastName());
-            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName());
+            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName(), uuid);
 
             // call the function
             Assertions.assertFalse(tradingSystemFacade.addManager(updatedOwner.getUserName(), 100000,
-                    updatedManager.getUserName()));
+                    updatedManager.getUserName(), uuid));
         }
 
         /**
@@ -1266,7 +1266,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a user newManagerUser
             UserSystem userSystemManager = UserSystem.builder()
@@ -1281,7 +1281,7 @@ class TradingSystemFacadeTest {
 
             // call the function
             Assertions.assertFalse(tradingSystemFacade.addManager(updatedOwner.getUserName(), store.getStoreId(),
-                    userSystemManager.getUserName()));
+                    userSystemManager.getUserName(), uuid));
 
         }
 
@@ -1298,7 +1298,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a user userManager
             UserSystem userSystemManager = UserSystem.builder()
@@ -1307,17 +1307,17 @@ class TradingSystemFacadeTest {
                     .firstName("RagnarManager")
                     .lastName("LodbrokManager").build();
             tradingSystemFacade.registerUser(userSystemManager.getUserName(), userSystemManager.getPassword(), userSystemManager.getFirstName(), userSystemManager.getLastName());
-            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName());
+            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
             // add userManager to manage the store
-            tradingSystemFacade.addManager(updatedOwner.getUserName(), store.getStoreId(), updatedManager.getUserName());
+            tradingSystemFacade.addManager(updatedOwner.getUserName(), store.getStoreId(), updatedManager.getUserName(), uuid);
 
             // call the function
             Assertions.assertTrue(tradingSystemFacade.addPermission(updatedOwner.getUserName(), store.getStoreId(),
-                    updatedManager.getUserName(), StorePermission.EDIT.function));
+                    updatedManager.getUserName(), StorePermission.EDIT.function, uuid));
         }
 
         /**
@@ -1333,7 +1333,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a user userManager
             UserSystem userSystemManager = UserSystem.builder()
@@ -1342,11 +1342,11 @@ class TradingSystemFacadeTest {
                     .firstName("RagnarManager")
                     .lastName("LodbrokManager").build();
             tradingSystemFacade.registerUser(userSystemManager.getUserName(), userSystemManager.getPassword(), userSystemManager.getFirstName(), userSystemManager.getLastName());
-            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName());
+            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName(), uuid);
 
             // call the function
             Assertions.assertFalse(tradingSystemFacade.addPermission(updatedOwner.getUserName(), 100000,
-                    updatedManager.getUserName(), StorePermission.EDIT.function));
+                    updatedManager.getUserName(), StorePermission.EDIT.function, uuid));
 
         }
         //////////////////////////////////////////////////////////////////////////
@@ -1364,7 +1364,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a user newManagerUser
             UserSystem userSystemManager = UserSystem.builder()
@@ -1373,18 +1373,18 @@ class TradingSystemFacadeTest {
                     .firstName("RagnarManager")
                     .lastName("LodbrokManager").build();
             tradingSystemFacade.registerUser(userSystemManager.getUserName(), userSystemManager.getPassword(), userSystemManager.getFirstName(), userSystemManager.getLastName());
-            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName());
+            UserSystem updatedManager = tradingSystem.getUser(userSystemManager.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castroo");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castroo")).findFirst().get();
 
             tradingSystemFacade.addManager(updatedOwner.getUserName(), store.getStoreId(),
-                    updatedManager.getUserName());
+                    updatedManager.getUserName(), uuid);
 
             // call the function
             Assertions.assertTrue(tradingSystemFacade.removeManager(updatedOwner.getUserName(), store.getStoreId(),
-                    updatedManager.getUserName()));
+                    updatedManager.getUserName(), uuid));
         }
 
         /**
@@ -1400,7 +1400,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystem.getUserName(), userSystem.getPassword(),
                     userSystem.getFirstName(), userSystem.getLastName());
-            UserSystem updatedUser = tradingSystem.getUser(userSystem.getUserName());
+            UserSystem updatedUser = tradingSystem.getUser(userSystem.getUserName(), uuid);
 
             // login the user
             tradingSystemFacade.login(updatedUser.getUserName(), updatedUser.getPassword());
@@ -1422,7 +1422,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             Assertions.assertTrue(tradingSystemFacade.openStore(updatedOwner.getUserName(), new PurchasePolicyDto(),
                     new DiscountPolicyDto(), "zaraa"));
@@ -1449,7 +1449,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystem.getUserName(), userSystem.getPassword(),
                     userSystem.getFirstName(), userSystem.getLastName());
-            UserSystem updatedUser = tradingSystem.getUser(userSystem.getUserName());
+            UserSystem updatedUser = tradingSystem.getUser(userSystem.getUserName(), uuid);
 
             // login the user
             Assertions.assertTrue(tradingSystemFacade.login(updatedUser.getUserName(), "Odin12"));
@@ -1468,7 +1468,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1494,7 +1494,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1523,7 +1523,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1553,7 +1553,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1583,7 +1583,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1615,7 +1615,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1665,7 +1665,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1715,7 +1715,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store1
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1768,7 +1768,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1813,7 +1813,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1838,7 +1838,7 @@ class TradingSystemFacadeTest {
                     .lastName("Lodbrok").build();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
             ShoppingCart shoppingCart = setUpShoppingCart();
 
             ShoppingCartDto shoppingCartDto = tradingSystemFacade.viewProductsInShoppingCart(userSystemOwner.getUserName());
@@ -1851,7 +1851,7 @@ class TradingSystemFacadeTest {
             UserSystem userSystemOwner = setUpOwnerStore();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1879,7 +1879,7 @@ class TradingSystemFacadeTest {
             UserSystem userSystemOwner = setUpOwnerStore();
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem updatedOwner = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
 
             // create a store
             tradingSystem.openStore(updatedOwner, new PurchasePolicy(), new DiscountPolicy(), "castro");
@@ -1916,7 +1916,7 @@ class TradingSystemFacadeTest {
             //initial
             tradingSystemFacade.registerUser(userSystemOwner.getUserName(), userSystemOwner.getPassword(),
                     userSystemOwner.getFirstName(), userSystemOwner.getLastName());
-            UserSystem regUser = tradingSystem.getUser(userSystemOwner.getUserName());
+            UserSystem regUser = tradingSystem.getUser(userSystemOwner.getUserName(), uuid);
             tradingSystem.openStore(regUser, new PurchasePolicy(), new DiscountPolicy(), "castro");
             Store store = this.tradingSystem.getStoresList().stream().filter(store1 -> store1.getStoreName().equals("castro")).findFirst().get();
             tradingSystemFacade.addProduct(regUser.getUserName(), store.getStoreId(), "table",

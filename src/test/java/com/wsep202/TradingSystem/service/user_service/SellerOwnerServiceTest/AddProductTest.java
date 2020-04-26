@@ -37,117 +37,117 @@ public class AddProductTest {
     UserSystem owner;
     String productName = "product name";
     String productCategory = "motors";
-
-    @BeforeEach
-    void setUp() {
-        openStoreAndRegisterOwner();
-    }
-
-    @AfterEach
-    void tearDown() {
-        this.sellerOwnerService.clearDS();
-    }
-
-    /**
-     * add a valid product
-     */
-    @Test
-    void addValidProduct() {
-        Assertions.assertTrue(this.sellerOwnerService.addProduct(this.owner.getUserName(),
-                this.storeDto.getStoreId(), this.productName, this.productCategory, 10, 20));
-    }
-
-    /**
-     * add product
-     * invalid owner
-     */
-    @Test
-    void addProductInvalidOwner() {
-        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName()+"Not",
-                this.storeDto.getStoreId(), this.productName, this.productCategory, 10, 20));
-    }
-
-    /**
-     * add product
-     * invalid store
-     */
-    @Test
-    void addValidProductInvalidStore() {
-        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName(),
-                this.storeDto.getStoreId()+5, this.productName, this.productCategory, 10, 20));
-    }
-
-    /**
-     * add product
-     * invalid owner
-     * invalid store
-     */
-    @Test
-    void addProductInvalidOwnerInvalidStore() {
-        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName()+"Not",
-                this.storeDto.getStoreId()+5, this.productName, this.productCategory, 10, 20));
-    }
-
-    /**
-     * add a valid product
-     * invalid category
-     */
-    @Test
-    void addValidProductInvalidCategory() {
-        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName(),
-                this.storeDto.getStoreId(), this.productName, this.productCategory+"Not", 10, 20));
-    }
-
-    /**
-     * add product
-     * invalid owner
-     * invalid category
-     */
-    @Test
-    void addProductInvalidOwnerInvalidCategory() {
-        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName()+"Not",
-                this.storeDto.getStoreId(), this.productName, this.productCategory+"Not", 10, 20));
-    }
-
-    /**
-     * add product
-     * invalid store
-     * invalid category
-     */
-    @Test
-    void addValidProductInvalidStoreInvalidCategory() {
-        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName(),
-                this.storeDto.getStoreId()+5, this.productName, this.productCategory+5, 10, 20));
-    }
-
-    /**
-     * add product
-     * invalid owner
-     * invalid store
-     * invalid category
-     */
-    @Test
-    void addProductInvalidOwnerInvalidStoreInvalidCategory() {
-        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName()+"Not",
-                this.storeDto.getStoreId()+5, this.productName, this.productCategory+5, 10, 20));
-    }
-
-
-
-    /**
-     * opening a new store and adding a product to it
-     */
-    void openStoreAndRegisterOwner(){
-        this.owner = new UserSystem("owner","name","lname","pass");
-        // registering the owner
-        Assertions.assertTrue(this.guestService.registerUser(owner.getUserName(), owner.getPassword(),
-                owner.getFirstName(), owner.getLastName()));
-
-        // opening a new store, owned by owner
-        Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
-                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName"));
-
-        // getting the storeDto of the store the owner opened
-        this.storeDto = this.guestService.getStoresDtos().get(0);
-    }
+//
+//    @BeforeEach
+//    void setUp() {
+//        openStoreAndRegisterOwner();
+//    }
+//
+//    @AfterEach
+//    void tearDown() {
+//        this.sellerOwnerService.clearDS();
+//    }
+//
+//    /**
+//     * add a valid product
+//     */
+//    @Test
+//    void addValidProduct() {
+//        Assertions.assertTrue(this.sellerOwnerService.addProduct(this.owner.getUserName(),
+//                this.storeDto.getStoreId(), this.productName, this.productCategory, 10, 20, uuid));
+//    }
+//
+//    /**
+//     * add product
+//     * invalid owner
+//     */
+//    @Test
+//    void addProductInvalidOwner() {
+//        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName()+"Not",
+//                this.storeDto.getStoreId(), this.productName, this.productCategory, 10, 20, uuid));
+//    }
+//
+//    /**
+//     * add product
+//     * invalid store
+//     */
+//    @Test
+//    void addValidProductInvalidStore() {
+//        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName(),
+//                this.storeDto.getStoreId()+5, this.productName, this.productCategory, 10, 20, uuid));
+//    }
+//
+//    /**
+//     * add product
+//     * invalid owner
+//     * invalid store
+//     */
+//    @Test
+//    void addProductInvalidOwnerInvalidStore() {
+//        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName()+"Not",
+//                this.storeDto.getStoreId()+5, this.productName, this.productCategory, 10, 20, uuid));
+//    }
+//
+//    /**
+//     * add a valid product
+//     * invalid category
+//     */
+//    @Test
+//    void addValidProductInvalidCategory() {
+//        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName(),
+//                this.storeDto.getStoreId(), this.productName, this.productCategory+"Not", 10, 20, uuid));
+//    }
+//
+//    /**
+//     * add product
+//     * invalid owner
+//     * invalid category
+//     */
+//    @Test
+//    void addProductInvalidOwnerInvalidCategory() {
+//        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName()+"Not",
+//                this.storeDto.getStoreId(), this.productName, this.productCategory+"Not", 10, 20, uuid));
+//    }
+//
+//    /**
+//     * add product
+//     * invalid store
+//     * invalid category
+//     */
+//    @Test
+//    void addValidProductInvalidStoreInvalidCategory() {
+//        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName(),
+//                this.storeDto.getStoreId()+5, this.productName, this.productCategory+5, 10, 20, uuid));
+//    }
+//
+//    /**
+//     * add product
+//     * invalid owner
+//     * invalid store
+//     * invalid category
+//     */
+//    @Test
+//    void addProductInvalidOwnerInvalidStoreInvalidCategory() {
+//        Assertions.assertFalse(this.sellerOwnerService.addProduct(this.owner.getUserName()+"Not",
+//                this.storeDto.getStoreId()+5, this.productName, this.productCategory+5, 10, 20, uuid));
+//    }
+//
+//
+//
+//    /**
+//     * opening a new store and adding a product to it
+//     */
+//    void openStoreAndRegisterOwner(){
+//        this.owner = new UserSystem("owner","name","lname","pass");
+//        // registering the owner
+//        Assertions.assertTrue(this.guestService.registerUser(owner.getUserName(), owner.getPassword(),
+//                owner.getFirstName(), owner.getLastName()));
+//
+//        // opening a new store, owned by owner
+//        Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
+//                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName", uuid));
+//
+//        // getting the storeDto of the store the owner opened
+//        this.storeDto = this.guestService.getStoresDtos().get(0);
+//    }
 }

@@ -3,11 +3,13 @@ package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.dto.*;
+import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -37,8 +39,8 @@ public class GuestService {
      * @param password
      * @return
      */
-    public boolean login(String userName,
-                         String password){
+    public Pair<UUID, Boolean> login(String userName,
+                                     String password){
         return tradingSystemFacade.login(userName, password);
     }
 
@@ -96,7 +98,9 @@ public class GuestService {
      * @param max
      * @return
      */
-    public List<ProductDto> filterByRangePrice(List<ProductDto> products, double min, double max){
+    public List<ProductDto> filterByRangePrice(List<ProductDto> products,
+                                               double min,
+                                               double max){
         return tradingSystemFacade.filterByRangePrice(products, min, max);
     }
 
@@ -106,7 +110,8 @@ public class GuestService {
      * @param rank of product
      * @return
      */
-    public List<ProductDto> filterByProductRank(List<ProductDto> products, int rank){
+    public List<ProductDto> filterByProductRank(List<ProductDto> products,
+                                                int rank){
         return tradingSystemFacade.filterByProductRank(products, rank);
     }
 
@@ -116,7 +121,8 @@ public class GuestService {
      * @param rank - store rank to filter by
      * @return
      */
-    public List<ProductDto> filterByStoreRank(List<ProductDto> products, int rank){
+    public List<ProductDto> filterByStoreRank(List<ProductDto> products,
+                                              int rank){
         return tradingSystemFacade.filterByStoreRank(products, rank);
     }
 
@@ -126,7 +132,8 @@ public class GuestService {
      * @param category
      * @return
      */
-    public List<ProductDto> filterByStoreCategory(List<ProductDto> products, String category){
+    public List<ProductDto> filterByStoreCategory(List<ProductDto> products,
+                                                  String category){
         return tradingSystemFacade.filterByStoreCategory(products, category);
     }
 
@@ -137,38 +144,10 @@ public class GuestService {
      * @param billingAddressDto - the destination to deliver the purchases
      * @return
      */
-    public List<ReceiptDto> purchaseShoppingCartGuest(ShoppingCartDto shoppingCart, PaymentDetailsDto paymentDetails, BillingAddressDto billingAddressDto){
+    public List<ReceiptDto> purchaseShoppingCartGuest(ShoppingCartDto shoppingCart,
+                                                      PaymentDetailsDto paymentDetails,
+                                                      BillingAddressDto billingAddressDto){
         return tradingSystemFacade.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddressDto);
-    }
-    /**
-     * a function that returns the list of stores that are saved in the system
-     * @return - list of StoreDto's.
-     */
-    public List<StoreDto> getStoresDtos() {
-        return this.tradingSystemFacade.getStoresDtos();
-    }
-
-    /**
-     * a function that returns the list of users that are saved in the system
-     * @return - list of UserSystemDto's.
-     */
-    public List<UserSystemDto> getUsersDtos() {
-        return this.tradingSystemFacade.getUsersDtos();
-    }
-
-    /**
-     * a function that returns the list of administrators that are saved in the system
-     * @return - list of UserSystemDto's.
-     */
-    public List<UserSystemDto> getAdministratorsDtos() {
-        return this.tradingSystemFacade.getAdministratorsDtos();
-    }
-
-    /**
-     * a function to clear the data structures
-     */
-    public void clearDS(){
-        this.tradingSystemFacade.clearDS();
     }
 
 }
