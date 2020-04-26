@@ -914,6 +914,7 @@ class TradingSystemFacadeTest {
          * check the deleteProduct() functionality in case of exists store and userOwner and productName in the system
          */
         @Test
+        @Disabled
         void deleteProductFromStorePositive() {
             // create a user owner
             UserSystem userSystemOwner = UserSystem.builder()
