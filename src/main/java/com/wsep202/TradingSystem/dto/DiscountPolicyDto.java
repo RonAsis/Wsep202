@@ -17,12 +17,12 @@ public class DiscountPolicyDto {
     /**
      * allow everyone to purchase from store
      */
-    private boolean isAllAllowed = true;
+    private boolean isAllAllowed;
 
     /**
      * status as string
      */
-    private String whoCanBuyStatus = "allow all discounts";
+    private String whoCanBuyStatus;
 
     /**
      * list that contains the allowed discounts in this policy
