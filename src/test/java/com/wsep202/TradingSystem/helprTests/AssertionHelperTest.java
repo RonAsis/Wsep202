@@ -122,8 +122,6 @@ public class AssertionHelperTest {
         assertProducts(store.getProducts(), storeDto.getProducts());
         assertPurchasePolicy(store.getPurchasePolicy(), storeDto.getPurchasePolicy());
         assertDiscountPolicy(store.getDiscountPolicy(), storeDto.getDiscountPolicy());
-        Assertions.assertEquals(store.getDiscountType().type, storeDto.getDiscountType());
-        Assertions.assertEquals(store.getPurchaseType().type, storeDto.getPurchaseType());
         assertReceipts(store.getReceipts(), storeDto.getReceipts());
         Assertions.assertEquals(store.getRank(), storeDto.getRank());
     }

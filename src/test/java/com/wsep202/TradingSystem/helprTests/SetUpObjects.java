@@ -97,8 +97,6 @@ public class SetUpObjects {
         for (int counter = 0; counter <= 10; counter++) {
             stores.add(Store.builder()
                     .storeId(counter)
-                    .discountType(DiscountType.NONE)
-                    .purchaseType(PurchaseType.BUY_IMMEDIATELY)
                     .purchasePolicy(new PurchasePolicy())
                     .discountPolicy(new DiscountPolicy())
                     .storeName("storeName" + counter)
@@ -127,11 +125,9 @@ public class SetUpObjects {
                 .owners(owners)
                 .storeName(storeName)
                 .discountPolicy(discountPolicy)
-                .discountType(DiscountType.NONE)
                 .products(products)
                 .receipts(receipts)
                 .rank(rank)
-                .purchaseType(PurchaseType.BUY_IMMEDIATELY)
                 .purchasePolicy(purchasePolicy)
                 .build();
     }
