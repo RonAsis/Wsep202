@@ -1,0 +1,22 @@
+<h2>Login</h2>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="col-sm-5 from-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" class="form-control"
+               #usernameInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+        <label for="password">Password</label>
+        <input type="text" id="password" class="form-control"
+               #passwordInput/>
+      </div>
+      <hr />
+      <div class="col-xs-12">
+        <button class="btn btn-success" type="submit" (click)="onLogin()">Login</button>
+        <button class="btn btn-primary" type="submit" (click)="onClearDetails()">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -17,6 +17,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping(PublicApiPaths.ADMIN_PATH)
+@CrossOrigin(origins = "http://localhost:4200")
 @Api(value = "API to admin", produces = "application/json")
 @RequiredArgsConstructor
 public class AdministratorController {

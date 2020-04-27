@@ -16,6 +16,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping(PublicApiPaths.GUEST_PATH)
+@CrossOrigin(origins = "http://localhost:4200")
 @Api(value = "API to guest", produces = "application/json")
 @RequiredArgsConstructor
 public class GuestController {

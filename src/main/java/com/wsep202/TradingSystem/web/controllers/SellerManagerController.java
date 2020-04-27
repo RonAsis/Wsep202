@@ -15,6 +15,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping(PublicApiPaths.SELLER_MANAGER_PATH)
+@CrossOrigin(origins = "http://localhost:4200")
 @Api(value = "API to seller manager", produces = "application/json")
 @RequiredArgsConstructor
 public class SellerManagerController {

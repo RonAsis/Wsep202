@@ -20,10 +20,6 @@ public class AssertionHelperTest {
                 Assertions.assertEquals(userSystemExpected.getUserName(), userSystemDto.getUserName());
                 Assertions.assertEquals(userSystemExpected.getFirstName(), userSystemDto.getFirstName());
                 Assertions.assertEquals(userSystemExpected.getLastName(), userSystemDto.getLastName());
-                assertSetStore(userSystemExpected.getOwnedStores(), userSystemDto.getOwnedStores());
-                assertSetStore(userSystemExpected.getManagedStores(), userSystemDto.getManagedStores());
-                assertShoppingCart(userSystemExpected.getShoppingCart(), userSystemDto.getShoppingCart());
-                assertReceipts(userSystemExpected.getReceipts(), userSystemDto.getReceipts());
             });
         }
     }
