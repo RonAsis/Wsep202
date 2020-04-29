@@ -52,11 +52,11 @@ public class ProductDto {
      * the type of discount with needs to be apply on the product when discount
      * and watch it's info.
      */
-    private DiscountType discountType = DiscountType.NONE;
+    private int costAfterDiscount;
 
     /**
      * the type of purchase with needs to be apply on the product when purchasing
      * and watch it's info.
      */
-    private PurchaseType purchaseType = PurchaseType.BUY_IMMEDIATELY;
+    private String purchaseType;
 }

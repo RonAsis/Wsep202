@@ -23,7 +23,7 @@ public class ReceiptDto {
     /**
      * the user name who perform this purchase or a Guest
      */
-    private String userName;
+    private String username;
 
     /**
      * the purchase date
@@ -39,13 +39,4 @@ public class ReceiptDto {
      * a list of all the products that the user bought in this purchase.
      */
     private Map<ProductDto,Integer> productsBought;
-
-    public Integer getProductBoughtAmountByProductSn(int productSn){
-        for (ProductDto productDto: productsBought.keySet()){
-            if (productDto.getProductSn() == productSn){
-                return productsBought.get(productDto);
-            }
-        }
-        return null;
-    }
 }

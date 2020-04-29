@@ -49,7 +49,7 @@ public class GuestController {
      * see store information
      * @param storeId
      */
-    @ApiOperation(value = "login")
+    @ApiOperation(value = "view-store-info")
     @GetMapping("view-store-info/{storeId}")
     public StoreDto viewStoreInfo(@PathVariable int storeId){
         return guestService.viewStoreInfo(storeId);
@@ -69,87 +69,6 @@ public class GuestController {
     }
 
     /**
-     * search product by productName
-     * @param productName - criteria for search
-     */
-    @ApiOperation(value = "search product by name")
-    @GetMapping("search-product-by-name/{productName}")
-    public List<ProductDto> searchProductByName(@PathVariable String productName){
-        return guestService.searchProductByName(productName);
-    }
-
-    /**
-     * search product by category
-     * @param category criteria for search
-     */
-    @ApiOperation(value = "search product by category")
-    @GetMapping("search-product-by-category/{category}")
-    public List<ProductDto> searchProductByCategory(@PathVariable String category){
-        return guestService.searchProductByCategory(category);
-    }
-
-    /**
-     * search product by KeyWords
-     * @param keyWords criteria for search
-     */
-    @ApiOperation(value = "search product by keywords")
-    @GetMapping("search-product-by-keywords/{keywords}")
-    public List<ProductDto> searchProductByKeyWords(@RequestBody List<String> keyWords){
-        return guestService.searchProductByKeyWords(keyWords);
-    }
-
-    /**
-     * filter products by range price
-     * @param products to filter
-     * @param min low threshold
-     * @param max threshold
-     */
-    @ApiOperation(value = "filter product by price")
-    @GetMapping("filter-by-range-price/{min}/{max}")
-    public List<ProductDto> filterByRangePrice(@RequestBody List<ProductDto> products,
-                                               @PathVariable  double min,
-                                               @PathVariable  double max){
-        return guestService.filterByRangePrice(products, min, max);
-    }
-
-    /**
-     * filter products by product rank
-     * @param products to filter
-     * @param rank filter by rank of product
-     * @return
-     */
-    @ApiOperation(value = "filter product by product rank")
-    @GetMapping("filter-by-product-rank/{rank}")
-    public List<ProductDto> filterByProductRank(@RequestBody List<ProductDto> products,
-                                                @PathVariable int rank){
-        return guestService.filterByProductRank(products, rank);
-    }
-
-    /**
-     * filter products by  store rank
-     * @param products to filter
-     * @param rank filter by rank of store
-     */
-    @ApiOperation(value = "filter product by store rank")
-    @GetMapping("filter-by-store-rank/{rank}")
-    public List<ProductDto> filterByStoreRank(@RequestBody List<ProductDto> products,
-                                              @PathVariable int rank){
-        return guestService.filterByStoreRank(products, rank);
-    }
-
-    /**
-     * filter products by category
-     * @param products to filter
-     * @param category filter criteria
-     */
-    @ApiOperation(value = "filter product by category")
-    @GetMapping("filter-by-store-rank/{category}")
-    public List<ProductDto> filterByStoreCategory(@RequestBody List<ProductDto> products,
-                                                  @PathVariable String category){
-        return guestService.filterByStoreCategory(products, category);
-    }
-
-    /**
      * purchase shopping cart
      * @param shoppingCartDto includes the bags of each store the user selected
      * @param paymentDetailsDto    - charging info of the user
@@ -161,5 +80,14 @@ public class GuestController {
                                                       @RequestBody PaymentDetailsDto paymentDetailsDto,
                                                       @RequestBody  BillingAddressDto billingAddressDto){
         return guestService.purchaseShoppingCartGuest(shoppingCartDto, paymentDetailsDto, billingAddressDto);
+    }
+
+    /**
+     * add manager
+     */
+    @ApiOperation(value = "get stores")
+    @GetMapping("get-stores/")
+    public List<StoreDto> getManageStores() {
+        return guestService.getStores();
     }
 }

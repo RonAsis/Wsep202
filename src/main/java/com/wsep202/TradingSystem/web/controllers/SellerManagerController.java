@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.web.controllers;
 
 import com.wsep202.TradingSystem.dto.ReceiptDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.service.user_service.SellerManagerService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class SellerManagerController {
 
     private final SellerManagerService sellerManagerService;
+
     /**
      * View store purchase history
      */
@@ -28,8 +30,18 @@ public class SellerManagerController {
     @GetMapping("view-purchase-history-of-manager/{userName}/{storeId}")
     public List<ReceiptDto> viewPurchaseHistoryOfManager(@PathVariable String userName,
                                                          @PathVariable int storeId,
-                                                         @RequestBody UUID uuid){
+                                                         @RequestBody UUID uuid) {
         return sellerManagerService.viewPurchaseHistoryOfManager(userName, storeId, uuid);
+    }
+
+    /**
+     * add manager
+     */
+    @ApiOperation(value = "get manage stores")
+    @GetMapping("get-manage-stores/{manageUsername}/{uuid}")
+    public List<StoreDto> getManageStores(@PathVariable String manageUsername,
+                                          @PathVariable UUID uuid) {
+        return sellerManagerService.getMangeStores(manageUsername, uuid);
     }
 
 }

@@ -105,4 +105,7 @@ public class SellerOwnerService {
         return tradingSystemFacade.addManager(ownerUsername, storeId, newManagerUsername, uuid);
     }
 
+    public List<StoreDto> getOwnerStores(String ownerUsername, UUID uuid) {
+        return tradingSystemFacade.getOwnerStores(ownerUsername, uuid);
+    }
 }

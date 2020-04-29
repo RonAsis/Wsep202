@@ -1,0 +1,24 @@
+<h2>Open new Store</h2>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="col-sm-5 from-group">
+        <label for="storeName">Store Name</label>
+        <input type="text" id="storeName" class="form-control"
+               #storeNameInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+       <p>Do PurchasePolicy and DiscountPolicyDto</p>
+      </div>
+
+      <hr />
+      <div class="col-xs-12">
+        <button class="btn btn-success" type="submit" (click)="onOpenStore()">Open Store</button>
+        <button class="btn btn-primary" type="submit" (click)="onClearDetails()">Clear</button>
+      </div>
+      <div class="col-sm-5 from-group">
+        <p>{{messageReg}}</p>
+      </div>
+    </div>
+  </div>
+</div>

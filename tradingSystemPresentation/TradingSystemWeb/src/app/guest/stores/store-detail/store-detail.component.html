@@ -1,0 +1,36 @@
+<div class="row">
+  <div class="col-xs-12">
+    <img [src]="" [alt]="store.storeName" class="img-responsive"
+         style="max-height: 300px"/>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <h1>{{store.storeName}}</h1>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <div class="btn-group "
+         appDropdown>
+      <button type="button" class="btn btn-primary dropdown-toggle">
+        Manage Store <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#">To shopping list</a></li>
+        <li><a href="#">Edit Store</a></li>
+        <li><a href="#">Delete Store</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    rank: {{store.rank}}
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <app-products [storeId] = store.storeId></app-products>
+  </div>
+</div>

@@ -26,19 +26,19 @@ export class RegisterComponent implements OnInit {
   }
 
   onRegisterUser() {
-    console.log('registering');
 
     this.userSystemService.register(this.usernameInputRef.nativeElement.value,
       this.passwordInputRef.nativeElement.value,
       this.firstNameInputRef.nativeElement.value,
       this.lastNameInputRef.nativeElement.value)
       .subscribe(
-        respone =>
-        this.handlerRegister(respone)
+        respone => {
+          this.handlerRegister(respone);
+          this.clearDetailsOfReg();
+        }
       );
 
   }
-
 
   handlerRegister(isRegisterSuc: boolean) {
     if (isRegisterSuc){
@@ -49,10 +49,14 @@ export class RegisterComponent implements OnInit {
   }
 
   onClearDetails() {
+    this.clearDetailsOfReg();
+    this.messageReg = '';
+  }
+
+  private clearDetailsOfReg() {
     this.usernameInputRef.nativeElement.value = '';
     this.firstNameInputRef.nativeElement.value = '';
     this.lastNameInputRef.nativeElement.value = '';
     this.passwordInputRef.nativeElement.value = '';
-    this.messageReg = '';
   }
 }

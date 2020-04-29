@@ -1,0 +1,14 @@
+<a href="#" class="list-group-item clearfix"
+   (click)="onSelected()">
+  <div class="pull-left">
+    <h4 class="list-group-item-heading">{{product.name}}</h4>
+    <p>Cost :{{product.cost}}</p>
+    <p>Cost After Discount :{{product.costAfterDiscount}}</p>
+  </div>
+  <span class="pull-right">
+        <img src=""
+             alt="{{product.name}}"
+             class="img-responsive"
+             style="max-height: 50px;" />
+      </span>
+</a>

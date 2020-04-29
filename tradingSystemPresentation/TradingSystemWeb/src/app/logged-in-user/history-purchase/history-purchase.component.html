@@ -1,0 +1,10 @@
+<h2>Login</h2>
+<div class="row">
+  <div class="col-md-12">
+    <div>
+      <app-receipt-element
+        *ngFor="let receiptElm of receipts | filter:searchText"
+        [receipt]="receiptElm"></app-receipt-element>
+      </div>
+    </div>
+  </div>

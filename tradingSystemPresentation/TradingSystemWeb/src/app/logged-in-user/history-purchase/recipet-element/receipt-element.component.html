@@ -1,0 +1,19 @@
+<a href="#" class="list-group-item clearfix"
+   (click)="onSelected()">
+  <div class="pull-left">
+    <h4 class="list-group-item-heading">{{receipt.receiptSn}}</h4>
+    <p>Store :{{receipt.storeId}} , Username: {{receipt.username}} , Amount to Pay: {{receipt.amountToPay}} </p>
+    <p>Purchase Date: {{receipt.purchaseDate}}</p>
+    <input type="text" [(ngModel)]="product">
+    <div *ngFor = "let productInReceipt of receipt.productsBought |filter:product | mapToArray" >
+      <app-product-in-receipt [product] = productInReceipt>
+      </app-product-in-receipt>
+    </div>
+  </div>
+  <span class="pull-right">
+        <img src=""
+             alt="{{receipt.receiptSn}}"
+             class="img-responsive"
+             style="max-height: 50px;" />
+      </span>
+</a>

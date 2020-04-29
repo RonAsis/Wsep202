@@ -17,15 +17,15 @@ public class PurchasePolicyDto {
     /**
      * allow everyone to purchase from store
      */
-    private boolean isAllAllowed = true;
+    private boolean isAllAllowed;
 
     /**
      * status as string
      */
-    private String whoCanBuyStatus = "allow all purchases";
+    private String whoCanBuyStatus;
 
     /**
      * a list that includes all the purchase types which are allowed in the store.
      */
-    private List<PurchaseType> listOfPurchaseTypes;
+    private List<String> listOfPurchaseTypes;
 }

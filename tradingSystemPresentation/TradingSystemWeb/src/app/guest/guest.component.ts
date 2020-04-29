@@ -6,10 +6,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./guest.component.css']
 })
 export class GuestComponent implements OnInit {
+  loadedFeature = 'Login';
 
   constructor() { }
 
   ngOnInit(): void {
   }
 
+  onNavigate(feature: string) {
+    this.loadedFeature = feature;
+  }
 }

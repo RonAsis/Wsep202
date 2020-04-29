@@ -14,20 +14,9 @@ public class ShoppingCartDto {
 
 
     /**
-     * list of stores and there shopping bags
+     * list of stores id and there shopping bags
      */
-    private Map<StoreDto, ShoppingBagDto> shoppingBagsList;
-    /**
-     * the total cost of the products in cart
-     */
-    private double totalCartCost;
-    /**
-     * number of different shopping bags in cart
-     */
-    private int numOfBagsInCart;
-    /**
-     * number of different products in the cart
-     */
-    private int numOfProductsInCart;
+    private Map<Integer, ShoppingBagDto> shoppingBags;
+
 
 }

@@ -1,6 +1,5 @@
 package com.wsep202.TradingSystem.web.controllers;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.Store;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
@@ -17,6 +16,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping(PublicApiPaths.BUYER_REG_PATH)
+@CrossOrigin(origins = "http://localhost:4200")
 @Api(value = "API to buyer registered", produces = "application/json")
 @RequiredArgsConstructor
 public class BuyerRegisteredController {
@@ -28,9 +28,9 @@ public class BuyerRegisteredController {
      * @param userName user to logout
      */
     @ApiOperation(value = "logout")
-    @PutMapping("logout/{userName}")
+    @PutMapping("logout/{userName}/{uuid}")
     public boolean logout(@PathVariable String userName,
-                          @RequestBody UUID uuid) {
+                          @PathVariable UUID uuid) {
         return buyerRegisteredService.logout(userName, uuid);
     }
 
@@ -40,15 +40,15 @@ public class BuyerRegisteredController {
      * @param usernameOwner  the opener and first owner of store
      * @param purchasePolicy each store has policy for purchase on users and products
      * @param discountPolicy each store has policy for discount on products
-     * @param storeName      - store name
+     * @param storeName       store name
      */
     @ApiOperation(value = "open store")
-    @PostMapping("open-store/{usernameOwner}/{storeName}")
+    @PostMapping("open-store/{usernameOwner}/{storeName}/{uuid}")
     public StoreDto openStore(@PathVariable String usernameOwner,
                            @RequestBody PurchasePolicyDto purchasePolicy,
                            @RequestBody DiscountPolicyDto discountPolicy,
                            @PathVariable String storeName,
-                           @RequestBody UUID uuid) {
+                           @PathVariable UUID uuid) {
         return buyerRegisteredService.openStore(usernameOwner, purchasePolicy, discountPolicy, storeName, uuid);
     }
 
@@ -58,9 +58,9 @@ public class BuyerRegisteredController {
      * @param userName of the user the history belongs to
      */
     @ApiOperation(value = "view purchase history")
-    @GetMapping("view-purchase-history/{userName}")
+    @GetMapping("view-purchase-history/{userName}/{uuid}")
     public List<ReceiptDto> viewPurchaseHistory(@PathVariable String userName,
-                                                @RequestBody UUID uuid) {
+                                                @PathVariable UUID uuid) {
         return buyerRegisteredService.viewPurchaseHistory(userName, uuid);
     }
 
@@ -73,12 +73,12 @@ public class BuyerRegisteredController {
      * @param amount    quantity to save
      */
     @ApiOperation(value = "save product in shopping bag")
-    @PostMapping("save-product-in-shopping-bag/{userName}/{storeId}/{productSn}/{amount}")
+    @PostMapping("save-product-in-shopping-bag/{userName}/{storeId}/{productSn}/{amount}/{uuid}")
     public boolean saveProductInShoppingBag(@PathVariable String userName,
                                             @PathVariable int storeId,
                                             @PathVariable int productSn,
                                             @PathVariable int amount,
-                                            @RequestBody UUID uuid) {
+                                            @PathVariable UUID uuid) {
         return buyerRegisteredService.saveProductInShoppingBag(userName, storeId, productSn, amount, uuid);
     }
 
@@ -88,9 +88,9 @@ public class BuyerRegisteredController {
      * @param userName the user the bag belongs to
      */
     @ApiOperation(value = "watch shopping cart")
-    @GetMapping("watch-shopping-cart/{username}")
+    @GetMapping("watch-shopping-cart/{username}/{uuid}")
     public ShoppingCartDto viewProductsInShoppingCart(@PathVariable String userName,
-                                                      @RequestBody UUID uuid) {
+                                                      @PathVariable UUID uuid) {
         return buyerRegisteredService.watchShoppingCart(userName, uuid);
     }
 
@@ -102,11 +102,11 @@ public class BuyerRegisteredController {
      * @param productSn identifier of product
      */
     @ApiOperation(value = "remove product in shopping bag")
-    @PostMapping("remove-product-in-shopping-bag/{userName}/{storeId}/{productSn}")
+    @PostMapping("remove-product-in-shopping-bag/{userName}/{storeId}/{productSn}/{uuid}")
     public boolean removeProductInShoppingBag(@PathVariable String userName,
                                               @PathVariable int storeId,
                                               @PathVariable int productSn,
-                                              @RequestBody UUID uuid) {
+                                              @PathVariable UUID uuid) {
         return buyerRegisteredService.removeProductInShoppingBag(userName, storeId, productSn, uuid);
     }
 

@@ -587,6 +587,21 @@ public class TradingSystemFacade {
         }
     }
 
+    public List<StoreDto> getOwnerStores(String ownerUsername, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        return convertStoreList(new LinkedList<>(user.getOwnedStores()));
+    }
+
+    public List<StoreDto> getMangeStores(String manageUsername, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(manageUsername, uuid);
+        return convertStoreList(new LinkedList<>(user.getManagedStores()));
+    }
+
+    public List<StoreDto> getStores() {
+//        Set<Store> stores = tradingSystem.getStores();
+//        return convertStoreList(new LinkedList<>(stores));
+        return null;
+    }
     //////////////////////////////// converters ///////////////////////////
 
     /**
@@ -598,6 +613,17 @@ public class TradingSystemFacade {
     private List<ReceiptDto> convertReceiptList(@NotNull List<@NotNull Receipt> receipts) {
         Type listType = new TypeToken<List<ReceiptDto>>() {}.getType();
         return modelMapper.map(receipts, listType);
+    }
+
+    /**
+     * converter of Receipt list to ReceiptDto list
+     *
+     * @param stores - list of stores
+     * @return list of ReceiptDto
+     */
+    private List<StoreDto> convertStoreList(@NotNull List<@NotNull Store> stores) {
+        Type listType = new TypeToken<List<StoreDto>>() {}.getType();
+        return modelMapper.map(stores, listType);
     }
 
     /**

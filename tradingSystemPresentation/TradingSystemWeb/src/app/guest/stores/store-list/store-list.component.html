@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="col-md-9">
+      <ng5-slider [(value)]="value" [options]="options"></ng5-slider>
+    </div>
+  </div>
+  <hr/>  <hr/>  <hr/>  <hr/>  <hr/>
+  <div class="row">
+    <div class="col-xs-12">
+      <app-store-item
+        *ngFor="let storeEl of stores | storeRank: value"
+        [store]="storeEl"></app-store-item>
+    </div>
+  </div>
+</div>
+

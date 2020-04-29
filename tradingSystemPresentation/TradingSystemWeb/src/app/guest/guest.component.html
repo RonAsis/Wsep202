@@ -1,8 +1,12 @@
+<app-header-guest (featureSelected)="onNavigate($event)"></app-header-guest>
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <app-register></app-register>
-      <app-login></app-login>
+      <app-register  *ngIf="loadedFeature === 'Register'"></app-register>
+      <app-login *ngIf="loadedFeature === 'Login'"></app-login>
+      <app-stores *ngIf="loadedFeature === 'Stores'"></app-stores>
+      <app-products *ngIf="loadedFeature === 'Products'"></app-products>
+      <app-shopping-cart *ngIf="loadedFeature === 'Shopping-cart'"></app-shopping-cart>
       <hr />
     </div>
   </div>

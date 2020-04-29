@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.web.controllers;
 
 import com.wsep202.TradingSystem.dto.ReceiptDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping(PublicApiPaths.SELLER_OWNER_PATH)
+@CrossOrigin(origins = "http://localhost:4200")
 @Api(value = "API to seller owner", produces = "application/json")
 @RequiredArgsConstructor
 public class SellerOwnerController {
@@ -28,8 +30,8 @@ public class SellerOwnerController {
     @GetMapping("view-purchase-history-of-owner/{userName}/{storeId}")
     public List<ReceiptDto> viewPurchaseHistoryOfOwner(@PathVariable String ownerUsername,
                                                        @PathVariable int storeId,
-                                                       @RequestBody UUID uuid){
-        return sellerOwnerService.viewPurchaseHistoryOfStoreOwner(ownerUsername,storeId, uuid);
+                                                       @RequestBody UUID uuid) {
+        return sellerOwnerService.viewPurchaseHistoryOfStoreOwner(ownerUsername, storeId, uuid);
     }
 
     /**
@@ -43,7 +45,7 @@ public class SellerOwnerController {
                               @PathVariable String category,
                               @PathVariable int amount,
                               @PathVariable double cost,
-                              @RequestBody UUID uuid){
+                              @RequestBody UUID uuid) {
         return sellerOwnerService.addProduct(ownerUsername, storeId, productName, category, amount, cost, uuid);
     }
 
@@ -55,7 +57,7 @@ public class SellerOwnerController {
     public boolean deleteProductFromStore(@PathVariable String ownerUsername,
                                           @PathVariable int storeId,
                                           @PathVariable int productSn,
-                                          @RequestBody UUID uuid){
+                                          @RequestBody UUID uuid) {
         return sellerOwnerService.deleteProductFromStore(ownerUsername, storeId, productSn, uuid);
     }
 
@@ -70,8 +72,8 @@ public class SellerOwnerController {
                                @PathVariable String productName,
                                @PathVariable String category,
                                @PathVariable int amount,
-                               @PathVariable double cost ,
-                               @RequestBody UUID uuid){
+                               @PathVariable double cost,
+                               @RequestBody UUID uuid) {
         return sellerOwnerService.editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost, uuid);
     }
 
@@ -82,8 +84,8 @@ public class SellerOwnerController {
     @PostMapping("add-owner/{ownerUsername}/{storeId}/{newOwnerUsername}")
     public boolean addOwner(@PathVariable String ownerUsername,
                             @PathVariable int storeId,
-                            @PathVariable  String newOwnerUsername,
-                            @RequestBody UUID uuid){
+                            @PathVariable String newOwnerUsername,
+                            @RequestBody UUID uuid) {
         return sellerOwnerService.addOwner(ownerUsername, storeId, newOwnerUsername, uuid);
     }
 
@@ -95,7 +97,7 @@ public class SellerOwnerController {
     public boolean removeManager(@PathVariable String ownerUsername,
                                  @PathVariable int storeId,
                                  @PathVariable String newManagerUsername,
-                                 @RequestBody UUID uuid){
+                                 @RequestBody UUID uuid) {
         return sellerOwnerService.removeManager(ownerUsername, storeId, newManagerUsername, uuid);
     }
 
@@ -108,7 +110,7 @@ public class SellerOwnerController {
                                  @PathVariable int storeId,
                                  @PathVariable String newManagerUsername,
                                  @PathVariable String permission,
-                                 @RequestBody UUID uuid){
+                                 @RequestBody UUID uuid) {
         return sellerOwnerService.addPermission(ownerUsername, storeId, newManagerUsername, permission, uuid);
     }
 
@@ -116,11 +118,21 @@ public class SellerOwnerController {
      * add manager
      */
     @ApiOperation(value = "add manager")
-    @PostMapping("add-manager/{ownerUsername}/{storeId}/{newManagerUsername}")
+    @PostMapping("add-manager/{ownerUsername}/{storeId}/{newManagerUsername}/{uuid}")
     public boolean addManager(@PathVariable String ownerUsername,
                               @PathVariable int storeId,
                               @PathVariable String newManagerUsername,
-                              @RequestBody UUID uuid){
+                              @PathVariable UUID uuid) {
         return sellerOwnerService.addManager(ownerUsername, storeId, newManagerUsername, uuid);
+    }
+
+    /**
+     * add manager
+     */
+    @ApiOperation(value = "get owner stores")
+    @GetMapping("get-owner-stores/{ownerUsername}/{uuid}")
+    public List<StoreDto> getOwnerStores(@PathVariable String ownerUsername,
+                                         @PathVariable UUID uuid) {
+        return sellerOwnerService.getOwnerStores(ownerUsername, uuid);
     }
 }

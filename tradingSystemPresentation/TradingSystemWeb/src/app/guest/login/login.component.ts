@@ -9,30 +9,29 @@ import {UserService} from '../../services/user.service';
 export class LoginComponent implements OnInit {
   @ViewChild('usernameInput', {static: false}) usernameInputRef: ElementRef;
   @ViewChild('passwordInput', {static: false}) passwordInputRef: ElementRef;
+  messageLogin: string;
 
-  @Output() isAdmin: boolean;
-  @Output() uuid: string;
   constructor(private userService: UserService) {
-    this.isAdmin = false;
+    this.messageLogin = '';
   }
 
   ngOnInit(): void {
   }
 
   onLogin() {
-    this.userService.login(
+    this.messageLogin = '';
+    const succeed = this.userService.login(
       this.usernameInputRef.nativeElement.value,
       this.passwordInputRef.nativeElement.value
-    ).subscribe(
-      response => console.log(response));
-  }
-
-  handlerLogin(pair: {key: string ; value: boolean}){
-      this.isAdmin = pair.value;
-      this.uuid = pair.key;
+    );
+    if (!succeed){
+      this.onClearDetails();
+      this.messageLogin = 'logging failed';
+    }
   }
 
   onClearDetails() {
-
+    this.passwordInputRef.nativeElement.value = '';
+    this.usernameInputRef.nativeElement.value = '';
   }
 }

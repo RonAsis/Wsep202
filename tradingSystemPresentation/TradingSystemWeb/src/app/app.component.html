@@ -1,0 +1,14 @@
+<app-header></app-header>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="col-md-7">
+        <app-guest
+          *ngIf="!isLogging; else loggingMenu"></app-guest>
+        <ng-template #loggingMenu>
+          <app-logged-in-user></app-logged-in-user>
+        </ng-template>
+    </div>
+  </div>
+</div>
+</div>
