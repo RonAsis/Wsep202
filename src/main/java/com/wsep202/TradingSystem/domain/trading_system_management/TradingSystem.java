@@ -1,8 +1,11 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
+import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
 import javafx.util.Pair;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -20,6 +23,8 @@ public class TradingSystem {
 
     private TradingSystemDao tradingSystemDao;
 
+    @Setter
+    private Subject subject;
 
     public TradingSystem(@NotNull ExternalServiceManagement externalServiceManagement,
                          @NotNull UserSystem admin,
@@ -524,5 +529,12 @@ public class TradingSystem {
         }
         log.info(String.format("failed remove user %s as manager from store '%s'", managerStore.getUserName(),ownedStSore.getStoreId()));
         return  false;
+    }
+
+    /**
+     * connect to Notification System
+     */
+    public void connectNotificationSystem(Observer observer, String principal) {
+        observer.connectNotificationSystem(subject, principal);
     }
 }

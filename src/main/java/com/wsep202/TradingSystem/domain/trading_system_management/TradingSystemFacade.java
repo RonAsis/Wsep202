@@ -3,7 +3,10 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
+import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
+import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 import com.wsep202.TradingSystem.dto.*;
+import com.wsep202.TradingSystem.service.ServiceFacade;
 import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,8 @@ public class TradingSystemFacade {
      * inorder to create new objects
      */
     private final FactoryObjects factoryObjects;
+
+    private final ServiceFacade serviceFacade;
 
     /**
      * view purchase history of user logged in
@@ -602,6 +607,17 @@ public class TradingSystemFacade {
 //        return convertStoreList(new LinkedList<>(stores));
         return null;
     }
+
+
+    public void connectNotificationSystem(String username, UUID uuid, String principal) {
+        Observer user = tradingSystem.getUser(username, uuid);
+        tradingSystem.connectNotificationSystem(user, principal);
+    }
+
+    public void sendNotification(List<Notification> notifications) {
+        List<NotificationDto> notificationDtos = convertNotificationList(notifications);
+        serviceFacade.sendNotification(notificationDtos);
+    }
     //////////////////////////////// converters ///////////////////////////
 
     /**
@@ -646,6 +662,11 @@ public class TradingSystemFacade {
     private List<Product> converterProductsList(@NotNull List<@NotNull ProductDto> productDtos) {
         Type listType = new TypeToken<List<Product>>() {}.getType();
         return modelMapper.map(productDtos, listType);
+    }
+
+    private List<NotificationDto> convertNotificationList(@NotNull List<@NotNull Notification> notifications) {
+        Type listType = new TypeToken<List<NotificationDto>>() {}.getType();
+        return modelMapper.map(notifications, listType);
     }
 
 }

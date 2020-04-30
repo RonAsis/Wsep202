@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.web.controllers;
 
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
+import com.wsep202.TradingSystem.service.user_service.NotificationService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -22,6 +24,8 @@ import java.util.UUID;
 public class GuestController {
 
     private final GuestService guestService;
+    private final NotificationService notificationService;
+
     /**
      * register user to the system
      * @param userName user to register - unique
@@ -42,7 +46,8 @@ public class GuestController {
     @PutMapping("login/{userName}/{password}")
     public Pair<UUID, Boolean> login(@PathVariable String userName,
                                     @PathVariable String password){
-        return guestService.login(userName, password);
+        Pair<UUID, Boolean> loginParam = guestService.login(userName, password);
+        return loginParam;
     }
 
     /**

@@ -11,5 +11,6 @@ public class PublicApiPaths {
     public static final String BUYER_REG_PATH = "/buyer-reg";
     public static final String SELLER_MANAGER_PATH = "/seller-manager";
     public static final String SELLER_OWNER_PATH =  "/seller-owner";
+    public static final String NOTIFICATION_PATH = "/notification";
 
 }
