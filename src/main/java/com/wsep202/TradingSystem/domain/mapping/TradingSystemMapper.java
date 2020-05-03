@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.mapping;
 
 import com.github.rozidan.springboot.modelmapper.TypeMapConfigurer;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
 import com.wsep202.TradingSystem.dto.ProductDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
@@ -19,8 +20,8 @@ public class TradingSystemMapper {
     public static class StoreToStoreDtoConverter extends TypeMapConfigurer<Store, StoreDto> {
         @Override
         public void configure(TypeMap<Store, StoreDto> typeMap) {
-            Converter<DiscountType, String> discountTypeStringConverter =
-                    ctx -> ctx.getSource() == null ? null : ctx.getSource().type;
+            Converter<DiscountPolicy, String> discountTypeStringConverter =
+                    ctx -> ctx.getSource() == null ? null : ctx.getSource().toString();
 
 //            typeMap.addMappings(mapper -> mapper.using(discountTypeStringConverter)
 //                    .map(Store::getDiscountType, StoreDto::setDiscountType));

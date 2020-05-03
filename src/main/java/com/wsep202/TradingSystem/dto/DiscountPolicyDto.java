@@ -1,11 +1,13 @@
 package com.wsep202.TradingSystem.dto;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.DiscountType;
+import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Data
@@ -14,18 +16,8 @@ import java.util.List;
 @Builder
 public class DiscountPolicyDto {
 
-    /**
-     * allow everyone to purchase from store
-     */
-    private boolean isAllAllowed;
 
-    /**
-     * status as string
-     */
-    private String whoCanBuyStatus;
-
-    /**
-     * list that contains the allowed discounts in this policy
-     */
-    private List<DiscountType> listOfDiscountTypes;
+    protected Calendar endTime; //expiration date of the discount
+    protected double discountPercentage;    //discount percentage for product
+    protected ArrayList<Product> productsUnderThisDiscount;
 }

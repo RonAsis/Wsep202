@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.service.user_service;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.UserSystemDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,4 @@ public class SellerManagerService {
         return tradingSystemFacade.viewPurchaseHistoryOfManager(userName, storeId, uuid);
     }
 
-    public List<StoreDto> getMangeStores(String manageUsername, UUID uuid) {
-        return tradingSystemFacade.getMangeStores(manageUsername, uuid);
-    }
 }

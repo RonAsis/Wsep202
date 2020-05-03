@@ -2,11 +2,9 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.google.common.base.Strings;
 import com.wsep202.TradingSystem.domain.exception.*;
-import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
-import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
+import com.wsep202.TradingSystem.domain.message.ExplainMessage;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 
 import java.util.*;
 
@@ -19,8 +17,12 @@ import java.util.*;
 @NoArgsConstructor
 @Slf4j
 @Builder
-public class UserSystem implements Observer {
+public class UserSystem {
 
+    /**
+     * waiting system messages for the user
+     */
+    private ExplainMessage waitingMessages;
     /**
      * the user name
      */
@@ -67,27 +69,11 @@ public class UserSystem implements Observer {
     @Builder.Default
     private List<Receipt> receipts = new LinkedList<>();
 
-    /**
-     * for notification
-     */
-    @Builder.Default
-    private List<Notification> notifications = new LinkedList<>();
-
-    //need ignore in Db;
-    private Subject subject;
-
-    //need ignore in Db;
-    private String principal;
-
     public UserSystem(String userName, String firstName, String lastName, String password) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        this.notifications = new LinkedList<>();
-        shoppingCart = new ShoppingCart();
-        ownedStores = new HashSet<>();
-        managedStores = new HashSet<>();
     }
 
     /**
@@ -164,7 +150,6 @@ public class UserSystem implements Observer {
      * @return always true, because the user is now logged-out
      */
     public boolean logout() {
-        subject.unregister(this);
         isLogin = false;
         return true;
     }
@@ -242,25 +227,5 @@ public class UserSystem implements Observer {
                 !Strings.isNullOrEmpty(password) &&
                 !Strings.isNullOrEmpty(firstName) &&
                 !Strings.isNullOrEmpty(lastName);
-    }
-
-    @Override
-    public void newNotification(Notification notification) {
-        this.notifications.add(notification);
-        subject.update(this);
-    }
-
-    @Override
-    public void connectNotificationSystem(Subject subject, String principal) {
-        setSubject(subject);
-        subject.register(this);
-    }
-
-    @Override
-    public List<Notification> getNotifications() {
-        List<Notification> notifications = this.notifications;
-        this.notifications = new LinkedList<>();
-        notifications.forEach(notification -> notification.setPrincipal(principal));
-        return notifications;
     }
 }

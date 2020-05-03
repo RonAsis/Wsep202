@@ -1,18 +1,14 @@
-package com.wsep202.TradingSystem.dto;
+package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.util.LinkedList;
 import java.util.List;
 
+
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class PurchasePolicyDto {
+public class PurchasePolicy {
 
     /**
      * allow everyone to purchase from store
@@ -28,4 +24,11 @@ public class PurchasePolicyDto {
      * a list that includes all the purchase types which are allowed in the store.
      */
     private List<PurchaseType> listOfPurchaseTypes;
+
+    public PurchasePolicy(){
+        listOfPurchaseTypes = new LinkedList<>();
+        listOfPurchaseTypes.add(PurchaseType.BUY_IMMEDIATELY);
+    }
+
+
 }

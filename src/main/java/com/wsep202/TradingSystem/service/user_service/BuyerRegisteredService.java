@@ -42,7 +42,7 @@ public class BuyerRegisteredService {
                              DiscountPolicyDto discountPolicy,
                              String storeName,
                              UUID uuid){
-        return tradingSystemFacade.openStore(usernameOwner, purchasePolicy, discountPolicy, storeName, uuid);
+        return tradingSystemFacade.openStore(usernameOwner,  storeName, uuid);
     }
 
     /**

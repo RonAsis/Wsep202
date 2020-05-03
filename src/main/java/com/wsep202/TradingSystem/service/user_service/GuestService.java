@@ -127,6 +127,17 @@ public class GuestService {
     }
 
     /**
+     *      * filter products by category
+     * @param products
+     * @param category
+     * @return
+     */
+    public List<ProductDto> filterByStoreCategory(List<ProductDto> products,
+                                                  String category){
+        return tradingSystemFacade.filterByStoreCategory(products, category);
+    }
+
+    /**
      *      * purchase shopping cart
      * @param shoppingCart includes the bags of each store the user selected
      * @param paymentDetails    - charging info of the user
@@ -139,7 +150,4 @@ public class GuestService {
         return tradingSystemFacade.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddressDto);
     }
 
-    public List<StoreDto> getStores() {
-        return tradingSystemFacade.getStores();
-    }
 }
