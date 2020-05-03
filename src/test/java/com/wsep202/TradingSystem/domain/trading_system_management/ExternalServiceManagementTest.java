@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
-import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import externals.ChargeSystem;
 import externals.SecuritySystem;
 import externals.SupplySystem;
@@ -277,7 +276,7 @@ class ExternalServiceManagementTest {
 
             paymentDetails = new PaymentDetails();
             user = new UserSystem("username","luis","enrique",passwordTest);
-            store = new Store(user,new PurchasePolicy(),new DiscountPolicy(),"keter");
+//            store = new Store(user,new PurchasePolicy(),new DiscountPolicy(),"keter");
             cart = new ShoppingCart();
             bag = new ShoppingBag(store);
             externalServiceManagement.connect();

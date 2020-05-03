@@ -2,7 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
 import com.wsep202.TradingSystem.domain.exception.NoOwnerInStoreException;
-import org.apache.catalina.User;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -225,13 +225,13 @@ class UserSystemTest {
             testUserSystem = UserSystem.builder().build();
             testStore1 = Store.builder()
                             .storeName("MovieStore")
-                            .purchasePolicy(new PurchasePolicy())
-                            .discountPolicy(new DiscountPolicy())
+//                            .purchasePolicy(new PurchasePolicy())
+//                            .discountPolicy(new DiscountPolicy())
                             .build();
             testStore2 = Store.builder()
                     .storeName("MovieStoreVIP")
-                    .purchasePolicy(new PurchasePolicy())
-                    .discountPolicy(new DiscountPolicy())
+//                    .purchasePolicy(new PurchasePolicy())
+//                    .discountPolicy(new DiscountPolicy())
                     .storeId(testStore1.getStoreId()+1)
                     .build();
             testProduct1 = new Product("Hunger Games", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore1.getStoreId());

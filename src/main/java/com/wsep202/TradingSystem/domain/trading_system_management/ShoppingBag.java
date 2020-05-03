@@ -144,4 +144,14 @@ public class ShoppingBag {
         }
         return -1;
     }
+
+    public double getTotalCostOfBag(){
+        double price=0;
+        for(Product product: this.getProductListFromStore().keySet()){
+            price+=(product.getCost()*this.getProductListFromStore().get(product));
+        }
+        price = Double.parseDouble(formatter.format(price));
+        return price;
+    }
+
 }

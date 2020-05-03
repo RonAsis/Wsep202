@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.helprTests;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import com.wsep202.TradingSystem.dto.*;
 import org.junit.jupiter.api.Assertions;
 
@@ -72,10 +73,10 @@ public class AssertionHelperTest {
         Assertions.assertEquals(product.getStoreId(), productDto.getStoreId());
     }
 
-    public static void assertDiscountPolicy(DiscountPolicy discountPolicy, DiscountPolicyDto discountPolicy1) {
-        Assertions.assertEquals(discountPolicy.getWhoCanBuyStatus(), discountPolicy1.getWhoCanBuyStatus());
-        Assertions.assertEquals(discountPolicy.isAllAllowed(), discountPolicy1.isAllAllowed());
-    }
+//    public static void assertDiscountPolicy(DiscountPolicy discountPolicy, DiscountPolicyDto discountPolicy1) {
+//        Assertions.assertEquals(discountPolicy.getWhoCanBuyStatus(), discountPolicy1.getWhoCanBuyStatus());
+//        Assertions.assertEquals(discountPolicy.isAllAllowed(), discountPolicy1.isAllAllowed());
+//    }
 
     public static void assertReceipts(List<Receipt> receipts, List<ReceiptDto> receiptDtos) {
         if (Objects.nonNull(receipts)) {

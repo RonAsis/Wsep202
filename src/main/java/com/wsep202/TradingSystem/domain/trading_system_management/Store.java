@@ -1,6 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.VisibleDiscount;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import java.util.*;
@@ -14,6 +18,7 @@ import java.util.stream.Collectors;
 @Getter
 public class Store {
 
+    private final Object stockLock = new Object();
 
     public static int storeIdAcc = 0;
 
@@ -34,10 +39,10 @@ public class Store {
     Set<Product> products= new HashSet<>();
 
     //The set purchase policy for the store
-    private PurchasePolicy purchasePolicy;
+    private ArrayList<PurchasePolicy> purchasePolicies;
 
     //The set purchase policy for the store
-    private DiscountPolicy discountPolicy;
+    private ArrayList<DiscountPolicy> discountPolicies;
 
     //owners of the store
     private Set<UserSystem> owners ;
@@ -52,7 +57,9 @@ public class Store {
     //the store rank
     private int rank;
 
-    public Store(UserSystem owner, PurchasePolicy purchasePolicy, DiscountPolicy discountPolicy,String storeName){
+    public Store(UserSystem owner,String storeName){
+        this.purchasePolicies = new ArrayList<>();
+        this.discountPolicies = new ArrayList<>();
         receipts = new LinkedList<>();
         appointedOwners = new HashMap<>();
         appointedManagers = new HashMap<>();
@@ -61,8 +68,6 @@ public class Store {
         managers = new HashSet<>();
         this.storeName = storeName;
         owners.add(owner);
-        this.discountPolicy = discountPolicy;
-        this.purchasePolicy = purchasePolicy;
         this.storeId = getStoreIdAcc();
         this.rank = 0;
     }
@@ -250,13 +255,29 @@ public class Store {
                 product.get().setName(productName);
                 product.get().setCategory(ProductCategory.getProductCategory(category));
                 product.get().setAmount(amount);
-                product.get().setCost(cost);
+                if (cost != product.get().getOriginalCost()){
+                    product.get().setCost(cost);
+                    product.get().setOriginalCost(cost);
+                    //TODO alert the user about the edit and ask to confirm update of cart.
+                }
                 log.info("The product "+productName+" edited successfully");
                 return true;
             }
         }
         log.info("Failed to edit the product: "+productName);
         return false;
+    }
+
+    /**
+     * update product by all discounts it has
+     * @param product to edit
+     */
+    private void updateDiscountByNewPrice(Product product) {
+        for(DiscountPolicy discountPolicy: this.discountPolicies){
+            if(discountPolicy.getProductsUnderThisDiscount().containsKey(product)){
+                discountPolicy.editProductByDiscount(product);
+            }
+        }
     }
 
     /**
@@ -495,5 +516,140 @@ public class Store {
         return products.stream()
                 .map(product -> product.productNameThatContainsKeyWords(keyWords)).filter(product -> product!=null)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * checks if all products in shopping bag are in stock of the store
+     * @param bag the products list the user wish to purchase
+     * @return true if all products in stock
+     * otherwise exception
+     */
+    @Synchronized("stockLock")
+    public boolean isAllInStock(ShoppingBag bag){
+        for(Product product : bag.getProductListFromStore().keySet()){
+            int amount = bag.getProductAmount(product);
+            Product productInStore = getProduct(product.getProductSn());
+            if(amount > productInStore.getAmount()){
+                log.info("The product "+product.getName()+" is out of stock in "+storeName);
+                throw  new NotInStockException(product.getName(),this.storeName);   //th
+            }
+        }
+        //all products in stock
+        log.info("all products in stock");
+        return true;
+    }
+
+
+    /**
+     * update amount of each bag product in the stock of store
+     * after the purchase
+     * @param bag shopping bag
+     */
+    @Synchronized("stockLock")
+    public void updateStock(ShoppingBag bag) {
+        for (Product product : bag.getProductListFromStore().keySet()) {
+            int purchasedAmount = bag.getProductAmount(product);
+            Product productInStore = getProduct(product.getProductSn());
+            editProductAmountInStock(productInStore.getProductSn(),productInStore.getAmount()-purchasedAmount);
+        }
+    }
+
+    /**
+     * The store creates receipt for the products purchased in the bag.
+     * @param bag
+     * @param buyerName
+     * @return
+     */
+    public Receipt createReceipt(ShoppingBag bag, String buyerName){
+        return new Receipt(this.storeId,buyerName,bag.getTotalCostOfBag()
+                ,bag.getProductListFromStore());
+    }
+
+    /**
+     * update amount of product in the stock
+     * @param productSn
+     * @param amount
+     * @return true if operation succeeded
+     */
+    public boolean editProductAmountInStock(int productSn, int amount) {
+        Optional<Product> product = products.stream().filter(p -> p.getProductSn()==productSn).findFirst();
+        if(product.isPresent()){    //update the product properties
+            product.get().setAmount(amount);
+            log.info("The product with id"+productSn+" edited successfully");
+            return true;
+        }
+        log.info("Failed to edit amount of the product: "+productSn);
+        return false;
+    }
+
+    /**
+     * set all the products in the received list with the received discount
+     * @param discountPolicy
+     * @param products
+     * @return
+     */
+    public boolean addDiscountForProduct (UserSystem owner, DiscountPolicy discountPolicy,
+                                          HashMap<Product,Integer> products) throws TradingSystemException{
+        if(owner==null){
+            return false;
+        }
+        if(isOwner(owner)) {
+            boolean isSet = discountPolicy.addProductToThisDiscount(products); //set discount to products
+            isSet = isSet && this.discountPolicies.add(discountPolicy);  //add the discount to store
+            return isSet;
+        }
+        //this is not an owner of the store
+        log.error("The received user: "+owner.getUserName()+"is not owner");
+        throw new NoOwnerInStoreException(owner.getUserName(),storeId);
+    }
+
+    /**
+     * apply discounts on a shopping bag
+     * update prices of products by store discounts
+     */
+    public void applyDiscountPolicies(HashMap<Product,Integer> productsBag) {
+        updateExpiredDiscounts();   //remove discounts that their time is expired from store.
+        for(DiscountPolicy discountPolicy:this.getDiscountPolicies()){  //apply discounts on shoppingBag
+            discountPolicy.applyDiscount(productsBag);
+        }
+    }
+
+    /**
+     * apply only visible discounts on the store's products
+     */
+    public void applyVisibleDiscountPoliciesOnlyOnStoreProducts() {
+        updateExpiredDiscounts();   //remove discounts that their time is expired from store.
+        HashMap<Product,Integer> productIntegerHashMap = new HashMap<>();
+        for(Product product: this.products){
+            productIntegerHashMap.put(product,0);
+        }
+        for(DiscountPolicy discountPolicy:this.getDiscountPolicies()){  //apply discounts on shoppingBag
+            if(discountPolicy instanceof VisibleDiscount){
+                discountPolicy.applyDiscount(productIntegerHashMap);
+            }
+        }
+    }
+
+    /**
+     * remove discounts that expired from store
+     */
+    private void updateExpiredDiscounts() {
+        for(DiscountPolicy discountPolicy:this.getDiscountPolicies()){
+            if(discountPolicy.isExpired()){
+                this.discountPolicies.remove(discountPolicy);
+            }
+        }
+    }
+
+    public boolean addDiscountForProduct(UserSystem owner, ConditionalStoreDiscount storeDiscount) {
+        if(owner==null){
+            return false;
+        }
+        if(isOwner(owner)) {
+            return this.discountPolicies.add(storeDiscount);  //add the discount to store
+        }
+        //this is not an owner of the store
+        log.error("The received user: "+owner.getUserName()+"is not owner");
+        throw new NoOwnerInStoreException(owner.getUserName(),storeId);
     }
 }

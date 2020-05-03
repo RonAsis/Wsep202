@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -208,8 +209,8 @@ class ShoppingBagTest {
         void setUp() {
             testStore1 = Store.builder()
                     .storeName("MovieStore")
-                    .purchasePolicy(new PurchasePolicy())
-                    .discountPolicy(new DiscountPolicy())
+//                    .purchasePolicy(new PurchasePolicy())
+//                    .discountPolicy(new DiscountPolicy())
                     .build();
             testProduct = new Product("Hunger Games", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore1.getStoreId());
             testProduct2 = new Product("Harry Potter", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore1.getStoreId());

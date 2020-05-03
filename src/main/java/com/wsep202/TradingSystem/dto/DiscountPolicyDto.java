@@ -1,31 +1,54 @@
+/**
+ * Dto of general discount class that defines the interface
+ * part of UC 4.2
+ */
 package com.wsep202.TradingSystem.dto;
-
-import com.wsep202.TradingSystem.domain.trading_system_management.DiscountType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
-
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import java.util.Calendar;
+import java.util.HashMap;
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
 @Builder
+@Slf4j
 public class DiscountPolicyDto {
-
+///////////////////////generic fields///////////////////////////////////////////////
     /**
-     * allow everyone to purchase from store
+     * products that has the specified discount
      */
-    private boolean isAllAllowed;
-
+    protected HashMap<ProductDto, Integer> productsUnderThisDiscount;
     /**
-     * status as string
+     * the product validation date
      */
-    private String whoCanBuyStatus;
-
+    protected Calendar endTime;
     /**
-     * list that contains the allowed discounts in this policy
+     * how much discount should to apply on product
      */
-    private List<DiscountType> listOfDiscountTypes;
+    protected double discountPercentage;
+
+///////////////////////////conditionals////////////////////////////////////////////////
+    /**
+     * describes the condition and the post of the specified discount
+     */
+    protected String conditionDescription;
+//////////////////////////////////////////////////////////////////////////////////////
+///////////////////////conditional product fields/////////////////////////////////////
+    /**
+     * The table that describes what is the amount of items from each product to apply the discount on.
+     */
+    private HashMap<ProductDto,Integer> amountOfProductsForApplyDiscounts;
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////conditional store fields/////////////////////////////////////////
+    /**
+     * the minimal price of purchase to apply the discount from
+     */
+    private double minPrice;
+
+
+
+
 }

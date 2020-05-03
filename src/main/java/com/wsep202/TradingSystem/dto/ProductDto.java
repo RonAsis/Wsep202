@@ -1,6 +1,5 @@
 package com.wsep202.TradingSystem.dto;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.DiscountType;
 import com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +38,12 @@ public class ProductDto {
     private double cost;
 
     /**
+     * the original cost before any discount
+     */
+    private double originalCost;
+
+
+    /**
      * the rank of this product
      */
     private int rank;
@@ -48,15 +53,6 @@ public class ProductDto {
      */
     private int storeId;
 
-    /**
-     * the type of discount with needs to be apply on the product when discount
-     * and watch it's info.
-     */
-    private int costAfterDiscount;
 
-    /**
-     * the type of purchase with needs to be apply on the product when purchasing
-     * and watch it's info.
-     */
-    private String purchaseType;
+
 }

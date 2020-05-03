@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
 import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -17,7 +18,7 @@ class StoreTest {
     private UserSystem owner;   //role as appointing owner in the store
     private Store storeUT;  //unit under test
     private PurchasePolicy purchasePolicy;
-    private DiscountPolicy discountPolicy;
+//    private DiscountPolicy discountPolicy;
     private Product product;    //product to add
 
     //integration attributes
@@ -50,11 +51,11 @@ class StoreTest {
             when(fakeOwner.getUserName()).thenReturn("Donald");
 
             purchasePolicy = new PurchasePolicy();
-            discountPolicy = new DiscountPolicy();
+//            discountPolicy = new DiscountPolicy();
             //owner and opener of the store
             owner = mock(UserSystem.class);
             when(owner.getUserName()).thenReturn("Michael");
-            storeUT = new Store(owner,purchasePolicy,discountPolicy,"Store under test");
+//            storeUT = new Store(owner,purchasePolicy,discountPolicy,"Store under test");
             product = mock(Product.class);
         }
 
@@ -608,10 +609,10 @@ class StoreTest {
             fakeOwnerReal = new UserSystem("DT","Donald","Trump","DT123");
 
             purchasePolicy = new PurchasePolicy();
-            discountPolicy = new DiscountPolicy();
+//            discountPolicy = new DiscountPolicy();
             //owner and opener of the store
             ownerRealUser = new UserSystem("Michael","micha","toti","pass");
-            storeUT = new Store(ownerRealUser,purchasePolicy,discountPolicy,"Store under test");
+//            storeUT = new Store(ownerRealUser,purchasePolicy,discountPolicy,"Store under test");
             product = new Product("Bamba",ProductCategory.SPORTING_GOODS,1,11,storeUT.getStoreId());
         }
 
