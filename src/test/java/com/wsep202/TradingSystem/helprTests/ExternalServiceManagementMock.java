@@ -33,8 +33,8 @@ public class ExternalServiceManagementMock  extends ExternalServiceManagement {
     }
 
     @Override
-    public List<Integer> charge(PaymentDetails paymentDetails, ShoppingCart cart){
-        return storesIdsCanBuy;
+    public boolean charge(PaymentDetails paymentDetails, ShoppingCart cart){
+        return true;
     }
 
     public boolean cancelCharge(PaymentDetails paymentDetails, ShoppingCart cart){

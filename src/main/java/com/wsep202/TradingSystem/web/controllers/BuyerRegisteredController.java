@@ -49,7 +49,7 @@ public class BuyerRegisteredController {
                            @RequestBody DiscountPolicyDto discountPolicy,
                            @PathVariable String storeName,
                            @PathVariable UUID uuid) {
-        return buyerRegisteredService.openStore(usernameOwner, purchasePolicy, discountPolicy, storeName, uuid);
+        return buyerRegisteredService.openStore(usernameOwner,  storeName, uuid);
     }
 
     /**

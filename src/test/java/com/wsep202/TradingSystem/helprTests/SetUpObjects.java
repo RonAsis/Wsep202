@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.helprTests;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 
 import java.util.*;
 
@@ -97,8 +98,8 @@ public class SetUpObjects {
         for (int counter = 0; counter <= 10; counter++) {
             stores.add(Store.builder()
                     .storeId(counter)
-                    .purchasePolicy(new PurchasePolicy())
-                    .discountPolicy(new DiscountPolicy())
+//                    .purchasePolicy(new PurchasePolicy())
+//                    .discountPolicy(new DiscountPolicy())
                     .storeName("storeName" + counter)
                     .rank(counter)
                     .build());
@@ -115,8 +116,8 @@ public class SetUpObjects {
         //init products
         Set<Product> products = setUpProducts();
 
-        PurchasePolicy purchasePolicy = new PurchasePolicy();
-        DiscountPolicy discountPolicy = new DiscountPolicy();
+//        PurchasePolicy purchasePolicy = new PurchasePolicy();
+//        DiscountPolicy discountPolicy = new DiscountPolicy();
         Set<UserSystem> owners = setupUsers();
         List<Receipt> receipts = setUpReceipts();
 
@@ -124,11 +125,11 @@ public class SetUpObjects {
                 .storeId(storeId)
                 .owners(owners)
                 .storeName(storeName)
-                .discountPolicy(discountPolicy)
+//                .discountPolicy(discountPolicy)
                 .products(products)
                 .receipts(receipts)
                 .rank(rank)
-                .purchasePolicy(purchasePolicy)
+//                .purchasePolicy(purchasePolicy)
                 .build();
     }
 

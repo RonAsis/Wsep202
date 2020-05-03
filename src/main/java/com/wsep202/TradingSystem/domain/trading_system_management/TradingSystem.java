@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import javafx.util.Pair;
 import lombok.NonNull;
 import lombok.Setter;
@@ -289,7 +290,6 @@ public class TradingSystem {
         return purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
     }
 
-///////////////////////////TODO BAR AND KSENIA ///////////////////////////////
 
     /**
      * This method is used to purchase all the products that the registered user added to his cart.
@@ -306,6 +306,7 @@ public class TradingSystem {
         return purchaseAndDeliver(paymentDetails, user.getShoppingCart(), billingAddress, user.getUserName());
     }
 
+
     /**
      * This method makes the payment in the externalServiceManagement using the charge method.
      *
@@ -314,162 +315,52 @@ public class TradingSystem {
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
-    private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress, String customerName) {
+    private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress, String customerName)
+            throws TradingSystemException{
+        //check validity of the arguments fields
+        if (validationOfPurchaseArgs(paymentDetails, shoppingCart, billingAddress)) return null;
+        shoppingCart.isAllBagsInStock();    //ask the cart to check all products in stock
+        log.info("all products in stock");
+        shoppingCart.applyDiscountPolicies();
+        log.info("applied stores discount policies on shopping cart");
+        externalServiceManagement.charge(paymentDetails, shoppingCart);
+        log.info("The user has been charged by his purchase.");
+        try{//request shipping for the purchase
+            externalServiceManagement.deliver(billingAddress, shoppingCart);
+        }catch (DeliveryRequestException exception){
+            //in case delivery request rejected, cancel charged cart
+            externalServiceManagement.cancelCharge(paymentDetails,shoppingCart);
+            throw new DeliveryRequestException("The delivery request for: "+customerName+" " +
+                    "has been rejected.");
+        }
+        log.info("delivery request accepted");
+        shoppingCart.updateAllAmountsInStock();
+        log.info("all amounts of products in stock of stores were updated");
+        return shoppingCart.createReceipts(customerName);
+    }
+
+    private boolean validationOfPurchaseArgs(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress) {
         if (shoppingCart == null || paymentDetails == null || billingAddress == null || shoppingCart.getNumOfBagsInCart() == 0 || shoppingCart.getShoppingBagsList() == null) {
             log.error("a store or payment details or billing address can't be null, cart can't be null or empty");
-            return null;
+            return true;
         }
-        List<Integer> listOfStoresWherePaymentPassed = makePurchase(shoppingCart, paymentDetails);
-        if (listOfStoresWherePaymentPassed.isEmpty()) {
-            log.error("no item was purchased from cart for user " + customerName);
-            return null;
-        }
-        boolean isDelivered = deliver(shoppingCart, billingAddress, listOfStoresWherePaymentPassed);
-        if (isDelivered) {//if the delivery was approved than make the receipts and send them to the customer
-            updateProductAmount(listOfStoresWherePaymentPassed, shoppingCart);
-            return makeReceipts(listOfStoresWherePaymentPassed, shoppingCart, customerName);
-        }
-        log.error("problem with delivery, cancel payment for " + customerName + " canceling purchase");
-        cancelPayment(listOfStoresWherePaymentPassed, shoppingCart, paymentDetails);
-        return null;
+        return false;
     }
 
-    /**
-     * This method is used to check which shopping can the user purchase,
-     * after checking all the cart, the bags and the payment details sent to externalServiceManagement to make the purchase.
-     *
-     * @param shoppingCart   - the users personal shopping cart
-     * @param paymentDetails - the users payment details
-     * @return true if the purchase was successful, false if there where problem in the process of charging.
-     */
-    private List<Integer> makePurchase(ShoppingCart shoppingCart, PaymentDetails paymentDetails) {
-        boolean canPurchaseShoppingBag;
-        ShoppingCart bagsToPurchase = new ShoppingCart();
-        for (Store store : shoppingCart.getShoppingBagsList().keySet()) {
-            canPurchaseShoppingBag = true;
-            ShoppingBag shoppingBag = shoppingCart.getShoppingBag(store);
-            Map<Product, Integer> productList = shoppingBag.getProductListFromStore();
-            for (Product product : productList.keySet()) { //check if there is enough products in store to make the purchase
-                if (product.getAmount() < productList.get(product) || !product.getPurchaseType().type.equals("Buy immediately")) {
-                    canPurchaseShoppingBag = false;
-                    log.error("not enough '" + product.getName() + "' in stock, shopping bag from store '" + store.getStoreName() + "'" +
-                            " will not be purchased");
-                    break;
-                }
-                bagsToPurchase.addBagToCart(store, shoppingBag);
-                log.info("transfer shopping bag from store '" + store.getStoreName() + "' to charging system");
-            }
-
-        }
-        return externalServiceManagement.charge(paymentDetails, bagsToPurchase);
-    }
-
-    /**
-     * This method is used to make all the receipts for the purchases that was made by the user
-     * and make a delivery throw externalServiceManagement using the deliver method
-     *
-     * @param listOfStoreIds - the store ids that the payment in them was successful
-     * @param shoppingCart   - the user shopping cart
-     * @param customerName   - the name of the user, if it's a guest the name will be "Guest" if the user is registered
-     *                       the name will be his userName.
-     * @return a list of all of the receipts for all the purchases the user made
-     */
-    private List<Receipt> makeReceipts(List<Integer> listOfStoreIds, ShoppingCart shoppingCart, String customerName) {
-        List<Receipt> cartReceiptList = new ArrayList<>();
-//        for (int storeId : listOfStoreIds) { // make a receipt for each store purchase
-//            Store receivedPaymentStore = stores.stream().filter(store -> store.getStoreId() == storeId).findFirst().get();
-//            double totalPaymentToStore = shoppingCart.getShoppingBag(receivedPaymentStore).getTotalCostOfBag();
-//            Receipt storeReceipt = new Receipt(storeId, customerName, totalPaymentToStore,
-//                    shoppingCart.getShoppingBag(receivedPaymentStore).getProductListFromStore());
-//            cartReceiptList.add(storeReceipt);
-//            receivedPaymentStore.addReceipt(storeReceipt);
-//            shoppingCart.removeBagFromCart(receivedPaymentStore, shoppingCart.getShoppingBag(receivedPaymentStore));
-//        }
-//        log.info("made a list of receipts for " + customerName + " on his purchase");
-        return cartReceiptList;
-    }
-
-    /**
-     * This method is used to make the delivery of the shopping bags that was purchased.
-     * The delivery happens in externalServiceManagement class.
-     *
-     * @param shoppingCart   - the users personal shopping cart
-     * @param billingAddress - the users address
-     * @param listOfStoreIds - list of all store ids that the payment was successful
-     * @return true if the delivery was successful, false if there were a problem
-     */
-    private boolean deliver(ShoppingCart shoppingCart, BillingAddress billingAddress, List<Integer> listOfStoreIds) {
-        ShoppingCart deliveryShoppingCart = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
-        return externalServiceManagement.deliver(billingAddress, deliveryShoppingCart);
-    }
-
-    /**
-     * This method is used If the delivery fails, then the system needs to cancel the payment on the bags that
-     * the user purchased and return the money.
-     *
-     * @param listOfStoreIds - list of store ids that the users made purchase in
-     * @param shoppingCart   - the users shopping cart
-     * @param paymentDetails - the users payment details
-     * @return true when the payment was canceled
-     */
-    private boolean cancelPayment(List<Integer> listOfStoreIds, ShoppingCart shoppingCart, PaymentDetails paymentDetails) {
-        ShoppingCart getCreditCart = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
-        return externalServiceManagement.cancelCharge(paymentDetails, getCreditCart);
-    }
-
-    /**
-     * This method is used to get the shopping bags that the user purchased.
-     *
-     * @param listOfStoreIds - list of store ids that the users made purchase in
-     * @param shoppingCart   - the users shopping cart
-     * @return shopping cart with the bags that was purchased
-     */
-    private ShoppingCart getPurchasedShoppingCart(List<Integer> listOfStoreIds, ShoppingCart shoppingCart) {
-        ShoppingCart shoppingCartToReturn = new ShoppingCart(); //save only the shopping bags that needs to be delivered
-//        for (int storeId : listOfStoreIds) {
-//            Store storeToSend = stores.stream().filter(store -> store.getStoreId() == storeId).findFirst().get();
-//            shoppingCartToReturn.addBagToCart(storeToSend, shoppingCart.getShoppingBag(storeToSend));
-//        }
-        return shoppingCartToReturn;
-    }
-
-    /**
-     * This method is used after the purchase of the products.
-     * The amount of the product in the store needs to be updated.
-     *
-     * @param listOfStoreIds - list of store ids that the users made purchase in
-     * @param shoppingCart   - the users shopping cart
-     */
-    private void updateProductAmount(List<Integer> listOfStoreIds, ShoppingCart shoppingCart) {
-        ShoppingCart shoppingCartToEdit = getPurchasedShoppingCart(listOfStoreIds, shoppingCart);
-        for (Store store : shoppingCartToEdit.getShoppingBagsList().keySet()) {
-            for (Product product : shoppingCartToEdit.getShoppingBag(store).getProductListFromStore().keySet()) {
-                product.setAmount(product.getAmount() - shoppingCartToEdit.getShoppingBag(store).getProductAmount(product));
-                log.info("amount of product '" + product.getName() + "' was updated");
-            }
-        }
-    }
-
-//////////////////////////////////////////////////////////////////////////////todo/////////////////////////////
 
     /**
      * This method is used to open a new store in the system
      *
      * @param user           - the user that wants to open the store
-     * @param purchasePolicy -  a collection of purchase rules that the user has decided on for his store
-     * @param discountPolicy -  a collection of discount rules that the user has decided on for his store
      * @param storeName      - the name of the store that the user decided
      * @return - false if the user is not registered, and true after the new store is added to store list
      */
     public Store openStore(UserSystem user,
-                           PurchasePolicy purchasePolicy,
-                           DiscountPolicy discountPolicy,
+
                            String storeName) {
         if (Objects.nonNull(user) &&
-                Objects.nonNull(purchasePolicy) &&
-                Objects.nonNull(discountPolicy) &&
                 Strings.isNotBlank(storeName)) {
-            Store newStore = new Store(user, purchasePolicy, discountPolicy, storeName);
+            Store newStore = new Store(user, storeName);
             tradingSystemDao.addStore(newStore);
             user.addNewOwnedStore(newStore);
             log.info(String.format("A new store '%s' was opened in the system, %s is the owner", storeName, user.getUserName()));
@@ -478,6 +369,7 @@ public class TradingSystem {
         log.info(String.format("Was problem to open store '%s' in the system by %s", storeName, user.getUserName()));
         return null;
     }
+
 
     /**
      * This method is used to add a new manager to an existing store

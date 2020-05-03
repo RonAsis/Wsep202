@@ -1,7 +1,7 @@
-package com.wsep202.TradingSystem.domain.trading_system_management;
+package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,4 +29,6 @@ public class PurchasePolicy {
         listOfPurchaseTypes = new LinkedList<>();
         listOfPurchaseTypes.add(PurchaseType.BUY_IMMEDIATELY);
     }
+
+
 }

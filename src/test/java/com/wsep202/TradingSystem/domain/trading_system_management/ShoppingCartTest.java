@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -246,7 +247,7 @@ class ShoppingCartTest {
         products.put(testProduct,1);
         testShoppingBag3.setProductListFromStore(products);
         when(testShoppingBag3.getProductListFromStore()).thenReturn(products);
-        when(testProduct.getDiscountType()).thenReturn(DiscountType.VISIBLE_DISCOUNT);
+//        when(testProduct.getDiscountType()).thenReturn(DiscountType.VISIBLE_DISCOUNT);
         Map<Store,ShoppingBag> bags= new HashMap<>();
         bags.put(testStore3,testShoppingBag3);
         testShoppingCart.setShoppingBagsList(bags);
@@ -294,19 +295,19 @@ public class ShoppingCartIntegration {
             testShoppingCart = new ShoppingCart();
             testStore1 = Store.builder()
                     .storeName("MovieStore")
-                    .purchasePolicy(new PurchasePolicy())
-                    .discountPolicy(new DiscountPolicy())
+//                    .purchasePolicy(new PurchasePolicy())
+//                    .discountPolicy(new DiscountPolicy())
                     .build();
             testStore2 = Store.builder()
                     .storeName("MovieStoreVIP")
-                    .purchasePolicy(new PurchasePolicy())
-                    .discountPolicy(new DiscountPolicy())
+//                    .purchasePolicy(new PurchasePolicy())
+//                    .discountPolicy(new DiscountPolicy())
                     .storeId(testStore1.getStoreId()+1)
                     .build();
             testStore3 = Store.builder()
                     .storeName("Sports")
-                    .purchasePolicy(new PurchasePolicy())
-                    .discountPolicy(new DiscountPolicy())
+//                    .purchasePolicy(new PurchasePolicy())
+//                    .discountPolicy(new DiscountPolicy())
                     .storeId(testStore2.getStoreId()+1)
                     .build();
             testShoppingBag1 = new ShoppingBag(testStore1);

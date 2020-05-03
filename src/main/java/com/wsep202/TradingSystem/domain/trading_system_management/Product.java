@@ -1,9 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.google.common.base.Strings;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.swing.plaf.IconUIResource;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -55,6 +56,12 @@ public class Product {
     private double cost = 0;
 
     /**
+     * the original price of this product before discount if applied one
+     */
+    @Min(value = 0, message = "Must be greater than or equal zero")
+    private double originalCost = 0;
+
+    /**
      * the rank of this product
      */
     @Min(value = 0, message = "Must be greater than or equal zero")
@@ -67,38 +74,7 @@ public class Product {
      */
     private int storeId;
 
-    /**
-     * the type of discount with needs to be apply on the product when discount
-     * and watch it's info.
-     */
-    private DiscountType discountType = DiscountType.NONE;
 
-    /**
-     * the type of purchase with needs to be apply on the product when purchasing
-     * and watch it's info.
-     */
-    private PurchaseType purchaseType = PurchaseType.BUY_IMMEDIATELY;
-
-    /**
-     * Product Constructor
-     * @param name - product name.
-     * @param category - product category.
-     * @param amount - product amount.
-     * @param cost - product cost.
-     * @param storeId - the storeId to which the product is linked
-     */
-    public Product(String name, ProductCategory category, int amount, double cost, int storeId,
-                   DiscountType discountType, PurchaseType purchaseType){
-        this.productSn = generateProductSn();
-        this.name = name;
-        this.category = category;
-        this.amount = amount;
-        this.cost = cost;
-        this.rank = 0;
-        this.storeId = storeId;
-        this.discountType = discountType;
-        this.purchaseType = purchaseType;
-    }
 
     public Product(String name, ProductCategory category, int amount, double cost, int storeId){
         this.productSn = generateProductSn();
@@ -106,6 +82,7 @@ public class Product {
         this.category = category;
         this.amount = amount;
         this.cost = cost;
+        this.originalCost = cost;
         this.rank = 0;
         this.storeId = storeId;
     }
@@ -178,5 +155,18 @@ public class Product {
         if(!contains)
             return null;
         return this;
+    }
+
+    /**
+     * check if all product fields are valid
+     * @return true if valid fields
+     */
+    public boolean isValidProduct() {
+        return !Strings.isNullOrEmpty(this.name) &&
+                !Strings.isNullOrEmpty(this.category.category);
+    }
+
+    public Product cloneProduct(){
+        return new Product(name,category,amount,cost,storeId);
     }
 }

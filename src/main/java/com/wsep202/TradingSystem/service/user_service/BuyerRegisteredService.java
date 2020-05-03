@@ -31,18 +31,14 @@ public class BuyerRegisteredService {
     /**
      * open store
      * @param usernameOwner the opener and first owner of store
-     * @param purchasePolicy each store has policy for purchase on users and products
-     * @param discountPolicy each store has policy for discount on products
      * @param storeName
      * @param uuid
      * @return
      */
     public StoreDto openStore(String usernameOwner,
-                             PurchasePolicyDto purchasePolicy,
-                             DiscountPolicyDto discountPolicy,
-                             String storeName,
-                             UUID uuid){
-        return tradingSystemFacade.openStore(usernameOwner, purchasePolicy, discountPolicy, storeName, uuid);
+                              String storeName,
+                              UUID uuid){
+        return tradingSystemFacade.openStore(usernameOwner,  storeName, uuid);
     }
 
     /**

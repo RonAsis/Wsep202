@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.exception.NotInStockException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,16 +101,16 @@ public class ShoppingCart {
      * and the Shopping bag if it's exists.
      */
     public ShoppingBag getShoppingBag(Store storeOfBag){
-       if(storeOfBag == null){
-           log.error("Can't return shopping of a null store");
-           return null;
-       }
-       if (shoppingBagsList.size() > 0 && shoppingBagsList.containsKey(storeOfBag)) {
-           log.info("Returns the wanted shopping bag from store '"+ storeOfBag.getStoreName() +"'");
-           return shoppingBagsList.get(storeOfBag);
-       }
-       log.error("The bag is not in the cart fro store '"+ storeOfBag.getStoreName() +"'");
-       return null;
+        if(storeOfBag == null){
+            log.error("Can't return shopping of a null store");
+            return null;
+        }
+        if (shoppingBagsList.size() > 0 && shoppingBagsList.containsKey(storeOfBag)) {
+            log.info("Returns the wanted shopping bag from store '"+ storeOfBag.getStoreName() +"'");
+            return shoppingBagsList.get(storeOfBag);
+        }
+        log.error("The bag is not in the cart fro store '"+ storeOfBag.getStoreName() +"'");
+        return null;
     }
 
     public boolean removeProductInCart(Store storeOfProduct, ShoppingBag shoppingBag, Product productToRemove) {
@@ -141,24 +143,53 @@ public class ShoppingCart {
         Map<Product,Integer> allProducts = new HashMap<>();
         for(ShoppingBag shoppingBag: shoppingBagsList.values()){
             for (Product product: shoppingBag.getProductListFromStore().keySet()){
-                if(isVisibleDiscount(product)){
-                    applyVisibleDiscount(product);
-                }
-                //else if hidden discount..
                 allProducts.put(product,shoppingBag.getProductAmount(product));
             }
         }
         return allProducts;
     }
 
-    private void applyVisibleDiscount(Product product) {
-     //TODO for next version
+    /**
+     * checks if all products in all bags are in ther related store
+     * @return true if all products in all bags are in ther related store
+     * @throws NotInStockException
+     */
+    public boolean isAllBagsInStock() throws NotInStockException {
+        boolean ans = true; //true if all products in all bags are in ther related store
+        for(Store store: this.getShoppingBagsList().keySet()){
+            ans = ans && store.isAllInStock(this.getShoppingBagsList().get(store));
+        }
+        return ans;
     }
 
-    private boolean isVisibleDiscount(Product product) {
-        return product.getDiscountType().type.equals("visible discount");
+    /**
+     * update the amount of products in stock after successful purchase
+     */
+    public void updateAllAmountsInStock() {
+        for(Store store: this.getShoppingBagsList().keySet()){
+            store.updateStock(this.getShoppingBagsList().get(store));
+        }
     }
 
+    /**
+     * create receipts for all bags were purchased
+     * @param buyerName
+     * @return
+     */
+    public ArrayList<Receipt> createReceipts(String buyerName){
+        ArrayList<Receipt> purchaseReceipts = new ArrayList<>();
+        for (Store store: this.getShoppingBagsList().keySet()){
+            purchaseReceipts.add(store.createReceipt(this.getShoppingBagsList().get(store),buyerName));
+        }
+        return purchaseReceipts;
+    }
+
+    public void applyDiscountPolicies() {
+        for (Store store: this.getShoppingBagsList().keySet()){
+            store.applyDiscountPolicies((HashMap<Product, Integer>) shoppingBagsList
+                    .get(store).getProductListFromStore());
+        }
+    }
 
     private void fixTotalCartCost(){
         totalCartCost = Double.parseDouble(formatter.format(totalCartCost));
