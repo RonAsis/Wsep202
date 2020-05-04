@@ -28,22 +28,22 @@ public class AdministratorController {
      * View store purchase history
      */
     @ApiOperation(value = "View Purchase History Store")
-    @GetMapping("view-purchase-history-store/{administratorUsername}/{storeId}")
+    @GetMapping("view-purchase-history-store/{administratorUsername}/{storeId}/{uuid}")
     public List<ReceiptDto> viewPurchaseHistory(
             @PathVariable String administratorUsername,
             @PathVariable int storeId,
-            @RequestBody UUID uuid) {
+            @PathVariable UUID uuid) {
         return administratorService.viewPurchaseHistory(administratorUsername, storeId, uuid);
     }
-
     /**
      * View buyer purchase history
      */
+
     @ApiOperation(value = "View Purchase History User")
-    @GetMapping("view-purchase-history-user/{administratorUsername}/{userName}")
+    @GetMapping("view-purchase-history-user/{administratorUsername}/{username}/{uuid}")
     public List<ReceiptDto> viewPurchaseHistory(@PathVariable String administratorUsername,
-                                                @PathVariable String userName,
-                                                @RequestBody UUID uuid) {
-        return administratorService.viewPurchaseHistory(administratorUsername, userName,uuid);
+                                                @PathVariable String username,
+                                                @PathVariable UUID uuid) {
+        return administratorService.viewPurchaseHistory(administratorUsername, username,uuid);
     }
 }

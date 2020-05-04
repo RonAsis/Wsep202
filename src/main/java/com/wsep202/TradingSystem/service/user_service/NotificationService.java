@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Data
@@ -23,7 +22,7 @@ public class NotificationService {
 
     public void sendNotification(List<NotificationDto> notificationDtos) {
         notificationDtos.forEach(notificationDto ->
-                simpMessagingTemplate.convertAndSendToUser(notificationDto.getUsername(), PublicApiPaths.NOTIFICATION_PATH,
+                simpMessagingTemplate.convertAndSendToUser(notificationDto.getPrincipal(), "/user" + PublicApiPaths.NOTIFICATION_PATH,
                         notificationDto.getContent()));
     }
 

@@ -20,28 +20,28 @@ public class GuestService {
 
     /**
      * register user to the system
-     * @param userName user to register - unique
+     * @param username user to register - unique
      * @param password
      * @param firstName
      * @param lastName
      * @return
      */
-    public boolean registerUser(String userName,
+    public boolean registerUser(String username,
                                 String password,
                                 String firstName,
                                 String lastName){
-        return tradingSystemFacade.registerUser(userName, password, firstName, lastName);
+        return tradingSystemFacade.registerUser(username, password, firstName, lastName);
     }
 
     /**
      * login user to the system
-     * @param userName
+     * @param username
      * @param password
      * @return
      */
-    public Pair<UUID, Boolean> login(String userName,
+    public Pair<UUID, Boolean> login(String username,
                                      String password){
-        return tradingSystemFacade.login(userName, password);
+        return tradingSystemFacade.login(username, password);
     }
 
     /**
@@ -141,5 +141,13 @@ public class GuestService {
 
     public List<StoreDto> getStores() {
         return tradingSystemFacade.getStores();
+    }
+
+    public List<ProductDto> getProducts() {
+        return tradingSystemFacade.getProducts();
+    }
+
+    public List<String> getCategories() {
+        return tradingSystemFacade.getCategories();
     }
 }

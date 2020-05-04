@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface TradingSystemDao {
     void registerAdmin(UserSystem admin);
@@ -25,4 +26,8 @@ public interface TradingSystemDao {
     List<Product> searchProductByKeyWords(List<String> keyWords);
 
     void addStore(Store newStore);
+
+    Set<Store> getStores();
+
+    Set<Product> getProducts();
 }

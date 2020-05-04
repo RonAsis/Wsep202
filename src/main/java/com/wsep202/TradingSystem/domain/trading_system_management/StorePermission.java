@@ -6,6 +6,9 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.exception.*;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public enum StorePermission {
 
@@ -27,5 +30,11 @@ public enum StorePermission {
         return Arrays.stream(StorePermission.values())
                 .filter(permission -> permission.function.equals(function))
                 .findFirst().orElseThrow(() -> new PermissionException(function));
+    }
+
+    public static List<String> getStringPermissions(Set<StorePermission> storePermissions) {
+        return storePermissions.stream()
+                .map(storePermission -> storePermission.function)
+                .collect(Collectors.toList());
     }
 }

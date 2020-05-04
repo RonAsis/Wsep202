@@ -104,4 +104,18 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
         this.stores.add(newStore);
     }
 
+    @Override
+    public Set<Store> getStores() {
+        return stores;
+    }
+
+    @Override
+    public Set<Product> getProducts() {
+        return stores.stream()
+                .map(Store::getProducts)
+                .reduce(new HashSet<>(), (productsAcc, products) ->{
+                productsAcc.addAll(products);
+                    return productsAcc;});
+    }
+
 }

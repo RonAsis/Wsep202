@@ -11,6 +11,9 @@ export class LoginComponent implements OnInit {
   @ViewChild('passwordInput', {static: false}) passwordInputRef: ElementRef;
   messageLogin: string;
 
+  private readonly webSocketTradingSystemsSubscribeEndpoint = '/user/trading-system-client/notification';
+  private readonly webSocketTradingSystemSendEndpoint = '/trading-system-server/connect-notification-system';
+
   constructor(private userService: UserService) {
     this.messageLogin = '';
   }
@@ -24,7 +27,7 @@ export class LoginComponent implements OnInit {
       this.usernameInputRef.nativeElement.value,
       this.passwordInputRef.nativeElement.value
     );
-    if (!succeed){
+    if (!succeed) {
       this.onClearDetails();
       this.messageLogin = 'logging failed';
     }
@@ -34,4 +37,8 @@ export class LoginComponent implements OnInit {
     this.passwordInputRef.nativeElement.value = '';
     this.usernameInputRef.nativeElement.value = '';
   }
+
+
+
+
 }

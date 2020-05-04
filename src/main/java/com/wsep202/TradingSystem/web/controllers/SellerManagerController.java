@@ -27,11 +27,11 @@ public class SellerManagerController {
      * View store purchase history
      */
     @ApiOperation(value = "view purchase history of manager")
-    @GetMapping("view-purchase-history-of-manager/{userName}/{storeId}")
-    public List<ReceiptDto> viewPurchaseHistoryOfManager(@PathVariable String userName,
+    @GetMapping("view-purchase-history-of-manager/{username}/{storeId}/{uuid}")
+    public List<ReceiptDto> viewPurchaseHistoryOfManager(@PathVariable String username,
                                                          @PathVariable int storeId,
-                                                         @RequestBody UUID uuid) {
-        return sellerManagerService.viewPurchaseHistoryOfManager(userName, storeId, uuid);
+                                                         @PathVariable UUID uuid) {
+        return sellerManagerService.viewPurchaseHistoryOfManager(username, storeId, uuid);
     }
 
     /**
@@ -43,5 +43,17 @@ public class SellerManagerController {
                                           @PathVariable UUID uuid) {
         return sellerManagerService.getMangeStores(manageUsername, uuid);
     }
+
+    /**
+     * add manager
+     */
+    @ApiOperation(value = "get operations can do")
+    @GetMapping("get-operations-can-do/{manageUsername}/{storeId}{uuid}")
+    public List<String> getOperationsCanDo(@PathVariable String manageUsername,
+                                           @PathVariable int storeId,
+                                           @PathVariable UUID uuid) {
+        return sellerManagerService.getOperationsCanDo(manageUsername, storeId, uuid);
+    }
+
 
 }

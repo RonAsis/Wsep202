@@ -254,6 +254,9 @@ public class UserSystem implements Observer {
     public void connectNotificationSystem(Subject subject, String principal) {
         setSubject(subject);
         subject.register(this);
+        if(!notifications.isEmpty()){
+            subject.update(this);
+        }
     }
 
     @Override
@@ -262,5 +265,12 @@ public class UserSystem implements Observer {
         this.notifications = new LinkedList<>();
         notifications.forEach(notification -> notification.setPrincipal(principal));
         return notifications;
+    }
+
+    public List<String> getOperationsCanDo(Store store) {
+        return managedStores.stream()
+                .filter(storeManagement -> storeManagement.getStoreId()== store.getStoreId())
+                .findFirst().map(storeManagement -> storeManagement.getOperationsCanDo(this))
+                .orElse(new ArrayList<>());
     }
 }

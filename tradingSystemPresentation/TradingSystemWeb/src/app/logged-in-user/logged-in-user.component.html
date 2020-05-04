@@ -2,14 +2,16 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <app-logout  *ngIf="loadedFeature === 'Logout'"></app-logout>
+      <app-logout *ngIf="loadedFeature === 'Logout'"></app-logout>
       <app-stores *ngIf="loadedFeature === 'Stores'"></app-stores>
       <app-products *ngIf="loadedFeature === 'Products'"></app-products>
       <app-shopping-cart *ngIf="loadedFeature === 'Shopping-cart'"></app-shopping-cart>
       <app-history-purchase *ngIf="loadedFeature === 'History-purchase'"></app-history-purchase>
       <app-owned-stores *ngIf="loadedFeature === 'Owned-stores'"></app-owned-stores>
       <app-managed-stores *ngIf="loadedFeature === 'Managed-stores'"></app-managed-stores>
-      <hr />
+<!--      for admin-->
+      <app-users *ngIf="loadedFeature === 'History-purchase-user'"></app-users>
+      <hr/>
     </div>
   </div>
 </div>

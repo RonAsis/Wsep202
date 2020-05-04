@@ -1,0 +1,31 @@
+<div class="row">
+  <div class="col-xs-12">
+    <img [src]="" [alt]="user.username" class="img-responsive"
+         style="max-height: 300px"/>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <h1>{{user.username}}</h1>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary" (click)="viewPurchaseHistory()" >
+        View Purchase History
+      </button>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <p>FirstName :{{user.firstName}}</p>
+    <p>LastName :{{user.lastName}}</p>
+  </div>
+  <div class="col-md-7">
+    <app-history-purchase
+      *ngIf="wantViewPurchaseHistory"></app-history-purchase>
+  </div>
+</div>
+

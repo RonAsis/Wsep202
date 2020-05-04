@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="row">
+    <div class="container text-center">
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5">
+          <app-user-list (userWasSelected)="selectedUser = $event"></app-user-list>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <app-user-detail
+        *ngIf="selectedUser; else infoText"
+        [user]="selectedUser"></app-user-detail>
+      <ng-template #infoText>
+        <p>Please Select a User!</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

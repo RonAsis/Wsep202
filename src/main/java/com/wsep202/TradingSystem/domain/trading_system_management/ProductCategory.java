@@ -3,6 +3,8 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.exception.*;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public enum ProductCategory {
 
@@ -31,5 +33,11 @@ public enum ProductCategory {
         return Arrays.stream(ProductCategory.values())
                 .filter(productCategory -> productCategory.category.equals(category)).findFirst()
                 .orElseThrow(() -> new CategoryDoesntExistException(category));
+    }
+
+    public static List<String> getCategories(){
+        return Arrays.stream(ProductCategory.values())
+                .map(productCategory -> productCategory.category)
+                .collect(Collectors.toList());
     }
 }

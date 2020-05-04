@@ -429,4 +429,12 @@ public class TradingSystem {
     public void connectNotificationSystem(Observer observer, String principal) {
         observer.connectNotificationSystem(subject, principal);
     }
+
+    public Set<Store> getStores() {
+        return tradingSystemDao.getStores();
+    }
+
+    public Set<Product> getProducts() {
+        return tradingSystemDao.getProducts();
+    }
 }

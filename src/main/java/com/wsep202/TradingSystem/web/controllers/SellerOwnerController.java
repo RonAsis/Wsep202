@@ -27,7 +27,7 @@ public class SellerOwnerController {
      * View store purchase history
      */
     @ApiOperation(value = "view purchase history of owner")
-    @GetMapping("view-purchase-history-of-owner/{userName}/{storeId}")
+    @GetMapping("view-purchase-history-of-owner/{ownerUsername}/{storeId}")
     public List<ReceiptDto> viewPurchaseHistoryOfOwner(@PathVariable String ownerUsername,
                                                        @PathVariable int storeId,
                                                        @RequestBody UUID uuid) {

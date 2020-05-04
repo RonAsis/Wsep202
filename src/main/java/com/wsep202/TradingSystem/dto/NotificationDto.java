@@ -16,6 +16,6 @@ public class NotificationDto {
     /**
      *
      */
-    private String username;
+    private String principal;
 
 }

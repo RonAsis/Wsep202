@@ -7,7 +7,6 @@ import { HeaderComponent } from './header/header.component';
 import { GuestComponent } from './guest/guest.component';
 import { BuyerComponent } from './logged-in-user/buyer/buyer.component';
 import { SellerComponent } from './logged-in-user/seller/seller.component';
-import { LoggedInUserComponent } from './logged-in-user/logged-in-user.component';
 import { RegisterComponent } from './guest/register/register.component';
 import { LoginComponent } from './guest/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -29,7 +28,6 @@ import { ProductRankPipe } from './pipes/product-rank.pipe';
 import { RangePriceProductPipe } from './pipes/range-price-product.pipe';
 import { StoreRankPipe } from './pipes/store-rank.pipe';
 import { ProductCategoryPipe } from './pipes/product-category.pipe';
-import { HeaderLoggingUserComponent } from './logged-in-user/header-logging-user/header-logging-user.component';
 import { LogoutComponent } from './logged-in-user/logout/logout.component';
 import { HistoryPurchaseComponent } from './logged-in-user/history-purchase/history-purchase.component';
 import { OwnedStoresComponent } from './logged-in-user/owned-stores/owned-stores.component';
@@ -38,6 +36,18 @@ import { OpenStoreComponent } from './guest/stores/open-store/open-store.compone
 import { ReceiptElementComponent } from './logged-in-user/history-purchase/recipet-element/receipt-element.component';
 import { ProductInReceiptComponent } from './logged-in-user/history-purchase/recipet-element/product-in-receipt/product-in-receipt.component';
 import { MapToArrayPipe } from './pipes/map-to-array.pipe';
+import {LoggedInUserComponent} from './logged-in-user/logged-in-user.component';
+import {HeaderLoggedInUserComponent} from './logged-in-user/header-logging-user/header-logging-user.component';
+import { ReversePipe } from './pipes/reverse-pipe.pipe';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ToasterModule} from 'angular2-toaster';
+import { UsersComponent } from './logged-in-user/admin/users/users.component';
+import {AdminComponent} from './logged-in-user/admin/admin.component';
+import { UserElementComponent } from './logged-in-user/admin/users/user-list/user-element/user-element.component';
+import { UserListComponent } from './logged-in-user/admin/users/user-list/user-list.component';
+import { UserDetailComponent } from './logged-in-user/admin/users/user-detail/user-detail.component';
+import { HttpComponent } from './services/http/http.component';
+
 
 @NgModule({
   declarations: [
@@ -45,7 +55,6 @@ import { MapToArrayPipe } from './pipes/map-to-array.pipe';
     HeaderComponent,
     GuestComponent,
     SellerComponent,
-    LoggedInUserComponent,
     BuyerComponent,
     RegisterComponent,
     LoginComponent,
@@ -63,7 +72,7 @@ import { MapToArrayPipe } from './pipes/map-to-array.pipe';
     RangePriceProductPipe,
     StoreRankPipe,
     ProductCategoryPipe,
-    HeaderLoggingUserComponent,
+    LoggedInUserComponent,
     LogoutComponent,
     HistoryPurchaseComponent,
     OwnedStoresComponent,
@@ -71,12 +80,22 @@ import { MapToArrayPipe } from './pipes/map-to-array.pipe';
     OpenStoreComponent,
     ReceiptElementComponent,
     ProductInReceiptComponent,
-    MapToArrayPipe
+    MapToArrayPipe,
+    HeaderLoggedInUserComponent,
+    ReversePipe,
+    UsersComponent,
+    AdminComponent,
+    UserElementComponent,
+    UserListComponent,
+    UserDetailComponent,
+    HttpComponent
   ],
   imports: [
     Ng2SearchPipeModule,
     Ng5SliderModule,
     BrowserModule,
+    BrowserAnimationsModule,
+    ToasterModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
     NgxBootstrapSliderModule,

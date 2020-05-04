@@ -1,4 +1,27 @@
-<app-header></app-header>
+<!--<div class="notification  list-group-item-info">-->
+<!--  <button class="delete"></button>-->
+<!--  Primar lorem ipsum dolor sit amet, consectetur-->
+<!--  adipiscing elit lorem ipsum dolor. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Sit amet,-->
+<!--  consectetur adipiscing elit-->
+<!--</div>-->
+
+<div class="wrapper">
+  <aside  *ngFor="let message of messages | reverse">
+    <div class="notification"
+
+         [ngClass]="{'list-group-item-info':     message.style=='info',
+                     'list-group-item-danger':   message.style=='danger',
+                     'list-group-item-success':  message.style=='success'}">
+
+      <button class="delete" (click)="dismiss(message)"></button>
+      {{message.content}}
+    </div>
+  </aside>
+</div>
+<div>
+  <toaster-container [toasterconfig]="config1"></toaster-container>
+<!--  <button (click)="popToast()">pop toast</button><br/>-->
+</div>
 <div class="container">
   <div class="row">
     <div class="col-md-12">
@@ -8,7 +31,7 @@
         <ng-template #loggingMenu>
           <app-logged-in-user></app-logged-in-user>
         </ng-template>
+      </div>
     </div>
   </div>
-</div>
 </div>

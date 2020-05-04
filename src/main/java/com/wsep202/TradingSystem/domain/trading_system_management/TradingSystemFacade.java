@@ -16,11 +16,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -604,11 +606,14 @@ public class TradingSystemFacade {
     }
 
     public List<StoreDto> getStores() {
-//        Set<Store> stores = tradingSystem.getStores();
-//        return convertStoreList(new LinkedList<>(stores));
-        return null;
+        Set<Store> stores = tradingSystem.getStores();
+        return convertStoreList(new LinkedList<>(stores));
     }
 
+    public List<ProductDto> getProducts() {
+        Set<Product> products = tradingSystem.getProducts();
+        return convertProductDtoList(new LinkedList<>(products));
+    }
 
     public void connectNotificationSystem(String username, UUID uuid, String principal) {
         Observer user = tradingSystem.getUser(username, uuid);
@@ -619,6 +624,17 @@ public class TradingSystemFacade {
         List<NotificationDto> notificationDtos = convertNotificationList(notifications);
         serviceFacade.sendNotification(notificationDtos);
     }
+
+    public List<String> getCategories() {
+        return ProductCategory.getCategories();
+    }
+
+    public List<String> getOperationsCanDo(String manageUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(manageUsername, uuid);
+        Store store = tradingSystem.getStore(storeId);
+        return user.getOperationsCanDo(store);
+    }
+
     ///////////////////////add discounts////////////////////////
     /**
      * add visible discount to the store for some products

@@ -28,11 +28,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint(PublicApiPaths.STOMP_ENDPOINT)
-				.setAllowedOrigins("*")
+				.setAllowedOrigins("http://localhost:4200")
 				.setHandshakeHandler(new CustomHandshakeHandler());
 
 		registry.addEndpoint(PublicApiPaths.STOMP_ENDPOINT)
-				.setAllowedOrigins("*")
+				.setAllowedOrigins("http://localhost:4200")
 				.setHandshakeHandler(new CustomHandshakeHandler())
 				.withSockJS();
 	}

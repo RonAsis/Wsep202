@@ -652,4 +652,12 @@ public class Store {
         log.error("The received user: "+owner.getUserName()+"is not owner");
         throw new NoOwnerInStoreException(owner.getUserName(),storeId);
     }
+
+    public List<String> getOperationsCanDo(UserSystem userSystem) {
+        return managers.stream()
+                .filter(mangerStore -> mangerStore.isTheUser(userSystem))
+                .findFirst()
+                .map(mangerStore -> StorePermission.getStringPermissions(mangerStore.getStorePermissions()))
+                .orElse(new ArrayList<>());
+    }
 }

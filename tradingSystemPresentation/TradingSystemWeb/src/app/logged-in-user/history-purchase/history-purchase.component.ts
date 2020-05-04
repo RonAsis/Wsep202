@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Receipt} from '../../shared/receipt.model';
 import {UserService} from '../../services/user.service';
+import {StoreService} from '../../services/store.service';
 
 @Component({
   selector: 'app-history-purchase',
@@ -11,10 +12,17 @@ export class HistoryPurchaseComponent implements OnInit {
   receipts: Receipt[];
   receipt: string;
   searchText: string;
-  constructor(private userService: UserService) { }
+  @Input() wantStoreHistory: boolean;
+  constructor(private userService: UserService, private storeService: StoreService) {
+    this.wantStoreHistory = false;
+  }
 
   ngOnInit(): void {
-    this.receipts = this.userService.viewPurchaseHistory();
+    if (this.wantStoreHistory){
+      this.receipts = this.storeService.viewPurchaseHistory();
+    }else{
+      this.receipts = this.userService.viewPurchaseHistory();
+    }
   }
 
 }

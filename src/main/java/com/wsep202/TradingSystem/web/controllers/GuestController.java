@@ -51,29 +51,6 @@ public class GuestController {
     }
 
     /**
-     * see store information
-     * @param storeId
-     */
-    @ApiOperation(value = "view-store-info")
-    @GetMapping("view-store-info/{storeId}")
-    public StoreDto viewStoreInfo(@PathVariable int storeId){
-        return guestService.viewStoreInfo(storeId);
-    }
-
-    /**
-     * view product in store with store id info.
-     * @param storeId belongs to the product to view
-     * @param productId - product to see
-     * @return
-     */
-    @ApiOperation(value = "view product")
-    @GetMapping("view-product/{storeId}/{productId}")
-    public ProductDto viewProduct(@PathVariable int storeId,
-                                  @PathVariable int productId){
-        return guestService.viewProduct(storeId, productId);
-    }
-
-    /**
      * purchase shopping cart
      * @param shoppingCartDto includes the bags of each store the user selected
      * @param paymentDetailsDto    - charging info of the user
@@ -88,11 +65,29 @@ public class GuestController {
     }
 
     /**
-     * add manager
+     * get stores
      */
     @ApiOperation(value = "get stores")
-    @GetMapping("get-stores/")
-    public List<StoreDto> getManageStores() {
+    @GetMapping("get-stores")
+    public List<StoreDto> getStores() {
         return guestService.getStores();
+    }
+
+    /**
+     * get products
+     */
+    @ApiOperation(value = "get products")
+    @GetMapping("get-products")
+    public List<ProductDto> getProducts() {
+        return guestService.getProducts();
+    }
+
+    /**
+     * get stores
+     */
+    @ApiOperation(value = "get categories")
+    @GetMapping("get-categories")
+    public List<String> getCategories() {
+        return guestService.getCategories();
     }
 }

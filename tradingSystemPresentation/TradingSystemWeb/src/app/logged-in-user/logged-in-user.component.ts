@@ -1,30 +1,34 @@
-import {AfterViewChecked, Component, EventEmitter, OnInit, Output, ViewChild, ViewChildren} from '@angular/core';
-import {LogoutComponent} from './logout/logout.component';
+import {Component, OnInit} from '@angular/core';
 import {UserService} from '../services/user.service';
+import {WebSocketAPI} from '../shared/apis/webSocketApi.model';
+import {WebSocketService} from '../services/web-socket.service';
 
 @Component({
   selector: 'app-logged-in-user',
   templateUrl: './logged-in-user.component.html',
   styleUrls: ['./logged-in-user.component.css']
 })
-export class LoggedInUserComponent implements OnInit, AfterViewChecked {
+export class LoggedInUserComponent implements OnInit {
   loadedFeature: string;
-  constructor(private userService: UserService) {
+  admin: boolean;
+
+  constructor(private userService: UserService, private webSocketService: WebSocketService) {
     this.tera();
+    this.webSocketService.getWebSocketAPI()._send();
   }
-  tera(){
+
+  tera() {
     this.loadedFeature = 'Products';
   }
+
   ngOnInit(): void {
     this.userService.logoutNoEvent.subscribe(() => this.tera());
-
   }
+
 
   onNavigate(feature: string) {
     this.loadedFeature = feature;
   }
 
-  ngAfterViewChecked(): void {
-  }
 
 }

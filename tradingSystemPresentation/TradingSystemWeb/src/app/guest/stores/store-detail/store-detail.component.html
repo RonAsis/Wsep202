@@ -34,3 +34,16 @@
     <app-products [storeId] = store.storeId></app-products>
   </div>
 </div>
+<div class="row">
+  <div class="col-xs-12">
+    <div class="btn-group">
+      <button *ngIf="getIsAdminOwnerManger()" type="button" class="btn btn-primary" (click)="viewPurchaseHistory()" >
+        View Purchase History
+      </button>
+    </div>
+  </div>
+</div>
+<div class="col-md-7">
+  <app-history-purchase
+    *ngIf="wantViewPurchaseHistory"></app-history-purchase>
+</div>

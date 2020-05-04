@@ -12,6 +12,7 @@
         <li><a href="#" (click)="onSelect('History-purchase')">History-purchase</a></li>
         <li><a href="#" (click)="onSelect('Owned-stores')">Owned-stores</a></li>
         <li><a href="#" (click)="onSelect('Managed-stores')">Managed-stores</a></li>
+        <li *ngIf="getIsAdmin()"><a href="#" (click)="onSelect('History-purchase-user')">History-purchase-user</a></li>
       </ul>
     </div>
   </div>

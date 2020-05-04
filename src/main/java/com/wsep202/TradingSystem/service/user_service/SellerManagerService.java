@@ -29,4 +29,8 @@ public class SellerManagerService {
     public List<StoreDto> getMangeStores(String manageUsername, UUID uuid) {
         return tradingSystemFacade.getMangeStores(manageUsername, uuid);
     }
+
+    public List<String> getOperationsCanDo(String manageUsername, int storeId, UUID uuid) {
+        return tradingSystemFacade.getOperationsCanDo(manageUsername, storeId, uuid);
+    }
 }

@@ -18,7 +18,6 @@ export class ProductService {
       new Product(343434, 's', 's', 1233243232, 1, 9, 1 , 1, 's')
 
     ];
-    console.log('cons servie product');
   }
 
   getProducts() {
