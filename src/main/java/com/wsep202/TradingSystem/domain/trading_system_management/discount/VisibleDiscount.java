@@ -54,6 +54,15 @@ public class VisibleDiscount extends DiscountPolicy{
     }
 
     /**
+     * delegates the products to internal visible discount undo operation
+     * @param products to update
+     */
+    @Override
+    public void undoDiscount(HashMap<Product, Integer> products) {
+        undoVisibleDiscount(products);
+    }
+
+    /**
      * match a product in the structure of discountsed products
      * @param product to search
      * @return

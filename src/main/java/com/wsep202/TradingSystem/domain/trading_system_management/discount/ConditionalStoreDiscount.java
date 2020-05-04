@@ -31,6 +31,16 @@ public class ConditionalStoreDiscount extends ConditionalDiscount {
             undoStoreDiscount(products);
         }
     }
+
+    /**
+     * delegates the internal undo store discount on products
+     * @param products to update
+     */
+    @Override
+    public void undoDiscount(HashMap<Product, Integer> products) {
+        undoStoreDiscount(products);
+    }
+
     /**
      * undo visible discount
      * @param products to update the related undo from the discount between them
@@ -75,7 +85,10 @@ public class ConditionalStoreDiscount extends ConditionalDiscount {
      * @return
      */
     public boolean isApprovedProducts(HashMap<Product,Integer> products){
-        return this.minPrice <= getTotalPurchasedCost(products);
+        if(this.endTime.compareTo(Calendar.getInstance())>=0) {
+            return this.minPrice <= getTotalPurchasedCost(products);
+        }
+        return false;
     }
     /**
      * calculate discount on product price

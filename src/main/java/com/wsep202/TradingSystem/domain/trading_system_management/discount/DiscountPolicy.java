@@ -59,6 +59,12 @@ public abstract class DiscountPolicy {
      */
     public abstract boolean isApprovedProducts(HashMap<Product,Integer> products);
 
+    /**
+     * this method will be called in case the discount expired and has to be undone
+     * @param products to update
+     */
+    public abstract void undoDiscount(HashMap<Product,Integer> products);
+
 
     @Synchronized
     protected int getdiscountIdAcc(){
