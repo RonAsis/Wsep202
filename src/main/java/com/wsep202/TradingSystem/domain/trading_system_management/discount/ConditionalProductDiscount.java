@@ -49,6 +49,15 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
     }
 
     /**
+     * delegates the product to be undo by the internal undo method
+     * @param products to update
+     */
+    @Override
+    public void undoDiscount(HashMap<Product, Integer> products) {
+        undoConditionalDiscount(products);
+    }
+
+    /**
      * undo visible discount
      * @param products to update the related undo from the discount between them
      */
@@ -101,15 +110,17 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
 
 
     public boolean isApprovedProducts(HashMap<Product,Integer> products){
-        int amountOfTerms = this.productsUnderThisDiscount.size();    //how many subConditions in the map
-        int amountOfTrueConditions = 0;
-        for(Product product: products.keySet()){
-            if(isApprovedCondition(product,products.get(product))) {
-                amountOfTrueConditions++;
+        if(this.endTime.compareTo(Calendar.getInstance())>=0) {
+            int amountOfTerms = this.productsUnderThisDiscount.size();    //how many subConditions in the map
+            int amountOfTrueConditions = 0;
+            for (Product product : products.keySet()) {
+                if (isApprovedCondition(product, products.get(product))) {
+                    amountOfTrueConditions++;
+                }
             }
-        }
-        if(amountOfTerms == amountOfTrueConditions){
-            return true;
+            if (amountOfTerms == amountOfTrueConditions) {
+                return true;
+            }
         }
         return false;
     }

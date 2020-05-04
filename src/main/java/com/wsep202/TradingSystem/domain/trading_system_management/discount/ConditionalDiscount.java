@@ -32,10 +32,15 @@ public abstract class ConditionalDiscount extends DiscountPolicy{
 
     /**
      * in case the condition is approved update products prices
-     * @param products in store
+     * @param products to update by discount
      */
     public abstract void applyDiscount(HashMap<Product,Integer> products);
 
+    /**
+     * this method will be called in case the discount expired and has to be undone
+     * @param products to update
+     */
+    public abstract void undoDiscount(HashMap<Product,Integer> products);
 
     public String toString(){
         return "Discount details: discount percentage: "+discountPercentage+" ,valid util: "+endTime+"" +

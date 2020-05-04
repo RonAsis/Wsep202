@@ -22,6 +22,11 @@ public class HiddenDiscount extends DiscountPolicy{
     }
 
     @Override
+    public void undoDiscount(HashMap<Product, Integer> products) {
+
+    }
+
+    @Override
     public void editProductByDiscount(Product product) {
 
     }
