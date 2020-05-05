@@ -79,6 +79,8 @@ public class UserSystem implements Observer {
     //need ignore in Db;
     private String principal;
 
+    private String imageUrl;
+
     public UserSystem(String userName, String firstName, String lastName, String password) {
         this.userName = userName;
         this.firstName = firstName;

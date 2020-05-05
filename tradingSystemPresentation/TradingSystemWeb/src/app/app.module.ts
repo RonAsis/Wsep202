@@ -46,8 +46,6 @@ import {AdminComponent} from './logged-in-user/admin/admin.component';
 import { UserElementComponent } from './logged-in-user/admin/users/user-list/user-element/user-element.component';
 import { UserListComponent } from './logged-in-user/admin/users/user-list/user-list.component';
 import { UserDetailComponent } from './logged-in-user/admin/users/user-detail/user-detail.component';
-import { HttpComponent } from './services/http/http.component';
-
 
 @NgModule({
   declarations: [
@@ -87,8 +85,7 @@ import { HttpComponent } from './services/http/http.component';
     AdminComponent,
     UserElementComponent,
     UserListComponent,
-    UserDetailComponent,
-    HttpComponent
+    UserDetailComponent
   ],
   imports: [
     Ng2SearchPipeModule,

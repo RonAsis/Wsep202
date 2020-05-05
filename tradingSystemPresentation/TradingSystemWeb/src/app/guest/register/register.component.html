@@ -3,33 +3,54 @@
   <div class="row">
     <div class="col-md-12">
       <div class="col-sm-5 from-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" class="form-control"
+        <label for="username">Username
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="text" id="username" class="form-control" required
                #usernameInput/>
       </div>
       <div class="col-sm-5 from-group">
-        <label for="firstName">First Name</label>
+        <label for="firstName">First Name
+          <span class="required-asterisk">*</span>
+        </label>
         <input type="text" id="firstName" class="form-control"
                #firstNameInput/>
       </div>
       <div class="col-sm-5 from-group">
-        <label for="lastName">Last Name</label>
+        <label for="lastName">Last Name
+          <span class="required-asterisk">*</span>
+        </label>
         <input type="text" id="lastName" class="form-control"
                #lastNameInput/>
       </div>
       <div class="col-sm-5 from-group">
-        <label for="password">Password</label>
-        <input type="text" id="password" class="form-control"
+        <label for="password">Password
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="password" id="password" class="form-control"
                #passwordInput/>
       </div>
-      <hr />
-      <div class="col-xs-12">
-        <button class="btn btn-success" type="submit" (click)="onRegisterUser()">Register</button>
-        <button class="btn btn-primary" type="submit" (click)="onClearDetails()">Clear</button>
-      </div>
       <div class="col-sm-5 from-group">
-        <p>{{messageReg}}</p>
+        <label for="password">Image</label>
+        <input type="file" id="image" (change)="fileUpload()" class="form-control" accept="image/*"
+               #imageInput/>
       </div>
+    <div class="col-sm-5 from-group">
+      <label for="password">Password Authentication
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="password" id="password-Authentication" class="form-control"
+             #passwordAuthenticationInput/>
+    </div>
+    <hr/>
+    <div class="col-xs-12">
+      <button class="btn btn-success" type="submit" (click)="onRegisterUser()">Register</button>
+      <button class="btn btn-primary" type="submit" (click)="onClearDetails()">Clear</button>
+    </div>
+    <div class="col-sm-5 from-group" [style.color]="messageColor">
+      <p>{{messageReg}}</p>
     </div>
   </div>
 </div>
+</div>
+

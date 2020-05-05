@@ -26,7 +26,10 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
 
     @Override
     public boolean isRegistered(UserSystem userSystem) {
-        return users.contains(userSystem);
+        return users.stream()
+                .anyMatch(userSystemReg -> userSystemReg.getUserName().equals(userSystem.getUserName())) ||
+                administrators.stream()
+                        .anyMatch(userSystemReg -> userSystemReg.getUserName().equals(userSystem.getUserName()));
     }
 
     @Override
@@ -113,9 +116,10 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
     public Set<Product> getProducts() {
         return stores.stream()
                 .map(Store::getProducts)
-                .reduce(new HashSet<>(), (productsAcc, products) ->{
-                productsAcc.addAll(products);
-                    return productsAcc;});
+                .reduce(new HashSet<>(), (productsAcc, products) -> {
+                    productsAcc.addAll(products);
+                    return productsAcc;
+                });
     }
 
 }

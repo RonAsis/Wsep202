@@ -33,14 +33,14 @@ export class HttpService {
 
   //////////////////////////// GuestController ///////////////////////////
 
-  public registerUser(username: string, password: string, firstName: string, lastName: string) {
+  public registerUser(username: string, password: string, firstName: string, lastName: string, image: File) {
     const url = `${this.guestUrl}/` + 'register-user/' +
       `${username}/` +
       `${password}/` +
       `${firstName}/` +
       `${lastName}`;
     return this.http.post<boolean>(
-      url, null);
+      url, this.getImageHttpFormat(image));
   }
 
   public login(username: string, password: string) {
@@ -205,6 +205,112 @@ export class HttpService {
       `${uuid}`;
     return this.http.get<Receipt[]>(
       url);
+  }
+
+  public addProduct(ownerUsername: string, storeId: number, productName: string,
+                    category: string, amount: number, cost: number, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'add-product/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${productName}/` +
+      `${category}/` +
+      `${amount}/` +
+      `${cost}/` +
+      `${uuid}`;
+    return this.http.post<boolean>(
+      url, null);
+  }
+
+  public deleteProductFromStore(ownerUsername: string, storeId: number, productSn: number, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'delete-product-from-store/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${productSn}/` +
+      `${uuid}`;
+    return this.http.put<boolean>(
+      url, null);
+  }
+
+  public editProduct(ownerUsername: string, storeId: number, productSn: number, productName: string,
+                     category: string, amount: number, cost: number, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'edit-product/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${productSn}/` +
+      `${productName}/` +
+      `${category}/` +
+      `${amount}/` +
+      `${cost}/` +
+      `${uuid}`;
+    return this.http.put<boolean>(
+      url, null);
+  }
+
+  public addOwner(ownerUsername: string, storeId: number, newOwnerUsername: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'add-owner/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${newOwnerUsername}/` +
+      `${uuid}`;
+    return this.http.post<boolean>(
+      url, null);
+  }
+
+  public removeManager(ownerUsername: string, storeId: number, managerUsername: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'remove-manager/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${managerUsername}/` +
+      `${uuid}`;
+    return this.http.post<boolean>(
+      url, null);
+  }
+
+  public addPermission(ownerUsername: string, storeId: number, managerUsername: string, permission: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'add-permission/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${managerUsername}/` +
+      `${permission}/` +
+      `${uuid}`;
+    return this.http.put<boolean>(
+      url, null);
+  }
+
+  public addManager(ownerUsername: string, storeId: number, newManagerUsername: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'add-manager/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${newManagerUsername}/` +
+      `${uuid}`;
+    return this.http.post<boolean>(
+      url, null);
+  }
+
+  public getOwnerStores(ownerUsername: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'get-owner-stores/' +
+      `${ownerUsername}/` +
+      `${uuid}`;
+    return this.http.get<Store[]>(
+      url);
+  }
+
+  public getAllOperationOfManger() {
+    const url = `${this.sellerOwnerUrl}/` + 'get-all-operation-manager/';
+    return this.http.get<Store[]>(
+      url);
+  }
+
+
+  //////////////////////////////////////// general /////////////////////////////
+
+  private getImageHttpFormat(image: File){
+    const uploadImageData = new FormData();
+    if (image !== null && image !== undefined) {
+      console.log('file define');
+      uploadImageData.append('imageFile', image, image.name);
+    }
+    return uploadImageData;
   }
 
 }

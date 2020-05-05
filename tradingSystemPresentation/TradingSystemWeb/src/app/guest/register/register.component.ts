@@ -9,48 +9,69 @@ import {Router} from '@angular/router';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  sucRegister = 'the registration is succeed';
-  failRegister = 'the registration is failed';
   @ViewChild('usernameInput', {static: false}) usernameInputRef: ElementRef;
   @ViewChild('firstNameInput', {static: false}) firstNameInputRef: ElementRef;
   @ViewChild('lastNameInput', {static: false}) lastNameInputRef: ElementRef;
   @ViewChild('passwordInput', {static: false}) passwordInputRef: ElementRef;
+  @ViewChild('passwordAuthenticationInput', {static: false}) passwordAuthenticationInput: ElementRef;
+  @ViewChild('imageInput', {static: false}) imageInput: ElementRef;
+  private imgUrl: any;
+  private selectedFile: File;
   messageReg: string;
+  messageColor: string;
 
-  constructor(private userSystemService: UserService,
-              private router: Router ) {
-    this.messageReg = '';
+  constructor(private userService: UserService,
+              private router: Router) {
+    this.clearMessage();
   }
 
   ngOnInit(): void {
+    this.userService.registerEvent.subscribe(response => {
+        this.clearDetailsOfReg();
+        console.log(response);
+        if (response) {
+          this.messageReg = 'the registration is succeed';
+          this.messageColor = 'blue';
+        } else {
+          this.errorMessage('the registration is failed');
+        }
+      }
+    );
   }
 
   onRegisterUser() {
-
-    this.userSystemService.register(this.usernameInputRef.nativeElement.value,
-      this.passwordInputRef.nativeElement.value,
-      this.firstNameInputRef.nativeElement.value,
-      this.lastNameInputRef.nativeElement.value)
-      .subscribe(
-        respone => {
-          this.handlerRegister(respone);
-          this.clearDetailsOfReg();
-        }
-      );
-
+    if (this.passwordInputRef.nativeElement.value !== this.passwordAuthenticationInput.nativeElement.value){
+      this.errorMessage('The passwords do not match');
+    }else if (this.passwordInputRef.nativeElement.value.length < 8 || this.passwordInputRef.nativeElement.value.length > 16){
+      this.errorMessage('The passwords must be between 8 to 16 chars');
+    }else if (this.passwordInputRef.nativeElement.value.replace(/\s/g, '') === '' ||
+      this.firstNameInputRef.nativeElement.value.replace(/\s/g, '') === '' ||
+      this.firstNameInputRef.nativeElement.value.replace(/\s/g, '') === '' ||
+      this.lastNameInputRef.nativeElement.value.replace(/\s/g, '') === '' ||
+      this.passwordAuthenticationInput.nativeElement.value.replace(/\s/g, '') === ''){
+      this.errorMessage('must to fill all the details');
+    }else{
+      this.userService.register(this.usernameInputRef.nativeElement.value.replace(/\s/g, '').toLowerCase(),
+        this.passwordInputRef.nativeElement.value,
+        this.firstNameInputRef.nativeElement.value,
+        this.lastNameInputRef.nativeElement.value,
+        this.selectedFile);
+    }
   }
 
-  handlerRegister(isRegisterSuc: boolean) {
-    if (isRegisterSuc){
-      this.messageReg = this.sucRegister;
-    }else{
-      this.messageReg = this.failRegister;
-    }
+  errorMessage(message: string){
+    this.messageReg = message;
+    this.messageColor = 'red';
   }
 
   onClearDetails() {
     this.clearDetailsOfReg();
+    this.clearMessage();
+  }
+
+  private clearMessage() {
     this.messageReg = '';
+    this.messageColor = '';
   }
 
   private clearDetailsOfReg() {
@@ -58,5 +79,16 @@ export class RegisterComponent implements OnInit {
     this.firstNameInputRef.nativeElement.value = '';
     this.lastNameInputRef.nativeElement.value = '';
     this.passwordInputRef.nativeElement.value = '';
+    this.passwordAuthenticationInput.nativeElement = '';
+    this.imageInput.nativeElement = null;
+  }
+
+  fileUpload() {
+    console.log(this.imageInput);
+    // Access the uploaded file through the ElementRef
+    this.selectedFile = this.imageInput.nativeElement.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL( this.imageInput.nativeElement.files[0]);
+    reader.onload = (ev => this.imgUrl = reader.result);
   }
 }

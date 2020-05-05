@@ -37,4 +37,10 @@ public enum StorePermission {
                 .map(storePermission -> storePermission.function)
                 .collect(Collectors.toList());
     }
+
+    public static List<String> getStringPermissions() {
+        return Arrays.stream(StorePermission.values())
+                .map(storePermission -> storePermission.function)
+                .collect(Collectors.toList());
+    }
 }

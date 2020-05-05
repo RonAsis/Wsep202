@@ -179,4 +179,8 @@ public class SellerOwnerService {
     public List<StoreDto> getOwnerStores(String ownerUsername, UUID uuid) {
         return tradingSystemFacade.getOwnerStores(ownerUsername, uuid);
     }
+
+    public List<String> getAllOperationOfManger() {
+        return tradingSystemFacade.getAllOperationOfManger();
+    }
 }

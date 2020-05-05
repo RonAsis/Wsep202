@@ -7,6 +7,7 @@ import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,13 +25,15 @@ public class GuestService {
      * @param password
      * @param firstName
      * @param lastName
+     * @param image
      * @return
      */
     public boolean registerUser(String username,
                                 String password,
                                 String firstName,
-                                String lastName){
-        return tradingSystemFacade.registerUser(username, password, firstName, lastName);
+                                String lastName,
+                                MultipartFile image){
+        return tradingSystemFacade.registerUser(username, password, firstName, lastName, image);
     }
 
     /**

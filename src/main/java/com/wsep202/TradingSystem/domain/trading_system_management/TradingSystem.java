@@ -1,6 +1,8 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
+import com.wsep202.TradingSystem.domain.image.ImagePath;
+import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
@@ -10,6 +12,7 @@ import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -63,15 +66,18 @@ public class TradingSystem {
      * with its password
      *
      * @param userToRegister the user we want to register
+     * @param image
      * @return true if the registration succeeded
      */
     @Synchronized
-    public boolean registerNewUser(UserSystem userToRegister) {
+    public boolean registerNewUser(UserSystem userToRegister, MultipartFile image) {
         if (Objects.nonNull(userToRegister)
                 && !tradingSystemDao.isRegistered(userToRegister)
                 && userToRegister.isValidUser()) {
             encryptPassword(userToRegister); //encrypt user password to store it and its salt in the system
             log.info(String.format("The user %s registering", userToRegister.getUserName()));
+            String urlImage = ImageUtil.saveImage(ImagePath.USER_IMAGE_DIC + userToRegister.getUserName(), image);
+            userToRegister.setImageUrl(urlImage);
             tradingSystemDao.addUserSystem(userToRegister);
             return true;
         }

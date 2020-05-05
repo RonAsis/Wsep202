@@ -27,10 +27,10 @@ public class SellerOwnerController {
      * View store purchase history
      */
     @ApiOperation(value = "view purchase history of owner")
-    @GetMapping("view-purchase-history-of-owner/{ownerUsername}/{storeId}")
+    @GetMapping("view-purchase-history-of-owner/{ownerUsername}/{storeId}/{uuid}")
     public List<ReceiptDto> viewPurchaseHistoryOfOwner(@PathVariable String ownerUsername,
                                                        @PathVariable int storeId,
-                                                       @RequestBody UUID uuid) {
+                                                       @PathVariable UUID uuid) {
         return sellerOwnerService.viewPurchaseHistoryOfStoreOwner(ownerUsername, storeId, uuid);
     }
 
@@ -38,14 +38,14 @@ public class SellerOwnerController {
      * add product
      */
     @ApiOperation(value = "add product")
-    @PostMapping("add-product/{ownerUsername}/{storeId}/{productName}/{category}/{amount}/{cost}")
+    @PostMapping("add-product/{ownerUsername}/{storeId}/{productName}/{category}/{amount}/{cost}/{uuid}")
     public boolean addProduct(@PathVariable String ownerUsername,
                               @PathVariable int storeId,
                               @PathVariable String productName,
                               @PathVariable String category,
                               @PathVariable int amount,
                               @PathVariable double cost,
-                              @RequestBody UUID uuid) {
+                              @PathVariable UUID uuid) {
         return sellerOwnerService.addProduct(ownerUsername, storeId, productName, category, amount, cost, uuid);
     }
 
@@ -53,11 +53,11 @@ public class SellerOwnerController {
      * remove product
      */
     @ApiOperation(value = "delete product from store")
-    @PutMapping("delete-product-from-store/{ownerUsername}/{storeId}/{productSn}")
+    @PutMapping("delete-product-from-store/{ownerUsername}/{storeId}/{productSn}/{uuid}")
     public boolean deleteProductFromStore(@PathVariable String ownerUsername,
                                           @PathVariable int storeId,
                                           @PathVariable int productSn,
-                                          @RequestBody UUID uuid) {
+                                          @PathVariable UUID uuid) {
         return sellerOwnerService.deleteProductFromStore(ownerUsername, storeId, productSn, uuid);
     }
 
@@ -65,7 +65,7 @@ public class SellerOwnerController {
      * edit product
      */
     @ApiOperation(value = "edit product")
-    @PutMapping("edit-product/{ownerUsername}/{storeId}/{productSn}/{productName}/{category}/{amount}/{cost}")
+    @PutMapping("edit-product/{ownerUsername}/{storeId}/{productSn}/{productName}/{category}/{amount}/{cost}/{uuid}")
     public boolean editProduct(@PathVariable String ownerUsername,
                                @PathVariable int storeId,
                                @PathVariable int productSn,
@@ -73,7 +73,7 @@ public class SellerOwnerController {
                                @PathVariable String category,
                                @PathVariable int amount,
                                @PathVariable double cost,
-                               @RequestBody UUID uuid) {
+                               @PathVariable UUID uuid) {
         return sellerOwnerService.editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost, uuid);
     }
 
@@ -81,11 +81,11 @@ public class SellerOwnerController {
      * add owner
      */
     @ApiOperation(value = "add owner")
-    @PostMapping("add-owner/{ownerUsername}/{storeId}/{newOwnerUsername}")
+    @PostMapping("add-owner/{ownerUsername}/{storeId}/{newOwnerUsername}/{uuid}")
     public boolean addOwner(@PathVariable String ownerUsername,
                             @PathVariable int storeId,
                             @PathVariable String newOwnerUsername,
-                            @RequestBody UUID uuid) {
+                            @PathVariable UUID uuid) {
         return sellerOwnerService.addOwner(ownerUsername, storeId, newOwnerUsername, uuid);
     }
 
@@ -93,25 +93,25 @@ public class SellerOwnerController {
      * remove manager
      */
     @ApiOperation(value = "remove manager")
-    @PostMapping("remove-manager/{ownerUsername}/{storeId}/{newManagerUsername}")
+    @PostMapping("remove-manager/{ownerUsername}/{storeId}/{managerUsername}/{uuid}")
     public boolean removeManager(@PathVariable String ownerUsername,
                                  @PathVariable int storeId,
-                                 @PathVariable String newManagerUsername,
-                                 @RequestBody UUID uuid) {
-        return sellerOwnerService.removeManager(ownerUsername, storeId, newManagerUsername, uuid);
+                                 @PathVariable String managerUsername,
+                                 @PathVariable UUID uuid) {
+        return sellerOwnerService.removeManager(ownerUsername, storeId, managerUsername, uuid);
     }
 
     /**
      * add permission
      */
     @ApiOperation(value = "add permission")
-    @PutMapping("add-permission/{ownerUsername}/{storeId}/{newManagerUsername}/{permission}")
+    @PutMapping("add-permission/{ownerUsername}/{storeId}/{managerUsername}/{permission}/{uuid}")
     public boolean addPermission(@PathVariable String ownerUsername,
                                  @PathVariable int storeId,
-                                 @PathVariable String newManagerUsername,
+                                 @PathVariable String managerUsername,
                                  @PathVariable String permission,
-                                 @RequestBody UUID uuid) {
-        return sellerOwnerService.addPermission(ownerUsername, storeId, newManagerUsername, permission, uuid);
+                                 @PathVariable UUID uuid) {
+        return sellerOwnerService.addPermission(ownerUsername, storeId, managerUsername, permission, uuid);
     }
 
     /**
@@ -127,12 +127,22 @@ public class SellerOwnerController {
     }
 
     /**
-     * add manager
+     * get Owner Stores
      */
     @ApiOperation(value = "get owner stores")
     @GetMapping("get-owner-stores/{ownerUsername}/{uuid}")
     public List<StoreDto> getOwnerStores(@PathVariable String ownerUsername,
                                          @PathVariable UUID uuid) {
         return sellerOwnerService.getOwnerStores(ownerUsername, uuid);
+    }
+
+
+    /**
+     * add manager
+     */
+    @ApiOperation(value = "get owner stores")
+    @GetMapping("get-all-operation-manager/")
+    public List<String> getAllOperationOfManger() {
+        return sellerOwnerService.getAllOperationOfManger();
     }
 }

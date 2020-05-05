@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -333,12 +334,14 @@ public class TradingSystemFacade {
      * @param password  - the password of the user
      * @param firstName - the first name of the new user
      * @param lastName  - the last name of the new user
+     * @param image
      * @return true if succeed
      */
-    public boolean registerUser(@NotBlank String userName, @NotBlank String password, @NotBlank String firstName, @NotBlank String lastName) {
+    public boolean registerUser(@NotBlank String userName, @NotBlank String password, @NotBlank String firstName,
+                                @NotBlank String lastName, MultipartFile image) {
         log.info("started session of registration for user: " + userName);
         UserSystem userSystem = factoryObjects.createSystemUser(userName, firstName, lastName, password);
-        return tradingSystem.registerNewUser(userSystem);
+        return tradingSystem.registerNewUser(userSystem, image);
     }
 
 
@@ -633,6 +636,10 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(manageUsername, uuid);
         Store store = tradingSystem.getStore(storeId);
         return user.getOperationsCanDo(store);
+    }
+
+    public List<String> getAllOperationOfManger() {
+        return StorePermission.getStringPermissions();
     }
 
     ///////////////////////add discounts////////////////////////
