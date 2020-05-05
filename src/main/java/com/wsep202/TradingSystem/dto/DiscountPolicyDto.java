@@ -3,6 +3,7 @@
  * part of UC 4.2
  */
 package com.wsep202.TradingSystem.dto;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import java.util.Calendar;
@@ -48,7 +49,16 @@ public class DiscountPolicyDto {
      */
     private double minPrice;
 
+///////////////////////composite////////////////////////////////////////////
+    /**
+     * children components of the composite conditional discount
+     */
+    private HashMap<Integer, DiscountPolicyDto> composedDiscounts;
 
+    /**
+     * the discounts to apply on the received products ion case they are stands in conditions
+     */
+    private HashMap<Integer, DiscountPolicy> discountsToApply;
 
 
 }
