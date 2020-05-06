@@ -1,28 +1,31 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
-
-@Getter
 @Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Slf4j
+@Builder
 public class HiddenDiscount extends DiscountPolicy{
 
 
     @Override
-    public void applyDiscount(HashMap<Product, Integer> products) {
+    public void applyDiscount(Map<Product, Integer> products) {
 
     }
 
     @Override
-    public boolean isApprovedProducts(HashMap<Product, Integer> products) {
+    public boolean isApprovedProducts(Map<Product, Integer> products) {
         return false;
     }
 
     @Override
-    public void undoDiscount(HashMap<Product, Integer> products) {
+    public void undoDiscount(Map<Product, Integer> products) {
 
     }
 

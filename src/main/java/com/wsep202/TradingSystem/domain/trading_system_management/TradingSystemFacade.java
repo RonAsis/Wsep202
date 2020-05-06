@@ -647,26 +647,47 @@ public class TradingSystemFacade {
      * @param ownerUsername the owner of the store
      * @param storeId
      * @param uuid the unique id of the owner
-     * @param discountPercentage
-     * @param endTime expiration date for the discount
-     * @param snOfProducts ids of products to validate by discount
+     * @param visibleDiscountDto the discount parameters objects that inserted by the owner
      * @return true for success
      */
     public boolean addVisibleDiscountPolicy(String ownerUsername,
-                                            int storeId, UUID uuid, double discountPercentage,
-                                            Calendar endTime, ArrayList<Integer> snOfProducts) {
+                                            int storeId, UUID uuid,
+                                            VisibleDiscountDto visibleDiscountDto) {
         try{
             Store store = tradingSystem.getStore(storeId);
             UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
-            VisibleDiscount visibleDiscount =new VisibleDiscount(endTime,discountPercentage);
+            //convert Products of type dto to the type of the products in the domain
+            Calendar endTime = visibleDiscountDto.getEndTime();
+            double discount = visibleDiscountDto.getDiscountPercentage();
+            HashMap<Product,Integer> products= convertDtoProductHashToProductHashFromStore
+                    (visibleDiscountDto.getProductsUnderThisDiscount(),store);
+            //create the visible discount
+            VisibleDiscount visibleDiscount = factoryObjects.createVisibleDiscount(endTime,discount,products);
             //create products list for the addition
-            HashMap<Product,Integer> products= getProductsFromSN(snOfProducts,store);
             store.addDiscountForProduct(owner,visibleDiscount,products);
             return true;
         }catch (TradingSystemException exception){
             log.error("failed to add discount policy");
             return false;
         }
+    }
+
+    /**
+     * convert from hash of ProductDto with their amounts into
+     * Product map with its amount
+     * @param productsUnderThisDiscount
+     * @param store the store that products belongs to
+     * @return productsHash
+     */
+    private HashMap<Product, Integer> convertDtoProductHashToProductHashFromStore
+            (HashMap<ProductDto, Integer> productsUnderThisDiscount,Store store) {
+        HashMap<Product,Integer> productsHash = new HashMap<>();
+        for(ProductDto productDto: productsUnderThisDiscount.keySet()){
+            Product productFromStore = store.getProduct(productDto.getProductSn());
+            //add the product object exist in store with the required amount for discount
+            productsHash.put(productFromStore,productsUnderThisDiscount.get(productDto));
+        }
+        return productsHash;
     }
 
     /**
