@@ -58,7 +58,7 @@ public class DiscountPolicyDto {
     /**
      * the discounts to apply on the received products ion case they are stands in conditions
      */
-    private HashMap<Integer, DiscountPolicy> discountsToApply;
+    private HashMap<Integer, DiscountPolicyDto> discountsToApply;
 
 
 }

@@ -5,13 +5,20 @@ package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
+@Setter
+@Getter
+@Slf4j
+@Builder
 public class ConditionalProductDiscount extends ConditionalDiscount {
     //this map tells us on how many products to apply the discount
-    private HashMap<Product,Integer> amountOfProductsForApplyDiscounts;
+    private Map<Product,Integer> amountOfProductsForApplyDiscounts;
 
     public ConditionalProductDiscount(Calendar endTime, double discountPercentage, String description) {
         super(endTime, discountPercentage, description);
@@ -37,7 +44,7 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
      * @param products in store
      */
     @Override
-    public void applyDiscount(HashMap<Product, Integer> products) {
+    public void applyDiscount(Map<Product, Integer> products) {
         //The discount time is not expired yet
         if(this.endTime.compareTo(Calendar.getInstance()) >= 0){
             if(!isApplied) {
@@ -54,7 +61,7 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
      * @param products to update
      */
     @Override
-    public void undoDiscount(HashMap<Product, Integer> products) {
+    public void undoDiscount(Map<Product, Integer> products) {
         undoConditionalDiscount(products);
     }
 
@@ -62,7 +69,7 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
      * undo visible discount
      * @param products to update the related undo from the discount between them
      */
-    private void undoConditionalDiscount(HashMap<Product,Integer> products) {
+    private void undoConditionalDiscount(Map<Product,Integer> products) {
         for(Product product: products.keySet()){
             //verify that if the product is with this discount, and it updated
             //with this discount then we undo the performed discount
@@ -76,7 +83,7 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
         }
     }
 
-    private double getDiscount(HashMap<Product, Integer> products, Product product) {
+    private double getDiscount(Map<Product, Integer> products, Product product) {
         Product productInAmountStruct = isProductInAmountStruct(product);
         int amountToApply = this.amountOfProductsForApplyDiscounts.get(productInAmountStruct);
         return calculateDiscount(amountToApply, products.get(product), product.getOriginalCost());
@@ -86,7 +93,7 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
      * update price by visible discount
      * @param products to update the related to the discount between them
      */
-    private void applyConditionalProductDiscount(HashMap<Product, Integer> products) {
+    private void applyConditionalProductDiscount(Map<Product, Integer> products) {
         int amountOfTerms = productsUnderThisDiscount.size();    //how many subConditions in the map
         int amountOfTrueConditions = 0;
         for (Product product : products.keySet()) {
@@ -110,7 +117,7 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
 
 
 
-    public boolean isApprovedProducts(HashMap<Product,Integer> products){
+    public boolean isApprovedProducts(Map<Product,Integer> products){
         if(this.endTime.compareTo(Calendar.getInstance())>=0) {
             int amountOfTerms = this.productsUnderThisDiscount.size();    //how many subConditions in the map
             int amountOfTrueConditions = 0;

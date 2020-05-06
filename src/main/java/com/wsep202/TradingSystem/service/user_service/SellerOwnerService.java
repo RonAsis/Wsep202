@@ -4,6 +4,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemF
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
+import com.wsep202.TradingSystem.dto.VisibleDiscountDto;
 import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,19 +37,15 @@ public class SellerOwnerService {
      * @param ownerUsername the owner does that add to his store
      * @param storeId the store that accepts the discount
      * @param uuid  of the owner
-     * @param discountPercentage the discount of the products it get as input
-     * @param endTime expiration date
-     * @param snOfProducts the products id
+     * @param visibleDiscountDto - the info of the discount inserted by the owner
      * @return true on successful addition
      */
     public boolean addVisibleDiscountPolicy(String ownerUsername,
                                             int storeId,
                                             UUID uuid,
-                                            double discountPercentage,
-                                            Calendar endTime,
-                                            ArrayList<Integer> snOfProducts){
+                                            VisibleDiscountDto visibleDiscountDto){
         return tradingSystemFacade.addVisibleDiscountPolicy(ownerUsername, storeId,
-                uuid, discountPercentage, endTime, snOfProducts);
+                uuid, visibleDiscountDto);
     }
 
     /**

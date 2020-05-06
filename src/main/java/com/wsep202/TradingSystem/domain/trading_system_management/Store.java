@@ -606,9 +606,8 @@ public class Store {
             return false;
         }
         if(isOwner(owner)) {
-            boolean isSet = discountPolicy.addProductToThisDiscount(products); //set discount to products
-            isSet = isSet && this.discountPolicies.add(discountPolicy);  //add the discount to store
-            return isSet;
+            //boolean isSet = discountPolicy.addProductToThisDiscount(products); //set discount to products
+           return this.discountPolicies.add(discountPolicy);  //add the discount to store
         }
         //this is not an owner of the store
         log.error("The received user: "+owner.getUserName()+"is not owner");

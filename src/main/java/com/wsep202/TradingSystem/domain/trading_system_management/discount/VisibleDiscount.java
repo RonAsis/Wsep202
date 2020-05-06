@@ -5,20 +5,25 @@ package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
-@Getter
 @Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Slf4j
+@Builder
 public class VisibleDiscount extends DiscountPolicy{
 
-    public VisibleDiscount(Calendar endTime, double discountPercentage) {
+    public VisibleDiscount(HashMap<Product,Integer> productsUnderDiscount,
+                           Calendar endTime, double discountPercentage) {
         this.endTime = endTime;
         this.discountPercentage = discountPercentage;
         //contains all products in store that are under this discount
-        this.productsUnderThisDiscount = new HashMap<>();
+        this.productsUnderThisDiscount = productsUnderDiscount;
         discountIdAcc = getdiscountIdAcc();
         this.id = discountIdAcc;
     }
@@ -29,7 +34,7 @@ public class VisibleDiscount extends DiscountPolicy{
      * @param products the items to apply the discount on
      */
     @Override
-    public void applyDiscount(HashMap<Product,Integer> products) {
+    public void applyDiscount(Map<Product,Integer> products) {
         //The discount time is not expired yet
         if(this.endTime.compareTo(Calendar.getInstance()) >= 0){
             if(!isApplied) {
@@ -43,7 +48,7 @@ public class VisibleDiscount extends DiscountPolicy{
     }
 
     @Override
-    public boolean isApprovedProducts(HashMap<Product, Integer> products) {
+    public boolean isApprovedProducts(Map<Product, Integer> products) {
         if (this.endTime.compareTo(Calendar.getInstance()) >= 0) {
             for (Product product : products.keySet()) {
                 if (isProductInDiscountStruct(product)!=null) {
@@ -59,7 +64,7 @@ public class VisibleDiscount extends DiscountPolicy{
      * @param products to update
      */
     @Override
-    public void undoDiscount(HashMap<Product, Integer> products) {
+    public void undoDiscount(Map<Product, Integer> products) {
         undoVisibleDiscount(products);
     }
 
@@ -91,7 +96,7 @@ public class VisibleDiscount extends DiscountPolicy{
      * undo visible discount
      * @param products to update the related undo from the discount between them
      */
-    private void undoVisibleDiscount(HashMap<Product,Integer> products) {
+    private void undoVisibleDiscount(Map<Product,Integer> products) {
         for(Product product: products.keySet()){
             //verify that if the product is with this discount, and it updated
             //with this discount then we undo the performed discount
@@ -110,7 +115,7 @@ public class VisibleDiscount extends DiscountPolicy{
      * update price by visible discount
      * @param products to update the related to the discount between them
      */
-    private void applyVisibleDiscount(HashMap<Product,Integer> products) {
+    private void applyVisibleDiscount(Map<Product,Integer> products) {
         for(Product product: products.keySet()){
             Product p = isProductInDiscountStruct(product);
             if(this.productsUnderThisDiscount.containsKey(p)){

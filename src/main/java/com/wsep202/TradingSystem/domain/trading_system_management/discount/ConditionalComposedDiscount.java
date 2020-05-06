@@ -1,10 +1,18 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
+@Setter
+@Getter
+
+@Slf4j
+@Builder
 public class ConditionalComposedDiscount extends ConditionalDiscount {
 
     private CompositeOperator compositeOperator;
@@ -13,7 +21,7 @@ public class ConditionalComposedDiscount extends ConditionalDiscount {
      * the operands of the composed conditional discount
      * Integer = the discount id
      */
-    private HashMap<Integer, DiscountPolicy> composedDiscounts;
+    private Map<Integer, DiscountPolicy> composedDiscounts;
 
     /**
      * the discounts to apply on the received products ion case they are stands in conditions
@@ -52,7 +60,7 @@ public class ConditionalComposedDiscount extends ConditionalDiscount {
      * @return true if stands in the composite condition
      */
     @Override
-    public boolean isApprovedProducts(HashMap<Product, Integer> products) {
+    public boolean isApprovedProducts(Map<Product, Integer> products) {
         boolean ans;
         if (this.endTime.compareTo(Calendar.getInstance()) >= 0) { //not expired yet
             if (this.compositeOperator == CompositeOperator.AND) {                        //And case
@@ -90,7 +98,7 @@ public class ConditionalComposedDiscount extends ConditionalDiscount {
      * @param products in store
      */
     @Override
-    public void applyDiscount(HashMap<Product, Integer> products) {
+    public void applyDiscount(Map<Product, Integer> products) {
         //composed condition is approved and is not expired yet
         if (this.endTime.compareTo(Calendar.getInstance()) >= 0 && isApprovedProducts(products)) {
             for (DiscountPolicy discountPolicy : this.discountsToApply.values()) {
@@ -111,7 +119,7 @@ public class ConditionalComposedDiscount extends ConditionalDiscount {
      * @param products to update
      */
     @Override
-    public void undoDiscount(HashMap<Product, Integer> products) {
+    public void undoDiscount(Map<Product, Integer> products) {
         for(DiscountPolicy discountPolicy: this.discountsToApply.values()){
             discountPolicy.undoDiscount(products);
         }

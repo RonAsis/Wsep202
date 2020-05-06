@@ -420,6 +420,7 @@ public class TradingSystem {
     public boolean removeManager(Store ownedStSore, UserSystem ownerUser, UserSystem managerStore) {
         if(Objects.nonNull(ownedStSore) && Objects.nonNull(ownerUser) && Objects.nonNull(managerStore)
                 && ownedStSore.removeManager(ownerUser, managerStore) ){
+            managerStore.removeManagedStore(ownedStSore);
             log.info(String.format("user %s was removed as manager from store '%d'", managerStore.getUserName(),ownedStSore.getStoreId()));
             return true;
         }
@@ -461,6 +462,11 @@ public class TradingSystem {
         return new Pair<>(sumBeforeDiscounts,sumAfterDiscounts);
     }
 
+    /**
+     * get the updated by discounts prices of the shopping bag.
+     * @param bagsToCalculate
+     * @return
+     */
     private double getCurrentTotalPrice(Map<Store, ShoppingBag> bagsToCalculate) {
         double totalPrice = 0;
         for(ShoppingBag bag: bagsToCalculate.values()){
@@ -469,6 +475,11 @@ public class TradingSystem {
         return totalPrice;
     }
 
+    /**
+     * get the shopping bag cost with original products prices
+     * @param bagsToCalculate
+     * @return
+     */
     private double getOriginalTotalPrice(Map<Store, ShoppingBag> bagsToCalculate) {
         double totalPrice = 0;
         for(ShoppingBag bag: bagsToCalculate.values()){

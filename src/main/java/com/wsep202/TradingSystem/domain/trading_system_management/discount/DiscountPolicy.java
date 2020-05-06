@@ -19,7 +19,7 @@ import java.util.*;
 public abstract class DiscountPolicy {
 
     //holds the conditioned products with pair of their required amount and quantity to apply discount
-    protected HashMap<Product, Integer> productsUnderThisDiscount;
+    protected Map<Product, Integer> productsUnderThisDiscount;
     protected static int discountIdAcc = 0;
     protected int id;
     protected boolean isExpired = false;
@@ -31,14 +31,14 @@ public abstract class DiscountPolicy {
      * apply the relevant discount type on the products in store
      * @param products in store
      */
-    public abstract void applyDiscount(HashMap<Product,Integer> products);
+    public abstract void applyDiscount(Map<Product,Integer> products);
 
     /**
      * add this discount type for the products
      * @param products
      * @return true for success
      */
-    public boolean addProductToThisDiscount(HashMap<Product,Integer> products){
+    public boolean addProductToThisDiscount(Map<Product,Integer> products){
         if(products==null){
             //invalid null value product inserted or missing field
             return false;
@@ -57,13 +57,13 @@ public abstract class DiscountPolicy {
      * @param products
      * @return true if the discount applies on the products
      */
-    public abstract boolean isApprovedProducts(HashMap<Product,Integer> products);
+    public abstract boolean isApprovedProducts(Map<Product,Integer> products);
 
     /**
      * this method will be called in case the discount expired and has to be undone
      * @param products to update
      */
-    public abstract void undoDiscount(HashMap<Product,Integer> products);
+    public abstract void undoDiscount(Map<Product,Integer> products);
 
 
     @Synchronized
