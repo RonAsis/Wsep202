@@ -12,7 +12,6 @@ import {Store} from '../../shared/store.model';
 export class ProductsComponent implements OnInit {
   selectedProduct: Product;
   @Input() store: Store;
-  searchText;
 
   constructor(private productService: ProductService) { }
 

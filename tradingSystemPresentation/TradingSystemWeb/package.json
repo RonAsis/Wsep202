@@ -25,6 +25,7 @@
     "bootstrap": "^3.4.1",
     "bulma": "^0.8.2",
     "net": "^1.0.2",
+    "ng-shopping-cart": "^1.0.0",
     "ng-snotify": "^9.0.1",
     "ng2-search-filter": "^0.5.1",
     "ng5-slider": "^1.2.4",

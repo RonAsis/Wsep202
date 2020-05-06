@@ -46,6 +46,9 @@ import {AdminComponent} from './logged-in-user/admin/admin.component';
 import { UserElementComponent } from './logged-in-user/admin/users/user-list/user-element/user-element.component';
 import { UserListComponent } from './logged-in-user/admin/users/user-list/user-list.component';
 import { UserDetailComponent } from './logged-in-user/admin/users/user-detail/user-detail.component';
+import {ShoppingCartModule} from 'ng-shopping-cart';
+import {Product} from './shared/product.model';
+import { CartItemComponent } from './guest/shopping-cart/cart-item/cart-item.component';
 
 @NgModule({
   declarations: [
@@ -85,19 +88,28 @@ import { UserDetailComponent } from './logged-in-user/admin/users/user-detail/us
     AdminComponent,
     UserElementComponent,
     UserListComponent,
-    UserDetailComponent
+    UserDetailComponent,
+    CartItemComponent
   ],
-  imports: [
-    Ng2SearchPipeModule,
-    Ng5SliderModule,
-    BrowserModule,
-    BrowserAnimationsModule,
-    ToasterModule.forRoot(),
-    AppRoutingModule,
-    HttpClientModule,
-    NgxBootstrapSliderModule,
-    FormsModule
-  ],
+    imports: [
+        Ng2SearchPipeModule,
+        Ng5SliderModule,
+        BrowserModule,
+        BrowserAnimationsModule,
+        ToasterModule.forRoot(),
+        AppRoutingModule,
+        HttpClientModule,
+        NgxBootstrapSliderModule,
+        FormsModule,
+      ShoppingCartModule.forRoot({ // <-- Add the cart module to your root module
+        itemType: Product, // <-- Configuration is optional
+        serviceType: 'localStorage',
+        serviceOptions: {
+          storageKey: 'NgShoppingCart',
+          clearOnError: true
+        }
+        })
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

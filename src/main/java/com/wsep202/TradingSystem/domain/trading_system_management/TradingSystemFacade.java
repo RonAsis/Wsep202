@@ -786,9 +786,11 @@ public class TradingSystemFacade {
         return products;
     }
 
-
-
-
+    public Pair<Double, Double> getTotalPriceOfShoppingCart(ShoppingCartDto shoppingCartDto) {
+        log.info("get Total Price Of Shopping Cart");
+        ShoppingCart shoppingCart = modelMapper.map(shoppingCartDto, ShoppingCart.class);
+        return tradingSystem.getTotalPrices(shoppingCart);
+    }
 
     //////////////////////////////// converters ///////////////////////////
 

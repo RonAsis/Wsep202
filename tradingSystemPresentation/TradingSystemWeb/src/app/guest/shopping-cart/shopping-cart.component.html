@@ -1,1 +1,28 @@
-<p>shopping-cart works!</p>
+<div class="cart-wrapper">
+  <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">
+      <div>Item Name</div>
+      <div>Price</div>
+      <div>Amount</div>
+      <div>Total Price</div>
+      <div></div>
+    </div>
+
+    <!-- Table -->
+    <div class="list-group">
+      <app-cart-item
+        class="list-group-item"
+        *ngFor="let item of cartItems | mapToArray"
+        [cartItem]="item"
+        (cartItemDeleted)="onCartItemDeleted($event)"
+        (cartItemChanged)="onCartItemChanged($event)"
+      >
+      </app-cart-item>
+    </div>
+    <div class="panel-footer">
+      <h4>Total {{cartTotal}}</h4>
+      <h4>Total After Discount {{cartTotalAfterDiscount}}</h4>
+    </div>
+  </div>
+</div>

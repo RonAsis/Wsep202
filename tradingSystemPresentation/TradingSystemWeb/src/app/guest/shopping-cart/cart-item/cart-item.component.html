@@ -1,0 +1,39 @@
+<div class="cart-item-wrapper"
+     [ngStyle]="{color: 'blue'}"
+>
+  <div>
+    {{cartItem.k.name}}
+  </div>
+  <div>
+    {{cartItem.k.cost}} USD
+  </div>
+  <div>
+    <input type="number"
+           value="cartItem.v"
+           placeholder="cartItem"
+           id="amount"
+           min=1
+           [(ngModel)]="cartItem.v"
+           (change)="onCartItemChanged($event)"
+           #amountCartItem
+    />
+  </div>
+  <div>
+    {{cartItem.v * cartItem.k.cost}} USD
+  </div>
+  <div>
+    <button type="button"
+            class="btn btn-default"
+            aria-label="Left Align"
+            (click)="onCartItemDeleted($event)"
+    >
+        <span class="glyphicon glyphicon-remove"
+              aria-hidden="true"
+              id={{cartItem.k.productSn}}>
+        </span>
+    </button>
+  </div>
+</div>
+
+
+

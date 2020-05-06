@@ -16,7 +16,6 @@ import java.util.Map;
 @Getter
 
 @Slf4j
-@Builder
 public class ConditionalStoreDiscount extends ConditionalDiscount {
     public ConditionalStoreDiscount(double minPrice, Calendar endTime, double discountPercentage, String description) {
         super(endTime, discountPercentage, description);

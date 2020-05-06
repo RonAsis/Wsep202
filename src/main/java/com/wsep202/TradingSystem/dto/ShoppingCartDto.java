@@ -12,11 +12,9 @@ import java.util.Map;
 @NoArgsConstructor
 public class ShoppingCartDto {
 
-
     /**
      * list of stores id and there shopping bags
      */
     private Map<Integer, ShoppingBagDto> shoppingBags;
-
 
 }

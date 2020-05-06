@@ -12,7 +12,6 @@ import java.util.Map;
 @Getter
 
 @Slf4j
-@Builder
 public class ConditionalComposedDiscount extends ConditionalDiscount {
 
     private CompositeOperator compositeOperator;

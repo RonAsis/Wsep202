@@ -9,10 +9,10 @@ import {Store} from '../../../shared/store.model';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit{
+export class ProductListComponent implements OnInit {
   @Output() productWasSelected = new EventEmitter<Product>();
   products: Product[];
-  @Input()store: Store;
+  @Input() store: Store;
   searchText;
 
   // for filter by product range
@@ -47,24 +47,30 @@ export class ProductListComponent implements OnInit{
         default:
           return '$' + value;
       }
-    }};
+    }
+  };
 
   selectedCategory = 'All';
-  categories: string [] = [this.selectedCategory] ;
+  categories: string [] = [this.selectedCategory];
 
   constructor(private productService: ProductService) {
-    this.productService.getCategories().subscribe(categories => this.categories.concat(categories));
+    this.productService.getCategories().subscribe(categories => {
+        if (categories !== null && categories !== undefined) {
+          this.categories = this.categories.concat(categories);
+        }
+      }
+    );
   }
 
   ngOnInit(): void {
     this.productService.filterByPriceEvent
       .subscribe(
-        (range: {min: number, max: number}) => {
+        (range: { min: number, max: number }) => {
           this.products = this.productService.filterByPrice(range);
         });
-    if (this.store !== null && this.store !== undefined){
+    if (this.store !== null && this.store !== undefined) {
       this.products = this.store.products;
-    }else {
+    } else {
       this.productService.getProducts().subscribe(products => {
         if (products !== null && products !== undefined) {
           this.products = products;

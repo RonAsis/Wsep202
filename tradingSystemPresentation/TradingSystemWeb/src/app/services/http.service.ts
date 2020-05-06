@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Store} from '../shared/store.model';
 import {ShoppingCart} from '../shared/shoppingCart.model';
 import {PaymentDetails} from '../shared/paymentDetails.model';
@@ -80,6 +80,12 @@ export class HttpService {
       url);
   }
 
+
+  getTotalPriceOfShoppingCart(shoppingCart: ShoppingCart) {
+    const url = `${this.guestUrl}/` + 'get-total-price-of-shopping-cart/';
+    return this.http.post<{key: number, value: number}>(
+      url, shoppingCart, );
+  }
   //////////////////////////// BuyerRegisteredController ///////////////////////////
 
   public logout(username: string, uuid: string) {

@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,6 +92,16 @@ public class GuestController {
     @GetMapping("get-categories")
     public List<String> getCategories() {
         return guestService.getCategories();
+    }
+
+    /**
+     * get Total Price Of ShoppingCart
+     */
+    @ApiOperation(value = " get Total Price Of ShoppingCart")
+    @PostMapping("get-total-price-of-shopping-cart")
+    @ResponseBody
+    public Pair<Double, Double> getTotalPriceOfShoppingCart(@RequestParam(value ="shoppingCart", required = false) ShoppingCartDto shoppingCart){
+        return guestService.getTotalPriceOfShoppingCart(shoppingCart);
     }
 }
 

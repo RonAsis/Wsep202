@@ -9,12 +9,11 @@ export class MapToArrayPipe implements PipeTransform {
     const ret = [];
 
     map.forEach((val, key) => {
-      ret.push({
+      ret.push({k:
         key,
-        val
+        v: val
       });
     });
-
     return ret;
   }
 

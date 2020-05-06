@@ -8,12 +8,13 @@ import {formatNumber} from '@angular/common';
 import {Receipt} from '../shared/receipt.model';
 import {Store} from '../shared/store.model';
 import {HttpService} from './http.service';
+import {Observable, of} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private shoppingCart: ShoppingCart;
+  private readonly shoppingCart: ShoppingCart;
   private isAdmin: boolean;
   private uuid: string;
   private username: string;
@@ -43,7 +44,7 @@ export class UserService {
       .subscribe(response => {
         if (response !== null && response === true) {
           this.registerEvent.emit(true);
-        }else{
+        } else {
           this.registerEvent.emit(false);
         }
       }, error => this.registerEvent.emit(false));
@@ -53,12 +54,12 @@ export class UserService {
     this.usernameWantSeeHistory = null; // need to remove from here
     this.httpService.login(username, password).subscribe(
       response => {
-        if (response !== null && response.key !== null ) {
+        if (response !== null && response.key !== null) {
           this.uuid = response.key;
           this.isAdmin = response.value;
           this.username = username;
           this.userLoggingEvent.emit(true);
-        }else{
+        } else {
           this.userLoggingEvent.emit(false);
         }
       });
@@ -71,21 +72,16 @@ export class UserService {
           this.uuid = null;
           this.isAdmin = false;
           this.userLogoutEvent.emit(true);
-        }else{
+        } else {
           this.userLogoutEvent.emit(false);
         }
       });
   }
 
   addToShoppingCart(product: Product, amountProducts: number) {
-    const storeId = product.storeId;
-    let shoppingBag = this.shoppingCart.shoppingBags.get(storeId);
-    if (shoppingBag === undefined) {
-      const products = new Map<Product, number>();
-      products.set(product, amountProducts);
-      shoppingBag = new ShoppingBag(products);
+    if (!this.isLoggingUser()) {
+      this.shoppingCart.addToShoppingCart(product, amountProducts);
     }
-    this.shoppingCart.shoppingBags.set(storeId, shoppingBag);
   }
 
   viewPurchaseHistory() {
@@ -130,4 +126,40 @@ export class UserService {
   public getUuid() {
     return this.uuid;
   }
+
+  getShoppingCart() {
+    console.log(this.isLoggingUser());
+    if (!this.isLoggingUser()) {
+      console.log(this.shoppingCart);
+      return of(this.shoppingCart);
+    }else {
+      return null;
+      // return this.httpService.getShoppingCard(this.username, this.uuid);
+    }
+  }
+
+  isLoggingUser(){
+    return this.uuid !== null && this.uuid !== undefined;
+  }
+
+  changeItemCartAmount(productSn: number, storeId: number, amount: number) {
+    if (!this.isLoggingUser()){
+      this.shoppingCart.addProductAmounts(productSn, storeId, amount);
+    }
+  }
+
+  removeCartItem(productSn: number, storeId: number) {
+    if (!this.isLoggingUser()){
+      this.shoppingCart.removeCartItem(productSn, storeId);
+    }
+  }
+
+  getTotalPriceOfShoppingCart() {
+    if (!this.isLoggingUser()){
+        return this.httpService.getTotalPriceOfShoppingCart(this.shoppingCart);
+    }else{
+      return null;
+    }
+  }
+
 }

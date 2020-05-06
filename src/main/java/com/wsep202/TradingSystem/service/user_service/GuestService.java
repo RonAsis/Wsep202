@@ -153,4 +153,8 @@ public class GuestService {
     public List<String> getCategories() {
         return tradingSystemFacade.getCategories();
     }
+
+    public Pair<Double, Double> getTotalPriceOfShoppingCart(ShoppingCartDto shoppingCartDto) {
+        return tradingSystemFacade.getTotalPriceOfShoppingCart(shoppingCartDto);
+    }
 }

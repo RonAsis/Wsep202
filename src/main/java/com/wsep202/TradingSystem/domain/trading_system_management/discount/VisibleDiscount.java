@@ -13,7 +13,6 @@ import java.util.*;
 @Setter
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @Slf4j
 @Builder
 public class VisibleDiscount extends DiscountPolicy{
