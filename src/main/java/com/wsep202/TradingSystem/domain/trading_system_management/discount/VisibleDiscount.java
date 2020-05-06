@@ -38,6 +38,7 @@ public class VisibleDiscount extends DiscountPolicy{
             }
         }else{  //check if needs to update back the price
             undoVisibleDiscount(products);
+
         }
     }
 

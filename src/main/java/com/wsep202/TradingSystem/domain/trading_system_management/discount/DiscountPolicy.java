@@ -24,6 +24,7 @@ public abstract class DiscountPolicy {
     protected int id;
     protected boolean isExpired = false;
     protected boolean isApplied =false;
+    protected boolean isUndone = false; //TODO if undone already then remove discount completely
     protected Calendar endTime; //expiration date of the discount
     protected double discountPercentage;    //discount percentage for product
     /**
@@ -31,7 +32,6 @@ public abstract class DiscountPolicy {
      * @param products in store
      */
     public abstract void applyDiscount(HashMap<Product,Integer> products);
-
 
     /**
      * add this discount type for the products

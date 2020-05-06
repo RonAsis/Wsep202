@@ -418,6 +418,7 @@ public class TradingSystem {
         if(Objects.nonNull(ownedStSore) && Objects.nonNull(ownerUser) && Objects.nonNull(managerStore)
                 && ownedStSore.removeManager(ownerUser, managerStore) ){
             log.info(String.format("user %s was removed as manager from store '%d'", managerStore.getUserName(),ownedStSore.getStoreId()));
+            return true;
         }
         log.info(String.format("failed remove user %s as manager from store '%s'", managerStore.getUserName(),ownedStSore.getStoreId()));
         return  false;
@@ -437,4 +438,41 @@ public class TradingSystem {
     public Set<Product> getProducts() {
         return tradingSystemDao.getProducts();
     }
+
+    /**
+     * get the total price of cart before the discounts
+     * and get the total price of cart after the discounts
+     * @param cartToCalculate
+     * @return
+     */
+    public Pair<Double, Double> getTotalPrices(ShoppingCart cartToCalculate){
+        double sumBeforeDiscounts;  //sum of original price
+        double sumAfterDiscounts; //sum of the prices after discount
+        //update the products in the bags with their discounts
+        Map<Store,ShoppingBag> bagsToCalculate = cartToCalculate.getShoppingBagsList();
+        for(Store store:bagsToCalculate.keySet()){  //apply the discounts on the bags in the cart (update the products prices)
+            store.applyDiscountPolicies((HashMap<Product, Integer>) bagsToCalculate.get(store).getProductListFromStore());
+        }
+        sumBeforeDiscounts = getOriginalTotalPrice(bagsToCalculate);
+        sumAfterDiscounts =  getCurrentTotalPrice(bagsToCalculate);
+        return new Pair<>(sumBeforeDiscounts,sumAfterDiscounts);
+    }
+
+    private double getCurrentTotalPrice(Map<Store, ShoppingBag> bagsToCalculate) {
+        double totalPrice = 0;
+        for(ShoppingBag bag: bagsToCalculate.values()){
+            totalPrice+= bag.getOriginalTotalCostOfBag();
+        }
+        return totalPrice;
+    }
+
+    private double getOriginalTotalPrice(Map<Store, ShoppingBag> bagsToCalculate) {
+        double totalPrice = 0;
+        for(ShoppingBag bag: bagsToCalculate.values()){
+            totalPrice+= bag.getTotalCostOfBag();
+        }
+        return totalPrice;
+    }
+
+
 }

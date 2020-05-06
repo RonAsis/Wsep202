@@ -1,5 +1,8 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.exception.ChargeException;
+import com.wsep202.TradingSystem.domain.exception.DeliveryRequestException;
+import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import externals.ChargeSystem;
 import externals.SecuritySystem;
@@ -120,7 +123,7 @@ class ExternalServiceManagementTest {
             when(store.getStoreId()).thenReturn(2);
             expectedStores.add(store.getStoreId());
             //success: the charge succeeded
-            Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
+            Assertions.assertTrue(externalServiceManagement.charge(paymentDetails,cart));
         }
 
         /**
@@ -138,7 +141,10 @@ class ExternalServiceManagementTest {
             when(chargeSystem.sendPaymentTransaction(store.getStoreName(),priceOfEachBag,paymentDetails)).thenReturn(false);
 
             //fail: the charge by the charge system failed for the received store in the list (store)
-            Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
+            Assertions.assertThrows(ChargeException.class,
+                    ()->{
+                        externalServiceManagement.charge(paymentDetails,cart);
+                    });
         }
 
         /**
@@ -213,7 +219,10 @@ class ExternalServiceManagementTest {
             when(cart.getShoppingBagsList()).thenReturn(shoppingBagsMap);
             when(supplySystem.deliver(addrInfo,expectedBags)).thenReturn(false);
             //fail: the deliver request denied so externalService notifies about that
-            Assertions.assertFalse(externalServiceManagement.deliver(addrInfo,cart));
+            Assertions.assertThrows(DeliveryRequestException.class,
+                    ()->{
+                        externalServiceManagement.deliver(addrInfo,cart);
+                    });
         }
 
         /**
@@ -276,7 +285,7 @@ class ExternalServiceManagementTest {
 
             paymentDetails = new PaymentDetails();
             user = new UserSystem("username","luis","enrique",passwordTest);
-//            store = new Store(user,new PurchasePolicy(),new DiscountPolicy(),"keter");
+            store = new Store(user,"keter");
             cart = new ShoppingCart();
             bag = new ShoppingBag(store);
             externalServiceManagement.connect();
@@ -327,15 +336,16 @@ class ExternalServiceManagementTest {
          */
         @Test
         void chargePositive() {
-            bag.setTotalCostOfBag(5.5);
+
+
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
-            List<Integer> expectedStores = new LinkedList<>();
-            expectedStores.add(store.getStoreId()); //the expected store that failed to be returned in list
-
+            //mock for charge system
+            when(chargeSystem.cancelCharge(store.getStoreName(),2,paymentDetails)).thenReturn(true);
+            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,2,store.getStoreId()),2);
             //success: the charge succeeded no failed stores received
             paymentDetails.setCreditCardNumber("123456789");    //valid card no. length
-            Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
+            Assertions.assertTrue(externalServiceManagement.charge(paymentDetails,cart));
         }
 
         /**
@@ -343,13 +353,19 @@ class ExternalServiceManagementTest {
          */
         @Test
         void chargeNegative() {
-            bag.setTotalCostOfBag(5.5);
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
             List<Integer> expectedStores = new LinkedList<>();
             //fail: the charge failed for shopping bag of store
             paymentDetails.setCreditCardNumber("1234567890");    //invalid card no. length
-            Assertions.assertEquals(expectedStores,externalServiceManagement.charge(paymentDetails,cart));
+            when(chargeSystem.sendPaymentTransaction(store.getStoreName(),5.5,paymentDetails)).thenReturn(false);
+            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,5.5,store.getStoreId()),2);
+
+            //fail: system indicates about charge failure by throw an exception
+            Assertions.assertThrows(ChargeException.class,
+                    ()->{
+                        externalServiceManagement.charge(paymentDetails,cart);
+                    });
         }
 
         /**
@@ -357,13 +373,18 @@ class ExternalServiceManagementTest {
          */
         @Test
         void cancelChargePositive() {
-            bag.setTotalCostOfBag(5.5);
+
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
             List<Integer> expectedStores = new LinkedList<>();
             expectedStores.add(store.getStoreId()); //the expected store that failed to be returned in list
             //success: the cancellation succeeded no failed stores received
             paymentDetails.setCreditCardNumber("123456789");    //valid card no. length
+            //mock for charge system
+            when(chargeSystem.cancelCharge(store.getStoreName(),2,paymentDetails)).thenReturn(true);
+            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,2,store.getStoreId()),2);
+
+            //success: charge canceled
             Assertions.assertTrue(externalServiceManagement.cancelCharge(paymentDetails,cart));
         }
 
@@ -372,11 +393,14 @@ class ExternalServiceManagementTest {
          */
         @Test
         void cancelChargeNegative() {
-            bag.setTotalCostOfBag(-2);
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
             List<Integer> expectedStores = new LinkedList<>();
             expectedStores.add(store.getStoreId()); //the expected store that failed to be returned in list
+            //mock for charge system
+            when(chargeSystem.cancelCharge(store.getStoreName(),2,paymentDetails)).thenReturn(true);
+            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,-2,store.getStoreId()),2);
+
             //fail: the cancellation failed
             paymentDetails.setCreditCardNumber("123456789");    //valid card no. length
             Assertions.assertFalse(externalServiceManagement.cancelCharge(paymentDetails,cart));
@@ -391,9 +415,14 @@ class ExternalServiceManagementTest {
         void deliverPositive() {
             BillingAddress addrInfo = new BillingAddress();
             addrInfo.setZipCode("2010300");    //set valid phone number
-            bag.setTotalCostOfBag(5.5);
+            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,5.5,store.getStoreId()),2);
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
+            ArrayList<ShoppingBag> bags = new ArrayList<>();
+            for(ShoppingBag bag: cart.getShoppingBagsList().values()){
+                bags.add(bag);
+            }
+            when(supplySystem.deliver(addrInfo,bags)).thenReturn(true);
             //success: the deliver request accepted so externalService notifies about that
             Assertions.assertTrue(externalServiceManagement.deliver(addrInfo,cart));
         }
@@ -405,11 +434,19 @@ class ExternalServiceManagementTest {
         void deliverNegative() {
             BillingAddress addrInfo = new BillingAddress();
             addrInfo.setZipCode("201030005");    //set invalid phone number
-            bag.setTotalCostOfBag(5.5);
+            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,5.5,store.getStoreId()),2);
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
-            //success: the deliver request accepted so externalService notifies about that
-            Assertions.assertFalse(externalServiceManagement.deliver(addrInfo,cart));
+            ArrayList<ShoppingBag> bags = new ArrayList<>();
+            for(ShoppingBag bag: cart.getShoppingBagsList().values()){
+                bags.add(bag);
+            }
+            when(supplySystem.deliver(addrInfo,bags)).thenReturn(false);
+            //failed to deliver: system notifies by throwing proper exception
+            Assertions.assertThrows(DeliveryRequestException.class,
+                    ()->{
+                        externalServiceManagement.deliver(addrInfo,cart);
+                    });
         }
 
         /**
@@ -420,9 +457,15 @@ class ExternalServiceManagementTest {
         void cancelDeliverPositive() {
             BillingAddress addrInfo = new BillingAddress();
             addrInfo.setZipCode("2010300");    //set valid phone number
-            bag.setTotalCostOfBag(5.5);
+            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,5.5,store.getStoreId()),2);
             bag.setStoreOfProduct(store);
             cart.addBagToCart(store,bag);
+            externalServiceManagement.cancelDelivery(addrInfo,cart);
+            ArrayList<ShoppingBag> bags = new ArrayList<>();
+            for(ShoppingBag bag: cart.getShoppingBagsList().values()){
+                bags.add(bag);
+            }
+            when(supplySystem.canceldelivery(addrInfo,bags)).thenReturn(true);
             //success: the cancel delivery request accepted so externalService notifies about that
             Assertions.assertTrue(externalServiceManagement.cancelDelivery(addrInfo,cart));
         }
@@ -435,6 +478,8 @@ class ExternalServiceManagementTest {
         void cancelDeliverNegative() {
             BillingAddress addrInfo = new BillingAddress();
             addrInfo.setZipCode("2010300");    //set valid phone number
+            when(supplySystem.canceldelivery(addrInfo,new ArrayList<>())).thenReturn(false);
+
             //fail: the cancel delivery failed - no bags to cancel
             Assertions.assertFalse(externalServiceManagement.cancelDelivery(addrInfo,cart));
         }

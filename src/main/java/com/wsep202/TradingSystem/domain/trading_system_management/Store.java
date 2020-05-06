@@ -641,7 +641,7 @@ public class Store {
         }
     }
 
-    public boolean addDiscountForProduct(UserSystem owner, ConditionalStoreDiscount storeDiscount) {
+    public boolean addDiscountForProduct(UserSystem owner, DiscountPolicy storeDiscount) {
         if(owner==null){
             return false;
         }

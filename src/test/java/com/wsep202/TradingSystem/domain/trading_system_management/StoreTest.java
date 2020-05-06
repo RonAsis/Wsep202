@@ -1,7 +1,12 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
+import com.wsep202.TradingSystem.domain.exception.NoOwnerInStoreException;
 import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
+import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.VisibleDiscount;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,12 +55,10 @@ class StoreTest {
             fakeOwner = mock(UserSystem.class);
             when(fakeOwner.getUserName()).thenReturn("Donald");
 
-            purchasePolicy = new PurchasePolicy();
-//            discountPolicy = new DiscountPolicy();
             //owner and opener of the store
             owner = mock(UserSystem.class);
             when(owner.getUserName()).thenReturn("Michael");
-//            storeUT = new Store(owner,purchasePolicy,discountPolicy,"Store under test");
+            storeUT = new Store(owner,"Store under test");
             product = mock(Product.class);
         }
 
@@ -480,7 +483,7 @@ class StoreTest {
         }
 
         /**
-         * get existing product in the store
+         * get not existing product in the store
          */
         @Test
         void getNotExistProductNegative() {
@@ -608,11 +611,9 @@ class StoreTest {
             //not owner of the store
             fakeOwnerReal = new UserSystem("DT","Donald","Trump","DT123");
 
-            purchasePolicy = new PurchasePolicy();
-//            discountPolicy = new DiscountPolicy();
             //owner and opener of the store
             ownerRealUser = new UserSystem("Michael","micha","toti","pass");
-//            storeUT = new Store(ownerRealUser,purchasePolicy,discountPolicy,"Store under test");
+            storeUT = new Store(ownerRealUser,"Store under test");
             product = new Product("Bamba",ProductCategory.SPORTING_GOODS,1,11,storeUT.getStoreId());
         }
 
@@ -1103,6 +1104,46 @@ class StoreTest {
 
         private void addOwnerSetup() {
             storeUT.addOwner(ownerRealUser, newOwnerReal);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        @Test
+        public void editProductAmountInStock(int productSn, int amount) {
+
+        }
+
+        @Test
+        public void addDiscountForProduct (UserSystem owner, DiscountPolicy discountPolicy,
+                                              HashMap<Product,Integer> products) throws TradingSystemException {
+
+        }
+
+        @Test
+        public void applyDiscountPolicies(HashMap<Product,Integer> productsBag) {
+
+        }
+
+       @Test
+        public void applyVisibleDiscountPoliciesOnlyOnStoreProducts() {
+
+        }
+
+        @Test
+        private void updateExpiredDiscounts() {
+
+        }
+
+        @Test
+        public void addDiscountForProduct(UserSystem owner, ConditionalStoreDiscount storeDiscount) {
+
+        }
+        @Test
+        public void updateStock(ShoppingBag bag) {
+
+        }
+        @Test
+        public void isAllInStock(ShoppingBag bag){
+
         }
     }
 }
