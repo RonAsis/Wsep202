@@ -78,5 +78,4 @@ public abstract class DiscountPolicy {
      */
     public abstract void editProductByDiscount(Product product);
 
-
 }

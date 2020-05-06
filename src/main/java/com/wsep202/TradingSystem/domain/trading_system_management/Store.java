@@ -594,25 +594,7 @@ public class Store {
         return false;
     }
 
-    /**
-     * set all the products in the received list with the received discount
-     * @param discountPolicy
-     * @param products
-     * @return
-     */
-    public boolean addDiscountForProduct (UserSystem owner, DiscountPolicy discountPolicy,
-                                          HashMap<Product,Integer> products) throws TradingSystemException{
-        if(owner==null){
-            return false;
-        }
-        if(isOwner(owner)) {
-            //boolean isSet = discountPolicy.addProductToThisDiscount(products); //set discount to products
-           return this.discountPolicies.add(discountPolicy);  //add the discount to store
-        }
-        //this is not an owner of the store
-        log.error("The received user: "+owner.getUserName()+"is not owner");
-        throw new NoOwnerInStoreException(owner.getUserName(),storeId);
-    }
+
 
     /**
      * apply discounts on a shopping bag
@@ -651,13 +633,17 @@ public class Store {
             }
         }
     }
-
-    public boolean addDiscountForProduct(UserSystem owner, DiscountPolicy storeDiscount) {
+    /**
+     * set all the products in the received list with the received discount
+     * @param discountPolicy
+     * @return
+     */
+    public boolean addDiscountForProduct(UserSystem owner, DiscountPolicy discountPolicy) {
         if(owner==null){
             return false;
         }
         if(isOwner(owner)) {
-            return this.discountPolicies.add(storeDiscount);  //add the discount to store
+            return this.discountPolicies.add(discountPolicy);  //add the discount to store
         }
         //this is not an owner of the store
         log.error("The received user: "+owner.getUserName()+"is not owner");
@@ -670,5 +656,20 @@ public class Store {
                 .findFirst()
                 .map(mangerStore -> StorePermission.getStringPermissions(mangerStore.getStorePermissions()))
                 .orElse(new ArrayList<>());
+    }
+
+    /**
+     * get discount in the store that has the received id
+     * @param id unique discount id
+     * @return
+     */
+    public DiscountPolicy getDiscountPolicyById(int id){
+        Optional<DiscountPolicy> discountPolicy = this.discountPolicies.stream().
+                filter(discountPolicy1 -> discountPolicy1.getId()==id).findFirst();
+        if(discountPolicy.isPresent()){
+            return discountPolicy.get();
+        }
+        //there is no discount with the requested id
+        throw new DiscountPolicyNoSuchIDException(id,this.getStoreName());
     }
 }

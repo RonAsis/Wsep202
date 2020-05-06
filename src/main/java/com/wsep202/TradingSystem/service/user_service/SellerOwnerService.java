@@ -1,10 +1,8 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
-import com.wsep202.TradingSystem.dto.ReceiptDto;
-import com.wsep202.TradingSystem.dto.StoreDto;
-import com.wsep202.TradingSystem.dto.UserSystemDto;
-import com.wsep202.TradingSystem.dto.VisibleDiscountDto;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalProductDiscount;
+import com.wsep202.TradingSystem.dto.*;
 import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,23 +51,15 @@ public class SellerOwnerService {
      * @param ownerUsername the owner does that add to his store
      * @param storeId the store that accepts the discount
      * @param uuid  of the owner
-     * @param discountPercentage the discount of the products it get as input
-     * @param endTime expiration date
-     * @param snOfProductsAndAmountsRequired the products id and their required amounts
-     * @param amountsToApplyOnTheDiscount the amount of products to apply the discount on
+     * @param conditionalProductDiscountDto the discount info inserted by the owner
      * @return true on successful addition
      */
     public boolean addConditionalProductDiscountPolicy(String ownerUsername,
                                                        int storeId,
                                                        UUID uuid,
-                                                       double discountPercentage,
-                                                       Calendar endTime,
-                                                       ArrayList<Pair<Integer, Integer>> snOfProductsAndAmountsRequired,
-                                                       ArrayList<Pair<Integer, Integer>> amountsToApplyOnTheDiscount,
-                                                       String description){
+                                                       ConditionalProductDiscountDto conditionalProductDiscountDto){
         return tradingSystemFacade.addConditionalDiscountPolicy(ownerUsername, storeId,
-                uuid, discountPercentage, endTime, snOfProductsAndAmountsRequired,
-                amountsToApplyOnTheDiscount,description);
+                uuid, conditionalProductDiscountDto);
     }
 
     /**
@@ -77,22 +67,34 @@ public class SellerOwnerService {
      * @param ownerUsername the creator
      * @param storeId id of store that will hold the discount
      * @param uuid of owner
-     * @param discountPercentage obvious
-     * @param endTime expiration date of discount
-     * @param minPrice the threshold to apply the discount from
-     * @param description the description of the discount
+     * @param conditionalStoreDiscountDto the discount info
      * @return true for successful operation
      */
     public boolean addConditionalStoreDiscountPolicy(String ownerUsername,
                                                      int storeId,
                                                      UUID uuid,
-                                                     double discountPercentage,
-                                                     Calendar endTime,
-                                                     double minPrice,
-                                                     String description){
+                                                     ConditionalStoreDiscountDto conditionalStoreDiscountDto){
         return tradingSystemFacade.addConditionalStoreDiscountPolicy(ownerUsername, storeId,
-                uuid, discountPercentage, endTime, minPrice,description);
+                uuid, conditionalStoreDiscountDto);
     }
+
+
+    /**
+     * add conditional composed discount
+     * @param ownerUsername the creator
+     * @param storeId id of store that will hold the discount
+     * @param uuid of owner
+     * @param conditionalComposedDto the discount info
+     * @return true for successful operation
+     */
+    public boolean addConditionalComposedDiscountPolicy(String ownerUsername,
+                                                     int storeId,
+                                                     UUID uuid,
+                                                     ConditionalComposedDto conditionalComposedDto){
+        return tradingSystemFacade.addConditionalComposedDiscountPolicy(ownerUsername, storeId,
+                uuid, conditionalComposedDto);
+    }
+
 
 
     /**

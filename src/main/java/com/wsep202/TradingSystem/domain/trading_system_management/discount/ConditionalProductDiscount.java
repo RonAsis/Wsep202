@@ -20,9 +20,12 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
     //this map tells us on how many products to apply the discount
     private Map<Product,Integer> amountOfProductsForApplyDiscounts;
 
-    public ConditionalProductDiscount(Calendar endTime, double discountPercentage, String description) {
+    public ConditionalProductDiscount(Map<Product,Integer> productsUnderDiscount,
+                                      Calendar endTime, double discountPercentage, String description,
+                                      Map<Product,Integer> amountOfProductsForApplyDiscounts) {
         super(endTime, discountPercentage, description);
-        amountOfProductsForApplyDiscounts = new HashMap<>();
+        this.productsUnderThisDiscount = productsUnderDiscount;
+        this.amountOfProductsForApplyDiscounts = amountOfProductsForApplyDiscounts;
     }
 
     /**

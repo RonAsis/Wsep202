@@ -18,7 +18,7 @@ import java.util.*;
 @Builder
 public class VisibleDiscount extends DiscountPolicy{
 
-    public VisibleDiscount(HashMap<Product,Integer> productsUnderDiscount,
+    public VisibleDiscount(Map<Product,Integer> productsUnderDiscount,
                            Calendar endTime, double discountPercentage) {
         this.endTime = endTime;
         this.discountPercentage = discountPercentage;
