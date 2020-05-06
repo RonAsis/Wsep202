@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Store} from '../../../shared/store.model';
 import {Options} from 'ng5-slider';
 import {StoreService} from '../../../services/store.service';
@@ -12,7 +12,7 @@ import {UserService} from '../../../services/user.service';
 export class StoreListComponent implements OnInit {
   @Output() storeWasSelected = new EventEmitter<Store>();
 
-  stores: Store[];
+  stores: Store [] ;
 
   value = 5;
   options: Options = {
@@ -29,10 +29,18 @@ export class StoreListComponent implements OnInit {
       {value: 9, legend: 'Excellent'}
     ]
   };
-  constructor(private storeService: StoreService, private userService: UserService) { }
+
+  constructor(private storeService: StoreService, private userService: UserService) {
+    this.stores = [];
+  }
 
   ngOnInit(): void {
-    this.stores = this.storeService.getStores(this.userService.getUsername(), this.userService.getUuid());
+    this.storeService.getStores(this.userService.getUsername(), this.userService.getUuid())
+      .subscribe(stores => {
+        if (stores !== null && stores !== undefined) {
+          this.stores = stores;
+        }
+      });
   }
 
 }

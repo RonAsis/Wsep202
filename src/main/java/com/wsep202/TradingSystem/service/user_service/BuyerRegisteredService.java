@@ -37,8 +37,9 @@ public class BuyerRegisteredService {
      */
     public StoreDto openStore(String usernameOwner,
                               String storeName,
+                              String description,
                               UUID uuid){
-        return tradingSystemFacade.openStore(usernameOwner,  storeName, uuid);
+        return tradingSystemFacade.openStore(usernameOwner,  storeName, description, uuid);
     }
 
     /**

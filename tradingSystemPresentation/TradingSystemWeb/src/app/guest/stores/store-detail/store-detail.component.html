@@ -1,49 +1,27 @@
-<div class="row">
-  <div class="col-xs-12">
-    <img [src]="" [alt]="store.storeName" class="img-responsive"
-         style="max-height: 300px"/>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <h1>{{store.storeName}}</h1>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <div class="btn-group "
-         appDropdown>
-      <button type="button" class="btn btn-primary dropdown-toggle">
-        Manage Store <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu">
-        <li><a href="#">To shopping list</a></li>
-        <li><a href="#">Edit Store</a></li>
-        <li><a href="#">Delete Store</a></li>
-      </ul>
+<div class="p-3 mb-2 bg-warning text-dark">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1 class="text-danger">{{store.storeName}}</h1>
     </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    rank: {{store.rank}}
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <app-products [storeId] = store.storeId></app-products>
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <div class="btn-group">
-      <button *ngIf="getIsAdminOwnerManger()" type="button" class="btn btn-primary" (click)="viewPurchaseHistory()" >
-        View Purchase History
-      </button>
+  <div class="row">
+    <div class="col-xs-12 text-warning">
+      rank: {{store.rank}}
+      <hr/>
+      <app-products [store]="store"></app-products>
     </div>
   </div>
-</div>
-<div class="col-md-7">
-  <app-history-purchase
-    *ngIf="wantViewPurchaseHistory"></app-history-purchase>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="btn-group">
+        <button *ngIf="getIsAdminOwnerManger()" type="button" class="btn btn-primary" (click)="viewPurchaseHistory()">
+          View Purchase History
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <app-history-purchase
+      *ngIf="wantViewPurchaseHistory"></app-history-purchase>
+  </div>
 </div>

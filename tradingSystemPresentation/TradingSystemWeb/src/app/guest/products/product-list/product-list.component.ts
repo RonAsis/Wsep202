@@ -2,6 +2,7 @@ import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild
 import {Product} from '../../../shared/product.model';
 import {ProductService} from '../../../services/product.service';
 import {LabelType, Options} from 'ng5-slider';
+import {Store} from '../../../shared/store.model';
 
 @Component({
   selector: 'app-product-list',
@@ -11,7 +12,7 @@ import {LabelType, Options} from 'ng5-slider';
 export class ProductListComponent implements OnInit{
   @Output() productWasSelected = new EventEmitter<Product>();
   products: Product[];
-  @Input()storeIdList: number;
+  @Input()store: Store;
   searchText;
 
   // for filter by product range
@@ -48,10 +49,11 @@ export class ProductListComponent implements OnInit{
       }
     }};
 
-  categories: string [] = ['All', 'sss', 'as', 'sadds'];
   selectedCategory = 'All';
+  categories: string [] = [this.selectedCategory] ;
 
   constructor(private productService: ProductService) {
+    this.productService.getCategories().subscribe(categories => this.categories.concat(categories));
   }
 
   ngOnInit(): void {
@@ -60,10 +62,14 @@ export class ProductListComponent implements OnInit{
         (range: {min: number, max: number}) => {
           this.products = this.productService.filterByPrice(range);
         });
-    if (this.storeIdList){
-      this.products = this.productService.getProductsStore(this.storeIdList);
+    if (this.store !== null && this.store !== undefined){
+      this.products = this.store.products;
     }else {
-      this.products = this.productService.getProducts();
+      this.productService.getProducts().subscribe(products => {
+        if (products !== null && products !== undefined) {
+          this.products = products;
+        }
+      });
     }
   }
 

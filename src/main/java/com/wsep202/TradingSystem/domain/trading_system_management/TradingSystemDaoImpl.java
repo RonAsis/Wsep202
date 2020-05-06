@@ -1,7 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NotAdministratorException;
+import com.wsep202.TradingSystem.domain.image.ImagePath;
+import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import javafx.util.Pair;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -33,13 +36,23 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
     }
 
     @Override
-    public void addUserSystem(UserSystem userToRegister) {
+    public void addUserSystem(UserSystem userToRegister, MultipartFile image) {
+        String urlImage = null;
+        if (Objects.nonNull(image)) {
+            urlImage = ImageUtil.saveImage(ImagePath.ROOT_IMAGE_DIC + ImagePath.USER_IMAGE_DIC + image.getOriginalFilename(), image);
+        }
+        userToRegister.setImageUrl(urlImage);
         users.add(userToRegister);
     }
 
     @Override
     public Optional<UserSystem> getUserSystem(String username) {
-        return users.stream()
+        Optional<UserSystem> userSystem = findUserSystem(users, username);
+        return userSystem.isPresent() ? userSystem : findUserSystem(administrators, username);
+    }
+
+    private Optional<UserSystem> findUserSystem(Set<UserSystem> userSystems, String username){
+        return userSystems.stream()
                 .filter(user -> user.getUserName().equals(username))
                 .findFirst();
     }

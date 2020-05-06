@@ -24,9 +24,19 @@ export class AppComponent implements OnInit{
   });
 
   ngOnInit(): void {
-    console.log('load app');
+    this.userService.userLogoutEvent.subscribe(
+      sucLogout => {
+        if (sucLogout){
+          this.isLogging = false;
+        }
+      }
+    );
     this.userService.userLoggingEvent.subscribe(
-      isLogging => this.isLogging = isLogging
+      sucLogging => {
+        if (sucLogging){
+          this.isLogging = sucLogging;
+        }
+      }
     );
     this.webSocketService
       .setWebSocketAPI(new WebSocketAPI(new AppComponent(this.userService, this.webSocketService, this.toasterService), this.userService));

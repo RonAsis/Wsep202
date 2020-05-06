@@ -166,7 +166,9 @@ public class UserSystem implements Observer {
      * @return always true, because the user is now logged-out
      */
     public boolean logout() {
-        subject.unregister(this);
+        if(Objects.nonNull(subject)) {
+            subject.unregister(this);
+        }
         isLogin = false;
         return true;
     }

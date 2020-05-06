@@ -20,11 +20,12 @@ export class UserService {
 
   // events
   userLoggingEvent = new EventEmitter<boolean>();
-  userLoggingEventError = new EventEmitter<boolean>();
 
   registerEvent = new EventEmitter<boolean>();
 
+  userLogoutEvent = new EventEmitter<boolean>();
   logoutNoEvent = new EventEmitter<boolean>();
+
   userSelectedEvent = new EventEmitter<UserSystem>();
 
   private usernameWantSeeHistory = null;
@@ -38,8 +39,6 @@ export class UserService {
                   firstName: string,
                   lastName: string,
                   image: File) {
-    console.log(image.name);
-    console.log(image.size);
     this.httpService.registerUser(username, password, firstName, lastName, image)
       .subscribe(response => {
         if (response !== null && response === true) {
@@ -51,18 +50,31 @@ export class UserService {
   }
 
   login(username: string, password: string) {
-    this.usernameWantSeeHistory = null;
-
+    this.usernameWantSeeHistory = null; // need to remove from here
     this.httpService.login(username, password).subscribe(
       response => {
-        if (response !== null && response.key !== null) {
+        if (response !== null && response.key !== null ) {
           this.uuid = response.key;
           this.isAdmin = response.value;
-          this.userLoggingEvent.emit(true);
           this.username = username;
+          this.userLoggingEvent.emit(true);
+        }else{
+          this.userLoggingEvent.emit(false);
         }
       });
-    return this.uuid !== null;
+  }
+
+  logout() {
+    this.httpService.logout(this.username, this.uuid).subscribe(
+      response => {
+        if (response) {
+          this.uuid = null;
+          this.isAdmin = false;
+          this.userLogoutEvent.emit(true);
+        }else{
+          this.userLogoutEvent.emit(false);
+        }
+      });
   }
 
   addToShoppingCart(product: Product, amountProducts: number) {
@@ -74,17 +86,6 @@ export class UserService {
       shoppingBag = new ShoppingBag(products);
     }
     this.shoppingCart.shoppingBags.set(storeId, shoppingBag);
-  }
-
-  logout() {
-    this.httpService.logout(this.username, this.uuid).subscribe(
-      response => {
-        if (response) {
-          this.uuid = null;
-          this.isAdmin = false;
-          this.userLoggingEvent.emit(false);
-        }
-      });
   }
 
   viewPurchaseHistory() {

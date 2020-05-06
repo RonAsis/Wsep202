@@ -1,5 +1,7 @@
 import {EventEmitter, Injectable, Output} from '@angular/core';
 import {Product} from '../shared/product.model';
+import {HttpService} from './http.service';
+import {Store} from '../shared/store.model';
 
 @Injectable({
   providedIn: 'root'
@@ -7,28 +9,23 @@ import {Product} from '../shared/product.model';
 export class ProductService {
   productSelectedEvent = new EventEmitter<Product>();
   filterByPriceEvent = new EventEmitter<{min: number, max: number}>();
-  private guestUrl: string;
-  @Output() products: Product[];
 
-  constructor() {
-    this.guestUrl = 'http://localhost:8080/guest';
-    this.products = [
-      new Product(1, 's', 's', 1, 1, 1, 1 , 1, 's'),
-      new Product(343434, 's', 's', 1233243232, 1, 1, 1 , 1, 's'),
-      new Product(343434, 's', 's', 1233243232, 1, 9, 1 , 1, 's')
-
-    ];
+  constructor(private httpService: HttpService) {
   }
 
   getProducts() {
-    return this.products;
+    return this.httpService.getProducts();
   }
 
-  getProductsStore(storeId: number) {
-    return [];
+  getProductsStore(store: Store) {
+    return store.products;
   }
 
   filterByPrice(range: {min: number, max: number} ) {
     return [];
+  }
+
+  getCategories() {
+    return this.httpService.getCategories();
   }
 }

@@ -1,17 +1,9 @@
 <div class="row">
   <div class="col-md-5">
-    <app-open-store></app-open-store>
-  </div>
-  <div class="col-md-5">
     <app-store-list
       (storeWasSelected)="selectedStore = $event"></app-store-list>
   </div>
-  <div class="col-md-7">
-    <app-store-detail
-      *ngIf="selectedStore; else infoText"
-      [store]="selectedStore"></app-store-detail>
-    <ng-template #infoText>
-      <p>Please Select a Store!</p>
-    </ng-template>
+  <div *ngIf="selectedStore" class="col-md-7">
+    <app-store-detail [store]="selectedStore"></app-store-detail>
   </div>
 </div>

@@ -17,7 +17,7 @@ export class RegisterComponent implements OnInit {
   @ViewChild('imageInput', {static: false}) imageInput: ElementRef;
   private imgUrl: any;
   private selectedFile: File;
-  messageReg: string;
+  message: string;
   messageColor: string;
 
   constructor(private userService: UserService,
@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit {
         this.clearDetailsOfReg();
         console.log(response);
         if (response) {
-          this.messageReg = 'the registration is succeed';
+          this.message = 'the registration is succeed';
           this.messageColor = 'blue';
         } else {
           this.errorMessage('the registration is failed');
@@ -60,7 +60,7 @@ export class RegisterComponent implements OnInit {
   }
 
   errorMessage(message: string){
-    this.messageReg = message;
+    this.message = message;
     this.messageColor = 'red';
   }
 
@@ -70,7 +70,7 @@ export class RegisterComponent implements OnInit {
   }
 
   private clearMessage() {
-    this.messageReg = '';
+    this.message = '';
     this.messageColor = '';
   }
 
@@ -79,16 +79,17 @@ export class RegisterComponent implements OnInit {
     this.firstNameInputRef.nativeElement.value = '';
     this.lastNameInputRef.nativeElement.value = '';
     this.passwordInputRef.nativeElement.value = '';
-    this.passwordAuthenticationInput.nativeElement = '';
-    this.imageInput.nativeElement = null;
+    this.passwordAuthenticationInput.nativeElement.value = '';
+    this.imageInput.nativeElement.value = null;
   }
 
   fileUpload() {
-    console.log(this.imageInput);
-    // Access the uploaded file through the ElementRef
-    this.selectedFile = this.imageInput.nativeElement.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL( this.imageInput.nativeElement.files[0]);
-    reader.onload = (ev => this.imgUrl = reader.result);
+    if (this.imageInput.nativeElement !== null && this.imageInput.nativeElement !== undefined) {
+      // Access the uploaded file through the ElementRef
+      this.selectedFile = this.imageInput.nativeElement.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(this.imageInput.nativeElement.files[0]);
+      reader.onload = (ev => this.imgUrl = reader.result);
+    }
   }
 }

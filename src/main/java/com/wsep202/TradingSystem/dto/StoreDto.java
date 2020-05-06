@@ -18,12 +18,8 @@ public class StoreDto {
 
     private  Set<ProductDto> products;
 
-    private Set<PurchasePolicyDto> purchasePolicy;
-
-    private Set<DiscountPolicyDto> discountPolicy;
-
-
-    private List<ReceiptDto> receipts;
+    //description
+    private String description;
 
     private int rank;
 }

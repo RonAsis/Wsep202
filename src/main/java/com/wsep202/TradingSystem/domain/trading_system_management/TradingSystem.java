@@ -76,9 +76,7 @@ public class TradingSystem {
                 && userToRegister.isValidUser()) {
             encryptPassword(userToRegister); //encrypt user password to store it and its salt in the system
             log.info(String.format("The user %s registering", userToRegister.getUserName()));
-            String urlImage = ImageUtil.saveImage(ImagePath.USER_IMAGE_DIC + userToRegister.getUserName(), image);
-            userToRegister.setImageUrl(urlImage);
-            tradingSystemDao.addUserSystem(userToRegister);
+            tradingSystemDao.addUserSystem(userToRegister, image);
             return true;
         }
         return false;
@@ -362,11 +360,11 @@ public class TradingSystem {
      * @return - false if the user is not registered, and true after the new store is added to store list
      */
     public Store openStore(UserSystem user,
-
-                           String storeName) {
+                           String storeName,
+                           String description) {
         if (Objects.nonNull(user) &&
                 Strings.isNotBlank(storeName)) {
-            Store newStore = new Store(user, storeName);
+            Store newStore = new Store(user, storeName, description);
             tradingSystemDao.addStore(newStore);
             user.addNewOwnedStore(newStore);
             log.info(String.format("A new store '%s' was opened in the system, %s is the owner", storeName, user.getUserName()));
@@ -375,7 +373,6 @@ public class TradingSystem {
         log.info(String.format("Was problem to open store '%s' in the system by %s", storeName, user.getUserName()));
         return null;
     }
-
 
     /**
      * This method is used to add a new manager to an existing store

@@ -37,7 +37,7 @@ public class GuestController {
                                 @PathVariable String password,
                                 @PathVariable String firstName,
                                 @PathVariable String lastName,
-                                @RequestParam("imageFile") MultipartFile image){
+                                @RequestParam(value = "imageFile", required=false) MultipartFile image){
         return guestService.registerUser(userName, password, firstName, lastName, image);
     }
 

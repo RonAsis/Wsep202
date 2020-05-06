@@ -28,7 +28,6 @@ export class StoreDetailComponent implements OnInit, AfterViewInit{
   }
 
   getIsAdminOwnerManger() {
-    return true;
-    // this.userService.getIsAdmin();
+     this.userService.getIsAdmin();
   }
 }

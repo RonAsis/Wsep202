@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {UserService} from '../services/user.service';
-import {WebSocketAPI} from '../shared/apis/webSocketApi.model';
 import {WebSocketService} from '../services/web-socket.service';
 
 @Component({
@@ -10,7 +9,6 @@ import {WebSocketService} from '../services/web-socket.service';
 })
 export class LoggedInUserComponent implements OnInit {
   loadedFeature: string;
-  admin: boolean;
 
   constructor(private userService: UserService, private webSocketService: WebSocketService) {
     this.tera();
@@ -24,7 +22,6 @@ export class LoggedInUserComponent implements OnInit {
   ngOnInit(): void {
     this.userService.logoutNoEvent.subscribe(() => this.tera());
   }
-
 
   onNavigate(feature: string) {
     this.loadedFeature = feature;

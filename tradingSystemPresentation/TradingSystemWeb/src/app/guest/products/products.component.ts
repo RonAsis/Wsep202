@@ -2,6 +2,7 @@ import {Component, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Product} from '../../shared/product.model';
 import {ProductService} from '../../services/product.service';
 import {ProductListComponent} from './product-list/product-list.component';
+import {Store} from '../../shared/store.model';
 
 @Component({
   selector: 'app-products',
@@ -10,7 +11,7 @@ import {ProductListComponent} from './product-list/product-list.component';
 })
 export class ProductsComponent implements OnInit {
   selectedProduct: Product;
-  @Input()storeId;
+  @Input() store: Store;
   searchText;
 
   constructor(private productService: ProductService) { }

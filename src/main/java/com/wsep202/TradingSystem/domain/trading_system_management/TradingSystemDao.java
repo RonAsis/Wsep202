@@ -1,5 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -9,7 +11,7 @@ public interface TradingSystemDao {
 
     boolean isRegistered(UserSystem userSystem);
 
-    void addUserSystem(UserSystem userToRegister);
+    void addUserSystem(UserSystem userToRegister, MultipartFile image);
 
     Optional<UserSystem> getUserSystem(String username);
 

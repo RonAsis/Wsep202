@@ -57,7 +57,14 @@ public class Store {
     //the store rank
     private int rank;
 
+    //description
+    private String description;
+
     public Store(UserSystem owner,String storeName){
+        initStore(owner, storeName);
+    }
+
+    private void initStore(UserSystem owner, String storeName) {
         this.purchasePolicies = new ArrayList<>();
         this.discountPolicies = new ArrayList<>();
         receipts = new LinkedList<>();
@@ -69,7 +76,12 @@ public class Store {
         this.storeName = storeName;
         owners.add(owner);
         this.storeId = getStoreIdAcc();
-        this.rank = 0;
+        this.rank = 5;
+    }
+
+    public Store(UserSystem owner,String storeName, String description){
+        initStore(owner, storeName);
+        this.description = description;
     }
 
     /**

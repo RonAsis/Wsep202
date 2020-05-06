@@ -9,28 +9,26 @@ import {UserService} from '../../services/user.service';
 export class LoginComponent implements OnInit {
   @ViewChild('usernameInput', {static: false}) usernameInputRef: ElementRef;
   @ViewChild('passwordInput', {static: false}) passwordInputRef: ElementRef;
-  messageLogin: string;
-
-  private readonly webSocketTradingSystemsSubscribeEndpoint = '/user/trading-system-client/notification';
-  private readonly webSocketTradingSystemSendEndpoint = '/trading-system-server/connect-notification-system';
+  message: string;
+  messageColor: string;
 
   constructor(private userService: UserService) {
-    this.messageLogin = '';
+    this.clearMessage();
   }
 
   ngOnInit(): void {
+    this.userService.userLoggingEvent.subscribe(response => {
+      if (!response){
+        this.errorMessage('password or username dont correct');
+      }
+    });
   }
 
   onLogin() {
-    this.messageLogin = '';
-    const succeed = this.userService.login(
+    this.userService.login(
       this.usernameInputRef.nativeElement.value,
       this.passwordInputRef.nativeElement.value
     );
-    if (!succeed) {
-      this.onClearDetails();
-      this.messageLogin = 'logging failed';
-    }
   }
 
   onClearDetails() {
@@ -38,7 +36,14 @@ export class LoginComponent implements OnInit {
     this.usernameInputRef.nativeElement.value = '';
   }
 
+  private clearMessage() {
+    this.message = '';
+    this.messageColor = '';
+  }
 
-
+  errorMessage(message: string){
+    this.message = message;
+    this.messageColor = 'red';
+  }
 
 }

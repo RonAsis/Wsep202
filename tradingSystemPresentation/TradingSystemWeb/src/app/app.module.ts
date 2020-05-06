@@ -32,7 +32,7 @@ import { LogoutComponent } from './logged-in-user/logout/logout.component';
 import { HistoryPurchaseComponent } from './logged-in-user/history-purchase/history-purchase.component';
 import { OwnedStoresComponent } from './logged-in-user/owned-stores/owned-stores.component';
 import { ManagedStoresComponent } from './logged-in-user/managed-stores/managed-stores.component';
-import { OpenStoreComponent } from './guest/stores/open-store/open-store.component';
+import { OpenStoreComponent } from './logged-in-user/open-store/open-store.component';
 import { ReceiptElementComponent } from './logged-in-user/history-purchase/recipet-element/receipt-element.component';
 import { ProductInReceiptComponent } from './logged-in-user/history-purchase/recipet-element/product-in-receipt/product-in-receipt.component';
 import { MapToArrayPipe } from './pipes/map-to-array.pipe';

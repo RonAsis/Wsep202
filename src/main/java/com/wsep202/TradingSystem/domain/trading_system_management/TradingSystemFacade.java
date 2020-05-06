@@ -301,8 +301,7 @@ public class TradingSystemFacade {
     public boolean logout(@NotBlank String username, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(username, uuid);
-            log.info("the user " + username + " logged out.");
-            return user.logout();
+            return this.tradingSystem.logout(user);
         } catch (TradingSystemException e) {
             log.error("Failed to logout", e);
             return false;
@@ -316,10 +315,10 @@ public class TradingSystemFacade {
      * @param storeName         - the name of the new store
      * @return true if succeed
      */
-    public StoreDto openStore(@NotBlank String usernameOwner, @NotBlank String storeName, UUID uuid) {
+    public StoreDto openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(usernameOwner, uuid);
-            Store store = tradingSystem.openStore(user, storeName);
+            Store store = tradingSystem.openStore(user, storeName, description);
             return Objects.nonNull(store) ? modelMapper.map(store, StoreDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("failed to open store", e);

@@ -64,10 +64,10 @@ public class Product {
     /**
      * the rank of this product
      */
-    @Min(value = 0, message = "Must be greater than or equal zero")
-    @Max(value = 5, message = "Must be smaller than or equal 5")
+    @Min(value = 1, message = "Must be greater than or equal zero")
+    @Max(value = 9, message = "Must be smaller than or equal 5")
     @Builder.Default
-    private int rank = 0;
+    private int rank = 5;
 
     /**
      * the storeId that connected to the store that the product exists in it.
@@ -83,7 +83,7 @@ public class Product {
         this.amount = amount;
         this.cost = cost;
         this.originalCost = cost;
-        this.rank = 0;
+        this.rank = 5;
         this.storeId = storeId;
     }
 
