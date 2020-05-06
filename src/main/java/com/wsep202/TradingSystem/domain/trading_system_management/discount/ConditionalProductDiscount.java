@@ -12,6 +12,7 @@ import java.util.HashMap;
 public class ConditionalProductDiscount extends ConditionalDiscount {
     //this map tells us on how many products to apply the discount
     private HashMap<Product,Integer> amountOfProductsForApplyDiscounts;
+
     public ConditionalProductDiscount(Calendar endTime, double discountPercentage, String description) {
         super(endTime, discountPercentage, description);
         amountOfProductsForApplyDiscounts = new HashMap<>();
