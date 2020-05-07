@@ -671,4 +671,19 @@ public class Store {
                 .map(mangerStore -> StorePermission.getStringPermissions(mangerStore.getStorePermissions()))
                 .orElse(new ArrayList<>());
     }
+
+    /**
+     * get discount in the store that has the received id
+     * @param id unique discount id
+     * @return
+     */
+    public DiscountPolicy getDiscountPolicyById(int id){
+        Optional<DiscountPolicy> discountPolicy = this.discountPolicies.stream().
+                filter(discountPolicy1 -> discountPolicy1.getId()==id).findFirst();
+        if(discountPolicy.isPresent()){
+            return discountPolicy.get();
+        }
+        //there is no discount with the requested id
+        throw new DiscountPolicyNoSuchIDException(id,this.getStoreName());
+    }
 }
