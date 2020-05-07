@@ -9,6 +9,8 @@ import {Receipt} from '../shared/receipt.model';
 import {Store} from '../shared/store.model';
 import {HttpService} from './http.service';
 import {Observable, of} from 'rxjs';
+import {PaymentDetails} from '../shared/paymentDetails.model';
+import {BillingAddress} from '../shared/billingAddress.model';
 
 @Injectable({
   providedIn: 'root'
@@ -162,4 +164,11 @@ export class UserService {
     }
   }
 
+  purchaseShoppingCart(paymentDetails: PaymentDetails, billingAddress: BillingAddress) {
+    if (!this.isLoggingUser()){
+      return this.httpService.purchaseShoppingCartGuest(this.shoppingCart, paymentDetails, billingAddress);
+    }else{
+      return this.httpService.purchaseShoppingCartBuyer(this.username, paymentDetails, billingAddress, this.uuid);
+    }
+  }
 }

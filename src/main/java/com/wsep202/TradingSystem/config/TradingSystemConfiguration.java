@@ -60,4 +60,5 @@ public class TradingSystemConfiguration {
     public TradingSystemFacade tradingSystemFacade(ModelMapper modelMapper, TradingSystem tradingSystem, FactoryObjects factoryObjects, ServiceFacade serviceFacade){
         return new TradingSystemFacade(tradingSystem,modelMapper, factoryObjects, serviceFacade);
     }
+
 }

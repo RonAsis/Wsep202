@@ -18,32 +18,33 @@ import java.util.Map;
 @Data
 public class ShoppingCart {
 
-    NumberFormat formatter = new DecimalFormat("#.##");
     /**
      * list of stores and there shopping bags
      */
     @Builder.Default
     private Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
-    /**
-     * the total cost of the products in cart
-     */
-    private double totalCartCost;
-    /**
-     * number of different shopping bags in cart
-     */
-    private int numOfBagsInCart;
-    /**
-     * number of different products in the cart
-     */
-    private int numOfProductsInCart;
+
 
     public ShoppingCart(){
         this.shoppingBagsList = new HashMap<>();
-        totalCartCost = 0;
-        numOfBagsInCart = 0;
-        numOfProductsInCart = 0;
     }
 
+    public int getNumOfBagsInCart(){
+        return shoppingBagsList.values().size();
+    }
+
+    public Double getTotalCartCost(){
+        return shoppingBagsList.values().stream()
+                .map(ShoppingBag::getTotalCostOfBag)
+                .reduce((double) 0, Double::sum);
+    }
+
+    public int getNumOfProductsInCart(){
+        return shoppingBagsList.values().stream()
+                .map(ShoppingBag::getNumOfProducts)
+                .reduce( 0, Integer::sum);
+
+    }
     /**
      * This method is used to add a bag from the cart.
      * @param storeOfBag - the store of the bag
@@ -61,10 +62,6 @@ public class ShoppingCart {
             return false;
         }
         shoppingBagsList.put(storeOfBag, bagToAdd);
-        numOfBagsInCart += 1;
-        numOfProductsInCart += bagToAdd.getNumOfProductsInBag();
-        totalCartCost += bagToAdd.getTotalCostOfBag();
-        fixTotalCartCost();
         log.info("Bag was successfully added to cart from store '"+ storeOfBag.getStoreName() +"'");
         return true;
     }
@@ -85,10 +82,6 @@ public class ShoppingCart {
             log.error("The bag is not in the cart from store '"+ storeOfBag.getStoreName() +"'");
             return false;
         }
-        numOfBagsInCart -= 1;
-        numOfProductsInCart -= bagToRemove.getNumOfProductsInBag();
-        totalCartCost -= bagToRemove.getTotalCostOfBag();
-        fixTotalCartCost();
         shoppingBagsList.remove(storeOfBag);
         log.info("Bag was successfully removed from cart from store '"+ storeOfBag.getStoreName() +"'");
         return true;
@@ -122,11 +115,7 @@ public class ShoppingCart {
             log.error("product '"+ productToRemove.getName() +"' from store '"+ storeOfProduct.getStoreName() +"'");
             return false;
         }
-        numOfProductsInCart--;
-        totalCartCost -= (shoppingBag.getProductAmount(productToRemove)*productToRemove.getCost());
-        fixTotalCartCost();
         if (shoppingBag.getNumOfProductsInBag() == 1){
-            numOfBagsInCart --;
             shoppingBag.removeProductFromBag(productToRemove);
             shoppingBagsList.remove(storeOfProduct);
             log.info("delete an empty shopping bag from store '"+ storeOfProduct.getStoreName() +"'");
@@ -191,7 +180,4 @@ public class ShoppingCart {
         }
     }
 
-    private void fixTotalCartCost(){
-        totalCartCost = Double.parseDouble(formatter.format(totalCartCost));
-    }
 }

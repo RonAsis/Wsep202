@@ -27,8 +27,6 @@ public class SetUpObjects {
         return PaymentDetails.builder()
                 .creditCardNumber("123456789")
                 .ccv(3)
-                .month("10")
-                .year("2021")
                 .build();
     }
 

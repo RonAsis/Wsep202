@@ -311,8 +311,8 @@ public class TradingSystemFacade {
     /**
      * open new store
      *
-     * @param usernameOwner     - the user that open the store
-     * @param storeName         - the name of the new store
+     * @param usernameOwner - the user that open the store
+     * @param storeName     - the name of the new store
      * @return true if succeed
      */
     public StoreDto openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
@@ -532,7 +532,7 @@ public class TradingSystemFacade {
             UserSystem user = tradingSystem.getUser(username, uuid);
             ShoppingCart shoppingCart = user.getShoppingCart();
             shoppingCart.applyDiscountPolicies();   //apply discount policies and verify the prices are updated
-            return Objects.nonNull(shoppingCart) ?modelMapper.map(shoppingCart, ShoppingCartDto.class) : null;
+            return Objects.nonNull(shoppingCart) ? modelMapper.map(shoppingCart, ShoppingCartDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("view products in shopping bag", e);
             return null;
@@ -568,7 +568,7 @@ public class TradingSystemFacade {
     public List<ReceiptDto> purchaseShoppingCart(@NotNull ShoppingCartDto shoppingCartDto,
                                                  @NotNull PaymentDetailsDto paymentDetailsDto,
                                                  @NotNull BillingAddressDto billingAddressDto) {
-        ShoppingCart shoppingCart = Objects.nonNull(shoppingCartDto) ? modelMapper.map(shoppingCartDto, ShoppingCart.class) : null;
+        ShoppingCart shoppingCart = convertToShoppingCart(shoppingCartDto);
         PaymentDetails paymentDetails = Objects.nonNull(paymentDetailsDto) ? modelMapper.map(paymentDetailsDto, PaymentDetails.class) : null;
         BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
         List<Receipt> receipts = tradingSystem.purchaseShoppingCartGuest(shoppingCart, paymentDetails, billingAddress);
@@ -642,31 +642,33 @@ public class TradingSystemFacade {
     }
 
     ///////////////////////add discounts////////////////////////
+
     /**
      * add visible discount to the store for some products
-     * @param ownerUsername the owner of the store
+     *
+     * @param ownerUsername      the owner of the store
      * @param storeId
-     * @param uuid the unique id of the owner
+     * @param uuid               the unique id of the owner
      * @param visibleDiscountDto the discount parameters objects that inserted by the owner
      * @return true for success
      */
     public boolean addVisibleDiscountPolicy(String ownerUsername,
                                             int storeId, UUID uuid,
                                             VisibleDiscountDto visibleDiscountDto) {
-        try{
+        try {
             Store store = tradingSystem.getStore(storeId);
-            UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+            UserSystem owner = tradingSystem.getUser(ownerUsername, uuid);
             //convert Products of type dto to the type of the products in the domain
             Calendar endTime = visibleDiscountDto.getEndTime();
             double discount = visibleDiscountDto.getDiscountPercentage();
-            HashMap<Product,Integer> products= convertDtoProductHashToProductHashFromStore
-                    (visibleDiscountDto.getProductsUnderThisDiscount(),store);
+            HashMap<Product, Integer> products = convertDtoProductHashToProductHashFromStore
+                    (visibleDiscountDto.getProductsUnderThisDiscount(), store);
             //create the visible discount
-            VisibleDiscount visibleDiscount = factoryObjects.createVisibleDiscount(endTime,discount,products);
+            VisibleDiscount visibleDiscount = factoryObjects.createVisibleDiscount(endTime, discount, products);
             //create products list for the addition
-            store.addDiscountForProduct(owner,visibleDiscount,products);
+            store.addDiscountForProduct(owner, visibleDiscount, products);
             return true;
-        }catch (TradingSystemException exception){
+        } catch (TradingSystemException exception) {
             log.error("failed to add discount policy");
             return false;
         }
@@ -675,49 +677,51 @@ public class TradingSystemFacade {
     /**
      * convert from hash of ProductDto with their amounts into
      * Product map with its amount
+     *
      * @param productsUnderThisDiscount
-     * @param store the store that products belongs to
+     * @param store                     the store that products belongs to
      * @return productsHash
      */
     private HashMap<Product, Integer> convertDtoProductHashToProductHashFromStore
-            (HashMap<ProductDto, Integer> productsUnderThisDiscount,Store store) {
-        HashMap<Product,Integer> productsHash = new HashMap<>();
-        for(ProductDto productDto: productsUnderThisDiscount.keySet()){
+    (HashMap<ProductDto, Integer> productsUnderThisDiscount, Store store) {
+        HashMap<Product, Integer> productsHash = new HashMap<>();
+        for (ProductDto productDto : productsUnderThisDiscount.keySet()) {
             Product productFromStore = store.getProduct(productDto.getProductSn());
             //add the product object exist in store with the required amount for discount
-            productsHash.put(productFromStore,productsUnderThisDiscount.get(productDto));
+            productsHash.put(productFromStore, productsUnderThisDiscount.get(productDto));
         }
         return productsHash;
     }
 
     /**
      * add visible discount to the store for some products
-     * @param ownerUsername the owner of the store
+     *
+     * @param ownerUsername      the owner of the store
      * @param storeId
-     * @param uuid the unique id of the owner
+     * @param uuid               the unique id of the owner
      * @param discountPercentage
-     * @param endTime expiration date for the discount
-     * @param snOfProducts ids of products to validate by discount
+     * @param endTime            expiration date for the discount
+     * @param snOfProducts       ids of products to validate by discount
      * @return true for success
      */
     public boolean addConditionalDiscountPolicy(String ownerUsername,
                                                 int storeId, UUID uuid, double discountPercentage,
-                                                Calendar endTime, ArrayList<Pair<Integer,Integer>> snOfProducts,
-                                                ArrayList<Pair<Integer,Integer>> amountsToApply,
+                                                Calendar endTime, ArrayList<Pair<Integer, Integer>> snOfProducts,
+                                                ArrayList<Pair<Integer, Integer>> amountsToApply,
                                                 String description) {
-        try{
+        try {
             Store store = tradingSystem.getStore(storeId);
-            UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+            UserSystem owner = tradingSystem.getUser(ownerUsername, uuid);
             ConditionalProductDiscount conditionalProdDiscount =
-                    new ConditionalProductDiscount(endTime,discountPercentage,description);
+                    new ConditionalProductDiscount(endTime, discountPercentage, description);
             //create products list for the addition
-            HashMap<Product,Integer> products= getProductsFromSNAndRequiredAmounts(snOfProducts,store);
-            HashMap<Product,Integer> amountsToApplyDiscount = getProductsFromSNAndRequiredAmounts(amountsToApply,store);
+            HashMap<Product, Integer> products = getProductsFromSNAndRequiredAmounts(snOfProducts, store);
+            HashMap<Product, Integer> amountsToApplyDiscount = getProductsFromSNAndRequiredAmounts(amountsToApply, store);
             //add the required amounts of each product to apply the discounts on
             conditionalProdDiscount.addProductToAmountToApply(amountsToApplyDiscount);
-            store.addDiscountForProduct(owner,conditionalProdDiscount,products);
+            store.addDiscountForProduct(owner, conditionalProdDiscount, products);
             return true;
-        }catch (TradingSystemException exception){
+        } catch (TradingSystemException exception) {
             log.error("failed to add discount policy");
             return false;
         }
@@ -725,74 +729,94 @@ public class TradingSystemFacade {
 
     /**
      * add visible discount to the store for some products
-     * @param ownerUsername the owner of the store
+     *
+     * @param ownerUsername      the owner of the store
      * @param storeId
-     * @param uuid the unique id of the owner
+     * @param uuid               the unique id of the owner
      * @param discountPercentage
-     * @param endTime expiration date for the discount
+     * @param endTime            expiration date for the discount
      * @return true for success
      */
     public boolean addConditionalStoreDiscountPolicy(String ownerUsername,
                                                      int storeId, UUID uuid, double discountPercentage,
-                                                     Calendar endTime,double minPrice,
+                                                     Calendar endTime, double minPrice,
                                                      String description) {
-        try{
+        try {
             Store store = tradingSystem.getStore(storeId);
-            UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+            UserSystem owner = tradingSystem.getUser(ownerUsername, uuid);
             ConditionalStoreDiscount storeDiscount =
-                    new ConditionalStoreDiscount(minPrice,endTime,discountPercentage,description);
+                    new ConditionalStoreDiscount(minPrice, endTime, discountPercentage, description);
 
-            store.addDiscountForProduct(owner,storeDiscount);
+            store.addDiscountForProduct(owner, storeDiscount);
             return true;
-        }catch (TradingSystemException exception){
+        } catch (TradingSystemException exception) {
             log.error("failed to add discount policy");
             return false;
         }
     }
 
 
-
-
-
-
     /**
      * get the real products of the store by their serial number
-     * @param snOfProducts  id of products list
-     * @param store the store the products belongs to
+     *
+     * @param snOfProducts id of products list
+     * @param store        the store the products belongs to
      * @return real products of the store by their serial number
      */
-    private HashMap<Product,Integer> getProductsFromSN(ArrayList<Integer> snOfProducts, Store store) {
-        HashMap<Product,Integer> products = new HashMap<>();
-        for(int productSn: snOfProducts){
+    private HashMap<Product, Integer> getProductsFromSN(ArrayList<Integer> snOfProducts, Store store) {
+        HashMap<Product, Integer> products = new HashMap<>();
+        for (int productSn : snOfProducts) {
             Product product = store.getProduct(productSn);
-            products.put(product,0);
+            products.put(product, 0);
         }
         return products;
     }
 
     /**
      * get the real products of the store by their serial number and the required amount for discount
-     * @param snOfProductsWithAmounts  id of products list and their required amount
-     * @param store the store the products belongs to
+     *
+     * @param snOfProductsWithAmounts id of products list and their required amount
+     * @param store                   the store the products belongs to
      * @return real products of the store by their serial number
      */
-    private HashMap<Product,Integer> getProductsFromSNAndRequiredAmounts
-    (ArrayList<Pair<Integer,Integer>> snOfProductsWithAmounts, Store store) {
-        HashMap<Product,Integer> products = new HashMap<>();
-        for(Pair<Integer,Integer> productSnAndAmount: snOfProductsWithAmounts){
+    private HashMap<Product, Integer> getProductsFromSNAndRequiredAmounts
+    (ArrayList<Pair<Integer, Integer>> snOfProductsWithAmounts, Store store) {
+        HashMap<Product, Integer> products = new HashMap<>();
+        for (Pair<Integer, Integer> productSnAndAmount : snOfProductsWithAmounts) {
             Product product = store.getProduct(productSnAndAmount.getKey());
-            products.put(product,productSnAndAmount.getValue());
+            products.put(product, productSnAndAmount.getValue());
         }
         return products;
     }
 
     public Pair<Double, Double> getTotalPriceOfShoppingCart(ShoppingCartDto shoppingCartDto) {
         log.info("get Total Price Of Shopping Cart");
-        ShoppingCart shoppingCart = modelMapper.map(shoppingCartDto, ShoppingCart.class);
+        ShoppingCart shoppingCart = convertToShoppingCart(shoppingCartDto);
         return tradingSystem.getTotalPrices(shoppingCart);
     }
 
     //////////////////////////////// converters ///////////////////////////
+
+    private ShoppingCart convertToShoppingCart(ShoppingCartDto shoppingCartDto) {
+        Map<Store, ShoppingBag> shoppingCartMap = new HashMap<>();
+        if (Objects.nonNull(shoppingCartDto)) {
+            shoppingCartDto.getShoppingBags()
+                    .forEach((key1, value1) -> {
+                        Store store = tradingSystem.getStore(key1);
+                        Map<Product, Integer> shoppingBagMap = new HashMap<>();
+                        value1.getProductListFromStore()
+                                .forEach((key, value) -> {
+                                    Product product = store.getProduct(key);
+                                    shoppingBagMap.put(product, value);
+                                });
+                        shoppingCartMap.put(store, ShoppingBag.builder().productListFromStore(shoppingBagMap).build());
+                    });
+        }
+        return ShoppingCart.builder()
+                .shoppingBagsList(shoppingCartMap)
+                .build();
+    }
+
 
     /**
      * converter of Receipt list to ReceiptDto list
@@ -801,7 +825,8 @@ public class TradingSystemFacade {
      * @return list of ReceiptDto
      */
     private List<ReceiptDto> convertReceiptList(@NotNull List<@NotNull Receipt> receipts) {
-        Type listType = new TypeToken<List<ReceiptDto>>() {}.getType();
+        Type listType = new TypeToken<List<ReceiptDto>>() {
+        }.getType();
         return modelMapper.map(receipts, listType);
     }
 
@@ -812,7 +837,8 @@ public class TradingSystemFacade {
      * @return list of ReceiptDto
      */
     private List<StoreDto> convertStoreList(@NotNull List<@NotNull Store> stores) {
-        Type listType = new TypeToken<List<StoreDto>>() {}.getType();
+        Type listType = new TypeToken<List<StoreDto>>() {
+        }.getType();
         return modelMapper.map(stores, listType);
     }
 
@@ -823,7 +849,8 @@ public class TradingSystemFacade {
      * @return list of ProductDto
      */
     private List<ProductDto> convertProductDtoList(@NotNull List<@NotNull Product> products) {
-        Type listType = new TypeToken<List<ProductDto>>() {}.getType();
+        Type listType = new TypeToken<List<ProductDto>>() {
+        }.getType();
         return modelMapper.map(products, listType);
     }
 
@@ -834,12 +861,14 @@ public class TradingSystemFacade {
      * @return list of products
      */
     private List<Product> converterProductsList(@NotNull List<@NotNull ProductDto> productDtos) {
-        Type listType = new TypeToken<List<Product>>() {}.getType();
+        Type listType = new TypeToken<List<Product>>() {
+        }.getType();
         return modelMapper.map(productDtos, listType);
     }
 
     private List<NotificationDto> convertNotificationList(@NotNull List<@NotNull Notification> notifications) {
-        Type listType = new TypeToken<List<NotificationDto>>() {}.getType();
+        Type listType = new TypeToken<List<NotificationDto>>() {
+        }.getType();
         return modelMapper.map(notifications, listType);
     }
 

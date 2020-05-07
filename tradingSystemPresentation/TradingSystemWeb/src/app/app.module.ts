@@ -49,6 +49,7 @@ import { UserDetailComponent } from './logged-in-user/admin/users/user-detail/us
 import {ShoppingCartModule} from 'ng-shopping-cart';
 import {Product} from './shared/product.model';
 import { CartItemComponent } from './guest/shopping-cart/cart-item/cart-item.component';
+import { PurchaseShoppingCartComponent } from './guest/shopping-cart/purchase-shopping-cart/purchase-shopping-cart.component';
 
 @NgModule({
   declarations: [
@@ -89,7 +90,8 @@ import { CartItemComponent } from './guest/shopping-cart/cart-item/cart-item.com
     UserElementComponent,
     UserListComponent,
     UserDetailComponent,
-    CartItemComponent
+    CartItemComponent,
+    PurchaseShoppingCartComponent
   ],
     imports: [
         Ng2SearchPipeModule,
@@ -108,7 +110,7 @@ import { CartItemComponent } from './guest/shopping-cart/cart-item/cart-item.com
           storageKey: 'NgShoppingCart',
           clearOnError: true
         }
-        })
+        }),
     ],
   providers: [],
   bootstrap: [AppComponent]

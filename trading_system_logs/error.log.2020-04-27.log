@@ -1,0 +1,63 @@
+27-04-2020 11:38:35.0481|ERROR|The bag is not in the cart from store 'MovieStoreVIP'
+27-04-2020 11:38:35.0511|ERROR|The bag is not in the cart fro store 'MovieStoreVIP'
+27-04-2020 11:38:35.0513|ERROR|The bag is not in the cart from store 'MovieStoreVIP'
+27-04-2020 11:38:35.0516|ERROR|The bag is not in the cart fro store 'MovieStore'
+27-04-2020 11:38:35.0525|ERROR|The bag is not in the cart fro store 'MovieStore'
+27-04-2020 11:38:35.0535|ERROR|The bag is not in the cart fro store 'MovieStoreVIP'
+27-04-2020 11:38:35.0549|ERROR|store or product or shopping bag can't be null
+27-04-2020 11:38:35.0549|ERROR|product 'Harry Potter' from store 'MovieStoreVIP'
+27-04-2020 11:38:35.0683|ERROR|Can't add bag to cart if bag or store is null
+27-04-2020 11:38:35.0691|ERROR|Can't add bag to cart if bag or store is null
+27-04-2020 11:38:35.0692|ERROR|Can't add the same bag again of store 'null'
+27-04-2020 11:38:35.0709|ERROR|store or product or shopping bag can't be null
+27-04-2020 11:38:35.0712|ERROR|product 'testProduct' from store 'null'
+27-04-2020 11:38:35.0720|ERROR|Can't return shopping of a null store
+27-04-2020 11:38:35.0721|ERROR|The bag is not in the cart fro store 'null'
+27-04-2020 11:38:35.0754|ERROR|Can't remove bag from cart if bag or store is null
+27-04-2020 11:38:35.0755|ERROR|Can't remove bag from cart if bag or store is null
+27-04-2020 11:38:35.0755|ERROR|The bag is not in the cart from store 'null'
+27-04-2020 11:38:35.0970|ERROR|DT cannot see the purchase history, he is not owner in the store.
+27-04-2020 11:38:36.0119|ERROR|DT cannot see the purchase history, he is not manager in the store.
+27-04-2020 11:38:36.0191|ERROR|couldn't add permission:edit to: Alex by DT
+27-04-2020 11:38:36.0571|ERROR|Donald cannot see the purchase history, he is not owner in the store.
+27-04-2020 11:38:37.0347|ERROR|Donald cannot see the purchase history, he is not manager in the store.
+27-04-2020 11:38:37.0541|ERROR|couldn't add permission:edit to: Alex by Donald
+27-04-2020 11:38:37.0669|ERROR|The amount of the product 'Harry Potter' needs to be greater than zero
+27-04-2020 11:38:37.0669|ERROR|The product 'Harry Potter' was not found
+27-04-2020 11:38:37.0670|ERROR|The product 'Games of Thrones' was not found
+27-04-2020 11:38:37.0670|ERROR|there is not enough 'The Hobbit' in store 'MovieStore'
+27-04-2020 11:38:37.0679|ERROR|can't return amount for null product
+27-04-2020 11:38:37.0758|ERROR|Store '1' id and product 'null' store id 2 does not mach
+27-04-2020 11:38:37.0759|ERROR|A null product was trying to be added to the bag
+27-04-2020 11:38:37.0762|ERROR|The amount of product 'null' cannot be less than 0
+27-04-2020 11:38:37.0765|ERROR|The amount of the product 'null' needs to be greater than zero
+27-04-2020 11:38:37.0765|ERROR|The amount of the product 'null' needs to be greater than zero
+27-04-2020 11:38:37.0766|ERROR|Store '1' id and product 'null' store id 0 does not mach
+27-04-2020 11:38:37.0770|ERROR|Can't remove a null product
+27-04-2020 11:38:37.0771|ERROR|Store id 1 and product store id 2 does not mach
+27-04-2020 11:38:37.0771|ERROR|Store id 1 and product store id 0 does not mach
+27-04-2020 11:38:37.0800|ERROR|can't return amount for null product
+27-04-2020 11:38:37.0840|ERROR|The function 'increasesProductAmount(int addedAmount)' can't accept negative/zero amount!
+27-04-2020 11:38:37.0843|ERROR|The function 'increasesProductAmount(int addedAmount)' can't accept negative/zero amount!
+27-04-2020 11:38:37.0843|ERROR|The function 'increasesProductAmount(int addedAmount)' can't accept negative/zero amount!
+27-04-2020 11:38:37.0850|ERROR|The function 'increasesProductAmount(int addedAmount)' can't accept negative/zero amount!
+27-04-2020 11:38:37.0853|ERROR|The function 'increasesProductAmount(int addedAmount)' can't accept negative/zero amount!
+27-04-2020 11:38:37.0854|ERROR|The function 'increasesProductAmount(int addedAmount)' can't accept negative/zero amount!
+27-04-2020 11:38:37.0878|ERROR|store 'MovieStoreVIP' is not managed by this user 'null'
+27-04-2020 11:38:37.0884|ERROR|The bag is not in the cart fro store 'MovieStore'
+27-04-2020 11:38:37.0886|ERROR|The bag is not in the cart fro store 'MovieStoreVIP'
+27-04-2020 11:38:37.0886|ERROR|the product 'Harry Potter' is not in cart
+27-04-2020 11:38:37.0886|ERROR|product 'Harry Potter' from store 'MovieStore'
+27-04-2020 11:38:37.0886|ERROR|product 'Harry Potter' was not removed
+27-04-2020 11:38:37.0886|ERROR|The bag is not in the cart fro store 'MovieStoreVIP'
+27-04-2020 11:38:37.0886|ERROR|the product 'Hunger Games' is not in cart
+27-04-2020 11:38:37.0903|ERROR|store 'MovieStoreVIP' is not managed by this user 'null'
+27-04-2020 11:38:37.0904|ERROR|The bag is not in the cart fro store 'MovieStore'
+27-04-2020 11:38:37.0904|ERROR|The bag is not in the cart fro store 'MovieStoreVIP'
+27-04-2020 11:38:37.0919|ERROR|store 'null' is not managed by this user 'null'
+27-04-2020 11:38:37.0919|ERROR|can't remove a null store
+27-04-2020 11:38:37.0940|ERROR|can't add a null store to user
+27-04-2020 11:38:37.0940|ERROR|can't add an existing store 'null'
+27-04-2020 11:38:37.0961|ERROR|the product 'null' is not in cart
+27-04-2020 11:38:37.0963|ERROR|can't add a null store to user
+27-04-2020 11:38:37.0964|ERROR|can't add an existing store 'null'

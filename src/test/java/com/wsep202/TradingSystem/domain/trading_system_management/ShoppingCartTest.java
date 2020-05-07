@@ -113,8 +113,6 @@ class ShoppingCartTest {
         Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
         shoppingBagsList.put(testStore1,testShoppingBag1);
         testShoppingCart.setShoppingBagsList(shoppingBagsList);
-        testShoppingCart.setNumOfProductsInCart(testShoppingBag1.getNumOfProductsInBag());
-        testShoppingCart.setTotalCartCost(testShoppingBag1.getTotalCostOfBag());
     }
 
     /**
@@ -262,9 +260,6 @@ class ShoppingCartTest {
         Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
         shoppingBagsList.put(testStore3,testShoppingBag3);
         testShoppingCart.setShoppingBagsList(shoppingBagsList);
-        testShoppingCart.setNumOfProductsInCart(testShoppingBag3.getNumOfProductsInBag());
-        testShoppingCart.setTotalCartCost(testShoppingBag3.getTotalCostOfBag());
-        testShoppingCart.setNumOfProductsInCart(1);
         when(testShoppingBag3.getProductAmount(testProduct)).thenReturn(1);
     }
 }

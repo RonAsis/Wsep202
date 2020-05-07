@@ -3,6 +3,7 @@ import {Product} from '../../shared/product.model';
 import {UserService} from '../../services/user.service';
 import {ShoppingCart} from '../../shared/shoppingCart.model';
 import {Observable} from 'rxjs';
+import {ShareService} from '../../services/share.service';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -23,7 +24,7 @@ export class ShoppingCartComponent implements OnInit {
     productSn: number,
     storeId: number
   }>();
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private shareService: ShareService) { }
 
   ngOnInit(): void {
     this.getShoppingCart();
@@ -63,6 +64,7 @@ export class ShoppingCartComponent implements OnInit {
     this.getTotalPrice();
   }
 
-
-
+  onPurchaseShoppingCart() {
+    this.shareService.featureSelected.emit('Purchase-shopping-cart');
+  }
 }

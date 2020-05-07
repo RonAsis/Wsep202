@@ -1,3 +1,5 @@
 export class PaymentDetails {
-  constructor() {}
+  constructor(private creditCardNumber: string,
+              private ccv: string,
+              private holderIDNumber: string) {}
 }

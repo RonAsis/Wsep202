@@ -1,3 +1,7 @@
 export class BillingAddress {
-  constructor() {}
+  constructor(public  customerFullName: string,
+              public address: string,
+              public city: string,
+              public country: string,
+              public zipCode: string) {}
 }

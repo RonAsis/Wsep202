@@ -1,9 +1,11 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import static com.wsep202.TradingSystem.domain.trading_system_management.purchase.Formatter.formatter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -13,10 +15,9 @@ import java.util.Map;
 @Data
 @Slf4j
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ShoppingBag {
-
-    //private Map<Integer, Integer> mapProductSnToAmount;
-    NumberFormat formatter = new DecimalFormat("#.##");
 
     /**
      * the store of the products
@@ -163,4 +164,7 @@ public class ShoppingBag {
         return price;
     }
 
+    public int getNumOfProducts() {
+        return productListFromStore.values().size();
+    }
 }

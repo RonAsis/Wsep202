@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.web.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.NotificationService;
@@ -55,16 +56,12 @@ public class GuestController {
 
     /**
      * purchase shopping cart
-     * @param shoppingCartDto includes the bags of each store the user selected
-     * @param paymentDetailsDto    - charging info of the user
-     * @param billingAddressDto - the destination to deliver the purchases
      */
     @ApiOperation(value = "purchase shopping cart guest")
     @PostMapping("purchase-shopping-cart-guest")
-    public List<ReceiptDto> purchaseShoppingCartGuest(@RequestBody ShoppingCartDto shoppingCartDto,
-                                                      @RequestBody PaymentDetailsDto paymentDetailsDto,
-                                                      @RequestBody  BillingAddressDto billingAddressDto){
-        return guestService.purchaseShoppingCartGuest(shoppingCartDto, paymentDetailsDto, billingAddressDto);
+    @ResponseBody
+    public List<ReceiptDto> purchaseShoppingCartGuest(@RequestBody String purchaseDto){
+        return guestService.purchaseShoppingCartGuest(purchaseDto);
     }
 
     /**
@@ -98,9 +95,9 @@ public class GuestController {
      * get Total Price Of ShoppingCart
      */
     @ApiOperation(value = " get Total Price Of ShoppingCart")
-    @PostMapping("get-total-price-of-shopping-cart")
+    @PostMapping(value = "get-total-price-of-shopping-cart" ,produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Pair<Double, Double> getTotalPriceOfShoppingCart(@RequestParam(value ="shoppingCart", required = false) ShoppingCartDto shoppingCart){
+    public Pair<Double, Double> getTotalPriceOfShoppingCart(@RequestBody(required = false) String shoppingCart){
         return guestService.getTotalPriceOfShoppingCart(shoppingCart);
     }
 }

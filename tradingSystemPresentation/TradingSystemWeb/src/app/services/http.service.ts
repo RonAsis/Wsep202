@@ -6,6 +6,8 @@ import {PaymentDetails} from '../shared/paymentDetails.model';
 import {BillingAddress} from '../shared/billingAddress.model';
 import {Product} from '../shared/product.model';
 import {Receipt} from '../shared/receipt.model';
+import {ShoppingBag} from '../shared/ShoppingBag.model';
+import {stringify} from 'querystring';
 
 @Injectable({
   providedIn: 'root'
@@ -68,9 +70,10 @@ export class HttpService {
   public purchaseShoppingCartGuest(shoppingCart: ShoppingCart,
                                    paymentDetails: PaymentDetails,
                                    billingAddress: BillingAddress) {
-    const url = `${this.guestUrl}/` + 'purchase-shopping-cart-guest/';
-    return this.http.post(url,
-      {shoppingCartDto: shoppingCart, paymentDetailsDto: paymentDetails, billingAddressDto: billingAddress});
+    const shoppingCartDtoConv = this.convertShoppingCartToJsonObject(shoppingCart);
+    const url = `${this.guestUrl}/` + 'purchase-shopping-cart-guest/' ;
+    return this.http.post<Receipt[]>(url,
+      {shoppingCartDto: shoppingCartDtoConv, paymentDetailsDto: paymentDetails, billingAddressDto: billingAddress});
   }
 
   // use for products info
@@ -80,13 +83,27 @@ export class HttpService {
       url);
   }
 
-
   getTotalPriceOfShoppingCart(shoppingCart: ShoppingCart) {
+    const convMap = this.convertShoppingCartToJsonObject(shoppingCart);
     const url = `${this.guestUrl}/` + 'get-total-price-of-shopping-cart/';
     return this.http.post<{key: number, value: number}>(
-      url, shoppingCart, );
+      url, convMap);
   }
-  //////////////////////////// BuyerRegisteredController ///////////////////////////
+
+  private convertShoppingCartToJsonObject(shoppingCart: ShoppingCart) {
+    const convMap = {};
+    shoppingCart.shoppingBags.forEach((val: ShoppingBag, key: number) => {
+      const convShoppingBag = {};
+      val.productListFromStore
+        .forEach((valShoppingBag: number, keyShoppingBag: Product) => {
+          convShoppingBag[keyShoppingBag.productSn] = valShoppingBag;
+        });
+      convMap[key] = convShoppingBag;
+    });
+    return convMap;
+  }
+
+//////////////////////////// BuyerRegisteredController ///////////////////////////
 
   public logout(username: string, uuid: string) {
     const url = `${this.buyerUrl}/` + 'logout/' +
@@ -150,7 +167,7 @@ export class HttpService {
     const url = `${this.buyerUrl}/` + 'purchase-shopping-cart-buyer/' +
       `${username}/` +
       `${uuid}`;
-    return this.http.post(url,
+    return this.http.post<Receipt[]>(url,
       {paymentDetailsDto: paymentDetails, billingAddressDto: billingAddress});
   }
 

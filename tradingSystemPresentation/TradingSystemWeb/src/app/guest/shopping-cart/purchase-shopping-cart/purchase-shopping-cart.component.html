@@ -1,0 +1,75 @@
+<h2>Purchase Shopping cart</h2>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="col-sm-5 from-group">
+        <label for="fullName">full Name
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="text" id="fullName" class="form-control" required
+               #fullNameInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+        <label for="address">Address
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="text" id="address" class="form-control"
+               #addressInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+        <label for="city">City
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="text" id="city" class="form-control"
+               #cityInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+        <label for="country">Country
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="text" id="country" class="form-control"
+               #countryInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+        <label for="zipCode">Zip Code
+          <span class="required-asterisk">*</span>
+        </label>
+        <input (keypress)="numberOnly($event)" type="string" id="zipCode" class="form-control"
+               #zipCodeInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+        <label for="creditCardNumber">Credit Card Number
+          <span class="required-asterisk">*</span>
+        </label>
+        <input (keypress)="numberOnly($event)" type="text" maxlength="9" id="creditCardNumber" class="form-control"
+               #creditCardNumberInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+        <label for="ccv">CCV
+          <span class="required-asterisk">*</span>
+        </label>
+        <input (keypress)="numberOnly($event)" maxlength="3" type="text" id="ccv" class="form-control"
+               #ccvInput/>
+      </div>
+      <div class="col-sm-5 from-group">
+        <label for="id">ID
+          <span class="required-asterisk">*</span>
+        </label>
+        <input (keypress)="numberOnly($event)" maxlength="9" type="string" id="id" class="form-control"
+               #idInput/>
+      </div>
+      <hr/>
+      <div class="col-xs-12">
+      <h4>Total {{cartTotal}}</h4>
+        <h4>Total After Discount {{cartTotalAfterDiscount}}</h4>
+      </div>
+      <div class="col-xs-12">
+        <button class="btn btn-success" type="submit" (click)="OnPurchase()">Purchase</button>
+      </div>
+      <div class="col-sm-5 from-group" [style.color]="messageColor">
+        <p>{{message}}</p>
+      </div>
+    </div>
+  </div>
+</div>
+

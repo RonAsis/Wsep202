@@ -1,14 +1,17 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.dto.*;
 import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +22,7 @@ public class GuestService {
 
     private final TradingSystemFacade tradingSystemFacade;
 
+    private final ObjectMapper objectMapper;
     /**
      * register user to the system
      * @param username user to register - unique
@@ -130,16 +134,14 @@ public class GuestService {
     }
 
     /**
-     *      * purchase shopping cart
-     * @param shoppingCart includes the bags of each store the user selected
-     * @param paymentDetails    - charging info of the user
-     * @param billingAddressDto - the destination to deliver the purchases
+     *purchase shopping cart
      * @return
+     * @param purchaseJsonNode
      */
-    public List<ReceiptDto> purchaseShoppingCartGuest(ShoppingCartDto shoppingCart,
-                                                      PaymentDetailsDto paymentDetails,
-                                                      BillingAddressDto billingAddressDto){
-        return tradingSystemFacade.purchaseShoppingCart(shoppingCart, paymentDetails, billingAddressDto);
+    public List<ReceiptDto> purchaseShoppingCartGuest(String purchaseJsonNode){
+        PurchaseDto purchaseDto = createPurchaseDto(purchaseJsonNode);
+        return tradingSystemFacade.purchaseShoppingCart(purchaseDto.getShoppingCartDto(),
+                purchaseDto.getPaymentDetailsDto(), purchaseDto.getBillingAddressDto());
     }
 
     public List<StoreDto> getStores() {
@@ -154,7 +156,24 @@ public class GuestService {
         return tradingSystemFacade.getCategories();
     }
 
-    public Pair<Double, Double> getTotalPriceOfShoppingCart(ShoppingCartDto shoppingCartDto) {
-        return tradingSystemFacade.getTotalPriceOfShoppingCart(shoppingCartDto);
+    public Pair<Double, Double> getTotalPriceOfShoppingCart(String shoppingCart) {
+       return tradingSystemFacade.getTotalPriceOfShoppingCart(createShoppingCartDto(shoppingCart));
+    }
+    private ShoppingCartDto createShoppingCartDto(String shoppingCart){
+        try {
+            return objectMapper.readValue(shoppingCart, ShoppingCartDto.class);
+        } catch (IOException e) {
+            log.error("is not json string", e);
+            return null;
+        }
+    }
+
+    private PurchaseDto createPurchaseDto(String purchaseDto){
+        try {
+            return objectMapper.readValue(purchaseDto, PurchaseDto.class);
+        } catch (IOException e) {
+            log.error("is not json string", e);
+            return null;
+        }
     }
 }
