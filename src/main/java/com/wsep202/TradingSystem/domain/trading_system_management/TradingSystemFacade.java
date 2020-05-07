@@ -3,9 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalProductDiscount;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.VisibleDiscount;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
@@ -532,7 +530,7 @@ public class TradingSystemFacade {
             UserSystem user = tradingSystem.getUser(username, uuid);
             ShoppingCart shoppingCart = user.getShoppingCart();
             shoppingCart.applyDiscountPolicies();   //apply discount policies and verify the prices are updated
-            return Objects.nonNull(shoppingCart) ? modelMapper.map(shoppingCart, ShoppingCartDto.class) : null;
+            return Objects.nonNull(shoppingCart) ?modelMapper.map(shoppingCart, ShoppingCartDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("view products in shopping bag", e);
             return null;
@@ -642,13 +640,11 @@ public class TradingSystemFacade {
     }
 
     ///////////////////////add discounts////////////////////////
-
     /**
      * add visible discount to the store for some products
-     *
-     * @param ownerUsername      the owner of the store
+     * @param ownerUsername the owner of the store
      * @param storeId
-     * @param uuid               the unique id of the owner
+     * @param uuid the unique id of the owner
      * @param visibleDiscountDto the discount parameters objects that inserted by the owner
      * @return true for success
      */
@@ -661,14 +657,14 @@ public class TradingSystemFacade {
             //convert Products of type dto to the type of the products in the domain
             Calendar endTime = visibleDiscountDto.getEndTime();
             double discount = visibleDiscountDto.getDiscountPercentage();
-            HashMap<Product, Integer> products = convertDtoProductHashToProductHashFromStore
-                    (visibleDiscountDto.getProductsUnderThisDiscount(), store);
+            Map<Product,Integer> products= convertDtoProductHashToProductHashFromStore
+                    (visibleDiscountDto.getProductsUnderThisDiscount(),store);
             //create the visible discount
             VisibleDiscount visibleDiscount = factoryObjects.createVisibleDiscount(endTime, discount, products);
             //create products list for the addition
-            store.addDiscountForProduct(owner, visibleDiscount, products);
-            return true;
-        } catch (TradingSystemException exception) {
+            return store.addDiscountForProduct(owner,visibleDiscount);
+
+        }catch (TradingSystemException exception){
             log.error("failed to add discount policy");
             return false;
         }
@@ -677,9 +673,8 @@ public class TradingSystemFacade {
     /**
      * convert from hash of ProductDto with their amounts into
      * Product map with its amount
-     *
      * @param productsUnderThisDiscount
-     * @param store                     the store that products belongs to
+     * @param store the store that products belongs to
      * @return productsHash
      */
     private HashMap<Product, Integer> convertDtoProductHashToProductHashFromStore
@@ -695,33 +690,39 @@ public class TradingSystemFacade {
 
     /**
      * add visible discount to the store for some products
-     *
-     * @param ownerUsername      the owner of the store
+     * @param ownerUsername the owner of the store
      * @param storeId
-     * @param uuid               the unique id of the owner
+     * @param uuid the unique id of the owner
      * @param discountPercentage
-     * @param endTime            expiration date for the discount
-     * @param snOfProducts       ids of products to validate by discount
+     * @param endTime expiration date for the discount
+     * @param snOfProducts ids of products to validate by discount
      * @return true for success
      */
     public boolean addConditionalDiscountPolicy(String ownerUsername,
-                                                int storeId, UUID uuid, double discountPercentage,
-                                                Calendar endTime, ArrayList<Pair<Integer, Integer>> snOfProducts,
-                                                ArrayList<Pair<Integer, Integer>> amountsToApply,
-                                                String description) {
-        try {
+                                                int storeId, UUID uuid,
+                                                ConditionalProductDiscountDto conditionProdDiscountDto) {
+        try{
             Store store = tradingSystem.getStore(storeId);
-            UserSystem owner = tradingSystem.getUser(ownerUsername, uuid);
-            ConditionalProductDiscount conditionalProdDiscount =
-                    new ConditionalProductDiscount(endTime, discountPercentage, description);
-            //create products list for the addition
-            HashMap<Product, Integer> products = getProductsFromSNAndRequiredAmounts(snOfProducts, store);
-            HashMap<Product, Integer> amountsToApplyDiscount = getProductsFromSNAndRequiredAmounts(amountsToApply, store);
-            //add the required amounts of each product to apply the discounts on
-            conditionalProdDiscount.addProductToAmountToApply(amountsToApplyDiscount);
-            store.addDiscountForProduct(owner, conditionalProdDiscount, products);
-            return true;
-        } catch (TradingSystemException exception) {
+            UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+
+            //convert dto to domain conditional product discount
+            Map<Product,Integer> productUnderDisc =
+                    convertDtoProductHashToProductHashFromStore(conditionProdDiscountDto.
+                            getProductsUnderThisDiscount(),store);
+            Calendar endTime = conditionProdDiscountDto.getEndTime();
+            double discount = conditionProdDiscountDto.getDiscountPercentage();
+            String description = conditionProdDiscountDto.getDescription();
+            Map<Product,Integer> productsAmountsToApply =
+                    convertDtoProductHashToProductHashFromStore(conditionProdDiscountDto.
+                            getAmountOfProductsForApplyDiscounts(),store);
+            //create the conditional discount
+            ConditionalProductDiscount conditionalProdDiscount = factoryObjects.
+                    createCondProductDiscountDiscount(productUnderDisc,endTime,discount,description,
+                            productsAmountsToApply);
+
+            return store.addDiscountForProduct(owner,conditionalProdDiscount);
+
+        }catch (TradingSystemException exception){
             log.error("failed to add discount policy");
             return false;
         }
@@ -729,23 +730,23 @@ public class TradingSystemFacade {
 
     /**
      * add visible discount to the store for some products
-     *
-     * @param ownerUsername      the owner of the store
+     * @param ownerUsername the owner of the store
      * @param storeId
-     * @param uuid               the unique id of the owner
-     * @param discountPercentage
-     * @param endTime            expiration date for the discount
+     * @param uuid the unique id of the owner
+     * @param conditionalStoreDiscountDto the discount info inserted by the owner
      * @return true for success
      */
     public boolean addConditionalStoreDiscountPolicy(String ownerUsername,
-                                                     int storeId, UUID uuid, double discountPercentage,
-                                                     Calendar endTime, double minPrice,
-                                                     String description) {
-        try {
+                                                     int storeId, UUID uuid,
+                                                     ConditionalStoreDiscountDto conditionalStoreDiscountDto) {
+        try{
             Store store = tradingSystem.getStore(storeId);
-            UserSystem owner = tradingSystem.getUser(ownerUsername, uuid);
-            ConditionalStoreDiscount storeDiscount =
-                    new ConditionalStoreDiscount(minPrice, endTime, discountPercentage, description);
+            UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+            ConditionalStoreDiscount storeDiscount = factoryObjects.
+                    createCondStoreDiscount(conditionalStoreDiscountDto.getEndTime(),
+                            conditionalStoreDiscountDto.getDiscountPercentage(),
+                            conditionalStoreDiscountDto.getDescription(),
+                            conditionalStoreDiscountDto.getMinPrice());
 
             store.addDiscountForProduct(owner, storeDiscount);
             return true;
@@ -756,42 +757,71 @@ public class TradingSystemFacade {
     }
 
 
+
+
+
+
     /**
-     * get the real products of the store by their serial number
-     *
-     * @param snOfProducts id of products list
-     * @param store        the store the products belongs to
-     * @return real products of the store by their serial number
+     * add visible discount to the store for some products
+     * @param ownerUsername the owner of the store
+     * @param storeId
+     * @param uuid the unique id of the owner
+     * @param conditionalComposedDto the discount info inserted by the owner
+     * @return true for success
      */
-    private HashMap<Product, Integer> getProductsFromSN(ArrayList<Integer> snOfProducts, Store store) {
-        HashMap<Product, Integer> products = new HashMap<>();
-        for (int productSn : snOfProducts) {
-            Product product = store.getProduct(productSn);
-            products.put(product, 0);
+    public boolean addConditionalComposedDiscountPolicy(String ownerUsername,
+                                                        int storeId, UUID uuid,
+                                                        ConditionalComposedDto conditionalComposedDto) {
+        try{
+            Store store = tradingSystem.getStore(storeId);
+            UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+            //init parameters of composed discount
+            //convert the conditions list to discounts
+            CompositeOperator operator = conditionalComposedDto.getCompositeOperator();
+            Map<Integer, DiscountPolicy> composedDiscounts =
+                    convertDiscountsMapFromDto(conditionalComposedDto.getComposedDiscounts(),store);
+            //convert to applying discounts
+            Map<Integer, DiscountPolicy> discountsToApply =
+                    convertDiscountsMapFromDto(conditionalComposedDto.getDiscountsToApply(),store);
+            Calendar endTime = conditionalComposedDto.getEndTime();
+            double discountPercentage = conditionalComposedDto.getDiscountPercentage();
+            String description = conditionalComposedDto.getDescription();
+            //get the store the discount belongs to
+
+            ConditionalComposedDiscount composedDiscount = factoryObjects. //create the discount
+                    createComposedDiscount(operator,composedDiscounts,discountsToApply,endTime,
+                    discountPercentage,description);
+            //add the composed new discount to the store
+            return store.addDiscountForProduct(owner,composedDiscount);
+        }catch (TradingSystemException exception){
+            log.error("failed to add discount policy");
+            return false;
         }
         return products;
     }
 
     /**
-     * get the real products of the store by their serial number and the required amount for discount
-     *
-     * @param snOfProductsWithAmounts id of products list and their required amount
-     * @param store                   the store the products belongs to
-     * @return real products of the store by their serial number
+     * convert from map of DiscountDto's into DiscountPolicy
+     * @param discountDtoMap the map to convert
+     * @return discountHash - the <Integer,Product> map related to <Integer,ProductDto> received
      */
-    private HashMap<Product, Integer> getProductsFromSNAndRequiredAmounts
-    (ArrayList<Pair<Integer, Integer>> snOfProductsWithAmounts, Store store) {
-        HashMap<Product, Integer> products = new HashMap<>();
-        for (Pair<Integer, Integer> productSnAndAmount : snOfProductsWithAmounts) {
-            Product product = store.getProduct(productSnAndAmount.getKey());
-            products.put(product, productSnAndAmount.getValue());
+    private Map<Integer, DiscountPolicy> convertDiscountsMapFromDto
+    (Map<Integer, DiscountPolicyDto> discountDtoMap,Store store){
+        Map<Integer,DiscountPolicy> discountHash = new HashMap<>();
+        try{
+            for(Integer discountId: discountDtoMap.keySet()){
+                DiscountPolicy discountPolicy = store.getDiscountPolicyById(discountId);
+                discountHash.put(discountId,discountPolicy);
+            }
+        }catch (TradingSystemException e){
+            return null;
         }
-        return products;
+        return discountHash;
     }
 
     public Pair<Double, Double> getTotalPriceOfShoppingCart(ShoppingCartDto shoppingCartDto) {
         log.info("get Total Price Of Shopping Cart");
-        ShoppingCart shoppingCart = convertToShoppingCart(shoppingCartDto);
+        ShoppingCart shoppingCart = modelMapper.map(shoppingCartDto, ShoppingCart.class);
         return tradingSystem.getTotalPrices(shoppingCart);
     }
 
@@ -825,8 +855,7 @@ public class TradingSystemFacade {
      * @return list of ReceiptDto
      */
     private List<ReceiptDto> convertReceiptList(@NotNull List<@NotNull Receipt> receipts) {
-        Type listType = new TypeToken<List<ReceiptDto>>() {
-        }.getType();
+        Type listType = new TypeToken<List<ReceiptDto>>() {}.getType();
         return modelMapper.map(receipts, listType);
     }
 
@@ -837,8 +866,7 @@ public class TradingSystemFacade {
      * @return list of ReceiptDto
      */
     private List<StoreDto> convertStoreList(@NotNull List<@NotNull Store> stores) {
-        Type listType = new TypeToken<List<StoreDto>>() {
-        }.getType();
+        Type listType = new TypeToken<List<StoreDto>>() {}.getType();
         return modelMapper.map(stores, listType);
     }
 
@@ -849,8 +877,7 @@ public class TradingSystemFacade {
      * @return list of ProductDto
      */
     private List<ProductDto> convertProductDtoList(@NotNull List<@NotNull Product> products) {
-        Type listType = new TypeToken<List<ProductDto>>() {
-        }.getType();
+        Type listType = new TypeToken<List<ProductDto>>() {}.getType();
         return modelMapper.map(products, listType);
     }
 
@@ -861,14 +888,12 @@ public class TradingSystemFacade {
      * @return list of products
      */
     private List<Product> converterProductsList(@NotNull List<@NotNull ProductDto> productDtos) {
-        Type listType = new TypeToken<List<Product>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Product>>() {}.getType();
         return modelMapper.map(productDtos, listType);
     }
 
     private List<NotificationDto> convertNotificationList(@NotNull List<@NotNull Notification> notifications) {
-        Type listType = new TypeToken<List<NotificationDto>>() {
-        }.getType();
+        Type listType = new TypeToken<List<NotificationDto>>() {}.getType();
         return modelMapper.map(notifications, listType);
     }
 

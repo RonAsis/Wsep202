@@ -370,9 +370,10 @@ public class TradingSystem {
             log.info(String.format("A new store '%s' was opened in the system, %s is the owner", storeName, user.getUserName()));
             return newStore;
         }
-        log.info(String.format("Was problem to open store '%s' in the system by %s", storeName, user.getUserName()));
+        log.info(String.format("Was problem to open store '%s'", storeName));
         return null;
     }
+
 
     /**
      * This method is used to add a new manager to an existing store
@@ -384,11 +385,11 @@ public class TradingSystem {
      */
     public boolean addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
         if(Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser)
-        && ownedStore.addManager(ownerUser, newManagerUser) ){
+                && ownedStore.addManager(ownerUser, newManagerUser) ){
             log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.getUserName(),ownedStore.getStoreId()));
             return newManagerUser.addNewManageStore(ownedStore);
         }
-        log.info(String.format("failed add user %s as manager in store '%d'", newManagerUser.getUserName(),ownedStore.getStoreId()));
+        log.info(String.format("failed add user as manager in store"));
         return false;
     }
 
@@ -401,12 +402,12 @@ public class TradingSystem {
      * @return true if the addition was successful, false if there were a problem
      */
     public boolean addOwnerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newOwnerUser) {
-        if(Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newOwnerUser)
-                && ownedStore.addOwner(ownerUser, newOwnerUser) ){
-            log.info(String.format("user %s was added as manager in store '%d'", newOwnerUser.getUserName(),ownedStore.getStoreId()));
+        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newOwnerUser)
+                && ownedStore.addOwner(ownerUser, newOwnerUser)) {
+            log.info(String.format("user %s was added as manager in store '%d'", newOwnerUser.getUserName(), ownedStore.getStoreId()));
             return newOwnerUser.addNewOwnedStore(ownedStore);
         }
-        log.info(String.format("failed add user %s as manager in store '%d'", newOwnerUser.getUserName(),ownedStore.getStoreId()));
+        log.info(String.format("failed add user as manager in store"));
         return false;
     }
 
@@ -420,11 +421,9 @@ public class TradingSystem {
     public boolean removeManager(Store ownedStSore, UserSystem ownerUser, UserSystem managerStore) {
         if(Objects.nonNull(ownedStSore) && Objects.nonNull(ownerUser) && Objects.nonNull(managerStore)
                 && ownedStSore.removeManager(ownerUser, managerStore) ){
-            managerStore.removeManagedStore(ownedStSore);
             log.info(String.format("user %s was removed as manager from store '%d'", managerStore.getUserName(),ownedStSore.getStoreId()));
-            return true;
         }
-        log.info(String.format("failed remove user %s as manager from store '%s'", managerStore.getUserName(),ownedStSore.getStoreId()));
+        log.info(String.format("failed remove user as manager from store"));
         return  false;
     }
 
