@@ -677,9 +677,9 @@ public class TradingSystemFacade {
      * @param store the store that products belongs to
      * @return productsHash
      */
-    private HashMap<Product, Integer> convertDtoProductHashToProductHashFromStore
-    (HashMap<ProductDto, Integer> productsUnderThisDiscount, Store store) {
-        HashMap<Product, Integer> productsHash = new HashMap<>();
+    private Map<Product, Integer> convertDtoProductHashToProductHashFromStore
+    (Map<ProductDto, Integer> productsUnderThisDiscount, Store store) {
+        Map<Product, Integer> productsHash = new HashMap<>();
         for (ProductDto productDto : productsUnderThisDiscount.keySet()) {
             Product productFromStore = store.getProduct(productDto.getProductSn());
             //add the product object exist in store with the required amount for discount
@@ -693,9 +693,6 @@ public class TradingSystemFacade {
      * @param ownerUsername the owner of the store
      * @param storeId
      * @param uuid the unique id of the owner
-     * @param discountPercentage
-     * @param endTime expiration date for the discount
-     * @param snOfProducts ids of products to validate by discount
      * @return true for success
      */
     public boolean addConditionalDiscountPolicy(String ownerUsername,
@@ -707,14 +704,12 @@ public class TradingSystemFacade {
 
             //convert dto to domain conditional product discount
             Map<Product,Integer> productUnderDisc =
-                    convertDtoProductHashToProductHashFromStore(conditionProdDiscountDto.
-                            getProductsUnderThisDiscount(),store);
+                    convertDtoProductHashToProductHashFromStore(conditionProdDiscountDto.getProductsUnderThisDiscount(),store);
             Calendar endTime = conditionProdDiscountDto.getEndTime();
             double discount = conditionProdDiscountDto.getDiscountPercentage();
             String description = conditionProdDiscountDto.getDescription();
             Map<Product,Integer> productsAmountsToApply =
-                    convertDtoProductHashToProductHashFromStore(conditionProdDiscountDto.
-                            getAmountOfProductsForApplyDiscounts(),store);
+                    convertDtoProductHashToProductHashFromStore(conditionProdDiscountDto.getAmountOfProductsForApplyDiscounts(),store);
             //create the conditional discount
             ConditionalProductDiscount conditionalProdDiscount = factoryObjects.
                     createCondProductDiscountDiscount(productUnderDisc,endTime,discount,description,
@@ -797,7 +792,6 @@ public class TradingSystemFacade {
             log.error("failed to add discount policy");
             return false;
         }
-        return products;
     }
 
     /**
