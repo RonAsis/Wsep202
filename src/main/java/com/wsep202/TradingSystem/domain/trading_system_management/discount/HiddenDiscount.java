@@ -8,7 +8,6 @@ import java.util.*;
 @Setter
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @Slf4j
 @Builder
 public class HiddenDiscount extends DiscountPolicy{

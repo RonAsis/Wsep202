@@ -19,6 +19,7 @@ public abstract class ConditionalDiscount extends DiscountPolicy{
 
 
     public ConditionalDiscount(Calendar endTime, double discountPercentage, String description) {
+
         this.endTime = endTime;
         this.discountPercentage = discountPercentage;
         //contains all products in store that are under this discount

@@ -12,7 +12,6 @@ import java.util.Map;
 @Getter
 
 @Slf4j
-@Builder
 public class ConditionalComposedDiscount extends ConditionalDiscount {
     /**
      * operator to apply between discounts in the condition

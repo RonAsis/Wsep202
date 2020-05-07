@@ -15,7 +15,6 @@ import java.util.Map;
 @Setter
 @Getter
 @Slf4j
-@Builder
 public class ConditionalProductDiscount extends ConditionalDiscount {
     //this map tells us on how many products to apply the discount
     private Map<Product,Integer> amountOfProductsForApplyDiscounts;
