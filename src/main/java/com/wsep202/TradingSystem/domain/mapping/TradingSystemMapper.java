@@ -2,9 +2,7 @@ package com.wsep202.TradingSystem.domain.mapping;
 
 import com.github.rozidan.springboot.modelmapper.TypeMapConfigurer;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.dto.ProductDto;
-import com.wsep202.TradingSystem.dto.ReceiptDto;
-import com.wsep202.TradingSystem.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.*;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
@@ -89,5 +87,19 @@ public class TradingSystemMapper {
         }
     }
 
+    @Component
+    public static class ShoppingCartToShoppingCartViewDto extends TypeMapConfigurer<ShoppingCart, ShoppingCartViewDto> {
+        @Override
+        public void configure(TypeMap<ShoppingCart, ShoppingCartViewDto> typeMap) {
+            typeMap.setConverter(context -> {
+                Map<Store, ShoppingBag> shoppingBagsList = context.getSource().getShoppingBagsList();
+                Map<Integer, ShoppingBagViewDto> shoppingBags = shoppingBagsList.entrySet().stream()
+                        .collect(Collectors.toMap(e -> e.getKey().getStoreId(),
+                                e -> ShoppingBagViewDto.builder().
+                                        productListFromStore(e.getValue().getProductListFromStore()).build()));
+                return ShoppingCartViewDto.builder().shoppingBags(shoppingBags).build();
+            });
+        }
+    }
 
 }

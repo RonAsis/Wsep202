@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.dto.*;
+import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -113,7 +114,11 @@ public class BuyerRegisteredService {
         return tradingSystemFacade.addProductToShoppingCart(username, amount, productDto, uuid);
     }
 
-    public ShoppingCartDto getShoppingCart(String username, UUID uuid) {
+    public ShoppingCartViewDto getShoppingCart(String username, UUID uuid) {
         return tradingSystemFacade.getShoppingCart(username, uuid);
+    }
+
+    public Pair<Double, Double> getTotalPriceOfShoppingCart(String username, UUID uuid) {
+        return tradingSystemFacade.getTotalPriceOfShoppingCart(username, uuid);
     }
 }

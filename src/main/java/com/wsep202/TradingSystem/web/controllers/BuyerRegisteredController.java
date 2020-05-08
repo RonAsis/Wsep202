@@ -5,8 +5,10 @@ import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
@@ -140,10 +142,21 @@ public class BuyerRegisteredController {
      * get shopping cart
      */
     @ApiOperation(value = "get-shopping-cart")
-    @PostMapping("get-shopping-cart/{username}/{uuid}")
-    public ShoppingCartDto getShoppingCart(@PathVariable String username,
-                                           @PathVariable UUID uuid) {
+    @GetMapping("get-shopping-cart/{username}/{uuid}")
+    public ShoppingCartViewDto getShoppingCart(@PathVariable String username,
+                                               @PathVariable UUID uuid) {
         return buyerRegisteredService.getShoppingCart(username, uuid);
+    }
+
+    /**
+     * get Total Price Of ShoppingCart
+     */
+    @ApiOperation(value = " get Total Price Of ShoppingCart")
+    @GetMapping(value = "get-total-price-of-shopping-cart/{username}/{uuid}" )
+    @ResponseBody
+    public Pair<Double, Double> getTotalPriceOfShoppingCart(@PathVariable String username,
+                                                            @PathVariable UUID uuid){
+        return buyerRegisteredService.getTotalPriceOfShoppingCart(username, uuid);
     }
 
 }

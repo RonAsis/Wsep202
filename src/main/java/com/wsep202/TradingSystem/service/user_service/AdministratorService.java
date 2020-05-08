@@ -1,12 +1,15 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
+import com.wsep202.TradingSystem.dto.UserSystemDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -30,4 +33,7 @@ public class AdministratorService {
         return tradingSystemFacade.viewPurchaseHistory(administratorUsername, userName, uuid);
     }
 
+    public Set<UserSystemDto> getUsers(String administratorUsername, UUID uuid) {
+        return tradingSystemFacade.getUsers(administratorUsername, uuid);
+    }
 }

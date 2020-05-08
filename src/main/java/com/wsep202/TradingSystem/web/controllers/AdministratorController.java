@@ -1,6 +1,8 @@
 package com.wsep202.TradingSystem.web.controllers;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
+import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.AdministratorService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -45,5 +48,15 @@ public class AdministratorController {
                                                 @PathVariable String username,
                                                 @PathVariable UUID uuid) {
         return administratorService.viewPurchaseHistory(administratorUsername, username,uuid);
+    }
+
+    /**
+     * View buyer purchase history
+     */
+    @ApiOperation(value = "get users")
+    @GetMapping("get-users/{administratorUsername}/{uuid}")
+    public Set<UserSystemDto> getUsers(@PathVariable String administratorUsername,
+                                       @PathVariable UUID uuid) {
+        return administratorService.getUsers(administratorUsername, uuid);
     }
 }

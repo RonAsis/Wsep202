@@ -816,10 +816,24 @@ public class TradingSystemFacade {
         return user.saveProductInShoppingBag(store, product, amount);
     }
 
-    public ShoppingCartDto getShoppingCart(String username, UUID uuid) {
+    public ShoppingCartViewDto getShoppingCart(String username, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username,uuid);
-        return modelMapper.map(user.getShoppingCart(), ShoppingCartDto.class);
+        return modelMapper.map(user.getShoppingCart(), ShoppingCartViewDto.class);
     }
+
+    public Pair<Double, Double> getTotalPriceOfShoppingCart(String username, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username,uuid);
+        return tradingSystem.getTotalPrices(user.getShoppingCart());
+    }
+
+
+    public Set<UserSystemDto> getUsers(String administratorUsername, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(administratorUsername,uuid);
+        Set<UserSystem> users = tradingSystem.getUsers(user);
+        return convertSetUsersToSetUserDto(users);
+    }
+
+
     //////////////////////////////// converters ///////////////////////////
 
     private ShoppingCart convertToShoppingCart(ShoppingCartDto shoppingCartDto) {
@@ -890,6 +904,11 @@ public class TradingSystemFacade {
     private List<NotificationDto> convertNotificationList(@NotNull List<@NotNull Notification> notifications) {
         Type listType = new TypeToken<List<NotificationDto>>() {}.getType();
         return modelMapper.map(notifications, listType);
+    }
+
+    private Set<UserSystemDto> convertSetUsersToSetUserDto(Set<UserSystem> users) {
+        Type listType = new TypeToken<Set<UserSystemDto>>() {}.getType();
+        return modelMapper.map(users, listType);
     }
 
 }

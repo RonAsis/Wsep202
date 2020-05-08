@@ -27,7 +27,9 @@ export class ShoppingCartComponent implements OnInit {
     productSn: number,
     storeId: number
   }>();
-  constructor(private userService: UserService, private shareService: ShareService) { }
+  constructor(private userService: UserService, private shareService: ShareService) {
+    this.cartItems = new Map<Product, number>() ;
+  }
 
   ngOnInit(): void {
     this.getShoppingCart();
@@ -35,13 +37,16 @@ export class ShoppingCartComponent implements OnInit {
     }
 
   private getShoppingCart() {
-    this.userService.getShoppingCart().subscribe((shoppingCart) => {
+    this.userService.getShoppingCart().subscribe((shoppingCart: ShoppingCart) => {
+      console.log(shoppingCart);
       if (shoppingCart !== null && shoppingCart !== undefined) {
         this.cartItems = Array.from(shoppingCart.shoppingBags.values())
           .reduce((acc, cur) => {
             cur.productListFromStore.forEach((value, key) => acc.set(key, value));
             return acc;
           }, new Map<Product, number>());
+        console.log('cartItem');
+        console.log(this.cartItems);
       }
     });
   }

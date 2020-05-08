@@ -488,4 +488,10 @@ public class TradingSystem {
     }
 
 
+    public Set<UserSystem> getUsers(UserSystem user) {
+        if(tradingSystemDao.isAdmin(user.getUserName())){
+            return tradingSystemDao.getUsers();
+        }
+        throw new NotAdministratorException(user.getUserName());
+    }
 }

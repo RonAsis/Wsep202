@@ -8,6 +8,7 @@ import {Product} from '../shared/product.model';
 import {Receipt} from '../shared/receipt.model';
 import {ShoppingBag} from '../shared/ShoppingBag.model';
 import {stringify} from 'querystring';
+import {UserSystem} from '../shared/userSystem.model';
 
 @Injectable({
   providedIn: 'root'
@@ -191,6 +192,14 @@ export class HttpService {
     return this.http.get<ShoppingCart>(url);
   }
 
+  getTotalPriceOfShoppingCartLoggingUser(username: string, uuid: string) {
+    const url = `${this.buyerUrl}/` + 'get-total-price-of-shopping-cart/' +
+      `${username}/` +
+      `${uuid}`;
+    return this.http.get<{key: number, value: number}>(
+      url );
+  }
+
   //////////////////////////// AdministratorController ///////////////////////////
 
   public viewPurchaseHistoryStoreByAdmin(administratorUsername: string, storeId: number, uuid: string) {
@@ -211,6 +220,13 @@ export class HttpService {
       url);
   }
 
+  getUsers(administratorUsername: string, uuid: string) {
+    const url = `${this.adminUrl}/` + 'get-users/' +
+      `${administratorUsername}/` +
+      `${uuid}`;
+    return this.http.get<UserSystem[]>(
+      url);
+  }
   //////////////////////////// SellerManagerController ///////////////////////////
 
   public viewPurchaseHistoryOfManager(username: string, storeId: number, uuid: string) {
@@ -355,6 +371,5 @@ export class HttpService {
     }
     return uploadImageData;
   }
-
 
 }

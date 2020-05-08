@@ -105,13 +105,11 @@ export class UserService {
   }
 
   getUsers() {
-    console.log(this.usernameWantSeeHistory);
     if (this.usernameWantSeeHistory !== null) {
-      return [new UserSystem('ron', 'ron', 'asis'),
-        new UserSystem('ron1', 'ro1n11', 'asis1')];
+      return of([new UserSystem('ron', 'ron', 'asis'),
+        new UserSystem('ron1', 'ro1n11', 'asis1')]);
     } else {
-      return [new UserSystem('null', 'null', 'null'),
-        new UserSystem('null', 'null', 'null')];
+     return this.httpService.getUsers(this.username, this.uuid);
     }
   }
 
@@ -137,8 +135,6 @@ export class UserService {
       return of(this.shoppingCart);
     }else {
       return this.httpService.getShoppingCart(this.username, this.uuid);
-      return null;
-      // return this.httpService.getShoppingCard(this.username, this.uuid);
     }
   }
 
@@ -162,7 +158,7 @@ export class UserService {
     if (!this.isLoggingUser()){
         return this.httpService.getTotalPriceOfShoppingCart(this.shoppingCart);
     }else{
-      return null;
+      return this.httpService.getTotalPriceOfShoppingCartLoggingUser(this.username, this.uuid);
     }
   }
 

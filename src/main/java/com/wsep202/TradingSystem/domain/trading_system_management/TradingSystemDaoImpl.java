@@ -135,4 +135,9 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
                 });
     }
 
+    @Override
+    public Set<UserSystem> getUsers() {
+        return this.users;
+    }
+
 }

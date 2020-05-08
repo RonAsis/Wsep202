@@ -32,4 +32,7 @@ public interface TradingSystemDao {
     Set<Store> getStores();
 
     Set<Product> getProducts();
+
+    Set<UserSystem> getUsers();
+
 }
