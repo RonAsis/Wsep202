@@ -72,7 +72,7 @@ export class HttpService {
                                    billingAddress: BillingAddress) {
     const shoppingCartDtoConv = this.convertShoppingCartToJsonObject(shoppingCart);
     const url = `${this.guestUrl}/` + 'purchase-shopping-cart-guest/' ;
-    return this.http.post<Receipt[] | {message: string}>(url,
+    return this.http.post<Receipt[] >(url,
       {shoppingCartDto: shoppingCartDtoConv, paymentDetailsDto: paymentDetails, billingAddressDto: billingAddress});
   }
 

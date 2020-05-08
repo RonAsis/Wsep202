@@ -90,8 +90,8 @@ export class PurchaseShoppingCartComponent implements OnInit {
     if (this.cityInputRef.nativeElement.value === undefined || this.cityInputRef.nativeElement.value.length === 0){
       this.errorMessage('You must write your city');
       theDetailsLegal = false;
-    }else if (this.zipCodeInputRef.nativeElement.value === undefined || this.zipCodeInputRef.nativeElement.value.length !== 8){
-      this.errorMessage('You must write zip on length 8');
+    }else if (this.zipCodeInputRef.nativeElement.value === undefined || this.zipCodeInputRef.nativeElement.value.length !== 7){
+      this.errorMessage('You must write zip on length 7');
       theDetailsLegal = false;
     }else if (this.countryInputRef.nativeElement.value === undefined || this.countryInputRef.nativeElement.value.length === 0){
       this.errorMessage('You must write you country');
