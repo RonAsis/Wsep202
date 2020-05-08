@@ -121,4 +121,9 @@ public class BuyerRegisteredService {
     public Pair<Double, Double> getTotalPriceOfShoppingCart(String username, UUID uuid) {
         return tradingSystemFacade.getTotalPriceOfShoppingCart(username, uuid);
     }
+
+    public boolean changeProductAmountInShoppingBag(String username, int storeId, int productSn, UUID uuid) {
+        //TODO
+        return false;
+    }
 }

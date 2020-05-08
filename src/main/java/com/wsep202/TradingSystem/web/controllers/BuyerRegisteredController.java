@@ -65,24 +65,6 @@ public class BuyerRegisteredController {
     }
 
     /**
-     * save product in shopping bag
-     *
-     * @param username  the username of the user which save in his bag
-     * @param storeId   store belobgs to the bag
-     * @param productSn the identifier of the product
-     * @param amount    quantity to save
-     */
-    @ApiOperation(value = "save product in shopping bag")
-    @PostMapping("save-product-in-shopping-bag/{username}/{storeId}/{productSn}/{amount}/{uuid}")
-    public boolean saveProductInShoppingBag(@PathVariable String username,
-                                            @PathVariable int storeId,
-                                            @PathVariable int productSn,
-                                            @PathVariable int amount,
-                                            @PathVariable UUID uuid) {
-        return buyerRegisteredService.saveProductInShoppingBag(username, storeId, productSn, amount, uuid);
-    }
-
-    /**
      * view product in shopping bag
      *
      * @param username the user the bag belongs to
@@ -108,6 +90,22 @@ public class BuyerRegisteredController {
                                               @PathVariable int productSn,
                                               @PathVariable UUID uuid) {
         return buyerRegisteredService.removeProductInShoppingBag(username, storeId, productSn, uuid);
+    }
+
+    /**
+     * remove product in shopping bag (edit)
+     *
+     * @param username  the user which edit
+     * @param storeId   the store belongs to the product
+     * @param productSn identifier of product
+     */
+    @ApiOperation(value = "change product-amount in shopping bag")
+    @PostMapping("change-product-amount-in-shopping-bag/{username}/{storeId}/{productSn}/{uuid}")
+    public boolean changeProductAmountInShoppingBag(@PathVariable String username,
+                                                    @PathVariable int storeId,
+                                                    @PathVariable int productSn,
+                                                    @PathVariable UUID uuid) {
+        return buyerRegisteredService.changeProductAmountInShoppingBag(username, storeId, productSn, uuid);
     }
 
     /**
@@ -152,10 +150,10 @@ public class BuyerRegisteredController {
      * get Total Price Of ShoppingCart
      */
     @ApiOperation(value = " get Total Price Of ShoppingCart")
-    @GetMapping(value = "get-total-price-of-shopping-cart/{username}/{uuid}" )
+    @GetMapping(value = "get-total-price-of-shopping-cart/{username}/{uuid}")
     @ResponseBody
     public Pair<Double, Double> getTotalPriceOfShoppingCart(@PathVariable String username,
-                                                            @PathVariable UUID uuid){
+                                                            @PathVariable UUID uuid) {
         return buyerRegisteredService.getTotalPriceOfShoppingCart(username, uuid);
     }
 
