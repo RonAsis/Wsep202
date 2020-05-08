@@ -2,6 +2,10 @@ import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../../services/user.service';
 import {PaymentDetails} from '../../../shared/paymentDetails.model';
 import {BillingAddress} from '../../../shared/billingAddress.model';
+import {Receipt} from '../../../shared/receipt.model';
+import {ResponseMessage} from '../../../shared/responseMessage.model';
+import {HttpErrorResponse} from '@angular/common/http';
+
 
 @Component({
   selector: 'app-purchase-shopping-cart',
@@ -22,10 +26,12 @@ export class PurchaseShoppingCartComponent implements OnInit {
   @Input() cartTotal: number;
   @Input() cartTotalAfterDiscount: number;
 
-  messageColor: any;
-  message: any;
+  messageColor: string;
+  message: string;
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {
+    this.message = '';
+  }
 
   ngOnInit(): void {
     this.getTotalPrice();
@@ -39,22 +45,30 @@ export class PurchaseShoppingCartComponent implements OnInit {
   }
 
   OnPurchase() {
-    const paymentDetails = new PaymentDetails(this.creditCardNumberInputRef.nativeElement.value,
-      this.ccvInputRef.nativeElement.value,
-      this.idInputRef.nativeElement.value);
-    const billingAddress = new BillingAddress(this.fullNameInputRef.nativeElement.value,
-      this.addressInputRef.nativeElement.value,
-      this.cityInputRef.nativeElement.value,
-      this.countryInputRef.nativeElement.value,
-      this.zipCodeInputRef.nativeElement.value);
-    console.log(paymentDetails);
-    console.log(billingAddress);
-    this.userService.purchaseShoppingCart(paymentDetails, billingAddress)
-      .subscribe(receipts => {
-        if (receipts !== undefined){
-          console.log(receipts);
-        }
-      }, error => this.errorMessage(error.value));
+    this.message = '';
+    if (this.checkAllDetails()) {
+      const paymentDetails = new PaymentDetails(this.creditCardNumberInputRef.nativeElement.value,
+        this.ccvInputRef.nativeElement.value,
+        this.idInputRef.nativeElement.value);
+      const billingAddress = new BillingAddress(this.fullNameInputRef.nativeElement.value,
+        this.addressInputRef.nativeElement.value,
+        this.cityInputRef.nativeElement.value,
+        this.countryInputRef.nativeElement.value,
+        this.zipCodeInputRef.nativeElement.value);
+      console.log(paymentDetails);
+      console.log(billingAddress);
+      this.userService.purchaseShoppingCart(paymentDetails, billingAddress)
+        .subscribe(response => {
+          if (response === undefined){
+            this.errorMessage('There is no response from the server');
+          }else{
+            console.log(response);
+          }
+        }, (error: HttpErrorResponse) => {
+          console.log(error);
+          this.errorMessage(error.error.message);
+          });
+    }
   }
 
   errorMessage(message: string){
@@ -68,6 +82,39 @@ export class PurchaseShoppingCartComponent implements OnInit {
       return false;
     }
     return true;
-
   }
+
+   checkAllDetails() {
+    let theDetailsLegal = true;
+    console.log(theDetailsLegal);
+    if (this.cityInputRef.nativeElement.value === undefined || this.cityInputRef.nativeElement.value.length === 0){
+      this.errorMessage('You must write your city');
+      theDetailsLegal = false;
+    }else if (this.zipCodeInputRef.nativeElement.value === undefined || this.zipCodeInputRef.nativeElement.value.length !== 8){
+      this.errorMessage('You must write zip on length 8');
+      theDetailsLegal = false;
+    }else if (this.countryInputRef.nativeElement.value === undefined || this.countryInputRef.nativeElement.value.length === 0){
+      this.errorMessage('You must write you country');
+      theDetailsLegal = false;
+    }else if (this.addressInputRef.nativeElement.value === undefined || this.addressInputRef.nativeElement.value.length === 0){
+      this.errorMessage('You must write you address');
+      theDetailsLegal = false;
+    }else if (this.fullNameInputRef.nativeElement.value === undefined || this.fullNameInputRef.nativeElement.value.length === 0){
+      this.errorMessage('You must write you full name');
+      theDetailsLegal = false;
+    }else if (this.idInputRef.nativeElement.value === undefined || this.idInputRef.nativeElement.value.length !== 9){
+      this.errorMessage('You must write you legal id on length 9');
+      theDetailsLegal = false;
+    }else if (this.ccvInputRef.nativeElement.value === undefined || this.ccvInputRef.nativeElement.value.length !== 3){
+      this.errorMessage('You must write you legal ccv on length 3');
+      theDetailsLegal = false;
+    }else if (this.creditCardNumberInputRef.nativeElement.value === undefined ||
+      this.creditCardNumberInputRef.nativeElement.value.length !== 9){
+      this.errorMessage('You must write your credit card number on length 9');
+      theDetailsLegal = false;
+    }
+    console.log(theDetailsLegal);
+    return theDetailsLegal;
+  }
+
 }

@@ -8,4 +8,5 @@ public class TradingSystemException extends RuntimeException {
     public TradingSystemException(String exceptionContent){
         super(exceptionContent);
     }
+
 }

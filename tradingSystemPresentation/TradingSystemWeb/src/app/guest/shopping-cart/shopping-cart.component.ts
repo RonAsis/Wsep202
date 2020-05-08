@@ -12,6 +12,9 @@ import {ShareService} from '../../services/share.service';
 })
 export class ShoppingCartComponent implements OnInit {
 
+  messageColor: any;
+  message: any;
+
   @Input() cartTotal: number;
   @Input() cartTotalAfterDiscount: number;
   @Input() cartItems: Map<Product , number> ;
@@ -65,6 +68,19 @@ export class ShoppingCartComponent implements OnInit {
   }
 
   onPurchaseShoppingCart() {
-    this.shareService.featureSelected.emit('Purchase-shopping-cart');
+    if (this.thereIsProducts() ){
+      this.shareService.featureSelected.emit('Purchase-shopping-cart');
+    }else{
+      this.errorMessage('You must select lest one product');
+    }
+  }
+
+  private thereIsProducts() {
+    return this.cartItems.size !== 0;
+  }
+
+  errorMessage(message: string){
+    this.message = message;
+    this.messageColor = 'red';
   }
 }

@@ -583,16 +583,11 @@ public class TradingSystemFacade {
                                                  @NotNull PaymentDetailsDto paymentDetailsDto,
                                                  @NotNull BillingAddressDto billingAddressDto,
                                                  UUID uuid) {
-        try {
             UserSystem user = tradingSystem.getUser(username, uuid);
             PaymentDetails paymentDetails = Objects.nonNull(paymentDetailsDto) ? modelMapper.map(paymentDetailsDto, PaymentDetails.class) : null;
             BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
             List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, user);
             return Objects.nonNull(receipts) ? convertReceiptList(receipts) : null;
-        } catch (TradingSystemException e) {
-            log.error("tried to purchase cart failed", e);
-            return null;
-        }
     }
 
     public List<StoreDto> getOwnerStores(String ownerUsername, UUID uuid) {
@@ -815,7 +810,7 @@ public class TradingSystemFacade {
 
     public Pair<Double, Double> getTotalPriceOfShoppingCart(ShoppingCartDto shoppingCartDto) {
         log.info("get Total Price Of Shopping Cart");
-        ShoppingCart shoppingCart = modelMapper.map(shoppingCartDto, ShoppingCart.class);
+        ShoppingCart shoppingCart = convertToShoppingCart(shoppingCartDto);
         return tradingSystem.getTotalPrices(shoppingCart);
     }
 
