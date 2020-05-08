@@ -27,5 +27,6 @@ export class ShoppingCart {
     }else{
       shoppingBag.addProduct(product, amountProducts);
     }
+    return true;
   }
 }

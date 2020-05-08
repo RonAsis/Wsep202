@@ -109,4 +109,11 @@ public class BuyerRegisteredService {
         return tradingSystemFacade.purchaseShoppingCart(userName, paymentDetails, billingAddress, uuid);
     }
 
+    public boolean addProductToShoppingCart(String username, int amount, ProductDto productDto, UUID uuid) {
+        return tradingSystemFacade.addProductToShoppingCart(username, amount, productDto, uuid);
+    }
+
+    public ShoppingCartDto getShoppingCart(String username, UUID uuid) {
+        return tradingSystemFacade.getShoppingCart(username, uuid);
+    }
 }

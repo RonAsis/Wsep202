@@ -173,6 +173,24 @@ export class HttpService {
       {paymentDetailsDto: paymentDetails, billingAddressDto: billingAddress});
   }
 
+  public addProductToShoppingCart(username: string,
+                                  product: Product,
+                                  amount: number,
+                                  uuid: string){
+    const url = `${this.buyerUrl}/` + 'add-product-to-shopping-cart/' +
+      `${username}/` +
+      `${amount}/` +
+      `${uuid}`;
+    return this.http.post<boolean>(url, product);
+  }
+
+  getShoppingCart(username: string, uuid: string) {
+    const url = `${this.buyerUrl}/` + 'get-shopping-cart/' +
+      `${username}/` +
+      `${uuid}`;
+    return this.http.get<ShoppingCart>(url);
+  }
+
   //////////////////////////// AdministratorController ///////////////////////////
 
   public viewPurchaseHistoryStoreByAdmin(administratorUsername: string, storeId: number, uuid: string) {
@@ -337,5 +355,6 @@ export class HttpService {
     }
     return uploadImageData;
   }
+
 
 }

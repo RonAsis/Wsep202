@@ -746,11 +746,6 @@ public class TradingSystemFacade {
         }
     }
 
-
-
-
-
-
     /**
      * add visible discount to the store for some products
      * @param ownerUsername the owner of the store
@@ -814,6 +809,17 @@ public class TradingSystemFacade {
         return tradingSystem.getTotalPrices(shoppingCart);
     }
 
+    public boolean addProductToShoppingCart(String username, int amount, ProductDto productDto, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username,uuid);
+        Product product = modelMapper.map(productDto, Product.class);
+        Store store = tradingSystem.getStore(product.getStoreId());
+        return user.saveProductInShoppingBag(store, product, amount);
+    }
+
+    public ShoppingCartDto getShoppingCart(String username, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username,uuid);
+        return modelMapper.map(user.getShoppingCart(), ShoppingCartDto.class);
+    }
     //////////////////////////////// converters ///////////////////////////
 
     private ShoppingCart convertToShoppingCart(ShoppingCartDto shoppingCartDto) {

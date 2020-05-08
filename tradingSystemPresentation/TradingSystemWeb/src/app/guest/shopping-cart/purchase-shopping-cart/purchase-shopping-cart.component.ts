@@ -5,6 +5,7 @@ import {BillingAddress} from '../../../shared/billingAddress.model';
 import {Receipt} from '../../../shared/receipt.model';
 import {ResponseMessage} from '../../../shared/responseMessage.model';
 import {HttpErrorResponse} from '@angular/common/http';
+import {ShareService} from '../../../services/share.service';
 
 
 @Component({
@@ -29,7 +30,7 @@ export class PurchaseShoppingCartComponent implements OnInit {
   messageColor: string;
   message: string;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private shareService: ShareService) {
     this.message = '';
   }
 
@@ -62,7 +63,8 @@ export class PurchaseShoppingCartComponent implements OnInit {
           if (response === undefined){
             this.errorMessage('There is no response from the server');
           }else{
-            console.log(response);
+            this.shareService.getReceipts(response);
+            this.shareService.featureSelected.emit('receipts-guest');
           }
         }, (error: HttpErrorResponse) => {
           console.log(error);

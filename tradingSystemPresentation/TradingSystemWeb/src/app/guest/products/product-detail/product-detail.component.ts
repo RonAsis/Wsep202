@@ -18,7 +18,11 @@ export class ProductDetailComponent implements OnInit {
   }
 
   addToShoppingCart() {
-    this.userService.addToShoppingCart(this.product, this.amountProducts.nativeElement.value);
-    this.shareService.featureSelected.emit('Shopping-cart');
+    this.userService.addToShoppingCart(this.product, this.amountProducts.nativeElement.value).subscribe( (response: boolean) => {
+      console.log(response);
+      if (response !== undefined){
+        this.shareService.featureSelected.emit('Shopping-cart');
+      }
+    }, error => console.log(error));
   }
 }

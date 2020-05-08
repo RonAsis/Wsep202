@@ -1,5 +1,6 @@
 import {Component, ElementRef, OnInit, Output, ViewChild} from '@angular/core';
 import {UserService} from '../../services/user.service';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -19,9 +20,9 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.userService.userLoggingEvent.subscribe(response => {
       if (!response){
-        this.errorMessage('password or username dont correct');
+        this.errorMessage('password or username dont correct or the user ');
       }
-    });
+    }, (error: HttpErrorResponse) => this.errorMessage(error.error.message));
   }
 
   onLogin() {

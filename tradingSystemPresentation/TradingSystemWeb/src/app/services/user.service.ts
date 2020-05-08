@@ -82,7 +82,9 @@ export class UserService {
 
   addToShoppingCart(product: Product, amountProducts: number) {
     if (!this.isLoggingUser()) {
-      this.shoppingCart.addToShoppingCart(product, amountProducts);
+      return of(this.shoppingCart.addToShoppingCart(product, amountProducts));
+    }else{
+      return this.httpService.addProductToShoppingCart(this.username, product, amountProducts, this.uuid);
     }
   }
 
@@ -132,9 +134,9 @@ export class UserService {
   getShoppingCart() {
     console.log(this.isLoggingUser());
     if (!this.isLoggingUser()) {
-      console.log(this.shoppingCart);
       return of(this.shoppingCart);
     }else {
+      return this.httpService.getShoppingCart(this.username, this.uuid);
       return null;
       // return this.httpService.getShoppingCard(this.username, this.uuid);
     }

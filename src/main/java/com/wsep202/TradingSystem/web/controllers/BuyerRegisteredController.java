@@ -25,6 +25,7 @@ public class BuyerRegisteredController {
 
     /**
      * logout username from the system
+     *
      * @param username user to logout
      */
     @ApiOperation(value = "logout")
@@ -36,16 +37,17 @@ public class BuyerRegisteredController {
 
     /**
      * open store
-     * @param usernameOwner  the opener and first owner of store
-     * @param storeName       store name
+     *
+     * @param usernameOwner the opener and first owner of store
+     * @param storeName     store name
      */
     @ApiOperation(value = "open store")
     @PostMapping("open-store/{usernameOwner}/{storeName}/{description}{uuid}")
     public StoreDto openStore(@PathVariable String usernameOwner,
-                           @PathVariable String storeName,
-                           @PathVariable String description,
-                           @PathVariable UUID uuid) {
-        return buyerRegisteredService.openStore(usernameOwner,  storeName, description, uuid);
+                              @PathVariable String storeName,
+                              @PathVariable String description,
+                              @PathVariable UUID uuid) {
+        return buyerRegisteredService.openStore(usernameOwner, storeName, description, uuid);
     }
 
     /**
@@ -80,6 +82,7 @@ public class BuyerRegisteredController {
 
     /**
      * view product in shopping bag
+     *
      * @param username the user the bag belongs to
      */
     @ApiOperation(value = "view products in shopping cart")
@@ -107,18 +110,40 @@ public class BuyerRegisteredController {
 
     /**
      * purchase shopping cart
-     * @param username       user that purchase
+     *
+     * @param username          user that purchase
      * @param paymentDetailsDto info to charge of the user
      * @param billingAddressDto the destination of the delivery
      */
     @ApiOperation(value = "purchase shopping cart buyer")
     @PutMapping("purchase-shopping-cart-buyer/{username}/{uuid}")
-    @MessageMapping("/purchase-shopping-cart-buyer")
     public List<ReceiptDto> purchaseShoppingCartBuyer(@PathVariable String username,
                                                       @RequestBody PaymentDetailsDto paymentDetailsDto,
                                                       @RequestBody BillingAddressDto billingAddressDto,
                                                       @PathVariable UUID uuid) {
         return buyerRegisteredService.purchaseShoppingCartBuyer(username, paymentDetailsDto, billingAddressDto, uuid);
+    }
+
+    /**
+     * add product to shopping cart
+     */
+    @ApiOperation(value = "add product to shopping cart")
+    @PostMapping("add-product-to-shopping-cart/{username}/{amount}/{uuid}")
+    public boolean addProductToShoppingCart(@PathVariable String username,
+                                            @PathVariable int amount,
+                                            @RequestBody ProductDto productDto,
+                                            @PathVariable UUID uuid) {
+        return buyerRegisteredService.addProductToShoppingCart(username, amount, productDto, uuid);
+    }
+
+    /**
+     * get shopping cart
+     */
+    @ApiOperation(value = "get-shopping-cart")
+    @PostMapping("get-shopping-cart/{username}/{uuid}")
+    public ShoppingCartDto getShoppingCart(@PathVariable String username,
+                                           @PathVariable UUID uuid) {
+        return buyerRegisteredService.getShoppingCart(username, uuid);
     }
 
 }
