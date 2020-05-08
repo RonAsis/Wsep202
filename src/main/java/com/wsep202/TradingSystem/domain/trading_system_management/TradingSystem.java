@@ -7,6 +7,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.notification.O
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import javafx.util.Pair;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.Synchronized;
@@ -17,7 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Getter
+@Setter
 @Slf4j
 public class TradingSystem {
 
