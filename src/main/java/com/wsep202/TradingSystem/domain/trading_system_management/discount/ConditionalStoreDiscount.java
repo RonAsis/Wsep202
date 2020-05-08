@@ -4,6 +4,7 @@
  */
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
+import com.wsep202.TradingSystem.domain.exception.NotValidEndTime;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +30,9 @@ public class ConditionalStoreDiscount extends ConditionalDiscount {
      */
     @Override
     public void applyDiscount(Map<Product, Integer> products) {
+
         //The discount time is not expired yet
-        if(this.endTime.compareTo(Calendar.getInstance()) >= 0){
+        if(this.endTime.compareTo(Calendar.getInstance()) >= 0 && !isDeleted){
             if(!isApplied) {
                 applyConditionalStoreDiscount(products);
                 isApplied = true;   //discount already performed
@@ -50,13 +52,43 @@ public class ConditionalStoreDiscount extends ConditionalDiscount {
     }
 
     /**
+     * edit the discount with received parameters
+     * @param endTime
+     * @param percentage
+     * @param minPrice
+     */
+    public void editDiscount(Calendar endTime, double percentage, double minPrice, String description) {
+        if(endTime!=null){
+            if(endTime.compareTo(Calendar.getInstance())<0){
+                //the end time passed so not valid
+                throw new NotValidEndTime(endTime);
+            }
+            //end time is valid
+            this.endTime = endTime;
+        }
+        if(percentage>=0){
+            this.discountPercentage = percentage;
+        }
+
+        if(minPrice >= 0){
+            this.minPrice= minPrice;
+        }
+        if(description!=null){
+            this.conditionDescription = description;
+        }
+    }
+
+
+    /**
      * undo visible discount
      * @param products to update the related undo from the discount between them
      */
     private void undoStoreDiscount(Map<Product,Integer> products) {
-        for(Product product: products.keySet()){
-            double discount = calculateDiscount(product.getOriginalCost());
-            product.setCost(product.getCost()+discount);    //update price
+        if(isApplied) {
+            for (Product product : products.keySet()) {
+                double discount = calculateDiscount(product.getOriginalCost());
+                product.setCost(product.getCost() + discount);    //update price
+            }
         }
     }
     /**
@@ -106,7 +138,6 @@ public class ConditionalStoreDiscount extends ConditionalDiscount {
     private double calculateDiscount(double price) {
         return (discountPercentage*price)/100;
     }
-    @Override
-    public void editProductByDiscount(Product product) {
-    }
+
+
 }

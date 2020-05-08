@@ -4,6 +4,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
+import com.wsep202.TradingSystem.domain.exception.NotValidEndTime;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,48 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
         this.amountOfProductsForApplyDiscounts = amountOfProductsForApplyDiscounts;
     }
 
+    public void editDiscount(Calendar endTime, double percentage,
+                             Map<Product, Integer> productsToDelete,
+                             Map<Product, Integer> productsToAdd,
+                             Map<Product, Integer> applyingToDelete,
+                             Map<Product, Integer> applyingToAdd,
+                             String description) {
+        if(endTime!=null){
+            if(endTime.compareTo(Calendar.getInstance())<0){
+                //the end time passed so not valid
+                throw new NotValidEndTime(endTime);
+            }
+            //end time is valid
+            this.endTime = endTime;
+        }
+        if(percentage>=0){
+            this.discountPercentage = percentage;
+        }
+        //add the new products to have discount or update their amounts
+        if(productsToAdd!=null){
+            this.addProductToThisDiscount(productsToAdd);
+        }
+        if(productsToDelete!=null){
+            for(Product product: productsToDelete.keySet()){
+                removeProductFromDiscount(product);
+            }
+        }
+        if(applyingToAdd!=null){
+            //update the applying amounts on products
+            this.addProductToAmountToApply(applyingToAdd);
+        }
+        if(applyingToDelete!=null){
+            //remove products from applying rule
+            for(Product product: applyingToDelete.keySet()){
+                removeProductFromDiscount(product);
+            }
+        }
+        if(description!=null){
+            this.conditionDescription = description;
+        }
+    }
+
+
     /**
      * checks weather the products stands in the condition or not
      * @param product to check
@@ -47,8 +90,9 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
      */
     @Override
     public void applyDiscount(Map<Product, Integer> products) {
+
         //The discount time is not expired yet
-        if(this.endTime.compareTo(Calendar.getInstance()) >= 0){
+        if(this.endTime.compareTo(Calendar.getInstance()) >= 0&& !isDeleted){
             if(!isApplied) {
                 applyConditionalProductDiscount(products);
                 isApplied = true;   //discount already performed
@@ -166,17 +210,13 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
         return null;
     }
 
-    @Override
-    public void editProductByDiscount(Product product) {
-
-    }
 
     /**
      * add products with amount of units to apply the discount on.
      * @param products
      * @return
      */
-    public boolean addProductToThisDiscount(HashMap<Product,Integer> products) {
+    public boolean addProductToThisDiscount(Map<Product,Integer> products) {
         try{
             this.productsUnderThisDiscount.putAll(products);
             return true;
@@ -190,7 +230,7 @@ public class ConditionalProductDiscount extends ConditionalDiscount {
      * @param products
      * @return
      */
-    public boolean addProductToAmountToApply(HashMap<Product,Integer> products) {
+    public boolean addProductToAmountToApply(Map<Product,Integer> products) {
         try{
             this.amountOfProductsForApplyDiscounts.putAll(products);
             return true;

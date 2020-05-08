@@ -28,8 +28,6 @@ public class HiddenDiscount extends DiscountPolicy{
 
     }
 
-    @Override
-    public void editProductByDiscount(Product product) {
 
-    }
+
 }

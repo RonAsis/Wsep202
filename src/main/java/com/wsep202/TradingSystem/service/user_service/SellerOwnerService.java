@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
 import com.wsep202.TradingSystem.dto.*;
 import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,22 @@ public class SellerOwnerService {
         return tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername,storeId, uuid);
     }
 
+    /**
+     * remove a discount from store
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param discountId
+     * @return
+     */
+    public boolean removeDiscountFromStore(String ownerUsername,
+                                           int storeId,
+                                           UUID uuid,
+                                           int discountId){
+        return tradingSystemFacade.removeDiscountFromStore(ownerUsername,storeId,uuid,discountId);
+    }
+
+
 
     /**
      * UC 4.2 - owner adds a new visible discount
@@ -43,6 +60,68 @@ public class SellerOwnerService {
                                             VisibleDiscountDto visibleDiscountDto){
         return tradingSystemFacade.addVisibleDiscountPolicy(ownerUsername, storeId,
                 uuid, visibleDiscountDto);
+    }
+
+    /**
+     * edit discount of type visible
+     * @param ownerUsername the editor
+     * @param storeId store the discount belongs to
+     * @param uuid id of the user - is unique
+     * @param visibleDiscountEditDto discount info to update
+     * @return
+     */
+    public boolean editVisibleDiscount(String ownerUsername,
+                                       int storeId,
+                                       UUID uuid,VisibleDiscountEditDto visibleDiscountEditDto){
+        return tradingSystemFacade.editVisibleDiscount(ownerUsername,storeId,uuid,
+                visibleDiscountEditDto);
+    }
+
+    /**
+     * edit discount of type conditional on product level
+     * @param ownerUsername the editor
+     * @param storeId store the discount belongs to
+     * @param uuid id of the user - is unique
+     * @param productEditDiscountDto discount info to update
+     * @return
+     */
+    public boolean editConditionalProductDiscount(String ownerUsername,
+                                                  int storeId,
+                                                  UUID uuid,ConditionalProductEditDto productEditDiscountDto){
+        return tradingSystemFacade.editConditionalProductDiscount(ownerUsername,storeId,uuid,
+                productEditDiscountDto);
+    }
+
+    /**
+     * edit discount of type conditional on store level
+     * @param ownerUsername the editor
+     * @param storeId store the discount belongs to
+     * @param uuid id of the user - is unique
+     * @param conditionalStoreDiscount discount info to update
+     * @return
+     */
+    public boolean editConditionalStoreDiscount(String ownerUsername,
+                                                int storeId,
+                                                UUID uuid,
+                                                ConditionalStoreDiscountEditDto conditionalStoreDiscount){
+        return tradingSystemFacade.editConditionalStoreDiscount(ownerUsername,storeId,uuid,
+                conditionalStoreDiscount);
+    }
+
+    /**
+     * edit discount of type conditional composed
+     * @param ownerUsername the editor
+     * @param storeId store the discount belongs to
+     * @param uuid id of the user - is unique
+     * @param composedDto discount info to update
+     * @return
+     */
+    public boolean editConditionalComposedDiscount(String ownerUsername,
+                                                   int storeId,
+                                                   UUID uuid,
+                                                   ConditionalComposedDiscountEditDto composedDto){
+        return tradingSystemFacade.editConditionalComposedDiscount(ownerUsername,storeId,uuid,
+                composedDto);
     }
 
     /**
@@ -105,7 +184,7 @@ public class SellerOwnerService {
                               int amount,
                               double cost,
                               UUID uuid){
-         return tradingSystemFacade.addProduct(ownerUsername, storeId, productName, category, amount, cost, uuid);
+        return tradingSystemFacade.addProduct(ownerUsername, storeId, productName, category, amount, cost, uuid);
     }
 
     /**
