@@ -22,6 +22,7 @@ public abstract class DiscountPolicy {
     protected Map<Product, Integer> productsUnderThisDiscount;
     protected static int discountIdAcc = 0;
     protected int id;
+    protected boolean isDeleted = false;    //true in case the owner deleted this discount
     protected boolean isExpired = false;
     protected boolean isApplied =false;
     protected boolean isUndone = false; //TODO if undone already then remove discount completely
@@ -34,11 +35,11 @@ public abstract class DiscountPolicy {
     public abstract void applyDiscount(Map<Product,Integer> products);
 
     /**
-     * add this discount type for the products
-     * @param products
+     * add this discount type for new products
+     * @param products that get the discount
      * @return true for success
      */
-    public boolean addProductToThisDiscount(Map<Product,Integer> products){
+    public boolean addProductsToThisDiscount(Map<Product,Integer> products){
         if(products==null){
             //invalid null value product inserted or missing field
             return false;
@@ -71,12 +72,22 @@ public abstract class DiscountPolicy {
         return discountIdAcc++;
     }
 
+    /**
+     * remove product that is in store from this discount
+     * @param product to remove from discount
+     * @return true if product removed
+     */
+    public boolean removeProductFromDiscount(Product product){
+        return this.productsUnderThisDiscount.remove(product)!=null;
+    }
 
     /**
-     * edit specific product by discount
-     * @param product
+     * sign this discount as deleted so it cannot be applied anymore
      */
-    public abstract void editProductByDiscount(Product product);
+    public void deleteDiscount(){
+        this.isDeleted = true;
+    }
+
 
 
 }

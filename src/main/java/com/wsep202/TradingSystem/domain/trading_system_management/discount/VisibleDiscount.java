@@ -4,6 +4,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management.discount;
  */
 
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
+import com.wsep202.TradingSystem.domain.exception.NotValidEndTime;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +90,32 @@ public class VisibleDiscount extends DiscountPolicy{
      */
     public boolean removeProductFromDiscount(Product product){
         return this.productsUnderThisDiscount.remove(product) != null;
+    }
+
+
+    public void editDiscount(Calendar endTime, double percentage,
+                             Map<Product, Integer> productsToDelete,
+                             Map<Product, Integer> productsToAdd) {
+        if(endTime!=null){
+            if(endTime.compareTo(Calendar.getInstance())<0){
+                //the end time passed so not valid
+                throw new NotValidEndTime(endTime);
+            }
+            //end time is valid
+            this.endTime = endTime;
+        }
+        if(percentage>=0){
+            this.discountPercentage = percentage;
+        }
+        //add the new products to have discount
+        if(productsToAdd!=null){
+            this.addProductsToThisDiscount(productsToAdd);
+        }
+        if(productsToDelete!=null){
+            for(Product product: productsToDelete.keySet()){
+                removeProductFromDiscount(product);
+            }
+        }
     }
 
     /**
