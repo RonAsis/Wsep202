@@ -1075,4 +1075,116 @@ public class TradingSystemFacade {
         return modelMapper.map(users, listType);
     }
 
+    /**
+     * get all discounts of store with id received
+     * @param storeId id of the store to get its discounts
+     * @return
+     */
+    public List<DiscountPolicyDto> getAllStoreDiscounts(int storeId) {
+        Store store = tradingSystem.getStore(storeId);
+        List<DiscountPolicy> allDiscounts = store.getDiscountPolicies();
+        return convertStoreDiscountsToDtos(allDiscounts);
+    }
+
+    /**
+     * returns list of converted domain discounts to dto type discounts
+     * @param allDiscounts discount policy type discounts
+     * @return
+     */
+    private List<DiscountPolicyDto> convertStoreDiscountsToDtos(List<DiscountPolicy> allDiscounts) {
+        List<DiscountPolicyDto> allStoreDiscountsDtos = new ArrayList<>();
+        for(DiscountPolicy discount: allDiscounts){
+            DiscountPolicyDto discountDto = convertDiscountToDto(discount);
+            allStoreDiscountsDtos.add(discountDto);
+        }
+        return allStoreDiscountsDtos;
+    }
+
+    /**
+     * returns a single discount converted fro domain type to dto type
+     * @param discount to convert
+     * @return
+     */
+    private DiscountPolicyDto convertDiscountToDto(DiscountPolicy discount) {
+       //set all default discountDto fields
+        CompositeOperator operator =null;
+        Map<ProductDto,Integer> productsUnderThisDiscount = null;
+        Calendar endTime = null;
+        double discountPercentage = 0;
+        String conditionDescription = null;
+        Map<ProductDto,Integer> amountOfProductsForApplyDiscounts = null;
+        double minPrice = -1;
+        Map<Integer, DiscountPolicyDto> composedDiscounts = null;;
+        Map<Integer, DiscountPolicyDto> discountsToApply = null;;
+
+        endTime = discount.getEndTime();
+        discountPercentage = discount.getDiscountPercentage();
+
+        if(discount instanceof VisibleDiscount){
+            productsUnderThisDiscount = convertProductsMapToDto(discount.
+                    getProductsUnderThisDiscount());
+        }
+        else if(discount instanceof ConditionalProductDiscount){
+            productsUnderThisDiscount = convertProductsMapToDto(discount.
+                    getProductsUnderThisDiscount());
+            conditionDescription = ((ConditionalProductDiscount) discount).getConditionDescription();
+            amountOfProductsForApplyDiscounts = convertProductsMapToDto(((ConditionalProductDiscount) discount).
+                    getAmountOfProductsForApplyDiscounts());
+        }
+        else if(discount instanceof ConditionalStoreDiscount){
+            conditionDescription = ((ConditionalStoreDiscount) discount).getConditionDescription();
+            minPrice = ((ConditionalStoreDiscount) discount).getMinPrice();
+        }
+        else if(discount instanceof ConditionalComposedDiscount){
+            conditionDescription = ((ConditionalComposedDiscount) discount).getConditionDescription();
+            operator = ((ConditionalComposedDiscount) discount).getCompositeOperator();
+            composedDiscounts = convertDiscountsMapToDto(((ConditionalComposedDiscount) discount).
+                    getComposedDiscounts());
+            discountsToApply = convertDiscountsMapToDto(((ConditionalComposedDiscount) discount).
+                    getDiscountsToApply());
+        }
+        return new DiscountPolicyDto(productsUnderThisDiscount,endTime,discountPercentage,
+                conditionDescription,amountOfProductsForApplyDiscounts,minPrice,
+                composedDiscounts,discountsToApply,operator);
+    }
+
+    /**
+     * convert map of discount policies to their dtos
+     * @param discountsToApply
+     * @return
+     */
+    private Map<Integer, DiscountPolicyDto> convertDiscountsMapToDto(Map<Integer, DiscountPolicy> discountsToApply) {
+        Map<Integer,DiscountPolicyDto> dtoDiscountsMap = new HashMap<>();
+        for(Integer discountId: discountsToApply.keySet()){
+            DiscountPolicy discount = discountsToApply.get(discountId);
+            DiscountPolicyDto discountDto = convertDiscountToDto(discount);
+            dtoDiscountsMap.put(discountId,discountDto);
+        }
+        return dtoDiscountsMap;
+    }
+
+    /**
+     * convert map of Product to a map of ProductDto
+     * @param productsUnderThisDiscount
+     * @return
+     */
+    private Map<ProductDto, Integer> convertProductsMapToDto
+    (Map<Product, Integer> productsUnderThisDiscount) {
+        Map<ProductDto,Integer> productsDtos = new HashMap<>();
+        for(Product product: productsUnderThisDiscount.keySet()){
+            ProductDto productDto = convertProductToDto(product);
+            productsDtos.put(productDto,productsUnderThisDiscount.get(product));
+        }
+        return productsDtos;
+    }
+
+    /**
+     * convert from Product to Product Dto
+     * @param p product to convert
+     * @return
+     */
+    private ProductDto convertProductToDto(Product p) {
+        return new ProductDto(p.getProductSn(),p.getName(),p.getCategory().category,
+                p.getAmount(),p.getCost(),p.getOriginalCost(),p.getRank(),p.getStoreId());
+    }
 }
