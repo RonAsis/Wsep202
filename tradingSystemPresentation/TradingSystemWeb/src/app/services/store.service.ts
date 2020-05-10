@@ -4,6 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Product} from '../shared/product.model';
 import {Receipt} from '../shared/receipt.model';
 import {HttpService} from './http.service';
+import {UserService} from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,15 +18,23 @@ export class StoreService {
 
   private storeWantViewPurchaseHistory: number;
 
-  constructor(private httpService: HttpService) {
+  constructor(private httpService: HttpService, private userService: UserService) {
   }
 
   public setOwnerStores(ownerStore: boolean) {
     this.ownerStore = ownerStore;
   }
 
+  public getOwnerStores() {
+    return this.ownerStore;
+  }
+
   public setManagerStores(mangerStore: boolean) {
     this.mangerStore = mangerStore;
+  }
+
+  public getManagerStores() {
+    return this.mangerStore;
   }
 
   getStores(username: string, uuid: string) {
@@ -51,5 +60,9 @@ export class StoreService {
     map.set(new Product(1, 'store !!!!', 'sdsdsdds', 1, 232, 323, 1, 1, 'sdsd'), 3);
 
     return [new Receipt(1, 1, 'store!!!!!!', new Date(), 2, map)];
+  }
+
+  openStore(storeName: string, description: string) {
+    return this.httpService.openStore(this.userService.getUsername(), storeName, description, this.userService.getUuid());
   }
 }

@@ -13,10 +13,12 @@ import {StoreService} from '../../../services/store.service';
 export class StoreDetailComponent implements OnInit, AfterViewInit{
   @Input()store: Store;
   wantViewPurchaseHistory: boolean;
+  isOwner: boolean;
 
   constructor(private userService: UserService, private storeService: StoreService) { }
 
   ngOnInit(): void {
+    this.isOwner = this.storeService.getOwnerStores();
   }
 
   ngAfterViewInit(): void {

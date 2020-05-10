@@ -36,7 +36,7 @@ public class BuyerRegisteredService {
      * @param uuid
      * @return
      */
-    public StoreDto openStore(String usernameOwner,
+    public boolean openStore(String usernameOwner,
                               String storeName,
                               String description,
                               UUID uuid){

@@ -4,6 +4,11 @@
       <h1 class="text-danger">{{store.storeName}}</h1>
     </div>
   </div>
+
+  <div class="row">
+    <app-owned-store-edit *ngIf="isOwner" ></app-owned-store-edit>
+  </div>
+
   <div class="row">
     <div class="col-xs-12 text-warning">
       rank: {{store.rank}}

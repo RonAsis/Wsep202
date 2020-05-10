@@ -44,8 +44,8 @@ public class BuyerRegisteredController {
      * @param storeName     store name
      */
     @ApiOperation(value = "open store")
-    @PostMapping("open-store/{usernameOwner}/{storeName}/{description}{uuid}")
-    public StoreDto openStore(@PathVariable String usernameOwner,
+    @PostMapping("open-store/{usernameOwner}/{storeName}/{description}/{uuid}")
+    public boolean openStore(@PathVariable String usernameOwner,
                               @PathVariable String storeName,
                               @PathVariable String description,
                               @PathVariable UUID uuid) {

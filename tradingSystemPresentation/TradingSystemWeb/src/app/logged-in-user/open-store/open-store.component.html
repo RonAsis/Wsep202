@@ -8,16 +8,17 @@
                #storeNameInput/>
       </div>
       <div class="col-sm-5 from-group">
-       <p>Do PurchasePolicy and DiscountPolicyDto</p>
+        <label for="description">Description</label>
+        <input type="text" id="description" class="form-control"
+               #descriptionInput/>
       </div>
-
       <hr />
       <div class="col-xs-12">
         <button class="btn btn-success" type="submit" (click)="onOpenStore()">Open Store</button>
         <button class="btn btn-primary" type="submit" (click)="onClearDetails()">Clear</button>
       </div>
-      <div class="col-sm-5 from-group">
-        <p>{{messageReg}}</p>
+      <div class="col-sm-5 from-group " [style.color]="messageColor">
+        <p>{{message}}</p>
       </div>
     </div>
   </div>

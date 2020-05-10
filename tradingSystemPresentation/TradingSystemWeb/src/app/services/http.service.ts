@@ -116,10 +116,11 @@ export class HttpService {
       url, null);
   }
 
-  public openStore(usernameOwner: string, storeName: string, uuid: string) {
+  public openStore(usernameOwner: string, storeName: string, description: string, uuid: string) {
     const url = `${this.buyerUrl}/` + 'open-store/' +
       `${usernameOwner}/` +
       `${storeName}/` +
+      `${description}/` +
       `${uuid}/`;
     return this.http.post<boolean>(
       url, null);

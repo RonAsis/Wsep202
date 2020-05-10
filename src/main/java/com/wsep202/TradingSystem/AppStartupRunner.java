@@ -61,7 +61,7 @@ public class AppStartupRunner implements ApplicationRunner {
                     UserSystem user = UserSystem.builder()
                             .userName(faker.name().username())
                             .firstName(faker.name().firstName())
-                            .lastName(faker.name().firstName())
+                            .lastName(faker.name().lastName())
                             .password(faker.code().asin())
                             .build();
                     log.info(String.format("user: %s , %s", user.getUserName(), user.getPassword()));
