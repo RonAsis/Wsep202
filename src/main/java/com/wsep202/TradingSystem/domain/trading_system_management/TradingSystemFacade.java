@@ -144,7 +144,7 @@ public class TradingSystemFacade {
      * @param cost          - the cost of the product
      * @return true if succeed
      */
-    public boolean addProduct(@NotBlank String ownerUsername, int storeId,
+    public ProductDto addProduct(@NotBlank String ownerUsername, int storeId,
                               @NotBlank String productName, @NotBlank String category,
                               int amount, double cost, UUID uuid) {
         try {
@@ -153,10 +153,10 @@ public class TradingSystemFacade {
             //convert to a category we can add to the product
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             Product product = new Product(productName, productCategory, amount, cost, storeId);
-            return ownerStore.addNewProduct(user, product);
+            return ownerStore.addNewProduct(user, product)? modelMapper.map(product, ProductDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("add product failed", e);
-            return false;
+            return null;
         }
     }
 

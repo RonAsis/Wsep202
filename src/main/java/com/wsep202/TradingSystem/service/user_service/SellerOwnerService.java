@@ -177,7 +177,7 @@ public class SellerOwnerService {
     /**
      * add product
      */
-    public boolean addProduct(String ownerUsername,
+    public ProductDto addProduct(String ownerUsername,
                               int storeId,
                               String productName,
                               String category,

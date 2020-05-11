@@ -48,4 +48,7 @@ export class EditProductComponent implements OnInit {
     });
   }
 
+  onProductItemAdded(product: Product) {
+    this.productItems.push(product);
+  }
 }

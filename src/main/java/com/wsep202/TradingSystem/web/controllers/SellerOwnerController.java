@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.web.controllers;
 
+import com.wsep202.TradingSystem.dto.ProductDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
@@ -39,13 +40,13 @@ public class SellerOwnerController {
      */
     @ApiOperation(value = "add product")
     @PostMapping("add-product/{ownerUsername}/{storeId}/{productName}/{category}/{amount}/{cost}/{uuid}")
-    public boolean addProduct(@PathVariable String ownerUsername,
-                              @PathVariable int storeId,
-                              @PathVariable String productName,
-                              @PathVariable String category,
-                              @PathVariable int amount,
-                              @PathVariable double cost,
-                              @PathVariable UUID uuid) {
+    public ProductDto addProduct(@PathVariable String ownerUsername,
+                                 @PathVariable int storeId,
+                                 @PathVariable String productName,
+                                 @PathVariable String category,
+                                 @PathVariable int amount,
+                                 @PathVariable double cost,
+                                 @PathVariable UUID uuid) {
         return sellerOwnerService.addProduct(ownerUsername, storeId, productName, category, amount, cost, uuid);
     }
 

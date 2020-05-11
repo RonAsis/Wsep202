@@ -39,7 +39,8 @@ export class AddProductComponent implements OnInit {
       this.storeService.addProduct(this.store.storeId, this.productNameInput.nativeElement.value,
         this.selectedCategory, this.amountProducts.nativeElement.value,
         this.cost.nativeElement.value).subscribe(response => {
-          if (response){
+          if (response !== null && response !== undefined){
+            this.productItemAdded.emit(response);
             this.sucMessage();
             this.clearFields();
           }

@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-xs-12">
-    <app-add-product [store]="store"></app-add-product>
+    <app-add-product [store]="store" (productItemAdded)="onProductItemAdded($event)"></app-add-product>
   </div>
   <div class="cart-wrapper">
     <div class="panel panel-default">

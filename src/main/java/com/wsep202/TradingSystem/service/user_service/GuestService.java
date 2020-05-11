@@ -52,88 +52,6 @@ public class GuestService {
     }
 
     /**
-     * view store info by store id
-     * @param storeId
-     * @return
-     */
-    public StoreDto viewStoreInfo(int storeId){
-        return tradingSystemFacade.viewStoreInfo(storeId);
-    }
-
-    /**
-     * view product in store with store id info.
-     * @param storeId belongs to the product to view
-     * @param productId - product to see
-     * @return
-     */
-    public ProductDto viewProduct(int storeId, int productId){
-        return tradingSystemFacade.viewProduct(storeId, productId);
-    }
-
-    /**
-     *      * search product by productName
-     * @param productName
-     * @return
-     */
-    public List<ProductDto> searchProductByName(String productName){
-        return tradingSystemFacade.searchProductByName(productName);
-    }
-
-    /**
-     *      * search product by category
-     * @param category
-     * @return
-     */
-    public List<ProductDto> searchProductByCategory(String category){
-        return tradingSystemFacade.searchProductByCategory(category);
-    }
-
-    /**
-     *      * search product by KeyWords
-     * @param keyWords
-     * @return
-     */
-    public List<ProductDto> searchProductByKeyWords(List<String> keyWords){
-        return tradingSystemFacade.searchProductByKeyWords(keyWords);
-    }
-
-    /**
-     *      * filter products by range price
-     * @param products to filter
-     * thresholds:
-     * @param min
-     * @param max
-     * @return
-     */
-    public List<ProductDto> filterByRangePrice(List<ProductDto> products,
-                                               double min,
-                                               double max){
-        return tradingSystemFacade.filterByRangePrice(products, min, max);
-    }
-
-    /**
-     *      * filter products by product rank
-     * @param products to filter
-     * @param rank of product
-     * @return
-     */
-    public List<ProductDto> filterByProductRank(List<ProductDto> products,
-                                                int rank){
-        return tradingSystemFacade.filterByProductRank(products, rank);
-    }
-
-    /**
-     *      * filter products by store rank
-     * @param products
-     * @param rank - store rank to filter by
-     * @return
-     */
-    public List<ProductDto> filterByStoreRank(List<ProductDto> products,
-                                              int rank){
-        return tradingSystemFacade.filterByStoreRank(products, rank);
-    }
-
-    /**
      *purchase shopping cart
      * @return
      * @param purchaseJsonNode
@@ -159,6 +77,7 @@ public class GuestService {
     public Pair<Double, Double> getTotalPriceOfShoppingCart(String shoppingCart) {
        return tradingSystemFacade.getTotalPriceOfShoppingCart(createShoppingCartDto(shoppingCart));
     }
+
     private ShoppingCartDto createShoppingCartDto(String shoppingCart){
         try {
             return objectMapper.readValue(shoppingCart, ShoppingCartDto.class);

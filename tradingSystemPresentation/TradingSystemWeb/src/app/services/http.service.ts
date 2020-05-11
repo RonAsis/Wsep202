@@ -277,7 +277,7 @@ export class HttpService {
       `${amount}/` +
       `${cost}/` +
       `${uuid}`;
-    return this.http.post<boolean>(
+    return this.http.post<Product>(
       url, null);
   }
 
