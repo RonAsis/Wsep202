@@ -171,7 +171,7 @@ public class Store {
      * @param newManagerUser
      * @return true for success otherwise false
      */
-    public boolean addManager(UserSystem ownerStore, UserSystem newManagerUser) {
+    public MangerStore addManager(UserSystem ownerStore, UserSystem newManagerUser) {
         if (isOwner(ownerStore)) {    //check if the user appointing is an owner so can appoint
             MangerStore newManager = new MangerStore(newManagerUser);
             boolean isAppointedToManager = appointAdditionManager(ownerStore, newManager);
@@ -179,14 +179,14 @@ public class Store {
                 managers.add(newManager);
                 log.info("The user: " + newManagerUser.getUserName() + " added as a manager to the store: " + this.storeName +
                         " by: " + ownerStore.getUserName());
-                return true;
+                return newManager;
             }
         }
         //the addition of manager failed
         log.info("The user: " + newManagerUser.getUserName() + " couldn't be added as a manager to the store: "
                 + this.storeName +
                 " by: " + ownerStore.getUserName());
-        return false;
+        return null;
     }
 
     private boolean removeAppointManager(UserSystem owner, MangerStore mangerStore) {
@@ -817,6 +817,15 @@ public class Store {
                 .map(Map.Entry::getValue)
                 .orElse(new HashSet<>()).stream()
                 .map(UserSystem::getUserName)
+                .collect(Collectors.toList());
+    }
+
+    public List<MangerStore> getMySubMangers(String ownerUsername) {
+        return appointedManagers.entrySet().stream()
+                .filter(userSystemSetEntry -> userSystemSetEntry.getKey().getUserName().equals(ownerUsername))
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .orElse(new HashSet<>()).stream()
                 .collect(Collectors.toList());
     }
 }

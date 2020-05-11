@@ -5,10 +5,14 @@ import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.dto.*;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TradingSystemMapper {
@@ -43,6 +47,49 @@ public class TradingSystemMapper {
 
             typeMap.addMappings(mapper -> mapper.using(productCategoryStringConverter)
                     .map(Product::getCategory, ProductDto::setCategory));
+        }
+    }
+
+    @Component
+    public static class ManagerStoreToManagerDtoListConverter extends TypeMapConfigurer<List<MangerStore>, List<ManagerDto>> {
+        @Override
+        public void configure(TypeMap<List<MangerStore>, List<ManagerDto>> typeMap) {
+            Converter<MangerStore, ManagerDto> managerStoreToManagerDtoConverter =
+                    ctx -> ctx.getSource() == null ? null : ManagerDto.builder()
+                            .username(ctx.getSource().getAppointedManager().getUserName())
+                            .permissions(ctx.getSource().getStorePermissions().stream()
+                            .map(storePermission -> storePermission.function)
+                            .collect(Collectors.toList()))
+                            .build();
+            typeMap.setConverter(context ->{
+                List<ManagerDto> managerDtos = context.getSource().stream().map(mangerStore -> {
+                    return ManagerDto.builder()
+                            .username(mangerStore.getAppointedManager().getUserName())
+                            .permissions(mangerStore.getStorePermissions().stream()
+                                    .map(storePermission -> storePermission.function)
+                                    .collect(Collectors.toList()))
+                            .build();
+                }).collect(Collectors.toList());
+                context.getDestination().clear();
+                context.getDestination().addAll(managerDtos);
+                return context.getDestination();
+            });
+        }
+    }
+
+    @Component
+    public static class ManagerStoreToManagerDtoConverter extends TypeMapConfigurer<MangerStore, ManagerDto> {
+        @Override
+        public void configure(TypeMap<MangerStore, ManagerDto> typeMap) {
+            typeMap.setConverter(context ->{
+                String userName = context.getSource().getAppointedManager().getUserName();
+                List<String> permssions = context.getSource().getStorePermissions().stream()
+                        .map(storePermission -> storePermission.function)
+                        .collect(Collectors.toList());
+                context.getDestination().setUsername(userName);
+                context.getDestination().setPermissions(permssions);
+                return context.getDestination();
+            });
         }
     }
 

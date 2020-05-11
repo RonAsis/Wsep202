@@ -87,9 +87,18 @@ export class StoreService {
       storeId, selectedNewOwner, this.userService.getUuid());
   }
 
-  getMySubOwner(storeId: number) {
+  getMySubOwners(storeId: number) {
     return this.httpService.getMySubOwners(this.userService.getUsername(),
       storeId, this.userService.getUuid());
   }
 
+  addManager(storeId: number, selectedNewManager: string) {
+    return this.httpService.addManager(this.userService.getUsername(),
+      storeId, selectedNewManager, this.userService.getUuid());
+  }
+
+  getMySubMangers(storeId: number) {
+    return this.httpService.getMySubMangers(this.userService.getUsername(),
+      storeId, this.userService.getUuid());
+  }
 }

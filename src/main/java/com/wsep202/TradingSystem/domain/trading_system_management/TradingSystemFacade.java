@@ -233,15 +233,16 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
-    public boolean addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
+    public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
             UserSystem newManagerUser = tradingSystem.getUser(newManagerUsername, uuid);
             Store ownedStore = ownerUser.getOwnerStore(storeId);
-            return tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUser);
+            MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUser);
+            return Objects.nonNull(mangerStore) ? modelMapper.map(mangerStore, ManagerDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("Add manager failed", e);
-            return false;
+            return null;
         }
     }
 
@@ -1101,6 +1102,13 @@ public class TradingSystemFacade {
         return store.getMySubOwners(ownerUsername);
     }
 
+
+    public List<ManagerDto> getMySubMangers(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
+        Type listType = new TypeToken<List<ManagerDto>>() {}.getType();
+        return modelMapper.map(store.getMySubMangers(ownerUsername), listType);
+    }
     /**
      * returns list of converted domain discounts to dto type discounts
      * @param allDiscounts discount policy type discounts

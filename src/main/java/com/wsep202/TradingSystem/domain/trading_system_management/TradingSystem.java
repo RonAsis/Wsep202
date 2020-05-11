@@ -387,14 +387,18 @@ public class TradingSystem {
      * @param newManagerUser - the user that needs to be added as a manager
      * @return true if the addition was successful, false if there were a problem
      */
-    public boolean addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
-        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser)
-                && ownedStore.addManager(ownerUser, newManagerUser)) {
-            log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.getUserName(), ownedStore.getStoreId()));
-            return newManagerUser.addNewManageStore(ownedStore);
+    public MangerStore addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
+        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser)) {
+            MangerStore mangerStore = ownedStore.addManager(ownerUser, newManagerUser);
+            if(Objects.nonNull(mangerStore)) {
+                log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.getUserName(), ownedStore.getStoreId()));
+                if(newManagerUser.addNewManageStore(ownedStore)){
+                    return mangerStore;
+                }
+            }
         }
         log.info(String.format("failed add user as manager in store"));
-        return false;
+        return null;
     }
 
     /**

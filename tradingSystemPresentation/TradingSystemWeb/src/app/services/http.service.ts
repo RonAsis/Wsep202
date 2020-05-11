@@ -9,6 +9,7 @@ import {Receipt} from '../shared/receipt.model';
 import {ShoppingBag} from '../shared/ShoppingBag.model';
 import {stringify} from 'querystring';
 import {UserSystem} from '../shared/userSystem.model';
+import {Manager} from '../shared/manager.model';
 
 @Injectable({
   providedIn: 'root'
@@ -256,6 +257,7 @@ export class HttpService {
       url);
   }
 
+
   //////////////////////////// SellerOwnerController ///////////////////////////
 
   public viewPurchaseHistoryOfOwner(ownerUsername: string, storeId: number, uuid: string) {
@@ -352,7 +354,7 @@ export class HttpService {
       `${storeId}/` +
       `${newManagerUsername}/` +
       `${uuid}`;
-    return this.http.post<boolean>(
+    return this.http.post<Manager>(
       url, null);
   }
 
@@ -376,6 +378,15 @@ export class HttpService {
       `${storeId}/` +
       `${uuid}`;
     return this.http.get<string[]>(
+      url);
+  }
+
+  getMySubMangers(ownerUsername: string, storeId: number, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'get-my-sub-managers/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<Manager[]>(
       url);
   }
 

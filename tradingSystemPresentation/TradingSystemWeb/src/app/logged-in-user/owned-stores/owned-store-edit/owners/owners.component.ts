@@ -15,7 +15,7 @@ export class OwnersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.storeService.getMySubOwner(this.store.storeId).subscribe(
+    this.storeService.getMySubOwners(this.store.storeId).subscribe(
       response => {
         if (response !== undefined && response !== null){
           this.owners = response;

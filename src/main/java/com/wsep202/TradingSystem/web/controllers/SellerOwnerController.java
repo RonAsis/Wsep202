@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.web.controllers;
 
+import com.wsep202.TradingSystem.dto.ManagerDto;
 import com.wsep202.TradingSystem.dto.ProductDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
@@ -120,10 +121,10 @@ public class SellerOwnerController {
      */
     @ApiOperation(value = "add manager")
     @PostMapping("add-manager/{ownerUsername}/{storeId}/{newManagerUsername}/{uuid}")
-    public boolean addManager(@PathVariable String ownerUsername,
-                              @PathVariable int storeId,
-                              @PathVariable String newManagerUsername,
-                              @PathVariable UUID uuid) {
+    public ManagerDto addManager(@PathVariable String ownerUsername,
+                                 @PathVariable int storeId,
+                                 @PathVariable String newManagerUsername,
+                                 @PathVariable UUID uuid) {
         return sellerOwnerService.addManager(ownerUsername, storeId, newManagerUsername, uuid);
     }
 
@@ -166,5 +167,16 @@ public class SellerOwnerController {
                                                         @PathVariable int storeId,
                                                         @PathVariable UUID uuid) {
         return sellerOwnerService.getMySubOwners(ownerUsername, storeId,uuid);
+    }
+
+    /**
+     * get user not mangers not owner
+     */
+    @ApiOperation(value = "get my sub owners")
+    @GetMapping("et-my-sub-managers/{ownerUsername}/{storeId}/{uuid}")
+    public List<ManagerDto> getMySubMangers(@PathVariable String ownerUsername,
+                                       @PathVariable int storeId,
+                                       @PathVariable UUID uuid) {
+        return sellerOwnerService.getMySubMangers(ownerUsername, storeId,uuid);
     }
 }

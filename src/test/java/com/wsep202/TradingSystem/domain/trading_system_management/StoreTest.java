@@ -350,7 +350,7 @@ class StoreTest {
         @Test
         void addManagerPositive() {
             //success: owner can add a manager who is not already manager or owner of the store
-            Assertions.assertTrue(storeUT.addManager(owner,managerUser));
+            Assertions.assertTrue(storeUT.addManager(owner,managerUser) != null);
         }
 
         /**
@@ -361,7 +361,7 @@ class StoreTest {
         void addManagerAlreadyManagerNegative() {
             addManagerSetup();  //adding the manager at the first time
             //fail: owner can't add a manager who is already manager
-            Assertions.assertFalse(storeUT.addManager(owner,managerUser));  //add manager again
+            Assertions.assertFalse(storeUT.addManager(owner,managerUser) != null);  //add manager again
         }
 
         /**
@@ -372,7 +372,7 @@ class StoreTest {
         void addManagerAlreadyOwnerNegative() {
             addOwnerSetup();  //adding the manager at the first time
             //fail: owner can't add a manager who is already owner in the store
-            Assertions.assertFalse(storeUT.addManager(owner,newOwner));  //add manager again
+            Assertions.assertFalse(storeUT.addManager(owner,newOwner) != null);  //add manager again
         }
 
         /**
@@ -381,7 +381,7 @@ class StoreTest {
         @Test
         void notAppointingOwnerAddManagerNegative() {
             //fail: not owner try to appoint a new manager for the store
-            Assertions.assertFalse(storeUT.addManager(fakeOwner,managerUser));  //add manager again
+            Assertions.assertFalse(storeUT.addManager(fakeOwner,managerUser) != null);  //add manager again
         }
 
         /**
@@ -886,7 +886,7 @@ class StoreTest {
         @Test
         void addManagerPositive() {
             //success: owner can add a manager who is not already manager or owner of the store
-            Assertions.assertTrue(storeUT.addManager(ownerRealUser,managerUser));
+            Assertions.assertNull(storeUT.addManager(ownerRealUser,managerUser));
         }
 
         /**
@@ -897,7 +897,7 @@ class StoreTest {
         void addManagerAlreadyManagerNegative() {
             addManagerSetup();  //adding the manager at the first time
             //fail: owner can't add a manager who is already manager
-            Assertions.assertFalse(storeUT.addManager(ownerRealUser,managerUser));  //add manager again
+            Assertions.assertFalse(storeUT.addManager(ownerRealUser,managerUser) != null);  //add manager again
         }
 
         /**
@@ -908,7 +908,7 @@ class StoreTest {
         void addManagerAlreadyOwnerNegative() {
             addOwnerSetup();  //adding the manager at the first time
             //fail: owner can't add a manager who is already owner in the store
-            Assertions.assertFalse(storeUT.addManager(ownerRealUser,newOwnerReal));  //add manager again
+            Assertions.assertNull(storeUT.addManager(ownerRealUser, newOwnerReal));  //add manager again
         }
 
         /**
@@ -917,7 +917,7 @@ class StoreTest {
         @Test
         void notAppointingOwnerAddManagerNegative() {
             //fail: not owner try to appoint a new manager for the store
-            Assertions.assertFalse(storeUT.addManager(fakeOwnerReal,managerUser));  //add manager again
+            Assertions.assertNull(storeUT.addManager(fakeOwnerReal, managerUser));  //add manager again
         }
 
         /**

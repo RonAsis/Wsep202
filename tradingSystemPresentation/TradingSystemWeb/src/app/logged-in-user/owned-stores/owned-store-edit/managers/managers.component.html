@@ -1,1 +1,21 @@
-<p>managers works!</p>
+<div class="row">
+  <div class="col-xs-12">
+    <app-add-manager [store]="store" (managerItemAdded)="onManagerAdded($event)" ></app-add-manager>
+  </div>
+</div>
+<div class="cart-wrapper">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div>Username</div>
+    </div>
+    <!-- Table -->
+    <div class="list-group">
+      <app-owner-item
+        class="list-group-item"
+        *ngFor="let manager of managers"
+        [manager]=manager
+      >
+      </app-owner-item>
+    </div>
+  </div>
+</div>

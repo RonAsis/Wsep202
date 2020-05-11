@@ -245,7 +245,7 @@ public class SellerOwnerService {
     /**
      * add manager
      */
-    public boolean addManager(String ownerUsername,
+    public ManagerDto addManager(String ownerUsername,
                               int storeId,
                               String newManagerUsername,
                               UUID uuid){
@@ -272,5 +272,9 @@ public class SellerOwnerService {
 
     public List<String> getMySubOwners(String ownerUsername, int storeId, UUID uuid) {
         return tradingSystemFacade.getMySubOwners(ownerUsername, storeId, uuid);
+    }
+
+    public List<ManagerDto> getMySubMangers(String ownerUsername, int storeId, UUID uuid) {
+        return tradingSystemFacade.getMySubMangers(ownerUsername, storeId, uuid);
     }
 }
