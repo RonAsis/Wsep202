@@ -27,7 +27,7 @@ public class ConditionalComposedDiscount extends ConditionalDiscount {
      * the discounts to apply on the received products ion case they are stands in conditions
      * Integer = the discount id
      */
-    private HashMap<Integer, DiscountPolicy> discountsToApply;
+    private Map<Integer, DiscountPolicy> discountsToApply;
 
 
     public ConditionalComposedDiscount(CompositeOperator compositeOperator, Calendar endTime, double discountPercentage, String description) {

@@ -259,4 +259,9 @@ public class SellerOwnerService {
     public List<String> getAllOperationOfManger() {
         return tradingSystemFacade.getAllOperationOfManger();
     }
+
+    public List<DiscountPolicyDto> getAllStoreDiscounts(int storeId){
+        return tradingSystemFacade.getAllStoreDiscounts(storeId);
+    }
+
 }

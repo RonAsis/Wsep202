@@ -3,11 +3,14 @@
  * part of UC 4.2
  */
 package com.wsep202.TradingSystem.dto;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,7 +22,7 @@ public class DiscountPolicyDto {
     /**
      * products that has the specified discount
      */
-    protected HashMap<ProductDto, Integer> productsUnderThisDiscount;
+    protected Map<ProductDto, Integer> productsUnderThisDiscount;
     /**
      * the product validation date
      */
@@ -39,7 +42,7 @@ public class DiscountPolicyDto {
     /**
      * The table that describes what is the amount of items from each product to apply the discount on.
      */
-    private HashMap<ProductDto,Integer> amountOfProductsForApplyDiscounts;
+    private Map<ProductDto,Integer> amountOfProductsForApplyDiscounts;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -53,12 +56,17 @@ public class DiscountPolicyDto {
     /**
      * children components of the composite conditional discount
      */
-    private HashMap<Integer, DiscountPolicyDto> composedDiscounts;
+    private Map<Integer, DiscountPolicyDto> composedDiscounts;
 
     /**
      * the discounts to apply on the received products ion case they are stands in conditions
      */
-    private HashMap<Integer, DiscountPolicyDto> discountsToApply;
+    private Map<Integer, DiscountPolicyDto> discountsToApply;
+
+    /**
+     * the operation between the conditionals discounts
+     */
+    private CompositeOperator compositeOperator;
 
 
 }
