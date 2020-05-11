@@ -260,8 +260,17 @@ public class SellerOwnerService {
         return tradingSystemFacade.getAllOperationOfManger();
     }
 
-    public List<DiscountPolicyDto> getAllStoreDiscounts(int storeId){
-        return tradingSystemFacade.getAllStoreDiscounts(storeId);
+    public List<DiscountPolicyDto> getAllStoreDiscounts(String ownerUsername,int storeId, UUID uuid){
+        return tradingSystemFacade.getAllStoreDiscounts(ownerUsername, storeId, uuid);
     }
 
+    public List<String> getAllUsernameNotOwnerNotManger(String ownerUsername,
+                                                        int storeId,
+                                                        UUID uuid){
+        return tradingSystemFacade.getAllUsernameNotOwnerNotManger(ownerUsername, storeId, uuid);
+    }
+
+    public List<String> getMySubOwners(String ownerUsername, int storeId, UUID uuid) {
+        return tradingSystemFacade.getMySubOwners(ownerUsername, storeId, uuid);
+    }
 }

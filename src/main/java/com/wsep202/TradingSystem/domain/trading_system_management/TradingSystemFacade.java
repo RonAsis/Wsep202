@@ -216,9 +216,8 @@ public class TradingSystemFacade {
     public boolean addOwner(@NotBlank String ownerUsername, int storeId, @NotBlank String newOwnerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            UserSystem newOwnerUser = tradingSystem.getUser(newOwnerUsername, uuid);
             Store ownerStore = ownerUser.getOwnerStore(storeId);
-            return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUser);
+            return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
         } catch (TradingSystemException e) {
             log.error("Add owner failed", e);
             return false;
@@ -1077,13 +1076,29 @@ public class TradingSystemFacade {
 
     /**
      * get all discounts of store with id received
+     *
+     * @param ownerUsername
      * @param storeId id of the store to get its discounts
+     * @param uuid
      * @return
      */
-    public List<DiscountPolicyDto> getAllStoreDiscounts(int storeId) {
-        Store store = tradingSystem.getStore(storeId);
+    public List<DiscountPolicyDto> getAllStoreDiscounts(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
         List<DiscountPolicy> allDiscounts = store.getDiscountPolicies();
         return convertStoreDiscountsToDtos(allDiscounts);
+    }
+
+    public List<String> getAllUsernameNotOwnerNotManger(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
+        return tradingSystem.getAllUsernameNotOwnerNotManger(store);
+    }
+
+    public List<String> getMySubOwners(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
+        return store.getMySubOwners(ownerUsername);
     }
 
     /**
@@ -1187,4 +1202,5 @@ public class TradingSystemFacade {
         return new ProductDto(p.getProductSn(),p.getName(),p.getCategory().category,
                 p.getAmount(),p.getCost(),p.getOriginalCost(),p.getRank(),p.getStoreId());
     }
+
 }

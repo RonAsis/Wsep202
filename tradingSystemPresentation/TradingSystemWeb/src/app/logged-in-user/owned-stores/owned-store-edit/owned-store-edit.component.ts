@@ -17,7 +17,7 @@ export class OwnedStoreEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.store = this.shareService.storeSelected;
-
+    this.loadedFeature = 'Edit-Product';
   }
 
   onEditProduct() {

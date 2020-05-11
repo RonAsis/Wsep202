@@ -1,9 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Store} from '../../../../shared/store.model';
 import {ShareService} from '../../../../services/share.service';
 import {Product} from '../../../../shared/product.model';
-import {UserService} from '../../../../services/user.service';
-import {ShoppingCart} from '../../../../shared/shoppingCart.model';
 import {StoreService} from '../../../../services/store.service';
 
 @Component({

@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Getter
 @Setter
 @Slf4j
@@ -322,7 +324,7 @@ public class TradingSystem {
      * @return a list of receipts for all of the purchases the user made
      */
     private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress, String customerName)
-            throws TradingSystemException{
+            throws TradingSystemException {
         //check validity of the arguments fields
         if (validationOfPurchaseArgs(paymentDetails, shoppingCart, billingAddress)) return null;
         shoppingCart.isAllBagsInStock();    //ask the cart to check all products in stock
@@ -331,12 +333,12 @@ public class TradingSystem {
         log.info("applied stores discount policies on shopping cart");
         externalServiceManagement.charge(paymentDetails, shoppingCart);
         log.info("The user has been charged by his purchase.");
-        try{//request shipping for the purchase
+        try {//request shipping for the purchase
             externalServiceManagement.deliver(billingAddress, shoppingCart);
-        }catch (DeliveryRequestException exception){
+        } catch (DeliveryRequestException exception) {
             //in case delivery request rejected, cancel charged cart
-            externalServiceManagement.cancelCharge(paymentDetails,shoppingCart);
-            throw new DeliveryRequestException("The delivery request for: "+customerName+" " +
+            externalServiceManagement.cancelCharge(paymentDetails, shoppingCart);
+            throw new DeliveryRequestException("The delivery request for: " + customerName + " " +
                     "has been rejected.");
         }
         log.info("delivery request accepted");
@@ -357,8 +359,8 @@ public class TradingSystem {
     /**
      * This method is used to open a new store in the system
      *
-     * @param user           - the user that wants to open the store
-     * @param storeName      - the name of the store that the user decided
+     * @param user      - the user that wants to open the store
+     * @param storeName - the name of the store that the user decided
      * @return - false if the user is not registered, and true after the new store is added to store list
      */
     public Store openStore(UserSystem user,
@@ -386,9 +388,9 @@ public class TradingSystem {
      * @return true if the addition was successful, false if there were a problem
      */
     public boolean addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
-        if(Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser)
-                && ownedStore.addManager(ownerUser, newManagerUser) ){
-            log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.getUserName(),ownedStore.getStoreId()));
+        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser)
+                && ownedStore.addManager(ownerUser, newManagerUser)) {
+            log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.getUserName(), ownedStore.getStoreId()));
             return newManagerUser.addNewManageStore(ownedStore);
         }
         log.info(String.format("failed add user as manager in store"));
@@ -403,31 +405,33 @@ public class TradingSystem {
      * @param newOwnerUser - the user that needs to be added as an owner
      * @return true if the addition was successful, false if there were a problem
      */
-    public boolean addOwnerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newOwnerUser) {
-        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newOwnerUser)
-                && ownedStore.addOwner(ownerUser, newOwnerUser)) {
-            log.info(String.format("user %s was added as manager in store '%d'", newOwnerUser.getUserName(), ownedStore.getStoreId()));
-            return newOwnerUser.addNewOwnedStore(ownedStore);
+    public boolean addOwnerToStore(Store ownedStore, UserSystem ownerUser, String newOwnerUser) {
+        UserSystem userSystem = tradingSystemDao.getUserSystem(newOwnerUser).orElse(null);
+        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(userSystem)
+                && ownedStore.addOwner(ownerUser, userSystem)) {
+            log.info(String.format("user %s was added as manager in store '%d'", newOwnerUser, ownedStore.getStoreId()));
+            return userSystem.addNewOwnedStore(ownedStore);
         }
-        log.info(String.format("failed add user as manager in store"));
+        log.info("failed add user as manager in store");
         return false;
     }
 
     /**
      * remove manager from the store
-     * @param ownedStSore   - the store
+     *
+     * @param ownedStSore  - the store
      * @param ownerUser    - the owner of the store that want remove the manager
      * @param managerStore - the manager that want to remove
      * @return true if manager was removed, else false
      */
     public boolean removeManager(Store ownedStSore, UserSystem ownerUser, UserSystem managerStore) {
-        if(Objects.nonNull(ownedStSore) && Objects.nonNull(ownerUser) && Objects.nonNull(managerStore)
-                && ownedStSore.removeManager(ownerUser, managerStore) ){
-            log.info(String.format("user %s was removed as manager from store '%d'", managerStore.getUserName(),ownedStSore.getStoreId()));
+        if (Objects.nonNull(ownedStSore) && Objects.nonNull(ownerUser) && Objects.nonNull(managerStore)
+                && ownedStSore.removeManager(ownerUser, managerStore)) {
+            log.info(String.format("user %s was removed as manager from store '%d'", managerStore.getUserName(), ownedStSore.getStoreId()));
             return true;
         }
         log.info(String.format("failed remove user as manager from store"));
-        return  false;
+        return false;
     }
 
     /**
@@ -448,53 +452,69 @@ public class TradingSystem {
     /**
      * get the total price of cart before the discounts
      * and get the total price of cart after the discounts
+     *
      * @param cartToCalculate
      * @return
      */
-    public Pair<Double, Double> getTotalPrices(ShoppingCart cartToCalculate){
+    public Pair<Double, Double> getTotalPrices(ShoppingCart cartToCalculate) {
         double sumBeforeDiscounts;  //sum of original price
         double sumAfterDiscounts; //sum of the prices after discount
         //update the products in the bags with their discounts
-        Map<Store,ShoppingBag> bagsToCalculate = cartToCalculate.getShoppingBagsList();
-        for(Store store:bagsToCalculate.keySet()){  //apply the discounts on the bags in the cart (update the products prices)
+        Map<Store, ShoppingBag> bagsToCalculate = cartToCalculate.getShoppingBagsList();
+        for (Store store : bagsToCalculate.keySet()) {  //apply the discounts on the bags in the cart (update the products prices)
             store.applyDiscountPolicies((HashMap<Product, Integer>) bagsToCalculate.get(store).getProductListFromStore());
         }
         sumBeforeDiscounts = getOriginalTotalPrice(bagsToCalculate);
-        sumAfterDiscounts =  getCurrentTotalPrice(bagsToCalculate);
-        return new Pair<>(sumBeforeDiscounts,sumAfterDiscounts);
+        sumAfterDiscounts = getCurrentTotalPrice(bagsToCalculate);
+        return new Pair<>(sumBeforeDiscounts, sumAfterDiscounts);
     }
 
     /**
      * get the updated by discounts prices of the shopping bag.
+     *
      * @param bagsToCalculate
      * @return
      */
     private double getCurrentTotalPrice(Map<Store, ShoppingBag> bagsToCalculate) {
         double totalPrice = 0;
-        for(ShoppingBag bag: bagsToCalculate.values()){
-            totalPrice+= bag.getOriginalTotalCostOfBag();
+        for (ShoppingBag bag : bagsToCalculate.values()) {
+            totalPrice += bag.getOriginalTotalCostOfBag();
         }
         return totalPrice;
     }
 
     /**
      * get the shopping bag cost with original products prices
+     *
      * @param bagsToCalculate
      * @return
      */
     private double getOriginalTotalPrice(Map<Store, ShoppingBag> bagsToCalculate) {
         double totalPrice = 0;
-        for(ShoppingBag bag: bagsToCalculate.values()){
-            totalPrice+= bag.getTotalCostOfBag();
+        for (ShoppingBag bag : bagsToCalculate.values()) {
+            totalPrice += bag.getTotalCostOfBag();
         }
         return totalPrice;
     }
 
 
     public Set<UserSystem> getUsers(UserSystem user) {
-        if(tradingSystemDao.isAdmin(user.getUserName())){
+        if (tradingSystemDao.isAdmin(user.getUserName())) {
             return tradingSystemDao.getUsers();
         }
         throw new NotAdministratorException(user.getUserName());
+    }
+
+    public List<String> getAllUsernameNotOwnerNotManger(Store store) {
+        List<String> usernameOwners = store.getOwners().stream()
+                .map(UserSystem::getUserName).collect(Collectors.toList());
+        List<String> usernameMangers = store.getManagers().stream()
+                .map(userSystem -> userSystem.getAppointedManager().getUserName())
+                .collect(Collectors.toList());
+        return tradingSystemDao.getUsers().stream()
+                .filter(userSystem -> usernameOwners.stream().noneMatch(user -> user.equals(userSystem.getUserName())) &&
+                        usernameMangers.stream().noneMatch(user -> user.equals(userSystem.getUserName())))
+                .map(UserSystem::getUserName)
+                .collect(Collectors.toList());
     }
 }

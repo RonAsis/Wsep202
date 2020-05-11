@@ -316,6 +316,15 @@ export class HttpService {
       url, null);
   }
 
+  public getAllUsernameNotOwnerNotManger(ownerUsername: string, storeId: number, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'get-user-not-manger-not-owner/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<string[]>(
+      url);
+  }
+
   public removeManager(ownerUsername: string, storeId: number, managerUsername: string, uuid: string) {
     const url = `${this.sellerOwnerUrl}/` + 'remove-manager/' +
       `${ownerUsername}/` +
@@ -361,6 +370,14 @@ export class HttpService {
       url);
   }
 
+  getMySubOwners(ownerUsername: string, storeId: number, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'get-my-sub-owners/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<string[]>(
+      url);
+  }
 
   //////////////////////////////////////// general /////////////////////////////
 

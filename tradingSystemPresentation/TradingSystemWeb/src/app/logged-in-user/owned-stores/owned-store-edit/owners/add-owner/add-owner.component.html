@@ -1,1 +1,20 @@
-<p>add-owner works!</p>
+<div class="row">
+  <div>
+    <label>Users:
+      <span class="required-asterisk">*</span>
+    </label>
+    <select [ngModel]="selectedNewOwner" (ngModelChange)="onSelectNewOwner($event)">
+      <option *ngFor="let username of usernames" value={{username}}>
+        {{username}}
+      </option>
+    </select>
+  </div>
+</div>
+<hr/>
+<div class="col-xs-12">
+  <button class="btn btn-success" type="submit" (click)="onAddOwner()">Add Owner</button>
+</div>
+<div class="col-sm-5 from-group" [style.color]="messageColor">
+  <p>{{message}}</p>
+</div>
+

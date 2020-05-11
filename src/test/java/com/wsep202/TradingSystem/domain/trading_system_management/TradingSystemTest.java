@@ -387,7 +387,9 @@ class TradingSystemTest {
             // userSystem1 <==> newManagerUser
             when(store.addOwner(userSystem,userSystem1)).thenReturn(true);
             when(userSystem1.addNewOwnedStore(store)).thenReturn(true);
-            Assertions.assertTrue(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
+            when(userSystem1.addNewOwnedStore(store)).thenReturn(true);
+            when(tradingSystemDao.getUserSystem(userSystem1.getUserName())).thenReturn(Optional.of(userSystem1));
+            Assertions.assertTrue(tradingSystem.addOwnerToStore(store, userSystem, userSystem1.getUserName()));
         }
 
         /**
@@ -398,7 +400,8 @@ class TradingSystemTest {
             //set up for test
             setUpAddOwner();
             //check that the addition of the new owner was successful
-            Assertions.assertTrue(tradingSystem.addOwnerToStore(store, userSystem, userSystem1));
+            when(tradingSystemDao.getUserSystem(userSystem1.getUserName())).thenReturn(Optional.of(userSystem1));
+            Assertions.assertTrue(tradingSystem.addOwnerToStore(store, userSystem, userSystem1.getUserName()));
             //check the store contains this user as owner
             Assertions.assertTrue(store.getOwners().contains(userSystem1));
             //check that the new owner contains the store
@@ -412,7 +415,8 @@ class TradingSystemTest {
         void addOwnerToStoreWrongStoreOwner() {
             setUpAddOwnerWrongOwner();
             //try to add a new owner to store with a non owner of store
-            Assertions.assertFalse(tradingSystem.addOwnerToStore(store, userSystem2, userSystem1));
+            when(tradingSystemDao.getUserSystem(userSystem1.getUserName())).thenReturn(Optional.of(userSystem1));
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store, userSystem2, userSystem1.getUserName()));
             //check that the store didn't add the user as owner
             Assertions.assertFalse(store.getOwners().contains(userSystem1));
 
@@ -426,9 +430,10 @@ class TradingSystemTest {
             //try to add a null new owner
             Assertions.assertFalse(tradingSystem.addOwnerToStore(store, userSystem, null));
             //try to add new owner to a null store
-            Assertions.assertFalse(tradingSystem.addOwnerToStore(null, userSystem, userSystem1));
+            when(tradingSystemDao.getUserSystem(userSystem1.getUserName())).thenReturn(Optional.of(userSystem1));
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(null, userSystem, userSystem1.getUserName()));
             //old owner null
-            Assertions.assertFalse(tradingSystem.addOwnerToStore(store, null, userSystem1));
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store, null, userSystem1.getUserName()));
         }
 
         /**

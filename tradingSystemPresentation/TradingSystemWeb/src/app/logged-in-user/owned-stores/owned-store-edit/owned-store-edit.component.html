@@ -8,7 +8,7 @@
   <app-discount *ngIf="loadedFeature === 'Discount'"></app-discount>
   <app-edit-product *ngIf="loadedFeature === 'Edit-Product'"></app-edit-product>
   <app-managers *ngIf="loadedFeature === 'Managers'"></app-managers>
-  <app-owners *ngIf="loadedFeature === 'Owners'"></app-owners>
+  <app-owners *ngIf="loadedFeature === 'Owners'" [store]="store"></app-owners>
   <app-policy *ngIf="loadedFeature === 'Policy'"></app-policy>
 
 </div>

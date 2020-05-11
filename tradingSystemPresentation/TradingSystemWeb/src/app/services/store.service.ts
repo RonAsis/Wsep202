@@ -76,4 +76,20 @@ export class StoreService {
     return this.httpService.editProduct(this.userService.getUsername(), storeId, productSn, productName, category,
       amount, cost, this.userService.getUuid());
   }
+
+  public getAllUsernameNotOwnerNotManger( storeId: number) {
+    return this.httpService.getAllUsernameNotOwnerNotManger(this.userService.getUsername(),
+      storeId, this.userService.getUuid());
+  }
+
+  addOwner(storeId: number, selectedNewOwner: string) {
+    return this.httpService.addOwner(this.userService.getUsername(),
+      storeId, selectedNewOwner, this.userService.getUuid());
+  }
+
+  getMySubOwner(storeId: number) {
+    return this.httpService.getMySubOwners(this.userService.getUsername(),
+      storeId, this.userService.getUuid());
+  }
+
 }

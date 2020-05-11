@@ -63,6 +63,7 @@ import {AddOwnerComponent} from './logged-in-user/owned-stores/owned-store-edit/
 import {AddManagerComponent} from './logged-in-user/owned-stores/owned-store-edit/managers/add-manager/add-manager.component';
 import {AddProductComponent} from './logged-in-user/owned-stores/owned-store-edit/edit-product/add-product/add-product.component';
 import {ProductEditItemComponent} from './logged-in-user/owned-stores/owned-store-edit/edit-product/product-edit-item/product-edit-item.component';
+import { OwnerItemComponent } from './logged-in-user/owned-stores/owned-store-edit/owners/owner-item/owner-item.component';
 
 const routes: Routes = []; // sets up routes constant where you define your routes
 
@@ -118,7 +119,8 @@ const routes: Routes = []; // sets up routes constant where you define your rout
     PermissionComponent,
     EditManagerComponent,
     AddProductComponent,
-    ProductEditItemComponent
+    ProductEditItemComponent,
+    OwnerItemComponent
   ],
   imports: [
     RouterModule.forRoot(routes),

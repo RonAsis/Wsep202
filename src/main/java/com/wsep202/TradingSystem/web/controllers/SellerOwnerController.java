@@ -137,6 +137,16 @@ public class SellerOwnerController {
         return sellerOwnerService.getOwnerStores(ownerUsername, uuid);
     }
 
+    /**
+     * get user not mangers not owner
+     */
+    @ApiOperation(value = "get user not manger not owner")
+    @GetMapping("get-user-not-manger-not-owner/{ownerUsername}/{storeId}/{uuid}")
+    public List<String> getAllUsernameNotOwnerNotManger(@PathVariable String ownerUsername,
+                                         @PathVariable int storeId,
+                                         @PathVariable UUID uuid) {
+        return sellerOwnerService.getAllUsernameNotOwnerNotManger(ownerUsername, storeId,uuid);
+    }
 
     /**
      * add manager
@@ -145,5 +155,16 @@ public class SellerOwnerController {
     @GetMapping("get-all-operation-manager/")
     public List<String> getAllOperationOfManger() {
         return sellerOwnerService.getAllOperationOfManger();
+    }
+
+    /**
+     * get user not mangers not owner
+     */
+    @ApiOperation(value = "get my sub owners")
+    @GetMapping("get-my-sub-owners/{ownerUsername}/{storeId}/{uuid}")
+    public List<String> getMySubOwners(@PathVariable String ownerUsername,
+                                                        @PathVariable int storeId,
+                                                        @PathVariable UUID uuid) {
+        return sellerOwnerService.getMySubOwners(ownerUsername, storeId,uuid);
     }
 }

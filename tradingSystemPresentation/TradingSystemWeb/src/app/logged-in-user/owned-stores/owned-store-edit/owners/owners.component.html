@@ -1,1 +1,21 @@
-<p>owners works!</p>
+<div class="row">
+  <div class="col-xs-12">
+    <app-add-owner [store]="store" (ownerItemAdded)="onOwnerAdded($event)" ></app-add-owner>
+  </div>
+</div>
+  <div class="cart-wrapper">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div>Username</div>
+      </div>
+      <!-- Table -->
+      <div class="list-group">
+        <app-owner-item
+          class="list-group-item"
+          *ngFor="let username of owners"
+          [username]=username
+        >
+        </app-owner-item>
+      </div>
+    </div>
+</div>
