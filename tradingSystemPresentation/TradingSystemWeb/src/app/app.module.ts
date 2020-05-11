@@ -51,12 +51,20 @@ import {Product} from './shared/product.model';
 import {CartItemComponent} from './guest/shopping-cart/cart-item/cart-item.component';
 import {PurchaseShoppingCartComponent} from './guest/shopping-cart/purchase-shopping-cart/purchase-shopping-cart.component';
 import {OwnedStoreEditComponent} from './logged-in-user/owned-stores/owned-store-edit/owned-store-edit.component';
-import {AddProductComponent} from './logged-in-user/owned-stores/owned-store-edit/add-prodcut/add-product.component';
-import {Routes, RouterModule} from '@angular/router'; // CLI imports router
+import {Routes, RouterModule} from '@angular/router';
+import { DiscountComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/discount.component';
+import { PolicyComponent } from './logged-in-user/owned-stores/owned-store-edit/policy/policy.component';
+import { EditProductComponent } from './logged-in-user/owned-stores/owned-store-edit/edit-product/edit-product.component';
+import { ManagersComponent } from './logged-in-user/owned-stores/owned-store-edit/managers/managers.component';
+import { OwnersComponent } from './logged-in-user/owned-stores/owned-store-edit/owners/owners.component';
+import { PermissionComponent } from './logged-in-user/owned-stores/owned-store-edit/managers/permission/permission.component';
+import { EditManagerComponent } from './logged-in-user/owned-stores/owned-store-edit/managers/edit-manager/edit-manager.component';
+import {AddOwnerComponent} from './logged-in-user/owned-stores/owned-store-edit/owners/add-owner/add-owner.component';
+import {AddManagerComponent} from './logged-in-user/owned-stores/owned-store-edit/managers/add-manager/add-manager.component';
+import {AddProductComponent} from './logged-in-user/owned-stores/owned-store-edit/edit-product/add-product/add-product.component';
+import {ProductEditItemComponent} from './logged-in-user/owned-stores/owned-store-edit/edit-product/product-edit-item/product-edit-item.component';
 
-const routes: Routes = [
-  { path: 'addProduct', component: AddProductComponent },
-]; // sets up routes constant where you define your routes
+const routes: Routes = []; // sets up routes constant where you define your routes
 
 @NgModule({
   declarations: [
@@ -100,7 +108,17 @@ const routes: Routes = [
     CartItemComponent,
     PurchaseShoppingCartComponent,
     OwnedStoreEditComponent,
-    AddProductComponent
+    AddOwnerComponent,
+    AddManagerComponent,
+    DiscountComponent,
+    PolicyComponent,
+    EditProductComponent,
+    ManagersComponent,
+    OwnersComponent,
+    PermissionComponent,
+    EditManagerComponent,
+    AddProductComponent,
+    ProductEditItemComponent
   ],
   imports: [
     RouterModule.forRoot(routes),

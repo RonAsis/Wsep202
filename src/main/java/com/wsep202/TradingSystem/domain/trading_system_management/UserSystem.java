@@ -157,6 +157,9 @@ public class UserSystem implements Observer {
      * This method is used to change the stage of the user to logged-in
      */
     public void login() {
+        if(!notifications.isEmpty()){
+            subject.update(this);
+        }
         isLogin = true;
     }
 

@@ -4,6 +4,7 @@ import {ProductsComponent} from '../../products/products.component';
 import {ProductListComponent} from '../../products/product-list/product-list.component';
 import {UserService} from '../../../services/user.service';
 import {StoreService} from '../../../services/store.service';
+import {ShareService} from '../../../services/share.service';
 
 @Component({
   selector: 'app-store-detail',
@@ -13,23 +14,25 @@ import {StoreService} from '../../../services/store.service';
 export class StoreDetailComponent implements OnInit, AfterViewInit{
   @Input()store: Store;
   wantViewPurchaseHistory: boolean;
-  isOwner: boolean;
 
-  constructor(private userService: UserService, private storeService: StoreService) { }
+  constructor(private userService: UserService, private storeService: StoreService,
+              private shareService: ShareService) { }
 
   ngOnInit(): void {
-    this.isOwner = this.storeService.getOwnerStores();
   }
 
   ngAfterViewInit(): void {
   }
 
   viewPurchaseHistory() {
-    this.storeService.wantViewPurchaseHistory(this.store);
-    this.wantViewPurchaseHistory = true;
   }
 
   getIsAdminOwnerManger() {
-     this.userService.getIsAdmin();
+     return this.storeService.getOwnerStores();
+  }
+
+  editStore() {
+    this.shareService.storeSelected = this.store;
+    this.shareService.featureSelected.emit('Edit-Store');
   }
 }

@@ -35,6 +35,7 @@ export class UserService {
 
   constructor(private httpService: HttpService) {
     this.shoppingCart = new ShoppingCart(new Map<number, ShoppingBag>());
+    this.isAdmin = false;
   }
 
   public register(username: string,

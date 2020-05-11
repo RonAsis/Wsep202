@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col-xs-12">
+    <app-add-product [store]="store"></app-add-product>
+  </div>
+  <div class="cart-wrapper">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div>Name</div>
+        <p>       </p>
+        <div>Category</div>
+        <div>Amount</div>
+        <div>Cost</div>
+        <div></div>
+      </div>
+
+      <!-- Table -->
+      <div class="list-group">
+        <app-product-edit-item
+          class="list-group-item"
+          *ngFor="let product of productItems"
+          [productItem]="product"
+          (productItemDeleted)="onProductItemDeleted($event)"
+          (productItemChanged)="onProductItemChanged($event)"
+        >
+        </app-product-edit-item>
+      </div>
+    </div>
+  </div>
+</div>

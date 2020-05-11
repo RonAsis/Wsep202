@@ -21,7 +21,7 @@ export class HistoryPurchaseComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.wantStoreHistory) {
-      this.receipts = this.storeService.viewPurchaseHistory();
+      // this.receipts = this.storeService.viewPurchaseHistory();
     } else if (!this.userService.isLoggingUser()) {
       this.receipts = this.shareService.receipts;
     } else {

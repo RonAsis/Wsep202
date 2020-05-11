@@ -16,8 +16,6 @@ export class StoreService {
   private ownerStore = false;
   private mangerStore = false;
 
-  private storeWantViewPurchaseHistory: number;
-
   constructor(private httpService: HttpService, private userService: UserService) {
   }
 
@@ -50,19 +48,32 @@ export class StoreService {
     }
   }
 
-  wantViewPurchaseHistory(store: Store) {
-    this.storeWantViewPurchaseHistory = store.storeId;
-  }
-
-  viewPurchaseHistory() {
-    const map = new Map();
-    map.set(new Product(1, 'store !!!!1', 'sds', 1, 3232, 323, 1, 1, 'sdsd'), 3);
-    map.set(new Product(1, 'store !!!!', 'sdsdsdds', 1, 232, 323, 1, 1, 'sdsd'), 3);
-
-    return [new Receipt(1, 1, 'store!!!!!!', new Date(), 2, map)];
+  viewPurchaseHistory(storeId: number) {
+    if (this.ownerStore) {
+      return this.httpService
+        .viewPurchaseHistoryOfOwner(this.userService.getUsername(), storeId, this.userService.getUuid());
+    } else if (this.ownerStore) {
+      return this.httpService
+        .viewPurchaseHistoryOfManager(this.userService.getUsername(), storeId, this.userService.getUuid());
+    }
   }
 
   openStore(storeName: string, description: string) {
     return this.httpService.openStore(this.userService.getUsername(), storeName, description, this.userService.getUuid());
+  }
+
+  addProduct(storeId: number, productName: string, category: string, amount: number, cost: number) {
+    return this.httpService.addProduct(this.userService.getUsername(), storeId, productName, category,
+      amount, cost, this.userService.getUuid());
+  }
+
+  deleteProductFromStore(productSn: number, storeId: number) {
+    return this.httpService.deleteProductFromStore(this.userService.getUsername(),
+      storeId, productSn, this.userService.getUuid());
+  }
+
+  editProduct(storeId: any, productSn: number, productName: string, category: string, amount: number, cost: number) {
+    return this.httpService.editProduct(this.userService.getUsername(), storeId, productSn, productName, category,
+      amount, cost, this.userService.getUuid());
   }
 }

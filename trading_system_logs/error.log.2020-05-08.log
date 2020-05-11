@@ -1,0 +1,13 @@
+08-05-2020 10:42:37.0394|ERROR|a store or payment details or billing address can't be null, cart can't be null or empty
+08-05-2020 13:03:14.0978|ERROR|The bag is not in the cart fro store 'Hodkiewicz, Hodkiewicz and Hodkiewicz'
+08-05-2020 13:10:20.0858|ERROR|The bag is not in the cart fro store 'Boyle, Boyle and Boyle'
+08-05-2020 13:10:20.0859|ERROR|there is not enough 'The Man Within' in store 'Boyle, Boyle and Boyle'
+08-05-2020 13:11:59.0100|ERROR|The bag is not in the cart fro store 'Rolfson, Rolfson and Rolfson'
+08-05-2020 13:14:08.0418|ERROR|The bag is not in the cart fro store 'Ziemann-Ziemann'
+08-05-2020 15:10:51.0144|ERROR|The bag is not in the cart fro store 'Murphy and Sons'
+08-05-2020 15:24:25.0045|ERROR|The bag is not in the cart fro store 'Davis-Davis'
+08-05-2020 15:30:49.0723|ERROR|The bag is not in the cart fro store 'Hackett-Hackett'
+08-05-2020 15:40:23.0930|ERROR|The bag is not in the cart fro store 'Davis-Davis'
+08-05-2020 16:10:13.0170|ERROR|The bag is not in the cart fro store 'Kling-Kling'
+08-05-2020 16:13:32.0673|ERROR|The bag is not in the cart fro store 'Corkery Group'
+08-05-2020 16:13:46.0094|ERROR|The bag is not in the cart fro store 'Davis, Davis and Davis'

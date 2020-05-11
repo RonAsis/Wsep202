@@ -1,0 +1,61 @@
+<div class="cart-item-wrapper"
+     [ngStyle]="{color: 'blue'}"
+>
+  <div>
+    <input type="text"
+           value="productItem.name"
+           placeholder="productItem"
+           [value]="productItem.name"
+           [(ngModel)]="productItem.name"
+           (change)="onProductItemChanged($event)"
+           #nameProductItem
+    />
+  </div>
+
+  <div>
+    <select [ngModel]="selectedCategory" (ngModelChange)="onSelectCategory($event)">
+      <option *ngFor="let category of categories" value={{selectedCategory}}>
+        {{category}}
+      </option>
+    </select>
+  </div>
+
+  <div>
+    <input type="number"
+           value="productItem.amount"
+           placeholder="productItem"
+           id="amount"
+           min=1
+           [(ngModel)]="productItem.amount"
+           (change)="onProductItemChanged($event)"
+           #amountProductItem
+    />
+  </div>
+  <div>
+    <input type="number"
+           value="productItem.cost"
+           placeholder="productItem"
+           id="cost"
+           min=1
+           [(ngModel)]="productItem.cost"
+           (change)="onProductItemChanged($event)"
+           #costProductItem
+    />
+  </div>
+
+  <div>
+    <button type="button"
+            class="btn btn-default"
+            aria-label="Left Align"
+            (click)="onProductItemDeleted($event)"
+    >
+        <span class="glyphicon glyphicon-remove"
+              aria-hidden="true"
+              id={{productItem.productSn}}>
+        </span>
+    </button>
+  </div>
+</div>
+
+
+

@@ -1,0 +1,59 @@
+<h2>New Product</h2>
+<div class="container">
+  <div class="row">
+      <div class="col-sm-5 from-group">
+        <label for="productName">Product Name
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="text" id="productName" class="form-control" required
+               #productNameInput/>
+      </div>
+    <div class="row">
+    <div>
+        <label>Category:
+          <span class="required-asterisk">*</span>
+        </label>
+        <select [ngModel]="selectedCategory" (ngModelChange)="onSelectCategory($event)">
+          <option *ngFor="let category of categories" value={{category}}>
+            {{category}}
+          </option>
+        </select>
+      </div>
+      <div>
+        <label for="amount">Amount:
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="number"
+               value=1
+               placeholder="cartItem"
+               id="amount"
+               min=1
+               max=100000
+               #amountProducts
+        />
+      </div>
+
+      <div >
+        <label for="cost">Cost:
+          <span class="required-asterisk">*</span>
+        </label>
+        <input type="number"
+               value="1"
+               placeholder="cartItem"
+               id="cost"
+               min=1
+               #cost
+        />
+      </div>
+
+    </div>
+      <hr/>
+      <div class="col-xs-12">
+        <button class="btn btn-success" type="submit" (click)="onAddProduct()">Add Product</button>
+      </div>
+      <div class="col-sm-5 from-group" [style.color]="messageColor">
+        <p>{{message}}</p>
+      </div>
+    </div>
+</div>
+
