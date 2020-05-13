@@ -1,34 +1,32 @@
+/**
+ * this class determines the rules of purchase the user and his bag should stands in.
+ */
 package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType;
+import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.Product;
+import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import lombok.Data;
+import lombok.Synchronized;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import java.util.Map;
 
 @Data
-public class PurchasePolicy {
-
+public abstract class PurchasePolicy {
+    protected static int purchaseIdAcc = 0;
+    protected int id;
     /**
-     * allow everyone to purchase from store
+     * check if the purchase details stands in the purchase policy of the store
+     * purchase details: user details/shopping bag details
+     * @param products in bag to purchase
+     * @param user the purchasing user
+     * @param userAddress the shippment details of the user
+     * @return true in case the purchase in the store is legal for this policy
      */
-    private boolean isAllAllowed = true;
-
-    /**
-     * status as string
-     */
-    private String whoCanBuyStatus = "allow all purchases";
-
-    /**
-     * a list that includes all the purchase types which are allowed in the store.
-     */
-    private List<PurchaseType> listOfPurchaseTypes;
-
-    public PurchasePolicy(){
-        listOfPurchaseTypes = new LinkedList<>();
-        listOfPurchaseTypes.add(PurchaseType.BUY_IMMEDIATELY);
+    public abstract boolean isApproved(Map<Product,Integer> products,UserSystem user, BillingAddress userAddress);
+    @Synchronized
+    protected int getPurchaseIdAcc(){
+        return purchaseIdAcc++;
     }
-
-
 }
+

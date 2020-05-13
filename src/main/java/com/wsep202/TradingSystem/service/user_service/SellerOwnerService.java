@@ -44,10 +44,10 @@ public class SellerOwnerService {
         return tradingSystemFacade.removeDiscountFromStore(ownerUsername,storeId,uuid,discountId);
     }
 
-
+////////////////////UC 4.2////////////////////////////////////////////////////////////////////////
 
     /**
-     * UC 4.2 - owner adds a new visible discount
+     * owner adds a new visible discount
      * @param ownerUsername the owner does that add to his store
      * @param storeId the store that accepts the discount
      * @param uuid  of the owner
@@ -172,7 +172,7 @@ public class SellerOwnerService {
         return tradingSystemFacade.addConditionalComposedDiscountPolicy(ownerUsername, storeId,
                 uuid, conditionalComposedDto);
     }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * add product
