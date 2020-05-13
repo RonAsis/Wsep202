@@ -1256,4 +1256,9 @@ public class TradingSystemFacade {
         UserSystem ownerUser = tradingSystem.getUser(username, uuid);
         return ownerUser.isOwner(storeId);
     }
+
+    public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username, uuid);
+        return user.changeProductAmountInShoppingBag(storeId, amount, productSn);
+    }
 }

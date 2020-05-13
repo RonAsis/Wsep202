@@ -1,5 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.dto.*;
 import javafx.util.Pair;
@@ -17,6 +19,8 @@ import java.util.UUID;
 public class BuyerRegisteredService {
 
     private final TradingSystemFacade tradingSystemFacade;
+
+    private final ObjectMapper objectMapper;
 
     /**
      * logout username from the system
@@ -98,16 +102,14 @@ public class BuyerRegisteredService {
     /**
      * purchase shopping cart
      * @param userName user that purchase
-     * @param paymentDetails info to charge of the user
-     * @param billingAddress the destination of the delivery
      * @param uuid
      * @return
      */
     public List<ReceiptDto> purchaseShoppingCartBuyer(String userName,
-                                                      PaymentDetailsDto paymentDetails,
-                                                      BillingAddressDto billingAddress,
+                                                      PurchaseRegisterBuyerDto purchaseRegisterBuyerDto,
                                                       UUID uuid){
-        return tradingSystemFacade.purchaseShoppingCart(userName, paymentDetails, billingAddress, uuid);
+        return tradingSystemFacade.purchaseShoppingCart(userName,
+                purchaseRegisterBuyerDto.getPaymentDetailsDto(), purchaseRegisterBuyerDto.getBillingAddressDto(),  uuid);
     }
 
     public boolean addProductToShoppingCart(String username, int amount, ProductDto productDto, UUID uuid) {
@@ -122,8 +124,7 @@ public class BuyerRegisteredService {
         return tradingSystemFacade.getTotalPriceOfShoppingCart(username, uuid);
     }
 
-    public boolean changeProductAmountInShoppingBag(String username, int storeId, int productSn, UUID uuid) {
-        //TODO
-        return false;
+    public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
+        return tradingSystemFacade.changeProductAmountInShoppingBag(username, storeId, amount, productSn, uuid);
     }
 }

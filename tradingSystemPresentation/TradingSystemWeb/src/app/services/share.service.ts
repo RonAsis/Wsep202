@@ -17,7 +17,7 @@ export class ShareService {
     this.receipts = [];
   }
 
-  getReceipts(receipts: Receipt[]) {
+  setReceipts(receipts: Receipt[]) {
     this.receipts = receipts;
   }
 

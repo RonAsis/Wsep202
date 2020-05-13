@@ -167,4 +167,13 @@ public class ShoppingBag {
     public int getNumOfProducts() {
         return productListFromStore.values().size();
     }
+
+    public boolean changeProductAmountInShoppingBag(int amount, int productSn) {
+        return productListFromStore.entrySet().stream()
+                .filter(productIntegerEntry -> productIntegerEntry.getKey().getProductSn() == productSn)
+                .findFirst().map(productIntegerEntry -> {
+                    productIntegerEntry.setValue(amount);
+                    return true;
+                }).orElse(false);
+    }
 }

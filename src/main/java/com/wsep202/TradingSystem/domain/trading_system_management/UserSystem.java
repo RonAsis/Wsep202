@@ -288,4 +288,8 @@ public class UserSystem implements Observer {
                 .anyMatch(store -> store.getStoreId() == storeId);
 
     }
+
+    public boolean changeProductAmountInShoppingBag(int storeId,int amount, int productSn) {
+        return shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
+    }
 }

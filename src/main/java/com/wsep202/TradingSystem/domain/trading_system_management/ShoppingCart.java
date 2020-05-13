@@ -180,4 +180,10 @@ public class ShoppingCart {
         }
     }
 
+    public boolean changeProductAmountInShoppingBag(int storeId, int amount, int productSn) {
+        return shoppingBagsList.entrySet().stream()
+                .filter(storeShoppingBagEntry -> storeShoppingBagEntry.getKey().getStoreId() == storeId)
+                .map(storeShoppingBagEntry -> storeShoppingBagEntry.getValue())
+                .findFirst().map(shoppingBag -> shoppingBag.changeProductAmountInShoppingBag(amount, productSn)).orElse(false);
+    }
 }
