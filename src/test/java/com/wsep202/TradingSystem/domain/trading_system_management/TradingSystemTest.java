@@ -352,7 +352,7 @@ class TradingSystemTest {
             // userSystem1 <==> newManagerUser
             when(store.addManager(userSystem,userSystem1)).thenReturn(any());
             when(userSystem1.addNewManageStore(store)).thenReturn(true);
-            Assertions.assertNotNull(tradingSystem.addMangerToStore(store, userSystem, userSystem1));
+            Assertions.assertNotNull(tradingSystem.addMangerToStore(store, userSystem, userSystem1.getUserName()));
         }
 
         /**
@@ -363,7 +363,7 @@ class TradingSystemTest {
             Store storeNull = mock(Store.class);
             UserSystem userSystemNull1 = mock(UserSystem.class);
             UserSystem userSystemNull2 = mock(UserSystem.class);
-            Assertions.assertFalse(tradingSystem.addMangerToStore(storeNull, userSystemNull1, userSystemNull2) != null);
+            Assertions.assertFalse(tradingSystem.addMangerToStore(storeNull, userSystemNull1, userSystemNull2.getUserName()) != null);
         }
 
         /**
@@ -375,7 +375,7 @@ class TradingSystemTest {
             // userSystem1 <==> newManagerUser
             when(store.addManager(userSystem,userSystem1)).thenReturn(any());
             when(userSystem1.addNewManageStore(store)).thenReturn(false);
-            Assertions.assertNull(tradingSystem.addMangerToStore(store, userSystem, userSystem1));
+            Assertions.assertNull(tradingSystem.addMangerToStore(store, userSystem, userSystem1.getUserName()));
         }
 
         /**

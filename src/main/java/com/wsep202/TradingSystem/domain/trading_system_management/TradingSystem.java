@@ -384,15 +384,16 @@ public class TradingSystem {
      *
      * @param ownedStore     - The store to which you want to add a manager
      * @param ownerUser      - owner of the store
-     * @param newManagerUser - the user that needs to be added as a manager
      * @return true if the addition was successful, false if there were a problem
      */
-    public MangerStore addMangerToStore(Store ownedStore, UserSystem ownerUser, UserSystem newManagerUser) {
-        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser)) {
-            MangerStore mangerStore = ownedStore.addManager(ownerUser, newManagerUser);
+    public MangerStore addMangerToStore(Store ownedStore, UserSystem ownerUser, String newManagerUsername) {
+        Optional<UserSystem> newManagerUser = tradingSystemDao.getUserSystem(newManagerUsername);
+        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser) &&
+                newManagerUser.isPresent()) {
+            MangerStore mangerStore = ownedStore.addManager(ownerUser, newManagerUser.get());
             if(Objects.nonNull(mangerStore)) {
-                log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.getUserName(), ownedStore.getStoreId()));
-                if(newManagerUser.addNewManageStore(ownedStore)){
+                log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.get().getUserName(), ownedStore.getStoreId()));
+                if(newManagerUser.get().addNewManageStore(ownedStore)){
                     return mangerStore;
                 }
             }

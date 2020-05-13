@@ -11,6 +11,7 @@ import {HttpService} from './http.service';
 import {Observable, of} from 'rxjs';
 import {PaymentDetails} from '../shared/paymentDetails.model';
 import {BillingAddress} from '../shared/billingAddress.model';
+import {ShareService} from './share.service';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,7 @@ export class UserService {
 
   private usernameWantSeeHistory = null;
 
-  constructor(private httpService: HttpService) {
+  constructor(private httpService: HttpService, private  shareService: ShareService) {
     this.shoppingCart = new ShoppingCart(new Map<number, ShoppingBag>());
     this.isAdmin = false;
   }
@@ -90,28 +91,11 @@ export class UserService {
   }
 
   viewPurchaseHistory() {
-    let receipts: Receipt[] = [];
-    this.httpService.viewPurchaseHistory(this.username, this.uuid)
-      .subscribe(res => receipts = res);
-
-    ///// need to delete///////
-    const map = new Map();
-    map.set(new Product(1, '2', 'sds', 1, 3232, 323, 1, 1, 'sdsd'), 3);
-    map.set(new Product(1, '2', 'sdsdsdds', 1, 232, 323, 1, 1, 'sdsd'), 3);
-
-    return [new Receipt(1, 1, 'sds', new Date(), 2, map)];
-    ///////////////
-
-    // return receipts;
+    return this.httpService.viewPurchaseHistory(this.username, this.uuid);
   }
 
   getUsers() {
-    if (this.usernameWantSeeHistory !== null) {
-      return of([new UserSystem('ron', 'ron', 'asis'),
-        new UserSystem('ron1', 'ro1n11', 'asis1')]);
-    } else {
      return this.httpService.getUsers(this.username, this.uuid);
-    }
   }
 
   wantViewPurchaseHistory(user: UserSystem) {
@@ -133,7 +117,7 @@ export class UserService {
   getShoppingCart() {
     console.log(this.isLoggingUser());
     if (!this.isLoggingUser()) {
-      return of(this.shoppingCart);
+      return of(this.shareService.createShoppingCartItems(this.shoppingCart));
     }else {
       return this.httpService.getShoppingCart(this.username, this.uuid);
     }
@@ -151,7 +135,9 @@ export class UserService {
 
   removeCartItem(productSn: number, storeId: number) {
     if (!this.isLoggingUser()){
-      this.shoppingCart.removeCartItem(productSn, storeId);
+      return of(this.shoppingCart.removeCartItem(productSn, storeId));
+    }else{
+      return this.httpService.removeProductInShoppingBag(this.username, storeId, productSn, this.uuid);
     }
   }
 

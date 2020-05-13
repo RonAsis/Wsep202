@@ -188,6 +188,15 @@ public class UserSystem implements Observer {
                 .findFirst().orElseThrow(() -> new NoOwnerInStoreException(userName, storeId));
     }
 
+    public Store getOwnerOrManagerStore(int storeId) {
+        return ownedStores.stream()
+                .filter(store -> store.getStoreId() == storeId)
+                .findFirst().orElse( managedStores.stream()
+                .filter(store -> store.getStoreId() == storeId && store.managerCanEdit(userName))
+                .findFirst().orElseThrow(() -> new TradingSystemException(
+                                String.format("The user %s is not manager with edit permission or owner of store %d",userName, storeId))));
+    }
+
     /**
      * This method is used to find if this user is a manager of a certain store.
      *
@@ -274,10 +283,13 @@ public class UserSystem implements Observer {
         return notifications;
     }
 
-    public List<String> getOperationsCanDo(Store store) {
-        return managedStores.stream()
-                .filter(storeManagement -> storeManagement.getStoreId()== store.getStoreId())
-                .findFirst().map(storeManagement -> storeManagement.getOperationsCanDo(this))
-                .orElse(new ArrayList<>());
+    public boolean isOwner(int storeId) {
+        return ownedStores.stream()
+                .anyMatch(store -> store.getStoreId() == storeId);
+
+    }
+
+    public boolean changeProductAmountInShoppingBag(int storeId,int amount, int productSn) {
+        return shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
     }
 }

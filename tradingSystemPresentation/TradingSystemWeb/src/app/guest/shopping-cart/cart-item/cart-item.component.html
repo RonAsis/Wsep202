@@ -2,24 +2,24 @@
      [ngStyle]="{color: 'blue'}"
 >
   <div>
-    {{cartItem.k.name}}
+    {{cartItem.name}}
   </div>
   <div>
-    {{cartItem.k.cost}} USD
+    {{cartItem.cost}} USD
   </div>
   <div>
     <input type="number"
-           value="cartItem.v"
+           value="cartItem"
            placeholder="cartItem"
            id="amount"
            min=1
-           [(ngModel)]="cartItem.v"
+           [(ngModel)]="cartItem.amountInShoppingCart"
            (change)="onCartItemChanged($event)"
            #amountCartItem
     />
   </div>
   <div>
-    {{cartItem.v * cartItem.k.cost}} USD
+    {{cartItem.amountInShoppingCart * cartItem.cost}} USD
   </div>
   <div>
     <button type="button"
@@ -29,7 +29,7 @@
     >
         <span class="glyphicon glyphicon-remove"
               aria-hidden="true"
-              id={{cartItem.k.productSn}}>
+              id={{cartItem.productSn}}>
         </span>
     </button>
   </div>

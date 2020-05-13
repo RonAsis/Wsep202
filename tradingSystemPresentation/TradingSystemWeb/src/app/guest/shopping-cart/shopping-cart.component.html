@@ -16,7 +16,7 @@
     <div class="list-group">
       <app-cart-item
         class="list-group-item"
-        *ngFor="let item of cartItems | mapToArray"
+        *ngFor="let item of cartItems"
         [cartItem]="item"
         (cartItemDeleted)="onCartItemDeleted($event)"
         (cartItemChanged)="onCartItemChanged($event)"

@@ -7,15 +7,19 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <div>Username</div>
+      <div>Permissions</div>
     </div>
     <!-- Table -->
     <div class="list-group">
-      <app-owner-item
+      <app-manager-item
         class="list-group-item"
         *ngFor="let manager of managers"
         [manager]=manager
+        [store]="store"
+        (managerItemDeleted)="onManagerItemDeleted($event)"
+        (managerItemChanged)="onManagerItemChanged($event)"
       >
-      </app-owner-item>
+      </app-manager-item>
     </div>
   </div>
 </div>

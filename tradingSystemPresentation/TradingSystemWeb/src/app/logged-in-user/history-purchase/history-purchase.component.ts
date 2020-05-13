@@ -13,19 +13,24 @@ export class HistoryPurchaseComponent implements OnInit {
   receipts: Receipt[];
   receipt: string;
   searchText: string;
-  @Input() wantStoreHistory: boolean;
 
   constructor(private userService: UserService, private storeService: StoreService, private shareService: ShareService) {
-    this.wantStoreHistory = false;
   }
 
   ngOnInit(): void {
-    if (this.wantStoreHistory) {
-      // this.receipts = this.storeService.viewPurchaseHistory();
-    } else if (!this.userService.isLoggingUser()) {
-      this.receipts = this.shareService.receipts;
+    if (this.shareService.storeSelected !== null) {
+      this.storeService.viewPurchaseHistory(this.shareService.storeSelected.storeId)
+        .subscribe(response => {
+          if (response !== undefined && response !== null){
+            this.receipts = response;
+          }
+        });
     } else {
-      this.receipts = this.userService.viewPurchaseHistory();
+      this.userService.viewPurchaseHistory().subscribe(response => {
+        if (response !== undefined && response !== null){
+          this.receipts = response;
+        }
+      });
     }
   }
 

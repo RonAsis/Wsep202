@@ -15,7 +15,6 @@ public enum StorePermission {
     VIEW("view"),
     EDIT("edit");
 
-
     public final String function;
 
     StorePermission(String function) {

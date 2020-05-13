@@ -149,7 +149,7 @@ public class TradingSystemFacade {
                               int amount, double cost, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get registered user with ownerUsername
-            Store ownerStore = user.getOwnerStore(storeId); //verify he owns store with storeId
+            Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
             //convert to a category we can add to the product
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             Product product = new Product(productName, productCategory, amount, cost, storeId);
@@ -171,7 +171,7 @@ public class TradingSystemFacade {
     public boolean deleteProductFromStore(@NotBlank String ownerUsername, int storeId, int productSn, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get the registered user
-            Store ownerStore = user.getOwnerStore(storeId); //verify he is owner of the store
+            Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he is owner of the store
             return ownerStore.removeProductFromStore(user, productSn);
         } catch (TradingSystemException e) {
             log.error("deleteProduct from store failed", e);
@@ -196,7 +196,7 @@ public class TradingSystemFacade {
                                @NotBlank String category, int amount, double cost, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownerStore = user.getOwnerStore(storeId);
+            Store ownerStore = user.getOwnerOrManagerStore(storeId);
             return ownerStore.editProduct(user, productSn, productName, category, amount, cost);
         } catch (TradingSystemException e) {
             log.error("editProduct failed", e);
@@ -236,9 +236,8 @@ public class TradingSystemFacade {
     public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            UserSystem newManagerUser = tradingSystem.getUser(newManagerUsername, uuid);
             Store ownedStore = ownerUser.getOwnerStore(storeId);
-            MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUser);
+            MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUsername);
             return Objects.nonNull(mangerStore) ? modelMapper.map(mangerStore, ManagerDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("Add manager failed", e);
@@ -251,21 +250,49 @@ public class TradingSystemFacade {
      *
      * @param ownerUsername   the username of the owner store
      * @param storeId         - of the store that want add permission the manger
-     * @param managerUserName - the user name of the manger
+     * @param managerUsername - the user name of the manger
      * @param permission      - the new permission
      * @param uuid
      * @return true if succeed
      */
-    public boolean addPermission(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUserName, @NotBlank String permission, UUID uuid) {
+    public boolean addPermission(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUsername, @NotBlank String permission, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
             Store ownedStore = ownerUser.getOwnerStore(storeId);
-            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUserName);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             StorePermission storePermission = StorePermission.getStorePermission(permission);
             return ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
         } catch (TradingSystemException e) {
             log.error("Add permission failed", e);
             return false;
+        }
+    }
+
+
+    public boolean removePermission(String ownerUsername, int storeId, String managerUsername, String permission, UUID uuid) {
+        try {
+            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
+            StorePermission storePermission = StorePermission.getStorePermission(permission);
+            return ownedStore.removePermission(ownerUser, managerStore, storePermission);
+        } catch (TradingSystemException e) {
+            log.error("Add permission failed", e);
+            return false;
+        }
+    }
+
+
+    public List<String> getPermissionOfManager(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
+        try {
+            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
+            Set<StorePermission> permissionOfManager = ownedStore.getPermissionOfManager(ownerUser, managerStore);
+            return StorePermission.getStringPermissions(permissionOfManager);
+        } catch (TradingSystemException e) {
+            log.error("get permission failed", e);
+            return null;
         }
     }
 
@@ -626,8 +653,8 @@ public class TradingSystemFacade {
 
     public List<String> getOperationsCanDo(String manageUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(manageUsername, uuid);
-        Store store = tradingSystem.getStore(storeId);
-        return user.getOperationsCanDo(store);
+        Store ownerStore = user.getManagerStore(storeId);
+        return ownerStore.getOperationsCanDo(user);
     }
 
     public List<String> getAllOperationOfManger() {
@@ -816,9 +843,10 @@ public class TradingSystemFacade {
         return user.saveProductInShoppingBag(store, product, amount);
     }
 
-    public ShoppingCartViewDto getShoppingCart(String username, UUID uuid) {
+    public  List<ProductShoppingCartDto> getShoppingCart(String username, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username,uuid);
-        return modelMapper.map(user.getShoppingCart(), ShoppingCartViewDto.class);
+        Type listType = new TypeToken<List<ProductShoppingCartDto>>() {}.getType();
+        return modelMapper.map(user.getShoppingCart(), listType);
     }
 
     public Pair<Double, Double> getTotalPriceOfShoppingCart(String username, UUID uuid) {
@@ -1211,4 +1239,26 @@ public class TradingSystemFacade {
                 p.getAmount(),p.getCost(),p.getOriginalCost(),p.getRank(),p.getStoreId());
     }
 
+    public List<String> getPermissionCantDo(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
+        try {
+            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
+            Set<StorePermission> permissionOfManager = ownedStore.getPermissionCantDo(ownerUser, managerStore);
+            return StorePermission.getStringPermissions(permissionOfManager);
+        } catch (TradingSystemException e) {
+            log.error("get permission failed", e);
+            return null;
+        }
+    }
+
+    public boolean isOwner(String username, int storeId, UUID uuid) {
+        UserSystem ownerUser = tradingSystem.getUser(username, uuid);
+        return ownerUser.isOwner(storeId);
+    }
+
+    public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username, uuid);
+        return user.changeProductAmountInShoppingBag(storeId, amount, productSn);
+    }
 }

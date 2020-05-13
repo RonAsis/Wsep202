@@ -117,6 +117,43 @@ public class SellerOwnerController {
     }
 
     /**
+     * get permission og manager
+     */
+    @ApiOperation(value = "add permission")
+    @PutMapping("get-permission/{ownerUsername}/{storeId}/{managerUsername}/{uuid}")
+    public List<String> getPermissionOfManager(@PathVariable String ownerUsername,
+                                 @PathVariable int storeId,
+                                 @PathVariable String managerUsername,
+                                 @PathVariable UUID uuid) {
+        return sellerOwnerService.getPermissionOfManager(ownerUsername, storeId, managerUsername, uuid);
+    }
+
+    /**
+     * remove permission
+     */
+    @ApiOperation(value = "remove permission")
+    @PutMapping("remove-permission/{ownerUsername}/{storeId}/{managerUsername}/{permission}/{uuid}")
+    public boolean removePermission(@PathVariable String ownerUsername,
+                                 @PathVariable int storeId,
+                                 @PathVariable String managerUsername,
+                                 @PathVariable String permission,
+                                 @PathVariable UUID uuid) {
+        return sellerOwnerService.removePermission(ownerUsername, storeId, managerUsername, permission, uuid);
+    }
+
+    /**
+     * get permissions can add (all the permissions that manager can't do)
+     */
+    @ApiOperation(value = "get permissions can't do")
+    @GetMapping("get-permissions-cant-do/{ownerUsername}/{storeId}/{managerUsername}/{uuid}")
+    public List<String> getPermissionCantDo(@PathVariable String ownerUsername,
+                                            @PathVariable int storeId,
+                                            @PathVariable String managerUsername,
+                                            @PathVariable UUID uuid) {
+        return sellerOwnerService.getPermissionCantDo(ownerUsername, storeId, managerUsername, uuid);
+    }
+
+    /**
      * add manager
      */
     @ApiOperation(value = "add manager")
@@ -172,8 +209,19 @@ public class SellerOwnerController {
     /**
      * get user not mangers not owner
      */
+    @ApiOperation(value = "get is owner")
+    @GetMapping("is-owner/{username}/{storeId}/{uuid}")
+    public boolean isOwner(@PathVariable String username,
+                           @PathVariable int storeId,
+                           @PathVariable UUID uuid) {
+        return sellerOwnerService.isOwner(username, storeId,uuid);
+    }
+
+    /**
+     * get user not mangers not owner
+     */
     @ApiOperation(value = "get my sub owners")
-    @GetMapping("et-my-sub-managers/{ownerUsername}/{storeId}/{uuid}")
+    @GetMapping("get-my-sub-managers/{ownerUsername}/{storeId}/{uuid}")
     public List<ManagerDto> getMySubMangers(@PathVariable String ownerUsername,
                                        @PathVariable int storeId,
                                        @PathVariable UUID uuid) {

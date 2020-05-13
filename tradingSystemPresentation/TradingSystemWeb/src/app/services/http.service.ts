@@ -10,6 +10,7 @@ import {ShoppingBag} from '../shared/ShoppingBag.model';
 import {stringify} from 'querystring';
 import {UserSystem} from '../shared/userSystem.model';
 import {Manager} from '../shared/manager.model';
+import {ProductShoppingCartDto} from '../shared/productShoppingCartDto.model';
 
 @Injectable({
   providedIn: 'root'
@@ -191,7 +192,7 @@ export class HttpService {
     const url = `${this.buyerUrl}/` + 'get-shopping-cart/' +
       `${username}/` +
       `${uuid}`;
-    return this.http.get<ShoppingCart>(url);
+    return this.http.get<ProductShoppingCartDto[]>(url);
   }
 
   getTotalPriceOfShoppingCartLoggingUser(username: string, uuid: string) {
@@ -248,7 +249,7 @@ export class HttpService {
       url);
   }
 
-  public getOperationsCanDo(manageUsername: string, storeId: string, uuid: string){
+  getMyPermissions(manageUsername: string, storeId: number, uuid: string){
     const url = `${this.sellerManagerUrl}/` + 'get-operations-can-do/' +
       `${manageUsername}/` +
       `${storeId}/` +
@@ -390,6 +391,39 @@ export class HttpService {
       url);
   }
 
+
+  removePermission(ownerUsername: string, storeId: number, managerUsername: string,
+                   permission: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'remove-permission/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${managerUsername}/` +
+      `${permission}/` +
+      `${uuid}`;
+    return this.http.put<boolean>(
+      url, null);
+  }
+
+
+  getPermissionCantDo(ownerUsername: string, storeId: number, managerUsername: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'get-permissions-cant-do/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${managerUsername}/` +
+      `${uuid}`;
+    return this.http.get<string[]>(
+      url);
+  }
+
+
+  isOwner(username: string, storeId: number, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'is-owner/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<boolean>(
+      url);
+  }
   //////////////////////////////////////// general /////////////////////////////
 
   private getImageHttpFormat(image: File){

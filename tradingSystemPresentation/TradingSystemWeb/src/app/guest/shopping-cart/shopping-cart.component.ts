@@ -4,6 +4,7 @@ import {UserService} from '../../services/user.service';
 import {ShoppingCart} from '../../shared/shoppingCart.model';
 import {Observable} from 'rxjs';
 import {ShareService} from '../../services/share.service';
+import {ProductShoppingCartDto} from '../../shared/productShoppingCartDto.model';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -17,7 +18,7 @@ export class ShoppingCartComponent implements OnInit {
 
   @Input() cartTotal: number;
   @Input() cartTotalAfterDiscount: number;
-  @Input() cartItems: Map<Product , number> ;
+  @Input() cartItems: ProductShoppingCartDto[];
 
   @Output() cartItemDeleted = new EventEmitter<{
     productSn: number,
@@ -28,33 +29,30 @@ export class ShoppingCartComponent implements OnInit {
     storeId: number
   }>();
   constructor(private userService: UserService, private shareService: ShareService) {
-    this.cartItems = new Map<Product, number>() ;
+    this.cartItems = [];
   }
 
   ngOnInit(): void {
-    this.getShoppingCart();
+    this.getShoppingCartItems();
     this.getTotalPrice();
     }
 
-  private getShoppingCart() {
-    this.userService.getShoppingCart().subscribe((shoppingCart: ShoppingCart) => {
-      console.log(shoppingCart);
-      if (shoppingCart !== null && shoppingCart !== undefined) {
-        this.cartItems = Array.from(shoppingCart.shoppingBags.values())
-          .reduce((acc, cur) => {
-            cur.productListFromStore.forEach((value, key) => acc.set(key, value));
-            return acc;
-          }, new Map<Product, number>());
-        console.log('cartItem');
-        console.log(this.cartItems);
-      }
-    });
+  private getShoppingCartItems() {
+      this.userService.getShoppingCart()
+        .subscribe(response => {
+          if (response !== undefined && response !== null){
+            this.cartItems = response;
+          }
+        });
   }
 
   onCartItemDeleted(productData: { productSn: number, storeId: number }) {
-    this.userService.removeCartItem(productData.productSn, productData.storeId);
-    this.getShoppingCart();
-    this.getTotalPrice();
+    this.userService.removeCartItem(productData.productSn, productData.storeId).subscribe( response => {
+      if (response){
+        this.getShoppingCartItems();
+        this.getTotalPrice();
+      }
+    });
   }
 
   private getTotalPrice() {
@@ -81,7 +79,7 @@ export class ShoppingCartComponent implements OnInit {
   }
 
   private thereIsProducts() {
-    return this.cartItems.size !== 0;
+    return this.cartItems.length !== 0;
   }
 
   errorMessage(message: string){

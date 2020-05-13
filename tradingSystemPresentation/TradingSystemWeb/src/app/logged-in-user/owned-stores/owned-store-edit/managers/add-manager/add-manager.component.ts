@@ -19,6 +19,7 @@ export class AddManagerComponent implements OnInit {
   constructor(private storeService: StoreService) { }
 
   ngOnInit(): void {
+    console.log(this.store);
     this.init();
   }
 

@@ -14,6 +14,7 @@ export class ShoppingCart {
     if (shoppingBag.productListFromStore.size === 0){
       this.shoppingBags.delete(storeId);
     }
+    return true;
   }
 
   addToShoppingCart(product: Product, amountProducts: number) {

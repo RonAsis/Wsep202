@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Product} from '../../../../../shared/product.model';
+import {UserService} from '../../../../../services/user.service';
 
 @Component({
   selector: 'app-permission',
@@ -6,10 +8,15 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./permission.component.css']
 })
 export class PermissionComponent implements OnInit {
+  @Input()permission: string;
 
-  constructor() { }
+  @Output() permissionItemDeleted = new EventEmitter<string>();
 
-  ngOnInit(): void {
+  onPermissionItemDeleted(event) {
+    this.permissionItemDeleted.emit(this.permission);
   }
 
+  constructor() {}
+
+  ngOnInit() {}
 }

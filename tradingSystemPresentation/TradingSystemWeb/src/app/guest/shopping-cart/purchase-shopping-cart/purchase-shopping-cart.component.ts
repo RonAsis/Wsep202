@@ -63,7 +63,8 @@ export class PurchaseShoppingCartComponent implements OnInit {
           if (response === undefined){
             this.errorMessage('There is no response from the server');
           }else{
-            this.shareService.getReceipts(response);
+            console.log(response);
+            this.shareService.setReceipts(response);
             this.shareService.featureSelected.emit('receipts-guest');
           }
         }, (error: HttpErrorResponse) => {

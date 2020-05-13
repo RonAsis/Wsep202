@@ -9,10 +9,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TradingSystemMapper {
@@ -54,14 +51,7 @@ public class TradingSystemMapper {
     public static class ManagerStoreToManagerDtoListConverter extends TypeMapConfigurer<List<MangerStore>, List<ManagerDto>> {
         @Override
         public void configure(TypeMap<List<MangerStore>, List<ManagerDto>> typeMap) {
-            Converter<MangerStore, ManagerDto> managerStoreToManagerDtoConverter =
-                    ctx -> ctx.getSource() == null ? null : ManagerDto.builder()
-                            .username(ctx.getSource().getAppointedManager().getUserName())
-                            .permissions(ctx.getSource().getStorePermissions().stream()
-                            .map(storePermission -> storePermission.function)
-                            .collect(Collectors.toList()))
-                            .build();
-            typeMap.setConverter(context ->{
+            typeMap.setConverter(context -> {
                 List<ManagerDto> managerDtos = context.getSource().stream().map(mangerStore -> {
                     return ManagerDto.builder()
                             .username(mangerStore.getAppointedManager().getUserName())
@@ -81,15 +71,19 @@ public class TradingSystemMapper {
     public static class ManagerStoreToManagerDtoConverter extends TypeMapConfigurer<MangerStore, ManagerDto> {
         @Override
         public void configure(TypeMap<MangerStore, ManagerDto> typeMap) {
-            typeMap.setConverter(context ->{
-                String userName = context.getSource().getAppointedManager().getUserName();
-                List<String> permssions = context.getSource().getStorePermissions().stream()
-                        .map(storePermission -> storePermission.function)
-                        .collect(Collectors.toList());
-                context.getDestination().setUsername(userName);
-                context.getDestination().setPermissions(permssions);
-                return context.getDestination();
-            });
+            Converter<Set<StorePermission>, List<String>> permissionsConverter =
+                    ctx -> ctx.getSource() == null ? null : ctx.getSource().stream()
+                            .map(storePermission -> storePermission.function)
+                            .collect(Collectors.toList());
+
+            Converter<UserSystem, String> usernameConverter =
+                    ctx -> ctx.getSource() == null ? null : ctx.getSource().getUserName();
+
+            typeMap.addMappings(mapper -> mapper.using(permissionsConverter)
+                    .map(MangerStore::getStorePermissions, ManagerDto::setPermissions));
+            typeMap.addMappings(mapper -> mapper.using(usernameConverter)
+                    .map(MangerStore::getAppointedManager, ManagerDto::setUsername));
+
         }
     }
 
@@ -97,7 +91,7 @@ public class TradingSystemMapper {
     public static class ProductDtoToProductConverter extends TypeMapConfigurer<ProductDto, Product> {
         @Override
         public void configure(TypeMap<ProductDto, Product> typeMap) {
-            Converter<String, ProductCategory > productCategoryStringConverter =
+            Converter<String, ProductCategory> productCategoryStringConverter =
                     ctx -> ctx.getSource() == null ? null : ProductCategory.getProductCategory(ctx.getSource());
 
             typeMap.addMappings(mapper -> mapper.using(productCategoryStringConverter)
@@ -112,7 +106,7 @@ public class TradingSystemMapper {
         public void configure(TypeMap<Receipt, ReceiptDto> typeMap) {
             typeMap.setPostConverter(context -> {
                 Map<Product, Integer> productsBought = context.getSource().getProductsBought();
-                if(Objects.nonNull(productsBought)) {
+                if (Objects.nonNull(productsBought)) {
                     Map<ProductDto, Integer> productsBoughtDto = context.getDestination().getProductsBought();
                     Map<ProductDto, Integer> productsBoughtDtoPost = productsBoughtDto.entrySet().stream()
                             .collect(Collectors.toMap(
@@ -135,18 +129,24 @@ public class TradingSystemMapper {
     }
 
     @Component
-    public static class ShoppingCartToShoppingCartViewDto extends TypeMapConfigurer<ShoppingCart, ShoppingCartViewDto> {
+    public static class ShoppingCartToProductShoppingCartDto extends TypeMapConfigurer<ShoppingCart, List<ProductShoppingCartDto>> {
         @Override
-        public void configure(TypeMap<ShoppingCart, ShoppingCartViewDto> typeMap) {
+        public void configure(TypeMap<ShoppingCart, List<ProductShoppingCartDto>> typeMap) {
             typeMap.setConverter(context -> {
                 Map<Store, ShoppingBag> shoppingBagsList = context.getSource().getShoppingBagsList();
-                Map<Integer, ShoppingBagViewDto> shoppingBags = shoppingBagsList.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey().getStoreId(),
-                                e -> ShoppingBagViewDto.builder().
-                                        productListFromStore(e.getValue().getProductListFromStore()).build()));
-                return ShoppingCartViewDto.builder().shoppingBags(shoppingBags).build();
+                List<ProductShoppingCartDto> productShoppingCartDtos = new LinkedList<>();
+                shoppingBagsList.values().stream()
+                        .map(ShoppingBag::getProductListFromStore)
+                        .forEach(shoppingBag -> shoppingBag.forEach((key, value) -> productShoppingCartDtos.add(ProductShoppingCartDto.builder()
+                                .amountInShoppingCart(value)
+                                .cost(key.getCost())
+                                .name(key.getName())
+                                .originalCost(key.getOriginalCost())
+                                .productSn(key.getProductSn())
+                                .storeId(key.getStoreId())
+                                .build())));
+                return productShoppingCartDtos;
             });
         }
     }
-
 }
