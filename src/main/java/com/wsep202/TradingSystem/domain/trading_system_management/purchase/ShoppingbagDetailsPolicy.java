@@ -9,6 +9,6 @@ import java.util.Map;
 public class ShoppingbagDetailsPolicy extends PurchasePolicy {
     @Override
     public boolean isApproved(Map<Product, Integer> products, UserSystem user, BillingAddress userAddress) {
-
+    return true;
     }
 }
