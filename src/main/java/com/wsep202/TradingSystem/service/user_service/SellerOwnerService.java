@@ -1,15 +1,11 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
 import com.wsep202.TradingSystem.dto.*;
-import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -276,5 +272,21 @@ public class SellerOwnerService {
 
     public List<ManagerDto> getMySubMangers(String ownerUsername, int storeId, UUID uuid) {
         return tradingSystemFacade.getMySubMangers(ownerUsername, storeId, uuid);
+    }
+
+    public boolean removePermission(String ownerUsername, int storeId, String managerUsername, String permission, UUID uuid) {
+        return tradingSystemFacade.removePermission(ownerUsername, storeId, managerUsername, permission, uuid);
+    }
+
+    public List<String> getPermissionOfManager(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
+        return tradingSystemFacade.getPermissionOfManager(ownerUsername, storeId, managerUsername, uuid);
+    }
+
+    public List<String> getPermissionCantDo(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
+        return tradingSystemFacade.getPermissionCantDo(ownerUsername, storeId, managerUsername, uuid);
+    }
+
+    public boolean isOwner(String username, int storeId, UUID uuid) {
+        return tradingSystemFacade.isOwner(username, storeId, uuid);
     }
 }

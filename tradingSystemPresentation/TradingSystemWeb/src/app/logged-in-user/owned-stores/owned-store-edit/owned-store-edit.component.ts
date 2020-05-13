@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {ShareService} from '../../../services/share.service';
 import {Store} from '../../../shared/store.model';
 import {StoreService} from '../../../services/store.service';
+import {UserService} from '../../../services/user.service';
 
 @Component({
   selector: 'app-owned-store-edit',
@@ -10,7 +11,8 @@ import {StoreService} from '../../../services/store.service';
 })
 export class OwnedStoreEditComponent implements OnInit {
 
-  constructor(private shareService: ShareService, private storeService: StoreService) { }
+  constructor(private shareService: ShareService, private storeService: StoreService,
+              private userService: UserService) { }
 
   store: Store;
   loadedFeature: string;
@@ -38,5 +40,9 @@ export class OwnedStoreEditComponent implements OnInit {
 
   onPolicy() {
     this.loadedFeature = 'Policy';
+  }
+
+  isOwner() {
+    return this.storeService.getIsOwner(this.store.storeId);
   }
 }

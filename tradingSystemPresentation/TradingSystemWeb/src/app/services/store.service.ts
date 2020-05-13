@@ -49,13 +49,8 @@ export class StoreService {
   }
 
   viewPurchaseHistory(storeId: number) {
-    if (this.ownerStore) {
       return this.httpService
         .viewPurchaseHistoryOfOwner(this.userService.getUsername(), storeId, this.userService.getUuid());
-    } else if (this.ownerStore) {
-      return this.httpService
-        .viewPurchaseHistoryOfManager(this.userService.getUsername(), storeId, this.userService.getUuid());
-    }
   }
 
   openStore(storeName: string, description: string) {
@@ -100,5 +95,31 @@ export class StoreService {
   getMySubMangers(storeId: number) {
     return this.httpService.getMySubMangers(this.userService.getUsername(),
       storeId, this.userService.getUuid());
+  }
+
+  removePermission(managerUsername: string, storeId: number, permission: string) {
+    return this.httpService.removePermission(this.userService.getUsername(),
+      storeId, managerUsername, permission, this.userService.getUuid());
+  }
+
+  removeManager(manager: string, storeId: number) {
+    return this.httpService.removeManager(this.userService.getUsername(), storeId, manager, this.userService.getUuid());
+
+  }
+
+  addPermission(storeId: number, managerUsername: string, permission: string) {
+    return this.httpService.addPermission(this.userService.getUsername(), storeId, managerUsername, permission, this.userService.getUuid());
+  }
+
+  getPermissionsCanAdd(managerUsername: string, storeId: number) {
+    return this.httpService.getPermissionCantDo(this.userService.getUsername(), storeId, managerUsername, this.userService.getUuid());
+  }
+
+  getMyPermissions(storeId: number) {
+    return this.httpService.getMyPermissions(this.userService.getUsername(), storeId, this.userService.getUuid());
+  }
+
+  getIsOwner(storeId: number) {
+    return this.httpService.isOwner(this.userService.getUsername(), storeId, this.userService.getUuid());
   }
 }

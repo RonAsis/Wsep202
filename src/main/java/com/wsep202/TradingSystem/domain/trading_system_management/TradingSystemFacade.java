@@ -236,9 +236,8 @@ public class TradingSystemFacade {
     public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            UserSystem newManagerUser = tradingSystem.getUser(newManagerUsername, uuid);
             Store ownedStore = ownerUser.getOwnerStore(storeId);
-            MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUser);
+            MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUsername);
             return Objects.nonNull(mangerStore) ? modelMapper.map(mangerStore, ManagerDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("Add manager failed", e);
@@ -251,21 +250,49 @@ public class TradingSystemFacade {
      *
      * @param ownerUsername   the username of the owner store
      * @param storeId         - of the store that want add permission the manger
-     * @param managerUserName - the user name of the manger
+     * @param managerUsername - the user name of the manger
      * @param permission      - the new permission
      * @param uuid
      * @return true if succeed
      */
-    public boolean addPermission(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUserName, @NotBlank String permission, UUID uuid) {
+    public boolean addPermission(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUsername, @NotBlank String permission, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
             Store ownedStore = ownerUser.getOwnerStore(storeId);
-            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUserName);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             StorePermission storePermission = StorePermission.getStorePermission(permission);
             return ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
         } catch (TradingSystemException e) {
             log.error("Add permission failed", e);
             return false;
+        }
+    }
+
+
+    public boolean removePermission(String ownerUsername, int storeId, String managerUsername, String permission, UUID uuid) {
+        try {
+            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
+            StorePermission storePermission = StorePermission.getStorePermission(permission);
+            return ownedStore.removePermission(ownerUser, managerStore, storePermission);
+        } catch (TradingSystemException e) {
+            log.error("Add permission failed", e);
+            return false;
+        }
+    }
+
+
+    public List<String> getPermissionOfManager(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
+        try {
+            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
+            Set<StorePermission> permissionOfManager = ownedStore.getPermissionOfManager(ownerUser, managerStore);
+            return StorePermission.getStringPermissions(permissionOfManager);
+        } catch (TradingSystemException e) {
+            log.error("get permission failed", e);
+            return null;
         }
     }
 
@@ -1211,4 +1238,21 @@ public class TradingSystemFacade {
                 p.getAmount(),p.getCost(),p.getOriginalCost(),p.getRank(),p.getStoreId());
     }
 
+    public List<String> getPermissionCantDo(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
+        try {
+            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
+            Set<StorePermission> permissionOfManager = ownedStore.getPermissionCantDo(ownerUser, managerStore);
+            return StorePermission.getStringPermissions(permissionOfManager);
+        } catch (TradingSystemException e) {
+            log.error("get permission failed", e);
+            return null;
+        }
+    }
+
+    public boolean isOwner(String username, int storeId, UUID uuid) {
+        UserSystem ownerUser = tradingSystem.getUser(username, uuid);
+        return ownerUser.isOwner(storeId);
+    }
 }

@@ -54,13 +54,6 @@ public class TradingSystemMapper {
     public static class ManagerStoreToManagerDtoListConverter extends TypeMapConfigurer<List<MangerStore>, List<ManagerDto>> {
         @Override
         public void configure(TypeMap<List<MangerStore>, List<ManagerDto>> typeMap) {
-            Converter<MangerStore, ManagerDto> managerStoreToManagerDtoConverter =
-                    ctx -> ctx.getSource() == null ? null : ManagerDto.builder()
-                            .username(ctx.getSource().getAppointedManager().getUserName())
-                            .permissions(ctx.getSource().getStorePermissions().stream()
-                            .map(storePermission -> storePermission.function)
-                            .collect(Collectors.toList()))
-                            .build();
             typeMap.setConverter(context ->{
                 List<ManagerDto> managerDtos = context.getSource().stream().map(mangerStore -> {
                     return ManagerDto.builder()
@@ -81,15 +74,19 @@ public class TradingSystemMapper {
     public static class ManagerStoreToManagerDtoConverter extends TypeMapConfigurer<MangerStore, ManagerDto> {
         @Override
         public void configure(TypeMap<MangerStore, ManagerDto> typeMap) {
-            typeMap.setConverter(context ->{
-                String userName = context.getSource().getAppointedManager().getUserName();
-                List<String> permssions = context.getSource().getStorePermissions().stream()
-                        .map(storePermission -> storePermission.function)
-                        .collect(Collectors.toList());
-                context.getDestination().setUsername(userName);
-                context.getDestination().setPermissions(permssions);
-                return context.getDestination();
-            });
+            Converter<Set<StorePermission>, List<String>> permissionsConverter =
+                    ctx -> ctx.getSource() == null ? null : ctx.getSource().stream()
+                            .map(storePermission -> storePermission.function)
+                            .collect(Collectors.toList());
+
+            Converter<UserSystem, String> usernameConverter =
+                    ctx -> ctx.getSource() == null ? null : ctx.getSource().getUserName();
+
+            typeMap.addMappings(mapper -> mapper.using(permissionsConverter)
+                    .map(MangerStore::getStorePermissions, ManagerDto::setPermissions));
+            typeMap.addMappings(mapper -> mapper.using(usernameConverter)
+                    .map(MangerStore::getAppointedManager, ManagerDto::setUsername));
+
         }
     }
 

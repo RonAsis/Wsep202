@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Manager} from '../../../../../shared/manager.model';
 
 @Component({
   selector: 'app-owner-item',
@@ -8,7 +7,7 @@ import {Manager} from '../../../../../shared/manager.model';
 })
 export class OwnerItemComponent implements OnInit {
 
-  @Input() manager: Manager;
+  @Input() username: string;
   constructor() { }
 
   ngOnInit(): void {

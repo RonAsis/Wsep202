@@ -48,7 +48,7 @@ public class SellerManagerController {
      * add manager
      */
     @ApiOperation(value = "get operations can do")
-    @GetMapping("get-operations-can-do/{manageUsername}/{storeId}{uuid}")
+    @GetMapping("get-operations-can-do/{manageUsername}/{storeId}/{uuid}")
     public List<String> getOperationsCanDo(@PathVariable String manageUsername,
                                            @PathVariable int storeId,
                                            @PathVariable UUID uuid) {

@@ -25,14 +25,38 @@ export class StoreDetailComponent implements OnInit, AfterViewInit{
   }
 
   viewPurchaseHistory() {
+    this.shareService.storeSelected = this.store;
+    this.shareService.featureSelected.emit('History-purchase');
   }
 
-  getIsAdminOwnerManger() {
+  isOwner() {
      return this.storeService.getOwnerStores();
+  }
+
+  isManagerWithPermissionEdit() {
+    return this.isHasPermission('edit');
+  }
+
+  private isHasPermission(permission: string) {
+    let res = false;
+    if (this.storeService.getManagerStores()) {
+      this.storeService.getMyPermissions(this.store.storeId)
+        .subscribe((response: string[]) => res = response.includes(permission));
+    }
+    return res;
+  }
+
+  isManagerWithPermissionViewOrAdminOrOwner() {
+    return this.userService.getIsAdmin() || this.isOwner() || this.isHasPermission('view');
   }
 
   editStore() {
     this.shareService.storeSelected = this.store;
     this.shareService.featureSelected.emit('Edit-Store');
+  }
+
+  editStoreManager() {
+    this.shareService.storeSelected = this.store;
+    this.shareService.featureSelected.emit('Edit-Store-Manager');
   }
 }

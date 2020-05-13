@@ -1,10 +1,13 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Slf4j
 public class MangerStore {
 
     public MangerStore(UserSystem appointedManager) {
@@ -48,7 +51,7 @@ public class MangerStore {
     public boolean addStorePermission(StorePermission permission){
         int sizeOfPermissions = storePermissions.size();
         this.storePermissions.add(permission);
-        return sizeOfPermissions < storePermissions.size() ? true : false;
+        return sizeOfPermissions < storePermissions.size();
     }
 
     /**
@@ -57,10 +60,7 @@ public class MangerStore {
      * @return true for success or false otherwise
      */
     public boolean removeStorePermission(StorePermission permission){
-        int sizeOfPermissions = storePermissions.size();
         //remove all permissions equals to permission received
-        storePermissions.removeIf(permission1 -> permission1.equals(permission));
-        return sizeOfPermissions > storePermissions.size() ? true : false;
-
+        return storePermissions.removeIf(permission1 -> permission1 == permission);
     }
 }

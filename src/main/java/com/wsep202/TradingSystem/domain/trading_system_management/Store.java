@@ -828,4 +828,40 @@ public class Store {
                 .orElse(new HashSet<>()).stream()
                 .collect(Collectors.toList());
     }
+
+    public boolean removePermission(UserSystem ownerStore, UserSystem user, StorePermission storePermission) {
+        if (!isOwner(ownerStore)) {    //verify the editor is owner in the store
+            log.error("couldn't remove permission:" + storePermission.function + " " +
+                    "to: " + user.getUserName() + " by " + ownerStore.getUserName());
+            return false;
+        }
+        return managers.stream().filter(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(user.getUserName()))
+                .findFirst().map(mangerStore -> mangerStore.removeStorePermission(storePermission))
+                .orElse(false);
+    }
+
+    public Set<StorePermission> getPermissionOfManager(UserSystem ownerStore, UserSystem user) {
+        if (!isOwner(ownerStore)) {    //verify the editor is owner in the store
+            log.error("couldn't get permissions of " + user.getUserName() + " by " + ownerStore.getUserName());
+            return null;
+        }else{
+            return managers.stream().filter(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(user.getUserName()))
+                    .findFirst().map(MangerStore::getStorePermissions)
+                    .orElse(null);
+        }
+    }
+
+    public Set<StorePermission> getPermissionCantDo(UserSystem ownerStore, UserSystem user) {
+        if (!isOwner(ownerStore)) {    //verify the editor is owner in the store
+            log.error("couldn't get permissions of " + user.getUserName() + " by " + ownerStore.getUserName());
+            return null;
+        } else {
+            Set<StorePermission> storePermissions = managers.stream().filter(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(user.getUserName()))
+                    .findFirst().map(MangerStore::getStorePermissions)
+                    .orElse(new HashSet<>());
+            return Arrays.stream(StorePermission.values())
+                    .filter(storePermission -> !storePermissions.contains(storePermission))
+                    .collect(Collectors.toSet());
+        }
+    }
 }

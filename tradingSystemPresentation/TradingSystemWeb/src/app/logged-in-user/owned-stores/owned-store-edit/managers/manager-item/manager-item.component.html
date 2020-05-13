@@ -1,1 +1,49 @@
-<p>manager-item works!</p>
+<div class="cart-item-wrapper"
+     [ngStyle]="{color: 'blue'}"
+>
+  <div>
+    {{manager.username}}
+  </div>
+  <div>
+    <div>
+      <div>
+        <button type="button"
+                class="btn btn-success"
+                aria-label="Left Align"
+                (click)="onPermissionAdd($event)"
+        >
+          Add Permission
+        </button>
+      </div>
+      <select [ngModel]="selectedPermission" (ngModelChange)="onSelectPermission($event)">
+        <option *ngFor="let permissions of permissionsCanAdd" value={{permissions}}>
+          {{permissions}}
+        </option>
+      </select>
+    </div>
+    <div class="panel-heading">
+      <div>Permission</div>
+    </div>
+    <app-permission
+      class="list-group-item"
+      *ngFor="let permission of manager.permissions"
+      [permission]=permission
+      (permissionItemDeleted)="onPermissionItemDeleted($event)"
+    ></app-permission>
+  </div>
+  <div>
+  <button type="button"
+            class="btn btn-default"
+            aria-label="Left Align"
+            (click)="onManagerItemDeleted($event)"
+    >
+        <span class="glyphicon glyphicon-remove"
+              aria-hidden="true">
+        </span>
+    Remove Manager
+    </button>
+  </div>
+</div>
+
+
+

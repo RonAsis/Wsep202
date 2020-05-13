@@ -27,8 +27,18 @@ export class ManagersComponent implements OnInit {
   }
 
   onManagerAdded(manager: Manager) {
-    console.log(manager);
     this.managers.push(manager);
   }
+ onManagerItemDeleted(manager: Manager) {
+    this.storeService.removeManager(manager.username, this.store.storeId)
+      .subscribe(response => {
+        if (response){
+          this.ngOnInit();
+        }
+      });
+  }
 
+  onManagerItemChanged(manager: Manager) {
+    this.ngOnInit();
+  }
 }

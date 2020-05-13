@@ -90,28 +90,11 @@ export class UserService {
   }
 
   viewPurchaseHistory() {
-    let receipts: Receipt[] = [];
-    this.httpService.viewPurchaseHistory(this.username, this.uuid)
-      .subscribe(res => receipts = res);
-
-    ///// need to delete///////
-    const map = new Map();
-    map.set(new Product(1, '2', 'sds', 1, 3232, 323, 1, 1, 'sdsd'), 3);
-    map.set(new Product(1, '2', 'sdsdsdds', 1, 232, 323, 1, 1, 'sdsd'), 3);
-
-    return [new Receipt(1, 1, 'sds', new Date(), 2, map)];
-    ///////////////
-
-    // return receipts;
+    return this.httpService.viewPurchaseHistory(this.username, this.uuid);
   }
 
   getUsers() {
-    if (this.usernameWantSeeHistory !== null) {
-      return of([new UserSystem('ron', 'ron', 'asis'),
-        new UserSystem('ron1', 'ro1n11', 'asis1')]);
-    } else {
      return this.httpService.getUsers(this.username, this.uuid);
-    }
   }
 
   wantViewPurchaseHistory(user: UserSystem) {

@@ -280,4 +280,10 @@ public class UserSystem implements Observer {
                 .findFirst().map(storeManagement -> storeManagement.getOperationsCanDo(this))
                 .orElse(new ArrayList<>());
     }
+
+    public boolean isOwner(int storeId) {
+        return ownedStores.stream()
+                .anyMatch(store -> store.getStoreId() == storeId);
+
+    }
 }

@@ -1,13 +1,13 @@
 <div class="col-xs-12">
   <button class="btn btn-primary" type="submit" (click)="onDiscount()">Discount</button>
   <button class="btn btn-primary" type="submit" (click)="onEditProduct()">Edit Product</button>
-  <button class="btn btn-primary" type="submit" (click)="onManagers()">Managers</button>
-  <button class="btn btn-primary" type="submit" (click)="onOwners()">Owners</button>
+  <button *ngIf="isOwner()" class="btn btn-primary" type="submit" (click)="onManagers()">Managers</button>
+  <button *ngIf="isOwner()" class="btn btn-primary" type="submit" (click)="onOwners()">Owners</button>
   <button class="btn btn-primary" type="submit" (click)="onPolicy()">Policy</button>
 
   <app-discount *ngIf="loadedFeature === 'Discount'"></app-discount>
-  <app-edit-product *ngIf="loadedFeature === 'Edit-Product'"></app-edit-product>
-  <app-managers *ngIf="loadedFeature === 'Managers'"></app-managers>
+  <app-edit-product *ngIf="loadedFeature === 'Edit-Product'" ></app-edit-product>
+  <app-managers *ngIf="loadedFeature === 'Managers'" [store]="store"></app-managers>
   <app-owners *ngIf="loadedFeature === 'Owners'" [store]="store"></app-owners>
   <app-policy *ngIf="loadedFeature === 'Policy'"></app-policy>
 
