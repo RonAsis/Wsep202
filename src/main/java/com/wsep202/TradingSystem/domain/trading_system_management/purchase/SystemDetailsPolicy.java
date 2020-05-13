@@ -5,11 +5,18 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Day;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
-
+@Setter
+@Getter
+@Slf4j
+@Builder
 public class SystemDetailsPolicy extends PurchasePolicy {
     //the system details which are the conditions to buy in the store
     /**
@@ -31,9 +38,13 @@ public class SystemDetailsPolicy extends PurchasePolicy {
             user.newNotification(Notification.builder().content("Sorry," +
                     " but purchase doesn't stands at the store purchase policy:" +
                     " store is closed at: "+purchaseDate.toString()).build());
+            log.info("the user '"+user.getUserName()+"' tried to purchase in store out its working days.\n" +
+                    "purchase policy ID: "+id);
             return false;
         }
         //stands in the policy terms
+        log.info("the user '"+user.getUserName()+"' passed the purchase policy with ID:" +
+                " " +id+".");
         return true;
     }
 

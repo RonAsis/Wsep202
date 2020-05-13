@@ -1,0 +1,172 @@
+13-05-2020 22:00:38.0013|INFO |Starting TradingSystemApplication on system76-pc with PID 5371 (/home/barper/sadnaProject/v2/12-5-20/Wsep202/target/classes started by barper in /home/barper/sadnaProject/v2/12-5-20/Wsep202)
+13-05-2020 22:00:38.0017|INFO |No active profile set, falling back to default profiles: default
+13-05-2020 22:00:39.0957|INFO |The system is now connected to the external systems
+13-05-2020 22:00:39.0986|INFO |The user admin got encrypted password and salt
+13-05-2020 22:00:39.0986|INFO |The system is now connected to the external systems
+13-05-2020 22:00:41.0388|INFO |notifyObservers
+13-05-2020 22:00:41.0409|INFO |Started TradingSystemApplication in 4.078 seconds (JVM running for 5.408)
+13-05-2020 22:00:41.0415|INFO |creation the Directories for images
+13-05-2020 22:00:41.0415|INFO |The Directory of the images exists
+13-05-2020 22:00:41.0543|INFO |user: jennings.quitzon , B000BFMIY0
+13-05-2020 22:00:41.0545|INFO |The user jennings.quitzon got encrypted password and salt
+13-05-2020 22:00:41.0545|INFO |The user jennings.quitzon registering
+13-05-2020 22:00:41.0595|INFO |user: gillian.windler , B0002XTOHK
+13-05-2020 22:00:41.0597|INFO |The user gillian.windler got encrypted password and salt
+13-05-2020 22:00:41.0597|INFO |The user gillian.windler registering
+13-05-2020 22:00:41.0652|INFO |user: aliya.heaney , B0000W463K
+13-05-2020 22:00:41.0654|INFO |The user aliya.heaney got encrypted password and salt
+13-05-2020 22:00:41.0654|INFO |The user aliya.heaney registering
+13-05-2020 22:00:41.0712|INFO |user: olaf.roberts , B000HB0138
+13-05-2020 22:00:41.0713|INFO |The user olaf.roberts got encrypted password and salt
+13-05-2020 22:00:41.0713|INFO |The user olaf.roberts registering
+13-05-2020 22:00:41.0769|INFO |user: allene.koepp , B000NI7RW8
+13-05-2020 22:00:41.0769|INFO |The user allene.koepp got encrypted password and salt
+13-05-2020 22:00:41.0769|INFO |The user allene.koepp registering
+13-05-2020 22:00:41.0828|INFO |user: geovanny.hilpert , B0000DGV0O
+13-05-2020 22:00:41.0828|INFO |The user geovanny.hilpert got encrypted password and salt
+13-05-2020 22:00:41.0828|INFO |The user geovanny.hilpert registering
+13-05-2020 22:00:41.0906|INFO |user: annalise.eichmann , B000JLDYM6
+13-05-2020 22:00:41.0907|INFO |The user annalise.eichmann got encrypted password and salt
+13-05-2020 22:00:41.0907|INFO |The user annalise.eichmann registering
+13-05-2020 22:00:41.0957|INFO |user: herta.walker , B00067Q8TY
+13-05-2020 22:00:41.0957|INFO |The user herta.walker got encrypted password and salt
+13-05-2020 22:00:41.0957|INFO |The user herta.walker registering
+13-05-2020 22:00:42.0003|INFO |user: lavina.kirlin , B000KP4VP0
+13-05-2020 22:00:42.0004|INFO |The user lavina.kirlin got encrypted password and salt
+13-05-2020 22:00:42.0004|INFO |The user lavina.kirlin registering
+13-05-2020 22:00:42.0069|INFO |user: nella.conn , B000II6WOW
+13-05-2020 22:00:42.0070|INFO |The user nella.conn got encrypted password and salt
+13-05-2020 22:00:42.0070|INFO |The user nella.conn registering
+13-05-2020 22:00:42.0123|INFO |store: Funk-Funk of the owner gillian.windler
+13-05-2020 22:00:42.0123|INFO |added a new owned OR managed store 'Funk-Funk' to the user 'gillian.windler'
+13-05-2020 22:00:42.0123|INFO |A new store 'Funk-Funk' was opened in the system, gillian.windler is the owner
+13-05-2020 22:00:42.0181|INFO |store: Treutel and Sons of the owner geovanny.hilpert
+13-05-2020 22:00:42.0181|INFO |added a new owned OR managed store 'Treutel and Sons' to the user 'geovanny.hilpert'
+13-05-2020 22:00:42.0181|INFO |A new store 'Treutel and Sons' was opened in the system, geovanny.hilpert is the owner
+13-05-2020 22:00:42.0226|INFO |store: Kilback, Kilback and Kilback of the owner lavina.kirlin
+13-05-2020 22:00:42.0226|INFO |added a new owned OR managed store 'Kilback, Kilback and Kilback' to the user 'lavina.kirlin'
+13-05-2020 22:00:42.0226|INFO |A new store 'Kilback, Kilback and Kilback' was opened in the system, lavina.kirlin is the owner
+13-05-2020 22:00:42.0271|INFO |store: Kilback, Kilback and Kilback of the owner geovanny.hilpert
+13-05-2020 22:00:42.0271|INFO |added a new owned OR managed store 'Kilback, Kilback and Kilback' to the user 'geovanny.hilpert'
+13-05-2020 22:00:42.0271|INFO |A new store 'Kilback, Kilback and Kilback' was opened in the system, geovanny.hilpert is the owner
+13-05-2020 22:00:42.0321|INFO |store: Will LLC of the owner aliya.heaney
+13-05-2020 22:00:42.0321|INFO |added a new owned OR managed store 'Will LLC' to the user 'aliya.heaney'
+13-05-2020 22:00:42.0321|INFO |A new store 'Will LLC' was opened in the system, aliya.heaney is the owner
+13-05-2020 22:00:42.0373|INFO |store: VonRueden LLC of the owner lavina.kirlin
+13-05-2020 22:00:42.0373|INFO |added a new owned OR managed store 'VonRueden LLC' to the user 'lavina.kirlin'
+13-05-2020 22:00:42.0373|INFO |A new store 'VonRueden LLC' was opened in the system, lavina.kirlin is the owner
+13-05-2020 22:00:42.0423|INFO |store: McGlynn, McGlynn and McGlynn of the owner gillian.windler
+13-05-2020 22:00:42.0423|INFO |added a new owned OR managed store 'McGlynn, McGlynn and McGlynn' to the user 'gillian.windler'
+13-05-2020 22:00:42.0423|INFO |A new store 'McGlynn, McGlynn and McGlynn' was opened in the system, gillian.windler is the owner
+13-05-2020 22:00:42.0470|INFO |store: Luettgen LLC of the owner allene.koepp
+13-05-2020 22:00:42.0470|INFO |added a new owned OR managed store 'Luettgen LLC' to the user 'allene.koepp'
+13-05-2020 22:00:42.0470|INFO |A new store 'Luettgen LLC' was opened in the system, allene.koepp is the owner
+13-05-2020 22:00:42.0519|INFO |store: Daniel, Daniel and Daniel of the owner olaf.roberts
+13-05-2020 22:00:42.0519|INFO |added a new owned OR managed store 'Daniel, Daniel and Daniel' to the user 'olaf.roberts'
+13-05-2020 22:00:42.0519|INFO |A new store 'Daniel, Daniel and Daniel' was opened in the system, olaf.roberts is the owner
+13-05-2020 22:00:42.0567|INFO |store: Labadie, Labadie and Labadie of the owner geovanny.hilpert
+13-05-2020 22:00:42.0567|INFO |added a new owned OR managed store 'Labadie, Labadie and Labadie' to the user 'geovanny.hilpert'
+13-05-2020 22:00:42.0567|INFO |A new store 'Labadie, Labadie and Labadie' was opened in the system, geovanny.hilpert is the owner
+13-05-2020 22:00:42.0623|INFO |The product: Nectar in a Sieve added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:42.0672|INFO |The product: Gone with the Wind added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:42.0720|INFO |The product: The Wives of Bath added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:42.0782|INFO |The product: Look Homeward, Angel added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:42.0837|INFO |The product: The Green Bay Tree added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:42.0893|INFO |The product: All the King's Men added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:42.0949|INFO |The product: This Lime Tree Bower added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:43.0019|INFO |The product: Brandy of the Damned added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:43.0064|INFO |The product: No Longer at Ease added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:43.0109|INFO |The product: Dance Dance Dance added to the store: Daniel, Daniel and Daniel
+13-05-2020 22:00:43.0160|INFO |The product: A Confederacy of Dunces added to the store: Treutel and Sons
+13-05-2020 22:00:43.0221|INFO |The product: Have His Carcase added to the store: Treutel and Sons
+13-05-2020 22:00:43.0276|INFO |The product: The Other Side of Silence added to the store: Treutel and Sons
+13-05-2020 22:00:43.0324|INFO |The product: This Side of Paradise added to the store: Treutel and Sons
+13-05-2020 22:00:43.0368|INFO |The product: Ego Dominus Tuus added to the store: Treutel and Sons
+13-05-2020 22:00:43.0414|INFO |The product: Oh! To be in England added to the store: Treutel and Sons
+13-05-2020 22:00:43.0472|INFO |The product: The Doors of Perception added to the store: Treutel and Sons
+13-05-2020 22:00:43.0524|INFO |The product: In Death Ground added to the store: Treutel and Sons
+13-05-2020 22:00:43.0568|INFO |The product: Jesting Pilate added to the store: Treutel and Sons
+13-05-2020 22:00:43.0618|INFO |The product: A Time of Gifts added to the store: Treutel and Sons
+13-05-2020 22:00:43.0672|INFO |The product: It's a Battlefield added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:43.0722|INFO |The product: By Grand Central Station I Sat Down and Wept added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:43.0769|INFO |The product: Tiger! Tiger! added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:43.0815|INFO |The product: Dying of the Light added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:43.0865|INFO |The product: The Last Enemy added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:43.0929|INFO |The product: Cabbages and Kings added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:43.0994|INFO |The product: Dance Dance Dance added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0060|INFO |The product: A Summer Bird-Cage added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0114|INFO |The product: The Curious Incident of the Dog in the Night-Time added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0168|INFO |The product: Paths of Glory added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0224|INFO |The product: The Glory and the Dream added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0279|INFO |The product: Waiting for the Barbarians added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0326|INFO |The product: Rosemary Sutcliff added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0376|INFO |The product: The Wealth of Nations added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0424|INFO |The product: No Highway added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0469|INFO |The product: In Dubious Battle added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0523|INFO |The product: Carrion Comfort added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0582|INFO |The product: Great Work of Time added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0651|INFO |The product: Recalled to Life added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0717|INFO |The product: A Confederacy of Dunces added to the store: Kilback, Kilback and Kilback
+13-05-2020 22:00:44.0773|INFO |The product: The Moon by Night added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:44.0830|INFO |The product: The Cricket on the Hearth added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:44.0881|INFO |The product: Far From the Madding Crowd added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:44.0932|INFO |The product: The Last Enemy added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:44.0981|INFO |The product: The Mermaids Singing added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:45.0041|INFO |The product: Wildfire at Midnight added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:45.0101|INFO |The product: Dance Dance Dance added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:45.0169|INFO |The product: A Glass of Blessings added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:45.0235|INFO |The product: Brandy of the Damned added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:45.0283|INFO |The product: In a Glass Darkly added to the store: Labadie, Labadie and Labadie
+13-05-2020 22:00:45.0333|INFO |The product: Many Waters added to the store: Funk-Funk
+13-05-2020 22:00:45.0382|INFO |The product: A Catskill Eagle added to the store: Funk-Funk
+13-05-2020 22:00:45.0429|INFO |The product: Fear and Trembling added to the store: Funk-Funk
+13-05-2020 22:00:45.0481|INFO |The product: The Cricket on the Hearth added to the store: Funk-Funk
+13-05-2020 22:00:45.0535|INFO |The product: Dulce et Decorum Est added to the store: Funk-Funk
+13-05-2020 22:00:45.0587|INFO |The product: All the King's Men added to the store: Funk-Funk
+13-05-2020 22:00:45.0636|INFO |The product: Lilies of the Field added to the store: Funk-Funk
+13-05-2020 22:00:45.0683|INFO |The product: A Catskill Eagle added to the store: Funk-Funk
+13-05-2020 22:00:45.0730|INFO |The product: O Pioneers! added to the store: Funk-Funk
+13-05-2020 22:00:45.0777|INFO |The product: The Yellow Meads of Asphodel added to the store: Funk-Funk
+13-05-2020 22:00:45.0831|INFO |The product: Stranger in a Strange Land added to the store: Will LLC
+13-05-2020 22:00:45.0876|INFO |The product: Behold the Man added to the store: Will LLC
+13-05-2020 22:00:45.0919|INFO |The product: A Handful of Dust added to the store: Will LLC
+13-05-2020 22:00:45.0965|INFO |The product: Gone with the Wind added to the store: Will LLC
+13-05-2020 22:00:46.0012|INFO |The product: O Pioneers! added to the store: Will LLC
+13-05-2020 22:00:46.0058|INFO |The product: Now Sleeps the Crimson Petal added to the store: Will LLC
+13-05-2020 22:00:46.0106|INFO |The product: The Millstone added to the store: Will LLC
+13-05-2020 22:00:46.0153|INFO |The product: nfinite Jest added to the store: Will LLC
+13-05-2020 22:00:46.0198|INFO |The product: I Will Fear No Evil added to the store: Will LLC
+13-05-2020 22:00:46.0258|INFO |The product: Far From the Madding Crowd added to the store: Will LLC
+13-05-2020 22:00:46.0309|INFO |The product: The Golden Apples of the Sun added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0358|INFO |The product: Rosemary Sutcliff added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0404|INFO |The product: All Passion Spent added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0450|INFO |The product: Consider the Lilies added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0497|INFO |The product: Blithe Spirit added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0558|INFO |The product: The Last Temptation added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0618|INFO |The product: Recalled to Life added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0673|INFO |The product: I Sing the Body Electric added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0728|INFO |The product: Consider the Lilies added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0788|INFO |The product: A Swiftly Tilting Planet added to the store: McGlynn, McGlynn and McGlynn
+13-05-2020 22:00:46.0847|INFO |The product: Of Human Bondage added to the store: Luettgen LLC
+13-05-2020 22:00:46.0899|INFO |The product: That Good Night added to the store: Luettgen LLC
+13-05-2020 22:00:46.0953|INFO |The product: An Acceptable Time added to the store: Luettgen LLC
+13-05-2020 22:00:47.0013|INFO |The product: The Moving Toyshop added to the store: Luettgen LLC
+13-05-2020 22:00:47.0069|INFO |The product: The Golden Apples of the Sun added to the store: Luettgen LLC
+13-05-2020 22:00:47.0131|INFO |The product: Time To Murder And Create added to the store: Luettgen LLC
+13-05-2020 22:00:47.0187|INFO |The product: Tirra Lirra by the River added to the store: Luettgen LLC
+13-05-2020 22:00:47.0234|INFO |The product: An Instant In The Wind added to the store: Luettgen LLC
+13-05-2020 22:00:47.0287|INFO |The product: The Needle's Eye added to the store: Luettgen LLC
+13-05-2020 22:00:47.0334|INFO |The product: Arms and the Man added to the store: Luettgen LLC
+13-05-2020 22:00:47.0381|INFO |The product: What's Become of Waring added to the store: VonRueden LLC
+13-05-2020 22:00:47.0388|INFO |notifyObservers
+13-05-2020 22:00:47.0444|INFO |The product: Blood's a Rover added to the store: VonRueden LLC
+13-05-2020 22:00:47.0498|INFO |The product: Number the Stars added to the store: VonRueden LLC
+13-05-2020 22:00:47.0545|INFO |The product: The Way Through the Woods added to the store: VonRueden LLC
+13-05-2020 22:00:47.0591|INFO |The product: The Cricket on the Hearth added to the store: VonRueden LLC
+13-05-2020 22:00:47.0637|INFO |The product: Far From the Madding Crowd added to the store: VonRueden LLC
+13-05-2020 22:00:47.0683|INFO |The product: The Other Side of Silence added to the store: VonRueden LLC
+13-05-2020 22:00:47.0731|INFO |The product: That Good Night added to the store: VonRueden LLC
+13-05-2020 22:00:47.0779|INFO |The product: No Country for Old Men added to the store: VonRueden LLC
+13-05-2020 22:00:47.0828|INFO |The product: Wildfire at Midnight added to the store: VonRueden LLC
+13-05-2020 22:00:47.0829|INFO |The application is starting
+13-05-2020 22:00:53.0388|INFO |notifyObservers

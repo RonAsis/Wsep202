@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.ShoppingBagDetailsPolicy;
 import com.wsep202.TradingSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +41,9 @@ public class SellerOwnerService {
         return tradingSystemFacade.removeDiscountFromStore(ownerUsername,storeId,uuid,discountId);
     }
 
-////////////////////UC 4.2////////////////////////////////////////////////////////////////////////
+////////////////////   UC 4.2  ////////////////////////////////////////////////////////////////////////
 
+    ///////////////////discounts policies/////////////////////////////////////
     /**
      * owner adds a new visible discount
      * @param ownerUsername the owner does that add to his store
@@ -50,6 +52,7 @@ public class SellerOwnerService {
      * @param visibleDiscountDto - the info of the discount inserted by the owner
      * @return true on successful addition
      */
+
     public boolean addVisibleDiscountPolicy(String ownerUsername,
                                             int storeId,
                                             UUID uuid,
@@ -168,6 +171,90 @@ public class SellerOwnerService {
         return tradingSystemFacade.addConditionalComposedDiscountPolicy(ownerUsername, storeId,
                 uuid, conditionalComposedDto);
     }
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////purchase policies/////////////////////////////////////////////////
+
+    /**
+     * add user purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param userDetailsPolicyDto
+     * @return
+     */
+    public boolean addUserDetailsPurchasePolicy(String ownerUsername,
+                                            int storeId,
+                                            UUID uuid,
+                                            UserDetailsPolicyDto userDetailsPolicyDto){
+        return tradingSystemFacade.addUserDetailsPolicy(ownerUsername, storeId,
+                uuid, userDetailsPolicyDto);
+    }
+    /**
+     * add system purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param systemDetailsPolicyDto
+     * @return
+     */
+    public boolean addSystemPurchasePolicy(String ownerUsername,
+                                        int storeId,
+                                        UUID uuid,
+                                        SystemDetailsPolicyDto systemDetailsPolicyDto){
+        return tradingSystemFacade.addSystemPurchasePolicy(ownerUsername, storeId,
+                uuid, systemDetailsPolicyDto);
+    }
+    /**
+     * add system purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param productDetailsPolicyDto
+     * @param productId SN as in store
+     * @return
+     */
+    public boolean addProductPurchasePolicy(String ownerUsername,
+                                           int productId,
+                                            int storeId,
+                                           UUID uuid,
+                                           ProductDetailsPolicyDto productDetailsPolicyDto){
+        return tradingSystemFacade.addProductPurchasePolicy(ownerUsername,productId, storeId,
+                uuid, productDetailsPolicyDto);
+    }
+    /**
+     * add system purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param shoppingBagDetailsPolicyDto
+     * @return
+     */
+    public boolean addShoppingBagPurchasePolicy(String ownerUsername,
+                                            int storeId,
+                                            UUID uuid,
+                                            ShoppingBagDetailsPolicyDto shoppingBagDetailsPolicyDto){
+        return tradingSystemFacade.addShoppingBagPurchasePolicy(ownerUsername, storeId,
+                uuid, shoppingBagDetailsPolicyDto);
+    }
+
+    /**
+     * add system purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param composedPurchaseDto
+     * @return
+     */
+    public boolean addComposedPurchasePurchasePolicy(String ownerUsername,
+                                                int storeId,
+                                                UUID uuid,
+                                                ComposedPurchaseDto composedPurchaseDto){
+        return tradingSystemFacade.addComposedPurchasePurchasePolicy(ownerUsername, storeId,
+                uuid, composedPurchaseDto);
+    }
+
+//TODO: EDIT purchase policy and remove
+    ///////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
