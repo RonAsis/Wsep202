@@ -114,7 +114,7 @@ public class BuyerRegisteredService {
         return tradingSystemFacade.addProductToShoppingCart(username, amount, productDto, uuid);
     }
 
-    public ShoppingCartViewDto getShoppingCart(String username, UUID uuid) {
+    public List<ProductShoppingCartDto> getShoppingCart(String username, UUID uuid) {
         return tradingSystemFacade.getShoppingCart(username, uuid);
     }
 

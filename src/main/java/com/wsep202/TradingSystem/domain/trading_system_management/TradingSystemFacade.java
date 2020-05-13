@@ -843,9 +843,10 @@ public class TradingSystemFacade {
         return user.saveProductInShoppingBag(store, product, amount);
     }
 
-    public ShoppingCartViewDto getShoppingCart(String username, UUID uuid) {
+    public  List<ProductShoppingCartDto> getShoppingCart(String username, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username,uuid);
-        return modelMapper.map(user.getShoppingCart(), ShoppingCartViewDto.class);
+        Type listType = new TypeToken<List<ProductShoppingCartDto>>() {}.getType();
+        return modelMapper.map(user.getShoppingCart(), listType);
     }
 
     public Pair<Double, Double> getTotalPriceOfShoppingCart(String username, UUID uuid) {

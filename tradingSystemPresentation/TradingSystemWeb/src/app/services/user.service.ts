@@ -11,6 +11,7 @@ import {HttpService} from './http.service';
 import {Observable, of} from 'rxjs';
 import {PaymentDetails} from '../shared/paymentDetails.model';
 import {BillingAddress} from '../shared/billingAddress.model';
+import {ShareService} from './share.service';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,7 @@ export class UserService {
 
   private usernameWantSeeHistory = null;
 
-  constructor(private httpService: HttpService) {
+  constructor(private httpService: HttpService, private  shareService: ShareService) {
     this.shoppingCart = new ShoppingCart(new Map<number, ShoppingBag>());
     this.isAdmin = false;
   }
@@ -116,7 +117,7 @@ export class UserService {
   getShoppingCart() {
     console.log(this.isLoggingUser());
     if (!this.isLoggingUser()) {
-      return of(this.shoppingCart);
+      return of(this.shareService.createShoppingCartItems(this.shoppingCart));
     }else {
       return this.httpService.getShoppingCart(this.username, this.uuid);
     }
@@ -134,7 +135,9 @@ export class UserService {
 
   removeCartItem(productSn: number, storeId: number) {
     if (!this.isLoggingUser()){
-      this.shoppingCart.removeCartItem(productSn, storeId);
+      return of(this.shoppingCart.removeCartItem(productSn, storeId));
+    }else{
+      return this.httpService.removeProductInShoppingBag(this.username, storeId, productSn, this.uuid);
     }
   }
 

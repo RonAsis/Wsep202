@@ -141,7 +141,7 @@ public class BuyerRegisteredController {
      */
     @ApiOperation(value = "get-shopping-cart")
     @GetMapping("get-shopping-cart/{username}/{uuid}")
-    public ShoppingCartViewDto getShoppingCart(@PathVariable String username,
+    public List<ProductShoppingCartDto> getShoppingCart(@PathVariable String username,
                                                @PathVariable UUID uuid) {
         return buyerRegisteredService.getShoppingCart(username, uuid);
     }

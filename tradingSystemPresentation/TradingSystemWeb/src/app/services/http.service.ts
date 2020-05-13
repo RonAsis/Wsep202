@@ -10,6 +10,7 @@ import {ShoppingBag} from '../shared/ShoppingBag.model';
 import {stringify} from 'querystring';
 import {UserSystem} from '../shared/userSystem.model';
 import {Manager} from '../shared/manager.model';
+import {ProductShoppingCartDto} from '../shared/productShoppingCartDto.model';
 
 @Injectable({
   providedIn: 'root'
@@ -191,7 +192,7 @@ export class HttpService {
     const url = `${this.buyerUrl}/` + 'get-shopping-cart/' +
       `${username}/` +
       `${uuid}`;
-    return this.http.get<ShoppingCart>(url);
+    return this.http.get<ProductShoppingCartDto[]>(url);
   }
 
   getTotalPriceOfShoppingCartLoggingUser(username: string, uuid: string) {
