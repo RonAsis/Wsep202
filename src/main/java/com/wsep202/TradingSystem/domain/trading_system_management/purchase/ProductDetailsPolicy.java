@@ -11,6 +11,6 @@ public class ProductDetailsPolicy extends PurchasePolicy {
     
     @Override
     public boolean isApproved(Map<Product, Integer> products, UserSystem user, BillingAddress userAddress) {
-return true;
+        return true;
     }
 }
