@@ -63,4 +63,9 @@ public class MangerStore {
         //remove all permissions equals to permission received
         return storePermissions.removeIf(permission1 -> permission1 == permission);
     }
+
+    public boolean canEdit() {
+        return storePermissions.stream()
+                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT));
+    }
 }

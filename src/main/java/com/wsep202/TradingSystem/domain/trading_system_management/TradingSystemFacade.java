@@ -149,7 +149,7 @@ public class TradingSystemFacade {
                               int amount, double cost, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get registered user with ownerUsername
-            Store ownerStore = user.getOwnerStore(storeId); //verify he owns store with storeId
+            Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
             //convert to a category we can add to the product
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             Product product = new Product(productName, productCategory, amount, cost, storeId);
@@ -171,7 +171,7 @@ public class TradingSystemFacade {
     public boolean deleteProductFromStore(@NotBlank String ownerUsername, int storeId, int productSn, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get the registered user
-            Store ownerStore = user.getOwnerStore(storeId); //verify he is owner of the store
+            Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he is owner of the store
             return ownerStore.removeProductFromStore(user, productSn);
         } catch (TradingSystemException e) {
             log.error("deleteProduct from store failed", e);
@@ -196,7 +196,7 @@ public class TradingSystemFacade {
                                @NotBlank String category, int amount, double cost, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownerStore = user.getOwnerStore(storeId);
+            Store ownerStore = user.getOwnerOrManagerStore(storeId);
             return ownerStore.editProduct(user, productSn, productName, category, amount, cost);
         } catch (TradingSystemException e) {
             log.error("editProduct failed", e);
@@ -653,8 +653,8 @@ public class TradingSystemFacade {
 
     public List<String> getOperationsCanDo(String manageUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(manageUsername, uuid);
-        Store store = tradingSystem.getStore(storeId);
-        return user.getOperationsCanDo(store);
+        Store ownerStore = user.getManagerStore(storeId);
+        return ownerStore.getOperationsCanDo(user);
     }
 
     public List<String> getAllOperationOfManger() {

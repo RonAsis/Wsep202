@@ -16,10 +16,16 @@ export class OwnedStoreEditComponent implements OnInit {
 
   store: Store;
   loadedFeature: string;
+  isOwner = false;
 
   ngOnInit(): void {
     this.store = this.shareService.storeSelected;
     this.loadedFeature = 'Edit-Product';
+    this.storeService.getIsOwner(this.store.storeId).subscribe(response =>{
+      if (response){
+        this.isOwner = true;
+      }
+    });
   }
 
   onEditProduct() {
@@ -40,9 +46,5 @@ export class OwnedStoreEditComponent implements OnInit {
 
   onPolicy() {
     this.loadedFeature = 'Policy';
-  }
-
-  isOwner() {
-    return this.storeService.getIsOwner(this.store.storeId);
   }
 }

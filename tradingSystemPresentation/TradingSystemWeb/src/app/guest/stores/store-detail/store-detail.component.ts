@@ -13,12 +13,13 @@ import {ShareService} from '../../../services/share.service';
 })
 export class StoreDetailComponent implements OnInit, AfterViewInit{
   @Input()store: Store;
-  wantViewPurchaseHistory: boolean;
-
+  managerWithPermissionEdit = false;
+  managerWithPermissionView = false;
   constructor(private userService: UserService, private storeService: StoreService,
               private shareService: ShareService) { }
 
   ngOnInit(): void {
+    this.setPermissionForManager();
   }
 
   ngAfterViewInit(): void {
@@ -34,20 +35,24 @@ export class StoreDetailComponent implements OnInit, AfterViewInit{
   }
 
   isManagerWithPermissionEdit() {
-    return this.isHasPermission('edit');
+    return this.managerWithPermissionEdit;
   }
 
-  private isHasPermission(permission: string) {
-    let res = false;
+   setPermissionForManager() {
     if (this.storeService.getManagerStores()) {
       this.storeService.getMyPermissions(this.store.storeId)
-        .subscribe((response: string[]) => res = response.includes(permission));
+        .subscribe((response: string[]) => {
+          console.log(response);
+          if (response !== null && response !== undefined){
+            this.managerWithPermissionEdit = response.includes('edit');
+            this.managerWithPermissionView = response.includes('view');
+          }
+        });
     }
-    return res;
   }
 
   isManagerWithPermissionViewOrAdminOrOwner() {
-    return this.userService.getIsAdmin() || this.isOwner() || this.isHasPermission('view');
+    return this.userService.getIsAdmin() || this.isOwner() || this.managerWithPermissionView;
   }
 
   editStore() {

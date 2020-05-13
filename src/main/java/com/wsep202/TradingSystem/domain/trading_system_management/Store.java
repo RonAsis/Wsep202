@@ -245,7 +245,7 @@ public class Store {
      * @return true for success
      */
     public boolean addNewProduct(UserSystem user, Product product) {
-        if (isOwner(user)) {  //verify the user is owner of the store
+        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
             products.add(product);
             log.info("The product: " + product.getName() + " added to the store: " + this.storeName);
             return true;
@@ -268,7 +268,7 @@ public class Store {
      */
     public boolean editProduct(UserSystem user, int productSn, String productName, String category,
                                int amount, double cost) {
-        if (isOwner(user)) {   //the user is owner
+        if (isOwner(user) || managerCanEdit(user.getUserName())) {   //the user is owner
             Optional<Product> product = products.stream().filter(p -> p.getProductSn() == productSn).findFirst();
             if (product.isPresent()) {    //update the product properties
                 product.get().setName(productName);
@@ -296,7 +296,7 @@ public class Store {
      * @return true if the removal succeeded otherwise false
      */
     public boolean removeProductFromStore(UserSystem user, int productSn) {
-        if (isOwner(user)) {  //only owner can remove products from its store
+        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //only owner can remove products from its store
             int sizeOfProducts = products.size();
             products.removeIf(product -> product.getProductSn() == productSn);
             if (sizeOfProducts > products.size()) {
@@ -863,5 +863,11 @@ public class Store {
                     .filter(storePermission -> !storePermissions.contains(storePermission))
                     .collect(Collectors.toSet());
         }
+    }
+
+    public boolean managerCanEdit(String userName) {
+        return managers.stream()
+                .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.canEdit());
+
     }
 }
