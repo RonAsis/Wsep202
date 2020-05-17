@@ -24,6 +24,7 @@ public class ComposedPurchase extends PurchasePolicy{
         this.composedPurchasePolicies = composedPurchasePolicies;
         this.id = getPurchaseIdAcc();
     }
+    //2
 
 //    public void editDiscount(Calendar endTime, double percentage, CompositeOperator operator,
 //                             Map<Integer, DiscountPolicy> composedToAdd,
