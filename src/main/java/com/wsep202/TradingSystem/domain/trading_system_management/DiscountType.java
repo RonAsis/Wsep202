@@ -6,7 +6,7 @@ import com.wsep202.TradingSystem.domain.exception.*;
 public enum DiscountType {
 
     VISIBLE_DISCOUNT("visible discount"),
-    NONE("no discount");
+    NONE("no  discount");
 
     public final String type;
 

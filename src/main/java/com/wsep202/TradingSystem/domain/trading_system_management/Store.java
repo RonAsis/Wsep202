@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.UserDetailsPolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
@@ -869,5 +870,33 @@ public class Store {
         return managers.stream()
                 .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.canEdit());
 
+    }
+
+    /**
+     * add any kind of purchase policy to the store
+     * @param owner that adds
+     * @param purchasePolicy to add
+     * @return
+     */
+    public boolean addPurchasePolicy(UserSystem owner, PurchasePolicy purchasePolicy) {
+        if (owner == null) {
+            return false;
+        }
+        if (isOwner(owner)) {
+            return this.purchasePolicies.add(purchasePolicy);  //add the discount to store
+        }
+        //this is not an owner of the store
+        log.error("The received user: " + owner.getUserName() + "is not owner");
+        throw new NoOwnerInStoreException(owner.getUserName(), storeId);
+    }
+
+    public PurchasePolicy getPurchasePolicyById(int id) {
+        Optional<PurchasePolicy> purchasePolicy = this.purchasePolicies.stream().
+                filter(purchasePolicy1 -> purchasePolicy1.getId() == id).findFirst();
+        if (purchasePolicy.isPresent()) {
+            return purchasePolicy.get();
+        }
+        //there is no discount with the requested id
+        throw new DiscountPolicyNoSuchIDException(id, this.getStoreName());
     }
 }
