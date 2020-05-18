@@ -27,20 +27,11 @@ public class ShoppingBag {
      * list of all of the products and the amount of each product
      */
     private Map<Product, Integer> productListFromStore;
-    /**
-     * shows the cost of all of the products in bag
-     */
-    private double totalCostOfBag;
-    /**
-     * shows how many types of products in the bag
-     */
-    private int numOfProductsInBag;
+
 
     public ShoppingBag(Store storeOfProduct){
         this.storeOfProduct = storeOfProduct;
         productListFromStore = new HashMap<>();
-        totalCostOfBag = 0;
-        numOfProductsInBag = 0;
     }
 
     /**
@@ -50,33 +41,25 @@ public class ShoppingBag {
      * @return true if the product was added successfully to the bag, false if the product was null.
      */
     public boolean addProductToBag(Product productToAdd, int amountOfProduct){
-        if (productToAdd == null) {
-            log.error("A null product was trying to be added to the bag");
+        if (productToAdd == null || amountOfProduct <= 0) {
+            log.info("A null product was trying to be added to the bag or a in correct amount");
             return false;
         }
         if(productToAdd.getStoreId() != storeOfProduct.getStoreId()){
-            log.error("Store '"+ storeOfProduct.getStoreId() +"' id and product '"+ productToAdd.getName() +"' store id "+ productToAdd.getStoreId() +" does not mach");
+            log.info("Store '"+ storeOfProduct.getStoreId() +"' id and product '"+ productToAdd.getName() +"' store id "+ productToAdd.getStoreId() +" does not mach");
             return false;
         }
         if (productToAdd.getAmount() < amountOfProduct){
-            log.error("there is not enough '" + productToAdd.getName() + "' in store '" + storeOfProduct.getStoreName() + "'");
+            log.info("there is not enough '" + productToAdd.getName() + "' in store '" + storeOfProduct.getStoreName() + "'");
             return false;
         }
-        else {
-            if (productListFromStore.containsKey(productToAdd)) {
-                return changeAmountOfProductInBag(productToAdd, amountOfProduct);
-            }
-            if (amountOfProduct <= 0){
-                log.error("The amount of the product '"+ productToAdd.getName() +"' needs to be greater than zero");
-                return false;
-            }
-            log.info("Product '"+ productToAdd.getName() + "' was added to bag");
-            productListFromStore.put(productToAdd, amountOfProduct);
-            numOfProductsInBag += 1;
-            totalCostOfBag += (productToAdd.getCost() * amountOfProduct);
-            totalCostOfBag = Double.parseDouble(formatter.format(totalCostOfBag));
-            return true;
+        Product isInBag = containProduct(productToAdd.getProductSn());
+        if (isInBag != null) {
+            return changeAmountOfProductInBag(isInBag.getProductSn(), amountOfProduct);
         }
+        log.info("Product '"+ productToAdd.getName() + "' was added to bag");
+        productListFromStore.put(productToAdd, amountOfProduct);
+        return true;
     }
 
     /**
@@ -87,19 +70,17 @@ public class ShoppingBag {
      */
     public boolean removeProductFromBag(Product productToRemove){
         if (productToRemove == null){
-            log.error("Can't remove a null product");
+            log.info("Can't remove a null product");
             return false;
         }
         if(productToRemove.getStoreId() != storeOfProduct.getStoreId()){
-            log.error("Store id "+ storeOfProduct.getStoreId() +" and product store id "+ productToRemove.getStoreId() +" does not mach");
+            log.info("Store id "+ storeOfProduct.getStoreId() +" and product store id "+ productToRemove.getStoreId() +" does not mach");
             return false;
         }
-        if (productListFromStore.containsKey(productToRemove)){
+        Product isInBag = containProduct(productToRemove.getProductSn());
+        if (isInBag != null){
             log.info("The product "+ productToRemove.getName() +" was removed from the bag");
-            totalCostOfBag -= (productListFromStore.get(productToRemove)*productToRemove.getCost());
-            totalCostOfBag = Double.parseDouble(formatter.format(totalCostOfBag));
-            numOfProductsInBag -= 1;
-            productListFromStore.remove(productToRemove);
+            productListFromStore.remove(isInBag);
             return true;
         }
         log.error("The product '"+ productToRemove.getName() +"' was not found");
@@ -107,43 +88,62 @@ public class ShoppingBag {
     }
 
     /**
-     * This method used to change the amount of an exciting product.
-     * In case if the calculation of amount of the product is less than 0, the method will return false.
-     * @param product - the product that is already in the bag
+     * This method used to change the amount of a product.
+     * @param serialNumber - the products serial number
      * @param amountOfProduct - the amount that needs to be added
      * @return true if the amount can be changed, false if it can't.
      */
-    private boolean changeAmountOfProductInBag(Product product, int amountOfProduct){
-        if(amountOfProduct < 0 && amountOfProduct + productListFromStore.get(product) < 0){
-            log.error("The amount of product '"+ product.getName() +"' cannot be less than 0");
+    public boolean changeAmountOfProductInBag(int serialNumber, int amountOfProduct){
+        Product isInBag = containProduct(serialNumber);
+        if (isInBag == null || amountOfProduct <= 0){
+            log.info("product is not in bag or amount is zero or less");
             return false;
         }
-        log.info("Update the amount of an exciting product '"+ product.getName() +"'");
-        totalCostOfBag += (amountOfProduct*product.getCost());
-        totalCostOfBag = Double.parseDouble(formatter.format(totalCostOfBag));
-        productListFromStore.replace(product,productListFromStore.get(product)+amountOfProduct);
-        if (productListFromStore.get(product)==0) {
-            productListFromStore.remove(product);
-            numOfProductsInBag --;
-        }
+        log.info("Update the amount of an exciting product '"+ isInBag.getName() +"'");
+        productListFromStore.replace(isInBag ,amountOfProduct);
         return true;
     }
 
     /**
      * This method used to get the amount of a product in the bag
-     * @param product - the product to get the amount
+     * @param serialNumber - the products serial number in store
      * @return the amount of the product in the bag if it's exists, -1 if the product is null or not in the bag
      */
-    public int getProductAmount(Product product){
-        if (product == null){
-            log.error("can't return amount for null product");
+    public int getProductAmount(int serialNumber){
+        Product isInBag = containProduct(serialNumber);
+        if (isInBag == null){
+            log.info("product not in bag");
             return -1;
         }
-        if(productListFromStore.containsKey(product)){
-            log.info("return the amount of product '"+ productListFromStore.get(product) +"'");
-            return productListFromStore.get(product);
+        log.info("return the amount of product '"+ productListFromStore.get(isInBag) +"'");
+        return productListFromStore.get(isInBag);
+    }
+
+/*
+    public boolean changeProductAmountInShoppingBag(int amount, int productSn) {
+        return productListFromStore.entrySet().stream()
+                .filter(productIntegerEntry -> productIntegerEntry.getKey().getProductSn() == productSn)
+                .findFirst().map(productIntegerEntry -> {
+                    productIntegerEntry.setValue(amount);
+                    return true;
+                }).orElse(false);
+    }
+*/
+
+    /**
+     * check if the product exists in bag
+     * @param serialNum - the products serial number
+     * @return null if the product does not exists, else the product in the bag
+     */
+    public Product containProduct(int serialNum){
+        for (Product product: productListFromStore.keySet()) {
+                if (product.getProductSn() == serialNum){
+                    log.info("product with serial number '" + serialNum + "' is in bag");
+                    return product;
+                }
         }
-        return -1;
+        log.info("product with serial number '" + serialNum + "' is not in bag");
+        return null;
     }
 
     public double getTotalCostOfBag(){
@@ -166,14 +166,5 @@ public class ShoppingBag {
 
     public int getNumOfProducts() {
         return productListFromStore.values().size();
-    }
-
-    public boolean changeProductAmountInShoppingBag(int amount, int productSn) {
-        return productListFromStore.entrySet().stream()
-                .filter(productIntegerEntry -> productIntegerEntry.getKey().getProductSn() == productSn)
-                .findFirst().map(productIntegerEntry -> {
-                    productIntegerEntry.setValue(amount);
-                    return true;
-                }).orElse(false);
     }
 }
