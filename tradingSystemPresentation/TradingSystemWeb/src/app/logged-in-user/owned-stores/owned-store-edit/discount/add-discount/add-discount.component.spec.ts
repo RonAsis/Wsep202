@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditManagerComponent } from './edit-manager.component';
+import { AddDiscountComponent } from './add-discount.component';
 
-describe('EditManagerComponent', () => {
-  let component: EditManagerComponent;
-  let fixture: ComponentFixture<EditManagerComponent>;
+describe('AddDiscountComponent', () => {
+  let component: AddDiscountComponent;
+  let fixture: ComponentFixture<AddDiscountComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditManagerComponent ]
+      declarations: [ AddDiscountComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditManagerComponent);
+    fixture = TestBed.createComponent(AddDiscountComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

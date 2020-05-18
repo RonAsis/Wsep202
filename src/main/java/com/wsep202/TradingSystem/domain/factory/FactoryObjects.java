@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.factory;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
+import com.wsep202.TradingSystem.dto.DiscountDto;
 import com.wsep202.TradingSystem.dto.VisibleDiscountDto;
 
 import java.util.Calendar;
@@ -56,5 +57,10 @@ public class FactoryObjects {
                                                               double discountPercentage,
                                                               String description) {
         return new ConditionalComposedDiscount(operator,endTime,discountPercentage,description);
+    }
+
+    public DiscountPolicy createDiscount(DiscountDto discountDto) {
+        //TODO
+        return null;
     }
 }

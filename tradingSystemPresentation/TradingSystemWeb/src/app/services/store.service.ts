@@ -5,6 +5,7 @@ import {Product} from '../shared/product.model';
 import {Receipt} from '../shared/receipt.model';
 import {HttpService} from './http.service';
 import {UserService} from './user.service';
+import {Discount} from '../shared/discount.model';
 
 @Injectable({
   providedIn: 'root'
@@ -121,5 +122,26 @@ export class StoreService {
 
   getIsOwner(storeId: number) {
     return this.httpService.isOwner(this.userService.getUsername(), storeId, this.userService.getUuid());
+  }
+
+  getStoreDiscounts(storeId: number) {
+    return this.httpService.getStoreDiscounts(this.userService.getUsername(), storeId, this.userService.getUuid());
+  }
+
+  removeDiscount(discountId: number, storeId: number) {
+    return this.httpService.removeDiscount(this.userService.getUsername(), storeId, discountId, this.userService.getUuid());
+  }
+
+  getCompositeOperators(storeId: number) {
+    return this.httpService.getCompositeOperators(this.userService.getUsername(), storeId, this.userService.getUuid());
+  }
+
+  getDiscounts(storeId: number) {
+    return this.httpService.getDiscounts(this.userService.getUsername(), storeId, this.userService.getUuid());
+  }
+
+  addDiscount(storeId: number, discount: Discount) {
+    return this.httpService.addDiscount(this.userService.getUsername(), storeId, discount, this.userService.getUuid());
+
   }
 }

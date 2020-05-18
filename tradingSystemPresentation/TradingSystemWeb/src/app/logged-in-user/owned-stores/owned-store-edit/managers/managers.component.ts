@@ -4,7 +4,7 @@ import {StoreService} from '../../../../services/store.service';
 import {Manager} from '../../../../shared/manager.model';
 
 @Component({
-  selector: 'app-managers',
+  selector: 'app-visible-discount-store',
   templateUrl: './managers.component.html',
   styleUrls: ['./managers.component.css']
 })

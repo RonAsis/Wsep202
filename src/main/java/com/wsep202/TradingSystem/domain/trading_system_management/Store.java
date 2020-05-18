@@ -5,7 +5,6 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +41,7 @@ public class Store {
     private ArrayList<PurchasePolicy> purchasePolicies;
 
     //The set purchase policy for the store
-    private ArrayList<DiscountPolicy> discountPolicies;
+    private List<DiscountPolicy> discounts;
 
     //owners of the store
     private Set<UserSystem> owners;
@@ -66,7 +65,7 @@ public class Store {
 
     private void initStore(UserSystem owner, String storeName) {
         this.purchasePolicies = new ArrayList<>();
-        this.discountPolicies = new ArrayList<>();
+        this.discounts = new ArrayList<>();
         receipts = new LinkedList<>();
         appointedOwners = new HashMap<>();
         appointedManagers = new HashMap<>();
@@ -612,7 +611,7 @@ public class Store {
      */
     public void applyDiscountPolicies(HashMap<Product, Integer> productsBag) {
         updateExpiredDiscounts();   //remove discounts that their time is expired from store.
-        for (DiscountPolicy discountPolicy : this.getDiscountPolicies()) {  //apply discounts on shoppingBag
+        for (DiscountPolicy discountPolicy : this.getDiscounts()) {  //apply discounts on shoppingBag
             discountPolicy.applyDiscount(productsBag);
         }
     }
@@ -626,7 +625,7 @@ public class Store {
         for (Product product : this.products) {
             productIntegerHashMap.put(product, 0);
         }
-        for (DiscountPolicy discountPolicy : this.getDiscountPolicies()) {  //apply discounts on shoppingBag
+        for (DiscountPolicy discountPolicy : this.getDiscounts()) {  //apply discounts on shoppingBag
             if (discountPolicy instanceof VisibleDiscount) {
                 discountPolicy.applyDiscount(productIntegerHashMap);
             }
@@ -637,9 +636,9 @@ public class Store {
      * remove discounts that expired from store
      */
     private void updateExpiredDiscounts() {
-        for (DiscountPolicy discountPolicy : this.getDiscountPolicies()) {
+        for (DiscountPolicy discountPolicy : this.getDiscounts()) {
             if (discountPolicy.isExpired()) {
-                this.discountPolicies.remove(discountPolicy);
+                this.discounts.remove(discountPolicy);
             }
         }
     }
@@ -656,7 +655,7 @@ public class Store {
             return false;
         }
         if (isOwner(owner)) {
-            return this.discountPolicies.add(discountPolicy);  //add the discount to store
+            return this.discounts.add(discountPolicy);  //add the discount to store
         }
         //this is not an owner of the store
         log.error("The received user: " + owner.getUserName() + "is not owner");
@@ -679,7 +678,7 @@ public class Store {
      * @return
      */
     public DiscountPolicy getDiscountPolicyById(int id) {
-        Optional<DiscountPolicy> discountPolicy = this.discountPolicies.stream().
+        Optional<DiscountPolicy> discountPolicy = this.discounts.stream().
                 filter(discountPolicy1 -> discountPolicy1.getId() == id).findFirst();
         if (discountPolicy.isPresent()) {
             return discountPolicy.get();
@@ -688,20 +687,14 @@ public class Store {
         throw new DiscountPolicyNoSuchIDException(id, this.getStoreName());
     }
 
-    /**
-     * remove discount from the available discounts of the store
-     *
-     * @param owner          - the user that tries to remove discount
-     * @param discountPolicy to remove
-     * @return true for success
-     * exception in case the user is not a valid owner in the store
-     */
-    public boolean removeDiscount(UserSystem owner, DiscountPolicy discountPolicy) throws NoOwnerInStoreException {
-        if (isOwner(owner)) {
-            discountPolicy.deleteDiscount();
-            return true;
+    public boolean removeDiscount(UserSystem userSystem, int discountId) {
+        if (isOwner(userSystem) || isManager(userSystem)) {
+            DiscountPolicy discount = discounts.stream()
+                    .filter(discountPolicy -> discountPolicy.getId() == discountId)
+                    .findFirst().orElseThrow(() -> new TradingSystemException(String.format("the discount %d don't exist on store %d", discountId, storeId)));
+            return discounts.remove(discount);
         }
-        throw new NoOwnerInStoreException(owner.getUserName(), this.getStoreId());
+        throw new NoOwnerInStoreException(userSystem.getUserName(), this.getStoreId());
     }
 
     /**
@@ -844,7 +837,7 @@ public class Store {
         if (!isOwner(ownerStore)) {    //verify the editor is owner in the store
             log.error("couldn't get permissions of " + user.getUserName() + " by " + ownerStore.getUserName());
             return null;
-        }else{
+        } else {
             return managers.stream().filter(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(user.getUserName()))
                     .findFirst().map(MangerStore::getStorePermissions)
                     .orElse(null);
@@ -869,5 +862,20 @@ public class Store {
         return managers.stream()
                 .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.canEdit());
 
+    }
+
+    public List<DiscountPolicy> getStoreDiscounts(UserSystem user) {
+        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+            return discounts;
+        }
+        throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
+    }
+
+    public DiscountPolicy addDiscount(UserSystem user, DiscountPolicy discountPolicy) {
+        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+            discounts.add(discountPolicy);
+            return discountPolicy;
+        }
+        throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 }

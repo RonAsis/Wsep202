@@ -23,7 +23,7 @@ import {ProductItemComponent} from './guest/products/product-list/product-item/p
 import {NgxBootstrapSliderModule} from 'ngx-bootstrap-slider';
 import {Ng5SliderModule} from 'ng5-slider';
 import {Ng2SearchPipeModule} from 'ng2-search-filter';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ProductRankPipe} from './pipes/product-rank.pipe';
 import {RangePriceProductPipe} from './pipes/range-price-product.pipe';
 import {StoreRankPipe} from './pipes/store-rank.pipe';
@@ -51,22 +51,25 @@ import {Product} from './shared/product.model';
 import {CartItemComponent} from './guest/shopping-cart/cart-item/cart-item.component';
 import {PurchaseShoppingCartComponent} from './guest/shopping-cart/purchase-shopping-cart/purchase-shopping-cart.component';
 import {OwnedStoreEditComponent} from './logged-in-user/owned-stores/owned-store-edit/owned-store-edit.component';
-import {Routes, RouterModule} from '@angular/router';
-import { DiscountComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/discount.component';
-import { PolicyComponent } from './logged-in-user/owned-stores/owned-store-edit/policy/policy.component';
-import { EditProductComponent } from './logged-in-user/owned-stores/owned-store-edit/edit-product/edit-product.component';
-import { ManagersComponent } from './logged-in-user/owned-stores/owned-store-edit/managers/managers.component';
-import { OwnersComponent } from './logged-in-user/owned-stores/owned-store-edit/owners/owners.component';
-import { PermissionComponent } from './logged-in-user/owned-stores/owned-store-edit/managers/permission/permission.component';
-import { EditManagerComponent } from './logged-in-user/owned-stores/owned-store-edit/managers/edit-manager/edit-manager.component';
+import {RouterModule} from '@angular/router';
+import {DiscountComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/discount.component';
+import {PolicyComponent} from './logged-in-user/owned-stores/owned-store-edit/policy/policy.component';
+import {EditProductComponent} from './logged-in-user/owned-stores/owned-store-edit/edit-product/edit-product.component';
+import {ManagersComponent} from './logged-in-user/owned-stores/owned-store-edit/managers/managers.component';
+import {OwnersComponent} from './logged-in-user/owned-stores/owned-store-edit/owners/owners.component';
+import {PermissionComponent} from './logged-in-user/owned-stores/owned-store-edit/managers/permission/permission.component';
 import {AddOwnerComponent} from './logged-in-user/owned-stores/owned-store-edit/owners/add-owner/add-owner.component';
 import {AddManagerComponent} from './logged-in-user/owned-stores/owned-store-edit/managers/add-manager/add-manager.component';
 import {AddProductComponent} from './logged-in-user/owned-stores/owned-store-edit/edit-product/add-product/add-product.component';
 import {ProductEditItemComponent} from './logged-in-user/owned-stores/owned-store-edit/edit-product/product-edit-item/product-edit-item.component';
-import { OwnerItemComponent } from './logged-in-user/owned-stores/owned-store-edit/owners/owner-item/owner-item.component';
-import { ManagerItemComponent } from './logged-in-user/owned-stores/owned-store-edit/managers/manager-item/manager-item.component';
-
-const routes: Routes = []; // sets up routes constant where you define your routes
+import {OwnerItemComponent} from './logged-in-user/owned-stores/owned-store-edit/owners/owner-item/owner-item.component';
+import {ManagerItemComponent} from './logged-in-user/owned-stores/owned-store-edit/managers/manager-item/manager-item.component';
+import {FormlyBootstrapModule} from '@ngx-formly/bootstrap';
+import {ConditionalDiscountComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/conditional-discount/conditional-discount.component';
+import {AddDiscountComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/add-discount/add-discount.component';
+import {DiscountItemComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/discount-item/discount-item.component';
+import {ProductDiscountItemComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/product-discount-item/product-discount-item.component';
+import {NgMultiSelectDropDownModule} from 'ng-multiselect-dropdown';
 
 @NgModule({
   declarations: [
@@ -118,15 +121,18 @@ const routes: Routes = []; // sets up routes constant where you define your rout
     ManagersComponent,
     OwnersComponent,
     PermissionComponent,
-    EditManagerComponent,
     AddProductComponent,
     ProductEditItemComponent,
     OwnerItemComponent,
-    ManagerItemComponent
+    ManagerItemComponent,
+    ConditionalDiscountComponent,
+    AddDiscountComponent,
+    DiscountItemComponent,
+    ProductDiscountItemComponent
   ],
   imports: [
-    RouterModule.forRoot(routes),
     Ng2SearchPipeModule,
+    NgMultiSelectDropDownModule,
     Ng5SliderModule,
     BrowserModule,
     BrowserAnimationsModule,
@@ -143,6 +149,8 @@ const routes: Routes = []; // sets up routes constant where you define your rout
         clearOnError: true
       }
     }),
+    ReactiveFormsModule,
+    FormlyBootstrapModule,
   ],
   exports: [RouterModule],
   providers: [],

@@ -6,7 +6,6 @@ import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.ServiceFacade;
 import javafx.util.Pair;
@@ -14,14 +13,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -160,6 +157,30 @@ public class TradingSystemFacade {
         }
     }
 
+    public List<DiscountDto> getStoreDiscounts(String username, int storeId, UUID uuid) {
+            UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
+            Store store = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
+            List<DiscountPolicy> storeDiscounts = store.getStoreDiscounts(user);
+            return convertDiscountList(storeDiscounts);
+    }
+
+    public boolean removeDiscount(String username, int storeId, int discountId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
+        Store store = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
+        return store.removeDiscount(user, discountId);
+    }
+
+    public DiscountDto addDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
+        Store store = user.getOwnerOrManagerStore(storeId);
+        DiscountPolicy discountPolicy = factoryObjects.createDiscount(discountDto);
+        return modelMapper.map(store.addDiscount(user, discountPolicy), DiscountDto.class);
+    }
+
+    public List<String> getCompositeOperators(String username, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
+        return CompositeOperator.getStringCompositeOperators();
+    }
     /**
      * delete product form store
      *
@@ -995,14 +1016,15 @@ public class TradingSystemFacade {
      * @return true in case of successful deletion
      */
     public boolean removeDiscountFromStore(String ownerUsername, int storeId, UUID uuid, int discountId) {
-        try{
-            Store store = tradingSystem.getStore(storeId);
-            UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
-            DiscountPolicy discountPolicy = store.getDiscountPolicyById(discountId);
-            return store.removeDiscount(owner,discountPolicy);
-        }catch (TradingSystemException e){
-            return false;
-        }
+//        try{
+//            Store store = tradingSystem.getStore(storeId);
+//            UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+//            DiscountPolicy discountPolicy = store.getDiscountPolicyById(discountId);
+//            return store.removeDiscount(owner,discountPolicy);
+//        }catch (TradingSystemException e){
+//            return false;
+//        }
+        return  false;
     }
 
 
@@ -1048,6 +1070,63 @@ public class TradingSystemFacade {
                 .build();
     }
 
+    /**
+     * get all discounts of store with id received
+     *
+     * @param ownerUsername
+     * @param storeId id of the store to get its discounts
+     * @param uuid
+     * @return
+     */
+    public List<DiscountDto> getAllStoreDiscounts(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
+        List<DiscountPolicy> allDiscounts = store.getDiscounts();
+        return convertDiscountList(allDiscounts);
+    }
+
+    public List<String> getAllUsernameNotOwnerNotManger(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
+        return tradingSystem.getAllUsernameNotOwnerNotManger(store);
+    }
+
+    public List<String> getMySubOwners(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
+        return store.getMySubOwners(ownerUsername);
+    }
+
+
+    public List<ManagerDto> getMySubMangers(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
+        Type listType = new TypeToken<List<ManagerDto>>() {}.getType();
+        return modelMapper.map(store.getMySubMangers(ownerUsername), listType);
+    }
+
+    public List<String> getPermissionCantDo(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
+        try {
+            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
+            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
+            Set<StorePermission> permissionOfManager = ownedStore.getPermissionCantDo(ownerUser, managerStore);
+            return StorePermission.getStringPermissions(permissionOfManager);
+        } catch (TradingSystemException e) {
+            log.error("get permission failed", e);
+            return null;
+        }
+    }
+
+    public boolean isOwner(String username, int storeId, UUID uuid) {
+        UserSystem ownerUser = tradingSystem.getUser(username, uuid);
+        return ownerUser.isOwner(storeId);
+    }
+
+    public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(username, uuid);
+        return user.changeProductAmountInShoppingBag(storeId, amount, productSn);
+    }
 
     /**
      * converter of Receipt list to ReceiptDto list
@@ -1084,7 +1163,6 @@ public class TradingSystemFacade {
 
     /**
      * converter of ProductDto list to Product list
-     *
      * @param productDtos - list of productDtos
      * @return list of products
      */
@@ -1098,167 +1176,15 @@ public class TradingSystemFacade {
         return modelMapper.map(notifications, listType);
     }
 
+    private List<DiscountDto> convertDiscountList(@NotNull List<@NotNull DiscountPolicy> discounts) {
+        Type listType = new TypeToken<List<DiscountPolicy>>() {}.getType();
+        return modelMapper.map(discounts, listType);
+    }
+
     private Set<UserSystemDto> convertSetUsersToSetUserDto(Set<UserSystem> users) {
         Type listType = new TypeToken<Set<UserSystemDto>>() {}.getType();
         return modelMapper.map(users, listType);
     }
 
-    /**
-     * get all discounts of store with id received
-     *
-     * @param ownerUsername
-     * @param storeId id of the store to get its discounts
-     * @param uuid
-     * @return
-     */
-    public List<DiscountPolicyDto> getAllStoreDiscounts(String ownerUsername, int storeId, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-        Store store = user.getOwnerStore(storeId);
-        List<DiscountPolicy> allDiscounts = store.getDiscountPolicies();
-        return convertStoreDiscountsToDtos(allDiscounts);
-    }
 
-    public List<String> getAllUsernameNotOwnerNotManger(String ownerUsername, int storeId, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-        Store store = user.getOwnerStore(storeId);
-        return tradingSystem.getAllUsernameNotOwnerNotManger(store);
-    }
-
-    public List<String> getMySubOwners(String ownerUsername, int storeId, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-        Store store = user.getOwnerStore(storeId);
-        return store.getMySubOwners(ownerUsername);
-    }
-
-
-    public List<ManagerDto> getMySubMangers(String ownerUsername, int storeId, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-        Store store = user.getOwnerStore(storeId);
-        Type listType = new TypeToken<List<ManagerDto>>() {}.getType();
-        return modelMapper.map(store.getMySubMangers(ownerUsername), listType);
-    }
-    /**
-     * returns list of converted domain discounts to dto type discounts
-     * @param allDiscounts discount policy type discounts
-     * @return
-     */
-    private List<DiscountPolicyDto> convertStoreDiscountsToDtos(List<DiscountPolicy> allDiscounts) {
-        List<DiscountPolicyDto> allStoreDiscountsDtos = new ArrayList<>();
-        for(DiscountPolicy discount: allDiscounts){
-            DiscountPolicyDto discountDto = convertDiscountToDto(discount);
-            allStoreDiscountsDtos.add(discountDto);
-        }
-        return allStoreDiscountsDtos;
-    }
-
-    /**
-     * returns a single discount converted fro domain type to dto type
-     * @param discount to convert
-     * @return
-     */
-    private DiscountPolicyDto convertDiscountToDto(DiscountPolicy discount) {
-       //set all default discountDto fields
-        CompositeOperator operator =null;
-        Map<ProductDto,Integer> productsUnderThisDiscount = null;
-        Calendar endTime = null;
-        double discountPercentage = 0;
-        String conditionDescription = null;
-        Map<ProductDto,Integer> amountOfProductsForApplyDiscounts = null;
-        double minPrice = -1;
-        Map<Integer, DiscountPolicyDto> composedDiscounts = null;;
-        Map<Integer, DiscountPolicyDto> discountsToApply = null;;
-
-        endTime = discount.getEndTime();
-        discountPercentage = discount.getDiscountPercentage();
-
-        if(discount instanceof VisibleDiscount){
-            productsUnderThisDiscount = convertProductsMapToDto(discount.
-                    getProductsUnderThisDiscount());
-        }
-        else if(discount instanceof ConditionalProductDiscount){
-            productsUnderThisDiscount = convertProductsMapToDto(discount.
-                    getProductsUnderThisDiscount());
-            conditionDescription = ((ConditionalProductDiscount) discount).getConditionDescription();
-            amountOfProductsForApplyDiscounts = convertProductsMapToDto(((ConditionalProductDiscount) discount).
-                    getAmountOfProductsForApplyDiscounts());
-        }
-        else if(discount instanceof ConditionalStoreDiscount){
-            conditionDescription = ((ConditionalStoreDiscount) discount).getConditionDescription();
-            minPrice = ((ConditionalStoreDiscount) discount).getMinPrice();
-        }
-        else if(discount instanceof ConditionalComposedDiscount){
-            conditionDescription = ((ConditionalComposedDiscount) discount).getConditionDescription();
-            operator = ((ConditionalComposedDiscount) discount).getCompositeOperator();
-            composedDiscounts = convertDiscountsMapToDto(((ConditionalComposedDiscount) discount).
-                    getComposedDiscounts());
-            discountsToApply = convertDiscountsMapToDto(((ConditionalComposedDiscount) discount).
-                    getDiscountsToApply());
-        }
-        return new DiscountPolicyDto(productsUnderThisDiscount,endTime,discountPercentage,
-                conditionDescription,amountOfProductsForApplyDiscounts,minPrice,
-                composedDiscounts,discountsToApply,operator);
-    }
-
-    /**
-     * convert map of discount policies to their dtos
-     * @param discountsToApply
-     * @return
-     */
-    private Map<Integer, DiscountPolicyDto> convertDiscountsMapToDto(Map<Integer, DiscountPolicy> discountsToApply) {
-        Map<Integer,DiscountPolicyDto> dtoDiscountsMap = new HashMap<>();
-        for(Integer discountId: discountsToApply.keySet()){
-            DiscountPolicy discount = discountsToApply.get(discountId);
-            DiscountPolicyDto discountDto = convertDiscountToDto(discount);
-            dtoDiscountsMap.put(discountId,discountDto);
-        }
-        return dtoDiscountsMap;
-    }
-
-    /**
-     * convert map of Product to a map of ProductDto
-     * @param productsUnderThisDiscount
-     * @return
-     */
-    private Map<ProductDto, Integer> convertProductsMapToDto
-    (Map<Product, Integer> productsUnderThisDiscount) {
-        Map<ProductDto,Integer> productsDtos = new HashMap<>();
-        for(Product product: productsUnderThisDiscount.keySet()){
-            ProductDto productDto = convertProductToDto(product);
-            productsDtos.put(productDto,productsUnderThisDiscount.get(product));
-        }
-        return productsDtos;
-    }
-
-    /**
-     * convert from Product to Product Dto
-     * @param p product to convert
-     * @return
-     */
-    private ProductDto convertProductToDto(Product p) {
-        return new ProductDto(p.getProductSn(),p.getName(),p.getCategory().category,
-                p.getAmount(),p.getCost(),p.getOriginalCost(),p.getRank(),p.getStoreId());
-    }
-
-    public List<String> getPermissionCantDo(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
-        try {
-            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownedStore = ownerUser.getOwnerStore(storeId);
-            UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
-            Set<StorePermission> permissionOfManager = ownedStore.getPermissionCantDo(ownerUser, managerStore);
-            return StorePermission.getStringPermissions(permissionOfManager);
-        } catch (TradingSystemException e) {
-            log.error("get permission failed", e);
-            return null;
-        }
-    }
-
-    public boolean isOwner(String username, int storeId, UUID uuid) {
-        UserSystem ownerUser = tradingSystem.getUser(username, uuid);
-        return ownerUser.isOwner(storeId);
-    }
-
-    public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(username, uuid);
-        return user.changeProductAmountInShoppingBag(storeId, amount, productSn);
-    }
 }

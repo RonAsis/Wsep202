@@ -1,0 +1,96 @@
+<div class="row">
+  <div>
+    <div class="col-sm-5 from-group">
+      <label for="discountPercentage">Discount Percentage
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="number" [min]="1" [max]="100" id="discountPercentage" class="form-control"
+             #discountPercentage/>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label for="endTime">End Time
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="date" id="endTime" class="form-control"
+             #endTime/>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label>productsUnderThisDiscount:
+        <span class="required-asterisk">*</span>
+      </label>
+      <div class="md-form">
+        <ng-multiselect-dropdown
+          [placeholder]="'Select Products'"
+          [settings]="productUnderDiscountSettings"
+          [data]="optionsProductUnderDiscount"
+          [(ngModel)]="selectedProductUnderDiscount"
+          (onSelect)="onSelectProductUnderDiscount($event)"
+          [disabled]="selectedProductUnderDiscountDisabled"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label for="description">description
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="text" id="description" class="form-control"
+             #description/>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label for="minPrice">Min Price</label>
+      <input type="number" [min]="1" id="minPrice" class="form-control"
+             #minPrice/>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label>amountOfProductsForApplyDiscounts:</label>
+      <div class="md-form">
+        <ng-multiselect-dropdown
+          [placeholder]="'Select Products'"
+          [settings]="productsForApplyDiscountSettings"
+          [data]="optionsProductsForApplyDiscounts"
+          [(ngModel)]="selectedProductsForApplyDiscounts"
+          [disabled]="selectedProductsForApplyDiscountsDisabled"
+          (onSelect)="onSelectProductsForApplyDiscount($event)"
+          (onDeSelect)="onDeSelectProductsForApplyDiscount($event)"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label>composedDiscounts:</label>
+      <div class="md-form">
+        <ng-multiselect-dropdown
+          [placeholder]="'Select Discounts'"
+          [settings]="composedDiscountsSettings"
+          [data]="optionsComposedDiscounts"
+          [(ngModel)]="selectedComposedDiscounts"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <select [ngModel]="selectedComposite" (ngModelChange)="onSelectedCompositeOperator($event)">
+        <option *ngFor="let compositeOperator of compositeOperators" value={{compositeOperator}}>
+          {{compositeOperator}}
+        </option>
+      </select>
+    </div>
+
+  </div>
+  <hr/>
+  <div class="col-xs-12">
+    <button class="btn btn-success" type="submit" (click)="onAddDiscount()">Add Discount</button>
+  </div>
+  <div class="col-sm-5 from-group" [style.color]="messageColor">
+    <p>{{message}}</p>
+  </div>
+</div>
+

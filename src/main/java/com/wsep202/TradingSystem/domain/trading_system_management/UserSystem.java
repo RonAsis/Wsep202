@@ -189,12 +189,14 @@ public class UserSystem implements Observer {
     }
 
     public Store getOwnerOrManagerStore(int storeId) {
-        return ownedStores.stream()
+        Optional<Store> ownerStore = ownedStores.stream()
                 .filter(store -> store.getStoreId() == storeId)
-                .findFirst().orElse( managedStores.stream()
-                .filter(store -> store.getStoreId() == storeId && store.managerCanEdit(userName))
-                .findFirst().orElseThrow(() -> new TradingSystemException(
-                                String.format("The user %s is not manager with edit permission or owner of store %d",userName, storeId))));
+                .findFirst();
+        return ownerStore.isPresent() ? ownerStore.get() :
+                managedStores.stream()
+                        .filter(store -> store.getStoreId() == storeId && store.managerCanEdit(userName))
+                        .findFirst().orElseThrow(() -> new TradingSystemException(
+                        String.format("The user %s is not manager with edit permission or owner of store %d",userName, storeId)));
     }
 
     /**

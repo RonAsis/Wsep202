@@ -5,9 +5,9 @@
   <button *ngIf="isOwner" class="btn btn-primary" type="submit" (click)="onOwners()">Owners</button>
   <button class="btn btn-primary" type="submit" (click)="onPolicy()">Policy</button>
 
-  <app-discount *ngIf="loadedFeature === 'Discount'"></app-discount>
+  <app-discount *ngIf="loadedFeature === 'Discount'" [store]="store"></app-discount>
   <app-edit-product *ngIf="loadedFeature === 'Edit-Product'" ></app-edit-product>
-  <app-managers *ngIf="loadedFeature === 'Managers'" [store]="store"></app-managers>
+  <app-visible-discount-store *ngIf="loadedFeature === 'Managers'" [store]="store"></app-visible-discount-store>
   <app-owners *ngIf="loadedFeature === 'Owners'" [store]="store"></app-owners>
   <app-policy *ngIf="loadedFeature === 'Policy'"></app-policy>
 

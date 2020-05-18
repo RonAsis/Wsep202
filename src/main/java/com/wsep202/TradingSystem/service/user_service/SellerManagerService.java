@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.dto.DiscountDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +33,25 @@ public class SellerManagerService {
 
     public List<String> getOperationsCanDo(String manageUsername, int storeId, UUID uuid) {
         return tradingSystemFacade.getOperationsCanDo(manageUsername, storeId, uuid);
+    }
+
+    public List<DiscountDto> getStoreDiscounts(String username, int storeId, UUID uuid) {
+        return tradingSystemFacade.getStoreDiscounts(username, storeId, uuid);
+    }
+
+    public boolean removeDiscount(String username, int storeId, int discountId, UUID uuid) {
+        return tradingSystemFacade.removeDiscount(username, storeId, discountId, uuid);
+    }
+
+    public List<String> getCompositeOperators(String username, int storeId, UUID uuid) {
+        return tradingSystemFacade.getCompositeOperators(username, storeId, uuid);
+    }
+
+    public List<DiscountDto> getDiscounts(String username, int storeId, UUID uuid) {
+        return tradingSystemFacade.getAllStoreDiscounts(username, storeId, uuid);
+    }
+
+    public DiscountDto addDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
+        return tradingSystemFacade.addDiscount(username, storeId, discountDto, uuid);
     }
 }

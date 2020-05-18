@@ -2,8 +2,6 @@ import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../../services/user.service';
 import {PaymentDetails} from '../../../shared/paymentDetails.model';
 import {BillingAddress} from '../../../shared/billingAddress.model';
-import {Receipt} from '../../../shared/receipt.model';
-import {ResponseMessage} from '../../../shared/responseMessage.model';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ShareService} from '../../../services/share.service';
 

@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.web.controllers;
 
+import com.wsep202.TradingSystem.dto.DiscountDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.service.user_service.SellerManagerService;
@@ -53,6 +54,63 @@ public class SellerManagerController {
                                            @PathVariable int storeId,
                                            @PathVariable UUID uuid) {
         return sellerManagerService.getOperationsCanDo(manageUsername, storeId, uuid);
+    }
+
+    /**
+     * get store discounts
+     */
+    @ApiOperation(value = "get store discounts")
+    @GetMapping("get-store-discounts/{username}/{storeId}/{uuid}")
+    public List<DiscountDto> getStoreDiscounts(@PathVariable String username,
+                                               @PathVariable int storeId,
+                                               @PathVariable UUID uuid) {
+        return sellerManagerService.getStoreDiscounts(username, storeId, uuid);
+    }
+
+    /**
+     * remove discount
+     */
+    @ApiOperation(value = "remove discount")
+    @PostMapping("remove-discount/{username}/{storeId}/{discountId}/{uuid}")
+    public boolean removeDiscount(@PathVariable String username,
+                                  @PathVariable int storeId,
+                                  @PathVariable int discountId,
+                                  @PathVariable UUID uuid) {
+        return sellerManagerService.removeDiscount(username, storeId, discountId, uuid);
+    }
+
+    /**
+     * get store discounts
+     */
+    @ApiOperation(value = "get composite operators")
+    @GetMapping("get-composite-operators/{username}/{storeId}/{uuid}")
+    public List<String> getCompositeOperators(@PathVariable String username,
+                                              @PathVariable int storeId,
+                                              @PathVariable UUID uuid) {
+        return sellerManagerService.getCompositeOperators(username, storeId, uuid);
+    }
+
+    /**
+     * get store discounts
+     */
+    @ApiOperation(value = "get Discounts")
+    @GetMapping("get-discounts/{username}/{storeId}/{uuid}")
+    public List<DiscountDto> getDiscounts(@PathVariable String username,
+                                          @PathVariable int storeId,
+                                          @PathVariable UUID uuid) {
+        return sellerManagerService.getDiscounts(username, storeId, uuid);
+    }
+
+    /**
+     * add discount
+     */
+    @ApiOperation(value = "remove discount")
+    @PostMapping("add-discount/{username}/{storeId}/{uuid}")
+    public DiscountDto addDiscount(@PathVariable String username,
+                                   @PathVariable int storeId,
+                                   @RequestBody DiscountDto discountDto,
+                                   @PathVariable UUID uuid) {
+        return sellerManagerService.addDiscount(username, storeId, discountDto, uuid);
     }
 
 

@@ -11,6 +11,7 @@ import {stringify} from 'querystring';
 import {UserSystem} from '../shared/userSystem.model';
 import {Manager} from '../shared/manager.model';
 import {ProductShoppingCartDto} from '../shared/productShoppingCartDto.model';
+import {Discount} from '../shared/discount.model';
 
 @Injectable({
   providedIn: 'root'
@@ -258,7 +259,51 @@ export class HttpService {
       url);
   }
 
+  getStoreDiscounts(username: string, storeId: number, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'get-store-discounts/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<Discount[]>(
+      url);
+  }
 
+  removeDiscount(username: string, storeId: number, discountId: number, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'remove-discount/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${discountId}/` +
+      `${uuid}`;
+    return this.http.post<boolean>(
+      url, null);
+  }
+
+
+  getCompositeOperators(username: string, storeId: number, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'get-composite-operators/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<string[]>(
+      url);
+  }
+  getDiscounts(username: string, storeId: number, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'get-discounts/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<Discount[]>(
+      url);
+  }
+
+  addDiscount(username: string, storeId: number, discount: Discount, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'add-discount/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.post<Discount>(
+      url, discount);
+  }
   //////////////////////////// SellerOwnerController ///////////////////////////
 
   public viewPurchaseHistoryOfOwner(ownerUsername: string, storeId: number, uuid: string) {
@@ -424,6 +469,8 @@ export class HttpService {
     return this.http.get<boolean>(
       url);
   }
+
+
   //////////////////////////////////////// general /////////////////////////////
 
   private getImageHttpFormat(image: File){
@@ -434,5 +481,6 @@ export class HttpService {
     }
     return uploadImageData;
   }
+
 
 }
