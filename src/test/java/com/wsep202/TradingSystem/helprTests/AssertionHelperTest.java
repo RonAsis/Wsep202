@@ -49,10 +49,7 @@ public class AssertionHelperTest {
         );
     }
 
-    public static void assertPurchasePolicy(PurchasePolicy purchasePolicy, PurchasePolicyDto purchasePolicy1) {
-        Assertions.assertEquals(purchasePolicy.getWhoCanBuyStatus(), purchasePolicy1.getWhoCanBuyStatus());
-        Assertions.assertEquals(purchasePolicy.isAllAllowed(), purchasePolicy1.isAllAllowed());
-    }
+
 
     public static void assertProducts(Set<Product> products, Set<ProductDto> productsDtos) {
         products.forEach(product -> {

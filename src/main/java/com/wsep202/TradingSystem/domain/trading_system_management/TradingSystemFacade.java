@@ -6,6 +6,7 @@ import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.*;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.ServiceFacade;
 import javafx.util.Pair;
@@ -13,12 +14,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -711,6 +714,108 @@ public class TradingSystemFacade {
             log.error("failed to add discount policy");
             return false;
         }
+    }
+
+    /**
+     * add user details purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param userDetailsPolicyDto
+     * @return
+     */
+    public boolean addUserDetailsPolicy(String ownerUsername, int storeId, UUID uuid,
+                                        UserDetailsPolicyDto userDetailsPolicyDto) {
+        Store store = tradingSystem.getStore(storeId);
+        UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+        Set<String> countries = userDetailsPolicyDto.getCountriesPermitted();
+        UserDetailsPolicy userPurchasePolicy = factoryObjects.createUserPurchasePolicy(countries);
+        return store.addPurchasePolicy(owner,userPurchasePolicy);
+    }
+    /**
+     * add system details purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param systemDetailsPolicyDto
+     * @return
+     */
+    public boolean addSystemPurchasePolicy(String ownerUsername, int storeId, UUID uuid, SystemDetailsPolicyDto systemDetailsPolicyDto) {
+        Store store = tradingSystem.getStore(storeId);
+        UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+        Set<Day> daysWorking = systemDetailsPolicyDto.getStoreWorkDays();
+        SystemDetailsPolicy systemDetailsPolicy = factoryObjects.createSystemPurchasePolicy(daysWorking);
+        return store.addPurchasePolicy(owner,systemDetailsPolicy);
+    }
+
+    /**
+     * add product purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param productDetailsPolicyDto
+     * @return
+     */
+    public boolean addProductPurchasePolicy(String ownerUsername,int productId, int storeId, UUID uuid, ProductDetailsPolicyDto productDetailsPolicyDto) {
+        Store store = tradingSystem.getStore(storeId);
+        UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+        int max = productDetailsPolicyDto.getMax();
+        int min = productDetailsPolicyDto.getMin();
+        ProductDetailsPolicy productDetailsPolicy = factoryObjects.
+                createProductPurchasePolicy(productId,min,max);
+        return store.addPurchasePolicy(owner,productDetailsPolicy);
+    }
+
+    /**
+     * add shopping bag level purchase policy
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param shoppingBagDetailsPolicyDto
+     * @return
+     */
+    public boolean addShoppingBagPurchasePolicy(String ownerUsername, int storeId, UUID uuid,
+                                                ShoppingBagDetailsPolicyDto shoppingBagDetailsPolicyDto) {
+        Store store = tradingSystem.getStore(storeId);
+        UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+        int max = shoppingBagDetailsPolicyDto.getMax();
+        int min = shoppingBagDetailsPolicyDto.getMin();
+        ShoppingBagDetailsPolicy shoppingBagDetailsPolicy = factoryObjects.
+                createShoppingBagPurchasePolicy(min,max);
+        return store.addPurchasePolicy(owner,shoppingBagDetailsPolicy);
+    }
+
+    /**
+     * add purchase policy that is composed
+     * @param ownerUsername
+     * @param storeId
+     * @param uuid
+     * @param composedPurchaseDto
+     * @return
+     */
+    public boolean addComposedPurchasePurchasePolicy(String ownerUsername, int storeId, UUID uuid,
+                                                     ComposedPurchaseDto composedPurchaseDto) {
+        Store store = tradingSystem.getStore(storeId);
+        UserSystem owner = tradingSystem.getUser(ownerUsername,uuid);
+        //converts
+        CompositeOperator operator = composedPurchaseDto.getCompositeOperator();
+        List<PurchasePolicy> purchasePolicies = convertPurchaseListFromDto(composedPurchaseDto.
+                getComposedPurchasePolicies(),store);
+        ComposedPurchase composedPurchase = factoryObjects.
+                createComposedPurchasePolicy(operator,purchasePolicies);
+        return store.addPurchasePolicy(owner,composedPurchase);
+    }
+
+    private List<PurchasePolicy> convertPurchaseListFromDto
+            (List<PurchasePolicyDto> policiesDto,Store store) {
+
+        List<PurchasePolicy> purchasePolicies = new ArrayList<>();
+            for (PurchasePolicyDto policy : policiesDto) {
+                PurchasePolicy purchasePolicy = store.getPurchasePolicyById(policy.getId());
+                purchasePolicies.add(purchasePolicy);
+            }
+
+        return purchasePolicies;
     }
 
     /**

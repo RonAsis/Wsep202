@@ -1,14 +1,14 @@
 package com.wsep202.TradingSystem.domain.factory;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.Day;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.*;
 import com.wsep202.TradingSystem.dto.DiscountDto;
 import com.wsep202.TradingSystem.dto.VisibleDiscountDto;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * create all the new objects in the system
@@ -62,5 +62,36 @@ public class FactoryObjects {
     public DiscountPolicy createDiscount(DiscountDto discountDto) {
         //TODO
         return null;
+    }
+/*
+create user details purchase policy
+ */
+    public UserDetailsPolicy createUserPurchasePolicy(Set<String> countries) {
+        return new UserDetailsPolicy(countries);
+    }
+/*
+create system purchase policy
+ */
+    public SystemDetailsPolicy createSystemPurchasePolicy(Set<Day> daysWorking) {
+        return new SystemDetailsPolicy(daysWorking);
+    }
+/*
+create product purchase policy
+ */
+    public ProductDetailsPolicy createProductPurchasePolicy(int productId,int min, int max) {
+        return new ProductDetailsPolicy(productId,min,max);
+    }
+/*
+create shopping bag purchase policy
+ */
+    public ShoppingBagDetailsPolicy createShoppingBagPurchasePolicy(int min, int max) {
+        return new ShoppingBagDetailsPolicy(min, max);
+    }
+/*
+create composed purchase policy
+ */
+    public ComposedPurchase createComposedPurchasePolicy(CompositeOperator operator,
+                                                         List<PurchasePolicy> purchasePolicies) {
+        return new ComposedPurchase(operator,purchasePolicies);
     }
 }

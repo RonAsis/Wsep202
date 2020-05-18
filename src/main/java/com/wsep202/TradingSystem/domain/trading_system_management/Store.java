@@ -3,8 +3,10 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.UserDetailsPolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,7 +43,7 @@ public class Store {
     private ArrayList<PurchasePolicy> purchasePolicies;
 
     //The set purchase policy for the store
-    private List<DiscountPolicy> discounts;
+    private ArrayList<DiscountPolicy> discountPolicies;
 
     //owners of the store
     private Set<UserSystem> owners;
@@ -611,7 +613,7 @@ public class Store {
      */
     public void applyDiscountPolicies(HashMap<Product, Integer> productsBag) {
         updateExpiredDiscounts();   //remove discounts that their time is expired from store.
-        for (DiscountPolicy discountPolicy : this.getDiscounts()) {  //apply discounts on shoppingBag
+        for (DiscountPolicy discountPolicy : this.getDiscountPolicies()) {  //apply discounts on shoppingBag
             discountPolicy.applyDiscount(productsBag);
         }
     }
@@ -625,7 +627,7 @@ public class Store {
         for (Product product : this.products) {
             productIntegerHashMap.put(product, 0);
         }
-        for (DiscountPolicy discountPolicy : this.getDiscounts()) {  //apply discounts on shoppingBag
+        for (DiscountPolicy discountPolicy : this.getDiscountPolicies()) {  //apply discounts on shoppingBag
             if (discountPolicy instanceof VisibleDiscount) {
                 discountPolicy.applyDiscount(productIntegerHashMap);
             }
@@ -636,9 +638,9 @@ public class Store {
      * remove discounts that expired from store
      */
     private void updateExpiredDiscounts() {
-        for (DiscountPolicy discountPolicy : this.getDiscounts()) {
+        for (DiscountPolicy discountPolicy : this.getDiscountPolicies()) {
             if (discountPolicy.isExpired()) {
-                this.discounts.remove(discountPolicy);
+                this.discountPolicies.remove(discountPolicy);
             }
         }
     }
@@ -877,5 +879,33 @@ public class Store {
             return discountPolicy;
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
+    }
+
+    /**
+     * add any kind of purchase policy to the store
+     * @param owner that adds
+     * @param purchasePolicy to add
+     * @return
+     */
+    public boolean addPurchasePolicy(UserSystem owner, PurchasePolicy purchasePolicy) {
+        if (owner == null) {
+            return false;
+        }
+        if (isOwner(owner)) {
+            return this.purchasePolicies.add(purchasePolicy);  //add the discount to store
+        }
+        //this is not an owner of the store
+        log.error("The received user: " + owner.getUserName() + "is not owner");
+        throw new NoOwnerInStoreException(owner.getUserName(), storeId);
+    }
+
+    public PurchasePolicy getPurchasePolicyById(int id) {
+        Optional<PurchasePolicy> purchasePolicy = this.purchasePolicies.stream().
+                filter(purchasePolicy1 -> purchasePolicy1.getId() == id).findFirst();
+        if (purchasePolicy.isPresent()) {
+            return purchasePolicy.get();
+        }
+        //there is no discount with the requested id
+        throw new DiscountPolicyNoSuchIDException(id, this.getStoreName());
     }
 }
