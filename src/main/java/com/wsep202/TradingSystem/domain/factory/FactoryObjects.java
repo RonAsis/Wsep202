@@ -6,7 +6,6 @@ import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.*;
 import com.wsep202.TradingSystem.dto.DiscountDto;
-import com.wsep202.TradingSystem.dto.VisibleDiscountDto;
 
 import java.util.*;
 
@@ -24,42 +23,8 @@ public class FactoryObjects {
                 .firstName(firstName)
                 .lastName(lastName).build();
     }
-    /*
-    create visible discount
-     */
-    public VisibleDiscount createVisibleDiscount(Calendar endTime, double discount,
-                                                 Map<Product, Integer> products) {
-        return new VisibleDiscount(products,endTime,discount);
-    }
-    /*
-    create conditional product discount
-     */
-    public ConditionalProductDiscount createCondProductDiscountDiscount(Map<Product, Integer> productUnderDisc,
-                                                                        Calendar endTime,
-                                                                        double discount,
-                                                                        String description,
-                                                                        Map<Product, Integer> productsAmountsToApply) {
-        return new ConditionalProductDiscount(productUnderDisc,endTime,discount,description,productsAmountsToApply);
-    }
-    /*
-    create conditional store discount
-     */
-    public ConditionalStoreDiscount createCondStoreDiscount(Calendar endTime, double discountPercentage, String description, double minPrice) {
-        return new ConditionalStoreDiscount(minPrice,endTime,discountPercentage,description);
-    }
-    /*
-    create the composed discount
-     */
-    public ConditionalComposedDiscount createComposedDiscount(CompositeOperator operator,
-                                                              Map<Integer, DiscountPolicy> composedDiscounts,
-                                                              Map<Integer, DiscountPolicy> discountsToApply,
-                                                              Calendar endTime,
-                                                              double discountPercentage,
-                                                              String description) {
-        return new ConditionalComposedDiscount(operator,endTime,discountPercentage,description);
-    }
 
-    public DiscountPolicy createDiscount(DiscountDto discountDto) {
+    public Discount createDiscount(DiscountDto discountDto) {
         //TODO
         return null;
     }

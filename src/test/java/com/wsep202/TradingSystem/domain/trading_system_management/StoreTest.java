@@ -1,12 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
-import com.wsep202.TradingSystem.domain.exception.NoOwnerInStoreException;
 import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
 import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.VisibleDiscount;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1113,7 +1111,7 @@ class StoreTest {
         }
 
         @Test
-        public void addDiscountForProduct (UserSystem owner, DiscountPolicy discountPolicy,
+        public void addDiscountForProduct (UserSystem owner, Discount discount,
                                               HashMap<Product,Integer> products) throws TradingSystemException {
 
         }

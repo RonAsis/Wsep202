@@ -51,7 +51,7 @@ public class SellerManagerService {
         return tradingSystemFacade.getAllStoreDiscounts(username, storeId, uuid);
     }
 
-    public DiscountDto addDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
-        return tradingSystemFacade.addDiscount(username, storeId, discountDto, uuid);
+    public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
+        return tradingSystemFacade.addEditDiscount(username, storeId, discountDto, uuid);
     }
 }

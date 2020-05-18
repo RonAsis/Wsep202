@@ -32,8 +32,8 @@ export class OwnedStoreEditComponent implements OnInit {
     this.loadedFeature = 'Edit-Product';
   }
 
-  onDiscount() {
-    this.loadedFeature = 'Discount';
+  onAddDiscount() {
+    this.loadedFeature = 'Add Discount';
   }
 
   onManagers() {
@@ -46,5 +46,9 @@ export class OwnedStoreEditComponent implements OnInit {
 
   onPolicy() {
     this.loadedFeature = 'Policy';
+  }
+
+  onDiscounts() {
+    this.loadedFeature= 'Discounts';
   }
 }

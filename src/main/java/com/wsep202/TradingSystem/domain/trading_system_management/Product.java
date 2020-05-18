@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.google.common.base.Strings;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 

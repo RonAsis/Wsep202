@@ -4,6 +4,8 @@ import {StoreService} from '../../../../../services/store.service';
 import {IDropdownSettings, ListItem} from 'ng-multiselect-dropdown/multiselect.model';
 import {Discount} from '../../../../../shared/discount.model';
 import {Product} from '../../../../../shared/product.model';
+import {MatDialog} from '@angular/material/dialog';
+import {AmountProductsComponent} from './amount-products/amount-products.component';
 
 @Component({
   selector: 'app-add-discount',
@@ -12,6 +14,7 @@ import {Product} from '../../../../../shared/product.model';
 })
 export class AddDiscountComponent implements OnInit {
 
+  @Input()discount: Discount;
   optionsProductUnderDiscount: Product[];
   selectedProductUnderDiscount: Product[];
   productUnderDiscountSettings: IDropdownSettings;
@@ -40,11 +43,13 @@ export class AddDiscountComponent implements OnInit {
   selectedComposite: string;
   selectedProductsForApplyDiscountsDisabled = true;
   selectedProductUnderDiscountDisabled = false;
+  today: string;
 
-  constructor(private storeService: StoreService) {
+  constructor(private storeService: StoreService, public dialog: MatDialog) {
     this.selectedProductUnderDiscount = [];
     this.selectedProductsForApplyDiscounts = [];
     this.selectedComposedDiscounts = [];
+    this.today = new Date().toISOString().split('T')[0];
 
     this.productUnderDiscountSettings = {
       singleSelection: false,
@@ -82,19 +87,23 @@ export class AddDiscountComponent implements OnInit {
           this.compositeOperators = response;
         }
       });
+    if (this.discount !== null && this.discount !== undefined){
+      this.selectedProductUnderDiscount = this.discount.productsUnderThisDiscount;
+      this.selectedProductsForApplyDiscounts = this.discount.amountOfProductsForApplyDiscounts;
+      this.selectedComposedDiscounts = this.discount.composedDiscounts;
+    }
   }
 
   private init() {
-    this.optionsProductUnderDiscount = this.store.products;
-    console.log(this.optionsProductUnderDiscount);
+    this.optionsProductsForApplyDiscounts = this.store.products.slice();
+    console.log(this.optionsProductsForApplyDiscounts);
     this.storeService.getDiscounts(this.store.storeId)
       .subscribe(response => {
         if (response !== null && response !== undefined) {
           this.optionsComposedDiscounts = response;
         }
       });
-    this.optionsProductsForApplyDiscounts = this.store.products
-      .filter(product => !this.selectedProductUnderDiscount.includes(product));
+    this.optionsProductUnderDiscount = this.store.products.slice();
   }
 
   errorMessage(message: string) {
@@ -113,42 +122,67 @@ export class AddDiscountComponent implements OnInit {
   }
 
   onAddDiscount() {
-    const discount = new Discount(
-      0,
-      this.discountPercentage.nativeElement.value,
-      this.endTime.nativeElement.value,
-      this.selectedProductUnderDiscount,
-      this.description.nativeElement.value,
-      this.selectedProductsForApplyDiscounts,
-      this.minPrice.nativeElement.value,
-      this.selectedComposedDiscounts,
-      this.selectedComposite);
-    this.storeService.addDiscount(this.store.storeId, discount)
-      .subscribe(response => {
-        if (response !== undefined && response !== null) {
-          console.log('added');
-        }
-      });
+    if (this.discountPercentage.nativeElement.value === null || this.discountPercentage.nativeElement.value === undefined ){
+      this.errorMessage('You must type discountPercentage');
+    }else if (this.selectedProductsForApplyDiscounts.length === 0) {
+      this.errorMessage('You must select products for apply discount');
+    }else if (this.description.nativeElement.value === null || this.description.nativeElement.value === undefined ||
+      this.description.nativeElement.value.length === 0 ) {
+      this.errorMessage('You must type description');
+    }else if (this.endTime.nativeElement.value === null || this.endTime.nativeElement.value === undefined  ) {
+      this.errorMessage('You must select end time');
+    }else {
+      const discount = new Discount(
+        this.discount !== null && this.discount !== undefined ? this.discount.discountId : -1,
+        this.discountPercentage.nativeElement.value,
+        this.endTime.nativeElement.value,
+        this.selectedProductUnderDiscount,
+        this.description.nativeElement.value,
+        this.selectedProductsForApplyDiscounts,
+        this.minPrice.nativeElement.value,
+        this.selectedComposedDiscounts,
+        this.selectedComposite);
+      this.storeService.addDiscount(this.store.storeId, discount)
+        .subscribe(response => {
+          if (response !== undefined && response !== null) {
+            this.optionsComposedDiscounts.push(response);
+          }
+        });
+    }
   }
 
   onSelectProductUnderDiscount(productItem: any) {
-    console.log(productItem);
-    console.log(this.optionsProductsForApplyDiscounts);
-    this.optionsProductsForApplyDiscounts = this.optionsProductsForApplyDiscounts
-      .filter(product => product.productSn !== productItem.productSn);
-    console.log(this.optionsProductsForApplyDiscounts
-      .filter(product => product.productSn !== productItem.id));
-    console.log(this.optionsProductsForApplyDiscounts);
-    this.selectedProductsForApplyDiscountsDisabled = false;
+    const dialogRef = this.dialog.open(AmountProductsComponent, {
+      width: '250px',
+    });
+    dialogRef.afterClosed().subscribe((result: {isNotWith: boolean, amount: number}) => {
+        if (!result.isNotWith){
+          const productFound: Product = this.selectedProductUnderDiscount.find(product => product.productSn === productItem.productSn);
+          productFound.amount = result.amount;
+          console.log( productFound.amount);
+          console.log(this.selectedProductUnderDiscount);
+        }else {
+          const productFound: Product = this.selectedProductUnderDiscount.find(product => product.productSn === productItem.productSn);
+          productFound.amount = -1;
+          console.log( productFound.amount);
+          console.log(this.selectedProductUnderDiscount);
+        }
+    });
   }
 
-  onSelectProductsForApplyDiscount(productItem: ListItem) {
-    this.selectedProductUnderDiscountDisabled = true;
+  onSelectProductsForApplyDiscount(productItem: any) {
+    const dialogRef = this.dialog.open(AmountProductsComponent, {
+      width: '250px',
+    });
+    dialogRef.afterClosed().subscribe((result: {with: string, amount: number}) => {
+      if (result.with === 'with'){
+        const productFound: Product = this.selectedProductsForApplyDiscounts.find(product => product.productSn === productItem.productSn);
+        productFound.amount = result.amount;
+      }else {
+        const productFound: Product = this.selectedProductsForApplyDiscounts.find(product => product.productSn === productItem.productSn);
+        productFound.amount = -1;
+      }
+    });
   }
 
-  onDeSelectProductsForApplyDiscount(productItem: ListItem) {
-    if (this.selectedProductsForApplyDiscounts.length === 0){
-      this.selectedProductUnderDiscountDisabled = false;
-    }
-  }
 }

@@ -1,31 +1,10 @@
 <div class="row">
-  <div class="col-xs-12">
-    <app-add-discount [store]="store" (discountItemAdded)="onDiscountAdded($event)" ></app-add-discount>
+  <div class="col-md-5">
+    <app-discounts
+      [store]="store"
+      (discountWasSelected)="selectedDiscount = $event"></app-discounts>
+  </div>
+  <div *ngIf="selectedDiscount" class="col-md-7">
+    <app-add-discount [discount]="selectedDiscount"></app-add-discount>
   </div>
 </div>
-<!--<div class="cart-wrapper">-->
-<!--  <div class="panel panel-default">-->
-<!--    <div class="panel-heading">-->
-<!--      <div>discountPercentage</div>-->
-<!--      <div>endTime</div>-->
-<!--      <div>productsUnderThisDiscount</div>-->
-<!--      <div>description</div>-->
-<!--      <div>amountOfProductsForApplyDiscounts</div>-->
-<!--      <div>minPrice</div>-->
-<!--      <div>composedDiscounts</div>-->
-<!--      <div>compositeOperator</div>-->
-<!--    </div>-->
-<!--    &lt;!&ndash; Table &ndash;&gt;-->
-<!--    <div class="list-group">-->
-<!--      <app-discount-item-->
-<!--        class="list-group-item"-->
-<!--        *ngFor="let discount of discounts"-->
-<!--        [discount]=discount-->
-<!--        [store]="store"-->
-<!--        (discountItemDeleted)="onDiscountItemDeleted($event)"-->
-<!--        (discountItemChanged)="onDiscountItemChanged($event)"-->
-<!--      >-->
-<!--      </app-discount-item>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->

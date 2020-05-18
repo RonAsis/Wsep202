@@ -102,15 +102,15 @@ public class SellerManagerController {
     }
 
     /**
-     * add discount
+     * add or edit discount
      */
     @ApiOperation(value = "remove discount")
     @PostMapping("add-discount/{username}/{storeId}/{uuid}")
-    public DiscountDto addDiscount(@PathVariable String username,
-                                   @PathVariable int storeId,
-                                   @RequestBody DiscountDto discountDto,
-                                   @PathVariable UUID uuid) {
-        return sellerManagerService.addDiscount(username, storeId, discountDto, uuid);
+    public DiscountDto addEditDiscount(@PathVariable String username,
+                                       @PathVariable int storeId,
+                                       @RequestBody DiscountDto discountDto,
+                                       @PathVariable UUID uuid) {
+        return sellerManagerService.addEditDiscount(username, storeId, discountDto, uuid);
     }
 
 

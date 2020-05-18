@@ -1,93 +1,54 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
-/**
- * this class defines the discount policy in store
- */
 
+import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import javafx.util.Pair;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Synchronized;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Map;
 
-//the component in  the composite pattern
-
-@Getter
-@Setter
 public abstract class DiscountPolicy {
 
-    //holds the conditioned products with pair of their required amount and quantity to apply discount
-    protected Map<Product, Integer> productsUnderThisDiscount;
-    protected static int discountIdAcc = 0;
-    protected int id;
-    protected boolean isDeleted = false;    //true in case the owner deleted this discount
-    protected boolean isExpired = false;
-    protected boolean isApplied =false;
-    protected boolean isUndone = false; //TODO if undone already then remove discount completely
-    protected Calendar endTime; //expiration date of the discount
-    protected double discountPercentage;    //discount percentage for product
-    /**
-     * apply the relevant discount type on the products in store
-     * @param products in store
-     */
-    public abstract void applyDiscount(Map<Product,Integer> products);
+    public abstract void applyDiscount(Discount discount, Map<Product, Integer> products);
 
-    /**
-     * add this discount type for new products
-     * @param products that get the discount
-     * @return true for success
-     */
-    public boolean addProductsToThisDiscount(Map<Product,Integer> products){
-        if(products==null){
-            //invalid null value product inserted or missing field
-            return false;
+    public abstract boolean isApprovedProducts(Discount discount, Map<Product, Integer> products);
+
+    public abstract void undoDiscount(Discount discount, Map<Product, Integer> products);
+
+    public boolean isExpired(Discount discount) {
+        return discount.getEndTime().compareTo(Calendar.getInstance()) < 0;
+    }
+
+    ////////////////////////////////////// general /////////////////////////////////////////
+
+    public void setCostAfterDiscount(Discount discount, Product product, double discountCost) {
+        product.setCost(product.getCost() - discountCost);
+        discount.setApplied(true);
+        if (product.getCost() <= 0) {
+            throw new IllegalProductPriceException(discount.getDiscountId());
         }
-        //verify all products fields are valid
-        for(Product product :products.keySet()){
-            if(!product.isValidProduct())
-                return false;
-        }
-        this.productsUnderThisDiscount.putAll(products); //add list of products to this discount
-        return true;
     }
 
     /**
-     * checks if the products stands in the discount condition
-     * @param products
-     * @return true if the discount applies on the products
+     * calculate the cost of the sum of products received
+     * @param products to calculate their sum price
+     * @return
      */
-    public abstract boolean isApprovedProducts(Map<Product,Integer> products);
-
-    /**
-     * this method will be called in case the discount expired and has to be undone
-     * @param products to update
-     */
-    public abstract void undoDiscount(Map<Product,Integer> products);
-
-
-    @Synchronized
-    protected int getdiscountIdAcc(){
-        return discountIdAcc++;
+    public double getTotalPurchasedCost(Map<Product, Integer> products) {
+        return products.entrySet().stream()
+                .reduce((double) 0, (sum, entry) -> sum + entry.getKey().getOriginalCost() * entry.getValue(), Double::sum);
     }
 
     /**
-     * remove product that is in store from this discount
-     * @param product to remove from discount
-     * @return true if product removed
+     * calculate discount on product price
+     * @param price
+     * @return
      */
-    public boolean removeProductFromDiscount(Product product){
-        return this.productsUnderThisDiscount.remove(product)!=null;
+    public double calculateDiscount(Discount discount, double price) {
+        return (discount.getDiscountPercentage() * price) / 100;
     }
 
-    /**
-     * sign this discount as deleted so it cannot be applied anymore
-     */
-    public void deleteDiscount(){
-        this.isDeleted = true;
+    public boolean isProductHaveDiscount(Discount discount, Product product) {
+        return discount.getAmountOfProductsForApplyDiscounts().keySet().stream()
+                .anyMatch(integer -> product.getProductSn() == integer.getProductSn());
     }
-
-
-
 }

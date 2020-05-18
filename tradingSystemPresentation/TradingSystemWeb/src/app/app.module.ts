@@ -65,11 +65,14 @@ import {ProductEditItemComponent} from './logged-in-user/owned-stores/owned-stor
 import {OwnerItemComponent} from './logged-in-user/owned-stores/owned-store-edit/owners/owner-item/owner-item.component';
 import {ManagerItemComponent} from './logged-in-user/owned-stores/owned-store-edit/managers/manager-item/manager-item.component';
 import {FormlyBootstrapModule} from '@ngx-formly/bootstrap';
-import {ConditionalDiscountComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/conditional-discount/conditional-discount.component';
 import {AddDiscountComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/add-discount/add-discount.component';
-import {DiscountItemComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/discount-item/discount-item.component';
-import {ProductDiscountItemComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/product-discount-item/product-discount-item.component';
 import {NgMultiSelectDropDownModule} from 'ng-multiselect-dropdown';
+import {MatDialogModule} from '@angular/material/dialog';
+import { AmountProductsComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/add-discount/amount-products/amount-products.component';
+import {MatRadioModule} from '@angular/material/radio';
+import { DiscountsComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/discounts/discounts.component';
+import { DiscontEditComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/discont-edit/discont-edit.component';
+import {DiscountItemComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/discounts/product-discount-item/discount-item.component';
 
 @NgModule({
   declarations: [
@@ -125,10 +128,11 @@ import {NgMultiSelectDropDownModule} from 'ng-multiselect-dropdown';
     ProductEditItemComponent,
     OwnerItemComponent,
     ManagerItemComponent,
-    ConditionalDiscountComponent,
     AddDiscountComponent,
     DiscountItemComponent,
-    ProductDiscountItemComponent
+    AmountProductsComponent,
+    DiscountsComponent,
+    DiscontEditComponent
   ],
   imports: [
     Ng2SearchPipeModule,
@@ -151,6 +155,8 @@ import {NgMultiSelectDropDownModule} from 'ng-multiselect-dropdown';
     }),
     ReactiveFormsModule,
     FormlyBootstrapModule,
+    MatDialogModule,
+    MatRadioModule
   ],
   exports: [RouterModule],
   providers: [],

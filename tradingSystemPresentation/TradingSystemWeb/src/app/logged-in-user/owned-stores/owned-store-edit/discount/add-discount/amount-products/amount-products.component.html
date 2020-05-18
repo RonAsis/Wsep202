@@ -1,0 +1,23 @@
+<div mat-dialog-content>
+  <div class="row">
+    <div mat-dialog-actions>
+      <mat-radio-group name="status" value="Without" aria-label="Select Product amount">
+        <mat-radio-button (change)="onChange()" value="With">With amount threshold</mat-radio-button>
+        <mat-radio-button value="Without">Without amount threshold</mat-radio-button>
+      </mat-radio-group>
+
+      <div class="col-sm-5 from-group">
+        <label for="amountProducts">amount-products
+          <span class="required-asterisk">*</span>
+        </label>
+        <input [disabled]="isNotWith" type="number" [min]="1" id="amountProducts" class="form-control"
+               #amount/>
+      </div>
+
+      <div class="col-xs-12">
+        <button class="btn btn-success" type="submit" (click)="onOk()">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+

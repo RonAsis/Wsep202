@@ -17,34 +17,18 @@ import {Discount} from '../../../../shared/discount.model';
 export class DiscountComponent implements OnInit {
 
   @Input() store: Store;
-  discounts: Discount[];
-  constructor(private storeService: StoreService) {
-    this.discounts = [];
-  }
+
+  selectedDiscount: Discount;
+
+  constructor(private storeService: StoreService) { }
 
   ngOnInit(): void {
-    this.storeService.getStoreDiscounts(this.store.storeId).subscribe(
-      response => {
-        if (response !== undefined && response !== null){
-          this.discounts = response;
+    this.storeService.discountSelected
+      .subscribe(
+        (discount: Discount) => {
+          this.selectedDiscount = discount;
         }
-      }
-    );
+      );
   }
 
-  onDiscountAdded(discount: Discount) {
-    // this.discounts.push(discount);
-  }
-  onDiscountItemDeleted(discount: Discount) {
-    this.storeService.removeDiscount(discount.discountId, this.store.storeId)
-      .subscribe(response => {
-        if (response){
-          this.ngOnInit();
-        }
-      });
-  }
-
-  onDiscountItemChanged(manager: Manager) {
-    this.ngOnInit();
-  }
 }
