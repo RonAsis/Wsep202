@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Builder
 @Slf4j
 @NoArgsConstructor
+@AllArgsConstructor
 public class Discount {
 
     protected static int discountIdAcc = 0;

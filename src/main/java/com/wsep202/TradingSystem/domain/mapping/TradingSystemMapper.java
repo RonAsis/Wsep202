@@ -2,6 +2,8 @@ package com.wsep202.TradingSystem.domain.mapping;
 
 import com.github.rozidan.springboot.modelmapper.TypeMapConfigurer;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.dto.*;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
@@ -149,4 +151,50 @@ public class TradingSystemMapper {
             });
         }
     }
+
+    @Component
+    public static class DiscountDtoToDiscount extends TypeMapConfigurer<DiscountDto, Discount> {
+        @Override
+        public void configure(TypeMap<DiscountDto, Discount> typeMap) {
+            typeMap.setConverter(context -> {
+                DiscountDto discountDto = context.getSource();
+                Map<Product, Integer> amountOfProductsForApplyDiscounts = createDiscountMap(discountDto.getAmountOfProductsForApplyDiscounts());
+                Map<Product, Integer> productsUnderThisDiscount = createDiscountMap(discountDto.getProductsUnderThisDiscount());
+                CompositeOperator compositeOperators = CompositeOperator.getCompositeOperators(discountDto.getCompositeOperator());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(discountDto.getEndTime());
+                return Discount.builder()
+                        .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                        .compositeOperator(compositeOperators)
+                        .productsUnderThisDiscount(productsUnderThisDiscount)
+                        .description(discountDto.getDescription())
+                        .discountId(discountDto.getDiscountId())
+                        .discountPercentage(discountDto.getDiscountPercentage())
+                        .endTime(calendar)
+                        .minPrice(discountDto.getMinPrice())
+                        .isStoreDiscount(discountDto.isApplied())
+                        .composedDiscounts(context.getDestination().getComposedDiscounts())
+                        .build();
+            });
+        }
+
+        Map<Product, Integer> createDiscountMap(List<ProductDto> productDtos) {
+            return productDtos.stream()
+                    .collect(Collectors.toMap(
+                            productDto ->
+                                    Product.builder()
+                                            .cost(productDto.getCost())
+                                            .name(productDto.getName())
+                                            .amount(productDto.getAmount())
+                                            .originalCost(productDto.getOriginalCost())
+                                            .productSn(productDto.getProductSn())
+                                            .storeId(productDto.getStoreId())
+                                            .rank(productDto.getRank())
+                                            .build()
+                            , ProductDto::getAmount
+                    ));
+        }
+    }
+
+
 }

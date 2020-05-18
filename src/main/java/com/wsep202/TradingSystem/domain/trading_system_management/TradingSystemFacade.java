@@ -304,7 +304,6 @@ public class TradingSystemFacade {
         }
     }
 
-
     public List<String> getPermissionOfManager(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);

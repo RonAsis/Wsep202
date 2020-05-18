@@ -37,7 +37,6 @@ public class DiscountDto {
      */
     private List<ProductDto> productsUnderThisDiscount;
 
-
     /**
      * describes the condition and the post of the specified discount
      */
@@ -59,13 +58,10 @@ public class DiscountDto {
     private List<DiscountDto> composedDiscounts;
 
     /**
-     * the discounts to apply on the received products ion case they are stands in conditions
-     */
-    private List<DiscountDto> discountsToApply;
-
-    /**
      * the operation between the conditionals discounts
      */
     private String compositeOperator;
+
+    private boolean isApplied;
 
 }
