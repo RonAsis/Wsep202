@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="622998df-f8b8-4128-ace6-68418385d5fa" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__ch_qos_logback_logback_classic_1_2_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__ch_qos_logback_logback_core_1_2_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_fasterxml_classmate_1_5_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_fasterxml_jackson_core_jackson_annotations_2_10_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_fasterxml_jackson_core_jackson_core_2_10_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_fasterxml_jackson_core_jackson_databind_2_10_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_fasterxml_jackson_datatype_jackson_datatype_jdk8_2_10_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_fasterxml_jackson_datatype_jackson_datatype_jsr310_2_10_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_fasterxml_jackson_module_jackson_module_parameter_names_2_10_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_github_javafaker_javafaker_0_12.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_github_mifmif_generex_1_0_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_github_rozidan_modelmapper_spring_boot_starter_2_3_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_google_guava_guava_20_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_jayway_jsonpath_json_path_2_4_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__com_vaadin_external_google_android_json_0_0_20131108_vaadin1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__dk_brics_automaton_automaton_1_11_8.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_micrometer_micrometer_core_1_3_6.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_springfox_springfox_core_2_9_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_springfox_springfox_schema_2_9_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_springfox_springfox_spi_2_9_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_springfox_springfox_spring_web_2_9_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_springfox_springfox_swagger2_2_9_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_springfox_springfox_swagger_common_2_9_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_springfox_springfox_swagger_ui_2_9_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_swagger_swagger_annotations_1_5_20.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__io_swagger_swagger_models_1_5_20.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__jakarta_activation_jakarta_activation_api_1_2_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__jakarta_annotation_jakarta_annotation_api_1_3_5.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__jakarta_validation_jakarta_validation_api_2_0_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__jakarta_xml_bind_jakarta_xml_bind_api_2_3_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__net_bytebuddy_byte_buddy_1_10_8.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__net_bytebuddy_byte_buddy_agent_1_10_8.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__net_minidev_accessors_smart_1_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__net_minidev_json_smart_2_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_apache_commons_commons_lang3_3_9.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_apache_logging_log4j_log4j_api_2_12_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_apache_logging_log4j_log4j_to_slf4j_2_12_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_apache_tomcat_embed_tomcat_embed_core_9_0_33.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_apache_tomcat_embed_tomcat_embed_el_9_0_33.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_apache_tomcat_embed_tomcat_embed_websocket_9_0_33.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_apiguardian_apiguardian_api_1_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_assertj_assertj_core_3_13_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_hamcrest_hamcrest_2_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_hdrhistogram_HdrHistogram_2_1_11.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_hibernate_validator_hibernate_validator_6_0_18_Final.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_jboss_logging_jboss_logging_3_4_1_Final.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_5_5_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_api_5_5_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_engine_5_5_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_params_5_5_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_junit_platform_junit_platform_commons_1_5_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_junit_platform_junit_platform_engine_1_5_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_latencyutils_LatencyUtils_2_0_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_mapstruct_mapstruct_1_2_0_Final.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_mockito_mockito_core_3_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_mockito_mockito_junit_jupiter_3_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_modelmapper_modelmapper_2_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_objenesis_objenesis_2_6.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_opentest4j_opentest4j_1_2_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_ow2_asm_asm_5_0_4.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_projectlombok_lombok_1_18_12.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_skyscreamer_jsonassert_1_5_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_slf4j_jul_to_slf4j_1_7_30.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_slf4j_slf4j_api_1_7_30.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_actuator_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_actuator_autoconfigure_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_autoconfigure_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_devtools_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_actuator_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_json_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_logging_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_test_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_tomcat_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_validation_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_web_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_websocket_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_test_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_boot_spring_boot_test_autoconfigure_2_2_6_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_plugin_spring_plugin_core_1_2_0_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_plugin_spring_plugin_metadata_1_2_0_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_aop_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_beans_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_context_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_core_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_expression_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_jcl_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_messaging_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_test_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_web_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_webmvc_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_springframework_spring_websocket_5_2_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_xmlunit_xmlunit_core_2_6_4.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/libraries/Maven__org_yaml_snakeyaml_1_25.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../images/users/image.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/AppStartupRunner.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/AppStartupRunner.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/Product$ProductBuilder.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/Product.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/Store$StoreBuilder.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/Store.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystem.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemDaoImpl.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemFacade$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemFacade$2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemFacade$3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemFacade$4.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemFacade$5.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemFacade.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/dto/StoreDto.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/service/user_service/BuyerRegisteredService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../target/classes/com/wsep202/TradingSystem/web/controllers/BuyerRegisteredController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/tradingSystemPresentation.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../trading_system_logs/event.log.2020-05-05.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/Wsep202.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/Wsep202.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/image/ImagePath.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/image/ImagePath.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/Store.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/Store.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemDaoImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemDaoImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/TradingSystemFacade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/UserSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/domain/trading_system_management/UserSystem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/dto/StoreDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/dto/StoreDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/service/user_service/BuyerRegisteredService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/service/user_service/BuyerRegisteredService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/web/controllers/BuyerRegisteredController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/web/controllers/BuyerRegisteredController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/web/controllers/GuestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../src/main/java/com/wsep202/TradingSystem/web/controllers/GuestController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/app.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/app.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/login/login.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/login/login.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/login/login.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/login/login.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/products/product-list/product-list.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/products/product-list/product-list.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/products/products.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/products/products.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/products/products.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/products/products.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/register/register.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/register/register.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/register/register.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/register/register.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/open-store/open-store.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/logged-in-user/open-store/open-store.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/open-store/open-store.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/logged-in-user/open-store/open-store.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/open-store/open-store.component.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/logged-in-user/open-store/open-store.component.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/open-store/open-store.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/logged-in-user/open-store/open-store.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-detail/store-detail.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-detail/store-detail.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-detail/store-detail.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-detail/store-detail.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-list/store-item/store-item.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-list/store-item/store-item.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-list/store-list.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-list/store-list.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-list/store-list.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/store-list/store-list.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/stores.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/guest/stores/stores.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/logged-in-user/logged-in-user.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/logged-in-user/logged-in-user.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/services/product.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/services/product.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/services/store.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/services/store.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/services/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/services/user.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TradingSystemWeb/src/app/shared/store.model.ts" beforeDir="false" afterPath="$PROJECT_DIR$/TradingSystemWeb/src/app/shared/store.model.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1bGReuQSib8NFZTvByDLcEeNBrD" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/TradingSystemWeb" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="ts.external.directory.path" value="C:\WorkSpace\Wsep202\tradingSystemPresentation\TradingSystemWeb\node_modules\typescript\lib" />
+  </component>
+  <component name="RunManager" selected="npm.Angular CLI Server">
+    <configuration name="E2E Tests (TradingSystemWeb)" type="JavaScriptTestRunnerProtractor">
+      <config-file value="$PROJECT_DIR$/TradingSystemWeb/e2e/protractor.conf.js" />
+      <node-interpreter value="project" />
+      <protractor-options value="" />
+      <envs />
+      <scope-kind value="ALL" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Angular Application" type="JavascriptDebugType" uri="http://localhost:4200">
+      <method v="2" />
+    </configuration>
+    <configuration name="Angular CLI Server" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/TradingSystemWeb/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="622998df-f8b8-4128-ace6-68418385d5fa" name="Default Changelist" comment="" />
+      <created>1588256542432</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1588256542432</updated>
+      <workItem from="1588272882271" duration="35000" />
+      <workItem from="1588272951766" duration="1042000" />
+      <workItem from="1588751114238" duration="191000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="-900" y="123" key="FileChooserDialogImpl" timestamp="1588751309196">
+      <screen x="-1360" y="0" width="1360" height="738" />
+    </state>
+    <state x="-900" y="123" key="FileChooserDialogImpl/0.0.1366.707/-1360.0.1360.738@-1360.0.1360.738" timestamp="1588751309196" />
+    <state x="462" y="118" key="FileChooserDialogImpl/0.0.1366.707/1366.0.1360.738@0.0.1366.707" timestamp="1588272955451" />
+    <state x="1826" y="123" key="FileChooserDialogImpl/0.0.1366.707/1366.0.1360.738@1366.0.1360.738" timestamp="1588314837062" />
+    <state width="1317" height="174" key="GridCell.Tab.0.bottom" timestamp="1588314838753">
+      <screen x="1366" y="0" width="1360" height="738" />
+    </state>
+    <state width="1317" height="174" key="GridCell.Tab.0.bottom/0.0.1366.707/1366.0.1360.738@1366.0.1360.738" timestamp="1588314838753" />
+    <state width="1317" height="174" key="GridCell.Tab.0.center" timestamp="1588314838752">
+      <screen x="1366" y="0" width="1360" height="738" />
+    </state>
+    <state width="1317" height="174" key="GridCell.Tab.0.center/0.0.1366.707/1366.0.1360.738@1366.0.1360.738" timestamp="1588314838752" />
+    <state width="1317" height="174" key="GridCell.Tab.0.left" timestamp="1588314838752">
+      <screen x="1366" y="0" width="1360" height="738" />
+    </state>
+    <state width="1317" height="174" key="GridCell.Tab.0.left/0.0.1366.707/1366.0.1360.738@1366.0.1360.738" timestamp="1588314838752" />
+    <state width="1317" height="174" key="GridCell.Tab.0.right" timestamp="1588314838753">
+      <screen x="1366" y="0" width="1360" height="738" />
+    </state>
+    <state width="1317" height="174" key="GridCell.Tab.0.right/0.0.1366.707/1366.0.1360.738@1366.0.1360.738" timestamp="1588314838753" />
+  </component>
+  <component name="simpleUML.UMLToolWindowPlugin">
+    <General>
+      <option name="birdViewUpdateDelay" value="2000" />
+      <option name="defaultFileLocation" value="file://$PROJECT_DIR$/.." />
+    </General>
+    <Classdiagram>
+      <option name="diagramTitleFont" value="SansSerif,1,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="defaultFieldsExpanded" value="false" />
+      <option name="defaultContructorsExpanded" value="false" />
+      <option name="defaultMethodsExpanded" value="false" />
+      <option name="showParameters" value="true" />
+      <option name="showTooltip" value="true" />
+      <option name="showReturnValues" value="true" />
+      <option name="longModifier" value="true" />
+      <option name="implementsBehaviour" value="1" />
+      <option name="extendsBehaviour" value="1" />
+      <option name="compartmentBehaviour" value="1" />
+      <option name="interfaceBackgroundColor" value="-6494306" />
+      <option name="abstractClassBackgroundColor" value="-1580132" />
+      <option name="classBackgroundColor" value="-6508057" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="quickSourceLinkColor" value="-16776961" />
+      <option name="quickDiagramLinkColor" value="-8454144" />
+      <option name="drawDecorations" value="false" />
+      <option name="hideFieldList" value="" />
+      <option name="showFieldList" value="" />
+      <option name="hideConstructorList" value="" />
+      <option name="showConstructorList" value="" />
+      <option name="hideMethodList" value="" />
+      <option name="showMethodList" value="" />
+      <option name="minimumFigureSize" value="0,0" />
+    </Classdiagram>
+    <Dependencydiagram>
+      <option name="diagramTitleFont" value="SansSerif,1,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="packageNameCompressionLevel" value="0" />
+    </Dependencydiagram>
+    <Packagediagram>
+      <option name="diagramTitleFont" value="SansSerif,0,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="packageBackgroundColor" value="-4144960" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="packageNameCompressionLevel" value="2" />
+    </Packagediagram>
+  </component>
+</project>

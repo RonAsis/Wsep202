@@ -541,7 +541,7 @@ public class Store {
     @Synchronized("stockLock")
     public boolean isAllInStock(ShoppingBag bag) {
         for (Product product : bag.getProductListFromStore().keySet()) {
-            int amount = bag.getProductAmount(product);
+            int amount = bag.getProductAmount(product.getProductSn());
             Product productInStore = getProduct(product.getProductSn());
             if (amount > productInStore.getAmount()) {
                 log.info("The product " + product.getName() + " is out of stock in " + storeName);
@@ -563,7 +563,7 @@ public class Store {
     @Synchronized("stockLock")
     public void updateStock(ShoppingBag bag) {
         for (Product product : bag.getProductListFromStore().keySet()) {
-            int purchasedAmount = bag.getProductAmount(product);
+            int purchasedAmount = bag.getProductAmount(product.getProductSn());
             Product productInStore = getProduct(product.getProductSn());
             editProductAmountInStock(productInStore.getProductSn(), productInStore.getAmount() - purchasedAmount);
         }

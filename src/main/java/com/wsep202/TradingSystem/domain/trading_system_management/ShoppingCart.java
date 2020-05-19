@@ -191,13 +191,6 @@ public class ShoppingCart {
         }
     }
 
-    public void ApprovePurchasePolicy(BillingAddress billingAddress) {
-        for (Store store: this.getShoppingBagsList().keySet()){
-    //        store.isApprovedPurchasePolicies((HashMap<Product, Integer>) shoppingBagsList
-      //              .get(store).getProductListFromStore(),billingAddress);
-        }
-    }
-
     public boolean changeProductAmountInShoppingBag(int storeId, int amount, int productSn) {
         return shoppingBagsList.entrySet().stream()
                 .filter(storeShoppingBagEntry -> storeShoppingBagEntry.getKey().getStoreId() == storeId)

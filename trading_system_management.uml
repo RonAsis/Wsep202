@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.wsep202.TradingSystem.domain.trading_system_management</OriginalElement>
+  <nodes>
+    <node x="1390.352564102564" y="254.0">com.wsep202.TradingSystem.domain.trading_system_management.DiscountPolicy</node>
+    <node x="958.852564102564" y="842.0">com.wsep202.TradingSystem.domain.trading_system_management.PaymentDetails</node>
+    <node x="586.2131254755611" y="112.0">com.wsep202.TradingSystem.domain.trading_system_management.StorePermission</node>
+    <node x="753.852564102564" y="842.0">com.wsep202.TradingSystem.domain.trading_system_management.PasswordSaltPair</node>
+    <node x="1139.852564102564" y="842.0">com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress</node>
+    <node x="194.33333333333326" y="254.0">com.wsep202.TradingSystem.domain.trading_system_management.Receipt</node>
+    <node x="633.6717501841858" y="954.0">com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement</node>
+    <node x="611.0050835175191" y="426.0">com.wsep202.TradingSystem.domain.trading_system_management.Store</node>
+    <node x="1571.352564102564" y="254.0">com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType</node>
+    <node x="743.6717501841858" y="1126.0">com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem</node>
+    <node x="1496.9217501841858" y="1278.0">com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade</node>
+    <node x="1210.352564102564" y="254.0">com.wsep202.TradingSystem.domain.trading_system_management.PurchasePolicy</node>
+    <node x="225.86549029554135" y="112.0">com.wsep202.TradingSystem.domain.trading_system_management.Product</node>
+    <node x="318.3333333333333" y="254.0">com.wsep202.TradingSystem.domain.trading_system_management.DiscountType</node>
+    <node x="534.7358527482883" y="842.0">com.wsep202.TradingSystem.domain.trading_system_management.UserSystem</node>
+    <node x="974.852564102564" y="700.0">com.wsep202.TradingSystem.domain.trading_system_management.CardAction</node>
+    <node x="619.5884168508524" y="254.0">com.wsep202.TradingSystem.domain.trading_system_management.MangerStore</node>
+    <node x="100.5" y="700.0">com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart</node>
+    <node x="483.3333333333333" y="578.0">com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag</node>
+    <node x="530.5154902955412" y="0.0">com.wsep202.TradingSystem.domain.trading_system_management.ProductCategory</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.PurchasePolicy">
+      <point x="40.0" y="-26.0" />
+      <point x="1636.9217501841858" y="1258.0" />
+      <point x="1639.3513430438297" y="1258.0" />
+      <point x="1639.3513430438297" y="376.0" />
+      <point x="1350.352564102564" y="376.0" />
+      <point x="59.99999999999994" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart" target="com.wsep202.TradingSystem.domain.trading_system_management.Store">
+      <point x="-28.799999999999955" y="-26.0" />
+      <point x="143.37845876058248" y="508.0" />
+      <point x="614.3896989021346" y="508.0" />
+      <point x="-40.61538461538464" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement" target="com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress">
+      <point x="108.5" y="-26.0" />
+      <point x="866.1717501841858" y="934.0" />
+      <point x="1166.5192307692307" y="934.0" />
+      <point x="-53.333333333333314" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag">
+      <point x="-5.3333333333332575" y="-26.0" />
+      <point x="594.139550949914" y="680.0" />
+      <point x="585.3333333333333" y="680.0" />
+      <point x="34.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.Product">
+      <point x="-80.0" y="-26.0" />
+      <point x="1516.9217501841858" y="1248.0" />
+      <point x="11.0" y="1248.0" />
+      <point x="11.0" y="194.0" />
+      <point x="240.04730847735948" y="194.0" />
+      <point x="-37.81818181818187" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag">
+      <point x="-48.0" y="-26.0" />
+      <point x="771.6717501841858" y="1076.0" />
+      <point x="90.0" y="1076.0" />
+      <point x="90.0" y="660.0" />
+      <point x="494.6666666666667" y="660.0" />
+      <point x="-56.66666666666663" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement" target="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem">
+      <point x="-77.5" y="-26.0" />
+      <point x="680.1717501841858" y="914.0" />
+      <point x="646.7358527482883" y="914.0" />
+      <point x="48.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.MangerStore">
+      <point x="11.733333333333348" y="-26.0" />
+      <point x="666.7384168508524" y="356.0" />
+      <point x="687.5884168508524" y="356.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.PurchasePolicy">
+      <point x="17.59999999999991" y="-26.0" />
+      <point x="672.605083517519" y="366.0" />
+      <point x="1230.352564102564" y="366.0" />
+      <point x="-60.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem">
+      <point x="-13.333333333333258" y="-26.0" />
+      <point x="1583.5884168508526" y="1198.0" />
+      <point x="819.6717501841858" y="1198.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.Store">
+      <point x="26.666666666666742" y="-26.0" />
+      <point x="1623.5884168508526" y="1258.0" />
+      <point x="1628.3513430438297" y="1258.0" />
+      <point x="1628.3513430438297" y="498.0" />
+      <point x="695.6204681329036" y="498.0" />
+      <point x="40.61538461538453" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.PaymentDetails">
+      <point x="32.0" y="-26.0" />
+      <point x="851.6717501841858" y="1056.0" />
+      <point x="1038.852564102564" y="1056.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.ProductCategory">
+      <point x="-11.733333333333348" y="-26.0" />
+      <point x="643.2717501841857" y="346.0" />
+      <point x="574.2797921422277" y="346.0" />
+      <point x="574.2797921422277" y="92.0" />
+      <point x="614.5154902955412" y="92.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.Receipt">
+      <point x="-37.33333333333326" y="-26.0" />
+      <point x="561.402519414955" y="802.0" />
+      <point x="255.0" y="802.0" />
+      <point x="8.666666666666742" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.Store">
+      <point x="26.66666666666663" y="-26.0" />
+      <point x="625.4025194149549" y="792.0" />
+      <point x="656.953801466237" y="792.0" />
+      <point x="656.953801466237" y="558.0" />
+      <point x="655.0050835175191" y="558.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem">
+      <point x="-13.538461538461547" y="26.0" />
+      <point x="641.4666219790577" y="548.0" />
+      <point x="629.8333333333333" y="548.0" />
+      <point x="629.8333333333333" y="772.0" />
+      <point x="604.0691860816216" y="772.0" />
+      <point x="5.333333333333371" y="-26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement" target="com.wsep202.TradingSystem.domain.trading_system_management.PaymentDetails">
+      <point x="77.5" y="-26.0" />
+      <point x="835.1717501841858" y="924.0" />
+      <point x="985.5192307692307" y="924.0" />
+      <point x="-53.33333333333334" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.Product">
+      <point x="-23.466666666666697" y="-26.0" />
+      <point x="631.5384168508524" y="366.0" />
+      <point x="557.8661557785915" y="366.0" />
+      <point x="557.8661557785915" y="204.0" />
+      <point x="315.6836721137232" y="204.0" />
+      <point x="37.81818181818187" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.MangerStore" target="com.wsep202.TradingSystem.domain.trading_system_management.StorePermission">
+      <point x="34.0" y="-26.0" />
+      <point x="721.5884168508524" y="234.0" />
+      <point x="691.2131254755611" y="234.0" />
+      <point x="21.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement" target="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart">
+      <point x="-108.5" y="-26.0" />
+      <point x="649.1717501841858" y="924.0" />
+      <point x="170.0" y="924.0" />
+      <point x="170.0" y="822.0" />
+      <point x="184.5" y="822.0" />
+      <point x="12.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.PasswordSaltPair">
+      <point x="8.0" y="-26.0" />
+      <point x="827.6717501841858" y="1026.0" />
+      <point x="899.3384168508524" y="1026.0" />
+      <point x="899.3384168508524" y="914.0" />
+      <point x="900.5192307692307" y="914.0" />
+      <point x="58.66666666666663" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.Receipt">
+      <point x="-56.0" y="-26.0" />
+      <point x="763.6717501841858" y="1086.0" />
+      <point x="82.0" y="1086.0" />
+      <point x="82.0" y="396.0" />
+      <point x="237.66666666666652" y="396.0" />
+      <point x="-8.666666666666742" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart" target="com.wsep202.TradingSystem.domain.trading_system_management.Product">
+      <point x="-57.60000000000002" y="-26.0" />
+      <point x="114.89999999999998" y="650.0" />
+      <point x="132.37845876058248" y="650.0" />
+      <point x="132.37845876058248" y="214.0" />
+      <point x="258.95639938645047" y="214.0" />
+      <point x="-18.909090909090878" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.StorePermission">
+      <point x="-5.866666666666674" y="-26.0" />
+      <point x="649.1384168508525" y="336.0" />
+      <point x="592.9631254755611" y="336.0" />
+      <point x="592.9631254755611" y="234.0" />
+      <point x="607.2131254755611" y="234.0" />
+      <point x="-63.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart">
+      <point x="-40.0" y="-26.0" />
+      <point x="1556.9217501841858" y="1218.0" />
+      <point x="44.0" y="1218.0" />
+      <point x="44.0" y="822.0" />
+      <point x="112.5" y="822.0" />
+      <point x="-60.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem">
+      <point x="-26.666666666666742" y="-26.0" />
+      <point x="1570.255083517519" y="1208.0" />
+      <point x="55.0" y="1208.0" />
+      <point x="55.0" y="934.0" />
+      <point x="550.7358527482883" y="934.0" />
+      <point x="-48.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.DiscountPolicy">
+      <point x="64.0" y="-26.0" />
+      <point x="883.6717501841858" y="1096.0" />
+      <point x="1490.352564102564" y="1096.0" />
+      <point x="20.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress">
+      <point x="48.0" y="-26.0" />
+      <point x="867.6717501841858" y="1076.0" />
+      <point x="1219.852564102564" y="1076.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.PurchasePolicy">
+      <point x="56.0" y="-26.0" />
+      <point x="875.6717501841858" y="1086.0" />
+      <point x="1310.352564102564" y="1086.0" />
+      <point x="19.999999999999943" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag" target="com.wsep202.TradingSystem.domain.trading_system_management.Store">
+      <point x="51.0" y="-26.0" />
+      <point x="602.3333333333333" y="538.0" />
+      <point x="634.697391209827" y="538.0" />
+      <point x="-20.307692307692264" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.ProductCategory">
+      <point x="72.0" y="-26.0" />
+      <point x="891.6717501841858" y="1106.0" />
+      <point x="1560.852564102564" y="1106.0" />
+      <point x="1560.852564102564" y="92.0" />
+      <point x="648.1154902955411" y="92.0" />
+      <point x="33.60000000000002" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.Receipt">
+      <point x="-66.66666666666674" y="-26.0" />
+      <point x="1530.255083517519" y="1238.0" />
+      <point x="22.0" y="1238.0" />
+      <point x="22.0" y="376.0" />
+      <point x="203.0" y="376.0" />
+      <point x="-43.33333333333326" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.MangerStore" target="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem">
+      <point x="54.40000000000009" y="26.0" />
+      <point x="741.9884168508524" y="356.0" />
+      <point x="720.1717501841858" y="356.0" />
+      <point x="720.1717501841858" y="822.0" />
+      <point x="657.4025194149549" y="822.0" />
+      <point x="58.66666666666663" y="-26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.Receipt">
+      <point x="-35.200000000000045" y="-26.0" />
+      <point x="619.805083517519" y="386.0" />
+      <point x="289.6666666666665" y="386.0" />
+      <point x="43.33333333333326" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.Store">
+      <point x="16.0" y="-26.0" />
+      <point x="835.6717501841858" y="1036.0" />
+      <point x="940.352564102564" y="1036.0" />
+      <point x="940.352564102564" y="528.0" />
+      <point x="675.3127758252115" y="528.0" />
+      <point x="20.307692307692378" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Receipt" target="com.wsep202.TradingSystem.domain.trading_system_management.Product">
+      <point x="26.0" y="-26.0" />
+      <point x="272.33333333333326" y="234.0" />
+      <point x="277.86549029554135" y="234.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart" target="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag">
+      <point x="57.60000000000002" y="-26.0" />
+      <point x="230.10000000000002" y="680.0" />
+      <point x="540.0" y="680.0" />
+      <point x="-11.333333333333371" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement" target="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag">
+      <point x="-46.5" y="-26.0" />
+      <point x="711.1717501841858" y="934.0" />
+      <point x="732.352564102564" y="934.0" />
+      <point x="732.352564102564" y="680.0" />
+      <point x="608.0" y="680.0" />
+      <point x="56.66666666666674" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.PaymentDetails" target="com.wsep202.TradingSystem.domain.trading_system_management.CardAction">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType">
+      <point x="66.66666666666674" y="-26.0" />
+      <point x="1663.5884168508526" y="1238.0" />
+      <point x="1679.352564102564" y="1238.0" />
+      <point x="36.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement" target="com.wsep202.TradingSystem.domain.trading_system_management.PasswordSaltPair">
+      <point x="46.5" y="-26.0" />
+      <point x="804.1717501841858" y="914.0" />
+      <point x="841.852564102564" y="914.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.DiscountPolicy">
+      <point x="53.33333333333326" y="-26.0" />
+      <point x="1650.3513430438297" y="366.0" />
+      <point x="1530.352564102564" y="366.0" />
+      <point x="60.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.StorePermission">
+      <point x="80.0" y="-26.0" />
+      <point x="1676.9217501841858" y="1248.0" />
+      <point x="1725.852564102564" y="1248.0" />
+      <point x="1725.852564102564" y="234.0" />
+      <point x="733.2131254755611" y="234.0" />
+      <point x="63.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag" target="com.wsep202.TradingSystem.domain.trading_system_management.Product">
+      <point x="-17.0" y="-26.0" />
+      <point x="534.3333333333333" y="498.0" />
+      <point x="528.3654902955413" y="498.0" />
+      <point x="528.3654902955413" y="214.0" />
+      <point x="306.2291266591777" y="214.0" />
+      <point x="28.363636363636374" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart">
+      <point x="-58.66666666666663" y="-26.0" />
+      <point x="540.0691860816216" y="822.0" />
+      <point x="208.5" y="822.0" />
+      <point x="36.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.DiscountPolicy">
+      <point x="29.333333333333258" y="-26.0" />
+      <point x="684.3384168508524" y="386.0" />
+      <point x="1410.352564102564" y="386.0" />
+      <point x="-60.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.DiscountType">
+      <point x="-29.33333333333337" y="-26.0" />
+      <point x="625.6717501841858" y="376.0" />
+      <point x="426.3333333333333" y="376.0" />
+      <point x="36.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress">
+      <point x="13.333333333333258" y="-26.0" />
+      <point x="1610.255083517519" y="1258.0" />
+      <point x="1617.3513430438297" y="1258.0" />
+      <point x="1617.3513430438297" y="914.0" />
+      <point x="1273.1858974358975" y="914.0" />
+      <point x="53.33333333333337" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement" target="com.wsep202.TradingSystem.domain.trading_system_management.Store">
+      <point x="-15.5" y="-26.0" />
+      <point x="742.1717501841858" y="934.0" />
+      <point x="743.352564102564" y="934.0" />
+      <point x="743.352564102564" y="538.0" />
+      <point x="668.5435450559805" y="538.0" />
+      <point x="13.538461538461434" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.PaymentDetails">
+      <point x="0.0" y="-26.0" />
+      <point x="1596.9217501841858" y="1248.0" />
+      <point x="1606.3513430438297" y="1248.0" />
+      <point x="1606.3513430438297" y="924.0" />
+      <point x="1092.1858974358975" y="924.0" />
+      <point x="53.333333333333314" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Product" target="com.wsep202.TradingSystem.domain.trading_system_management.ProductCategory">
+      <point x="-26.0" y="-26.0" />
+      <point x="251.86549029554135" y="72.0" />
+      <point x="547.3154902955412" y="72.0" />
+      <point x="-67.20000000000005" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart">
+      <point x="-40.0" y="-26.0" />
+      <point x="779.6717501841858" y="1066.0" />
+      <point x="147.37845876058248" y="1066.0" />
+      <point x="147.37845876058248" y="822.0" />
+      <point x="136.5" y="822.0" />
+      <point x="-36.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.DiscountType">
+      <point x="-53.33333333333326" y="-26.0" />
+      <point x="1543.5884168508526" y="1228.0" />
+      <point x="33.0" y="1228.0" />
+      <point x="33.0" y="406.0" />
+      <point x="354.3333333333333" y="406.0" />
+      <point x="-36.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement">
+      <point x="-8.0" y="-26.0" />
+      <point x="811.6717501841858" y="1026.0" />
+      <point x="695.6717501841858" y="1026.0" />
+      <point x="-62.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.Product">
+      <point x="-72.0" y="-26.0" />
+      <point x="747.6717501841858" y="1106.0" />
+      <point x="66.0" y="1106.0" />
+      <point x="66.0" y="204.0" />
+      <point x="249.50185393190498" y="204.0" />
+      <point x="-28.363636363636374" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem">
+      <point x="-24.0" y="-26.0" />
+      <point x="795.6717501841858" y="1046.0" />
+      <point x="594.7358527482883" y="1046.0" />
+      <point x="594.7358527482883" y="934.0" />
+      <point x="582.7358527482883" y="934.0" />
+      <point x="-16.0" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.UserSystem" target="com.wsep202.TradingSystem.domain.trading_system_management.Product">
+      <point x="-26.66666666666663" y="-26.0" />
+      <point x="572.0691860816216" y="792.0" />
+      <point x="472.8333333333333" y="792.0" />
+      <point x="472.8333333333333" y="234.0" />
+      <point x="287.32003575008684" y="234.0" />
+      <point x="9.454545454545496" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade" target="com.wsep202.TradingSystem.domain.trading_system_management.ProductCategory">
+      <point x="93.33333333333326" y="-26.0" />
+      <point x="1690.255083517519" y="1258.0" />
+      <point x="1736.852564102564" y="1258.0" />
+      <point x="1736.852564102564" y="82.0" />
+      <point x="681.7154902955413" y="82.0" />
+      <point x="67.20000000000005" y="26.0" />
+    </edge>
+    <edge source="com.wsep202.TradingSystem.domain.trading_system_management.Store" target="com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType">
+      <point x="41.066666666666606" y="-26.0" />
+      <point x="696.0717501841857" y="406.0" />
+      <point x="1607.352564102564" y="406.0" />
+      <point x="-36.0" y="26.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.3294117647058824" x="988.1407506570167" y="695.1436842184326" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
