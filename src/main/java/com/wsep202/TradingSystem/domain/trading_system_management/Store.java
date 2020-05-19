@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class Store {
     Set<Product> products = new HashSet<>();
 
     //The set purchase policy for the store
-    private List<PurchasePolicy> purchasePolicies;
+    private List<Purchase> purchasePolicies;
 
     //The set purchase policy for the store
     private List<Discount> discounts;
@@ -751,34 +752,26 @@ public class Store {
 
     public Discount addDiscount(UserSystem user, Discount discount) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+            discount.setNewId();  //generate new ID for the new discount
             discounts.add(discount);
             return discount;
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
-    /**
-     * add any kind of purchase policy to the store
-     *
-     * @param owner          that adds
-     * @param purchasePolicy to add
-     * @return
-     */
-    public boolean addPurchasePolicy(UserSystem owner, PurchasePolicy purchasePolicy) {
-        if (owner == null) {
-            return false;
+    public Purchase addPurchase(UserSystem user, Purchase purchase) {
+        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+            purchase.setNewId();  //generate new ID for the new discount
+            purchasePolicies.add(purchase);
+            return purchase;
         }
-        if (isOwner(owner)) {
-            return this.purchasePolicies.add(purchasePolicy);  //add the discount to store
-        }
-        //this is not an owner of the store
-        log.error("The received user: " + owner.getUserName() + "is not owner");
-        throw new NoOwnerInStoreException(owner.getUserName(), storeId);
+        throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
-    public PurchasePolicy getPurchasePolicyById(int id) {
-        Optional<PurchasePolicy> purchasePolicy = this.purchasePolicies.stream().
-                filter(purchasePolicy1 -> purchasePolicy1.getId() == id).findFirst();
+
+    public Purchase getPurchasePolicyById(int id) {
+        Optional<Purchase> purchasePolicy = this.purchasePolicies.stream().
+                filter(purchasePolicy1 -> purchasePolicy1.getPurchaseId() == id).findFirst();
         if (purchasePolicy.isPresent()) {
             return purchasePolicy.get();
         }
@@ -794,6 +787,14 @@ public class Store {
         }
     }
 
+    public Purchase addEditPurchase(UserSystem user, Purchase purchase) {
+        if (purchase.getPurchaseId() < 0) {
+            return addPurchase(user, purchase);
+        } else {
+            return editPurchase(user, purchase);
+        }
+    }
+
     private Discount editDiscount(UserSystem user, Discount discount) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
             Optional<Boolean> isEdit = discounts.stream()
@@ -802,6 +803,18 @@ public class Store {
                             discount.getEndTime(), discount.getProductsUnderThisDiscount(), discount.getDescription(), discount.getAmountOfProductsForApplyDiscounts(),
                             discount.getMinPrice(), discount.getComposedDiscounts(), discount.getCompositeOperator(), discount.isStoreDiscount()));
             return isEdit.isPresent() ? discount : null;
+        }
+        throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
+    }
+
+    private Purchase editPurchase(UserSystem user, Purchase purchase) {
+        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+            Optional<Boolean> isEdit = purchasePolicies.stream()
+                    .filter(purchaseCur -> purchaseCur.getPurchaseId() == purchase.getPurchaseId())
+                    .findFirst().map(purchaseCur -> purchaseCur.editPurchase(purchase.getCountriesPermitted(),purchase.getStoreWorkDays(),
+                            purchase.getMin(),purchase.getMax(),purchase.getProductId(),purchase.getCompositeOperator(),
+                            purchase.getComposedPurchasePolicies(),purchase.isShoppingBagPurchaseLimit()));
+            return isEdit.isPresent() ? purchase : null;
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }

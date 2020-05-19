@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.dto.DiscountDto;
+import com.wsep202.TradingSystem.dto.PurchaseDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,16 @@ public class SellerManagerService {
         return tradingSystemFacade.getAllStoreDiscounts(username, storeId, uuid);
     }
 
+    public List<PurchaseDto> getPurchases(String username, int storeId, UUID uuid) {
+        return tradingSystemFacade.getAllStorePurchases(username, storeId, uuid);
+    }
+
+    //////////////////////UC 4.2////////////////////////////////////////////////////////////////////////////
     public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
         return tradingSystemFacade.addEditDiscount(username, storeId, discountDto, uuid);
+    }
+
+    public PurchaseDto addEditPurchase(String username, int storeId, PurchaseDto purchaseDto, UUID uuid) {
+        return tradingSystemFacade.addEditPurchase(username, storeId, purchaseDto, uuid);
     }
 }
