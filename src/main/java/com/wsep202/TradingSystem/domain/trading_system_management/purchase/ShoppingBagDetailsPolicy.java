@@ -1,4 +1,5 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
+import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
@@ -24,18 +25,16 @@ public class ShoppingBagDetailsPolicy extends PurchasePolicy {
 //    }
 
     @Override
-    public boolean isApproved(Purchase purchase, Map<Product, Integer> products, UserSystem user, BillingAddress userAddress) {
+    public boolean isApproved(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {
         int amountOfProductsInBag = products.size();
         if (!isStandsInTerms(amountOfProductsInBag,purchase.getMin(),purchase.getMax())) {
             //is not approved policy terms
-            user.newNotification(Notification.builder().content("" +
-                    "Sorry, your shopping bag details are incompatible with" +
-                    "purchase policy: your shopping bag has "
-                    + amountOfProductsInBag + " products but the policy minimum required is " + purchase.getMin() + "and maximum is " +
-                    purchase.getMax()).build());
             log.info("bad amount of products in shopping bag: " + amountOfProductsInBag + " \npurchase " +
                     "policy with id: " + purchase.purchaseId + " failed");
-            return false;
+            throw new PurchasePolicyException("Sorry, your shopping bag details are incompatible with" +
+                    "purchase policy: your shopping bag has "
+                    + amountOfProductsInBag + " products but the policy minimum required is " + purchase.getMin() + "and maximum is " +
+                    purchase.getMax());
         }
         //approved policy terms on amount of products in bag
         log.info("shopping bag passed the shopping bag purchase policy with" +

@@ -323,12 +323,16 @@ public class TradingSystem {
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
-    private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress, String customerName)
+    private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
+                                             ShoppingCart shoppingCart, BillingAddress billingAddress,
+                                             String customerName)
             throws TradingSystemException {
         //check validity of the arguments fields
         if (validationOfPurchaseArgs(paymentDetails, shoppingCart, billingAddress)) return null;
         shoppingCart.isAllBagsInStock();    //ask the cart to check all products in stock
         log.info("all products in stock");
+        shoppingCart.ApprovePurchasePolicy(billingAddress);
+        log.info("applied stores purchase policies on shopping cart");
         shoppingCart.applyDiscountPolicies();
         log.info("applied stores discount policies on shopping cart");
         externalServiceManagement.charge(paymentDetails, shoppingCart);

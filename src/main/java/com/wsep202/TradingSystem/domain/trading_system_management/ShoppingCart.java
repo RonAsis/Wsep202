@@ -186,4 +186,11 @@ public class ShoppingCart {
                 .map(storeShoppingBagEntry -> storeShoppingBagEntry.getValue())
                 .findFirst().map(shoppingBag -> shoppingBag.changeProductAmountInShoppingBag(amount, productSn)).orElse(false);
     }
+
+    public void ApprovePurchasePolicy(BillingAddress billingAddress) {
+        for (Store store: this.getShoppingBagsList().keySet()){
+            store.isApprovedPurchasePolicies((HashMap<Product, Integer>) shoppingBagsList
+                    .get(store).getProductListFromStore(),billingAddress);
+        }
+    }
 }

@@ -92,24 +92,24 @@ public class Purchase {
 
     }
 
-    public boolean isApproved(Map<Product, Integer> products, UserSystem user, BillingAddress userAddress){
+    public boolean isApproved(Map<Product, Integer> products, BillingAddress userAddress){
         if (isComposed()) {
-            return purchasePolicies.get(ComposedPurchase.class.getName()).isApproved(this,products,user,userAddress);
+            return purchasePolicies.get(ComposedPurchase.class.getName()).isApproved(this,products,userAddress);
         } else if (isSystemDetails()) {
-            return purchasePolicies.get(SystemDetailsPolicy.class.getName()).isApproved(this,products,user,userAddress);
+            return purchasePolicies.get(SystemDetailsPolicy.class.getName()).isApproved(this,products,userAddress);
         } else if(isUserDetails()){
-            return purchasePolicies.get(UserDetailsPolicy.class.getName()).isApproved(this,products,user,userAddress);
+            return purchasePolicies.get(UserDetailsPolicy.class.getName()).isApproved(this,products,userAddress);
         }else { //this is purchase amount limit policy
-            return isApprovedPurchaseAmount(products,user,userAddress);
+            return isApprovedPurchaseAmount(products, userAddress);
         }
     }
 
-    private boolean isApprovedPurchaseAmount(Map<Product, Integer> products, UserSystem user, BillingAddress userAddress) {
+    private boolean isApprovedPurchaseAmount(Map<Product, Integer> products, BillingAddress userAddress) {
         if(isShoppingBagPurchaseLimit){
-            return purchasePolicies.get(ShoppingBagDetailsPolicy.class.getName()).isApproved(this,products,user,userAddress);
+            return purchasePolicies.get(ShoppingBagDetailsPolicy.class.getName()).isApproved(this,products,userAddress);
         }
         else {  //purchase policy on single product
-            return purchasePolicies.get(ProductDetailsPolicy.class.getName()).isApproved(this,products,user,userAddress);
+            return purchasePolicies.get(ProductDetailsPolicy.class.getName()).isApproved(this,products,userAddress);
         }
     }
 
