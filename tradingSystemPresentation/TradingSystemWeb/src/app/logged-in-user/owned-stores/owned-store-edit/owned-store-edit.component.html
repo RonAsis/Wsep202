@@ -6,7 +6,7 @@
   <button *ngIf="isOwner" class="btn btn-primary" type="submit" (click)="onOwners()">Owners</button>
   <button class="btn btn-primary" type="submit" (click)="onPolicy()">Policy</button>
 
-  <app-add-discount *ngIf="loadedFeature === 'Add Discount'" [store]="store"></app-add-discount>
+  <app-add-discount *ngIf="loadedFeature === 'Add Discount'" [store]="store" (discountItemAdded)="discountAdded()"></app-add-discount>
   <app-discount *ngIf="loadedFeature === 'Discounts'" [store]="store"></app-discount>
   <app-edit-product *ngIf="loadedFeature === 'Edit-Product'" ></app-edit-product>
   <app-visible-discount-store *ngIf="loadedFeature === 'Managers'" [store]="store"></app-visible-discount-store>

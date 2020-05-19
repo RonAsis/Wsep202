@@ -25,6 +25,7 @@ export class DiscountsComponent implements OnInit {
       .subscribe(discounts => {
         if (discounts !== null && discounts !== undefined) {
           this.discounts = discounts;
+          console.log(this.discounts);
         }
       });
   }

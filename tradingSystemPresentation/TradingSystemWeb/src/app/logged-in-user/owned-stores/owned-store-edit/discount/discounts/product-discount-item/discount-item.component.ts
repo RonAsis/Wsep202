@@ -17,6 +17,7 @@ export class DiscountItemComponent implements OnInit {
   }
 
   onSelected() {
+    console.log(this.discount);
     this.storeService.discountSelected.emit(this.discount);
   }
 }

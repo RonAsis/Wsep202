@@ -269,43 +269,37 @@ public class Store {
     public boolean editProduct(UserSystem user, int productSn, String productName, String category,
                                int amount, double cost) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {   //the user is owner
-            Optional<Product> product = products.stream().filter(p -> p.getProductSn() == productSn).findFirst();
-            if (product.isPresent()) {    //update the product properties
-                product.get().setName(productName);
-                product.get().setCategory(ProductCategory.getProductCategory(category));
-                product.get().setAmount(amount);
-                if (cost != product.get().getOriginalCost()) {
-                    product.get().setCost(cost);
-                    product.get().setOriginalCost(cost);
-                    //TODO alert the user about the edit and ask to confirm update of cart.
-                }
-                log.info("The product " + productName + " edited successfully");
-                return true;
-            }
+            products.stream().filter(p -> p.getProductSn() == productSn)
+                    .forEach(p -> {
+                        p.setName(productName);
+                        p.setCategory(ProductCategory.getProductCategory(category));
+                        p.setAmount(amount);
+                        if (cost != p.getOriginalCost()) {
+                            p.setOriginalCost(cost);
+                            //TODO alert the user about the edit and ask to confirm update of cart.
+                        }
+                        log.info("The product " + productName + " edited successfully");
+                    });
+            return true;
         }
         log.info("Failed to edit the product: " + productName);
         return false;
     }
 
 
-    /**
-     * remove a product from the products set of the store
-     *
-     * @param user      - the user requests to remove
-     * @param productSn - the unique identifier of the product
-     * @return true if the removal succeeded otherwise false
-     */
     public boolean removeProductFromStore(UserSystem user, int productSn) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {  //only owner can remove products from its store
-            int sizeOfProducts = products.size();
-            products.removeIf(product -> product.getProductSn() == productSn);
-            if (sizeOfProducts > products.size()) {
-                log.info("The product with id: " + productSn + " was removed successfully");
-                return true;
-            }
+            Set<Product> duplicate = new HashSet<>(products);
+            duplicate.stream()
+                    .filter(product -> product.getProductSn()==productSn)
+                    .forEach(products::remove);
+
+            //is present
+            return duplicate.size() > products.size();
         }
         //the user is not an owner of the store so can't remove
-        log.info("The product with id: " + productSn + " wasn't removed.");
+        log.info("The product with id: " + productSn + " wasn't removed.\n" +
+                "not owner");
         return false;
     }
 

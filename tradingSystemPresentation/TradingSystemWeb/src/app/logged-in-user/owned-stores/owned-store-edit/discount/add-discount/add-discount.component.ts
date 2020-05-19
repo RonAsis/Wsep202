@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Store} from '../../../../../shared/store.model';
 import {StoreService} from '../../../../../services/store.service';
-import {IDropdownSettings, ListItem} from 'ng-multiselect-dropdown/multiselect.model';
+import {IDropdownSettings} from 'ng-multiselect-dropdown/multiselect.model';
 import {Discount} from '../../../../../shared/discount.model';
 import {Product} from '../../../../../shared/product.model';
 import {MatDialog} from '@angular/material/dialog';
@@ -14,7 +14,9 @@ import {AmountProductsComponent} from './amount-products/amount-products.compone
 })
 export class AddDiscountComponent implements OnInit {
 
-  @Input()discount: Discount;
+  labelPosition: 'store' | 'product' = 'store';
+
+  @Input() discount: Discount;
   optionsProductUnderDiscount: Product[];
   selectedProductUnderDiscount: Product[];
   productUnderDiscountSettings: IDropdownSettings;
@@ -41,11 +43,13 @@ export class AddDiscountComponent implements OnInit {
   message: string;
   compositeOperators: string[];
   selectedComposite: string;
-  selectedProductsForApplyDiscountsDisabled = true;
-  selectedProductUnderDiscountDisabled = false;
   today: string;
 
   constructor(private storeService: StoreService, public dialog: MatDialog) {
+
+  }
+
+  ngOnInit(): void {
     this.selectedProductUnderDiscount = [];
     this.selectedProductsForApplyDiscounts = [];
     this.selectedComposedDiscounts = [];
@@ -77,9 +81,6 @@ export class AddDiscountComponent implements OnInit {
       unSelectAllText: 'UnSelect All',
       allowSearchFilter: true
     };
-  }
-
-  ngOnInit(): void {
     this.init();
     this.storeService.getCompositeOperators(this.store.storeId)
       .subscribe(response => {
@@ -87,16 +88,26 @@ export class AddDiscountComponent implements OnInit {
           this.compositeOperators = response;
         }
       });
-    if (this.discount !== null && this.discount !== undefined){
-      this.selectedProductUnderDiscount = this.discount.productsUnderThisDiscount;
-      this.selectedProductsForApplyDiscounts = this.discount.amountOfProductsForApplyDiscounts;
-      this.selectedComposedDiscounts = this.discount.composedDiscounts;
+    if (this.discount !== null && this.discount !== undefined) {
+      this.selectedProductUnderDiscount =
+        this.discount.productsUnderThisDiscount !== undefined && this.discount.productsUnderThisDiscount !== null ?
+          this.discount.productsUnderThisDiscount : [];
+      this.selectedProductsForApplyDiscounts =
+        this.discount.amountOfProductsForApplyDiscounts !== undefined && this.discount.amountOfProductsForApplyDiscounts !== null ?
+          this.discount.amountOfProductsForApplyDiscounts : [];
+      this.selectedComposedDiscounts =
+        this.discount.composedDiscounts !== undefined && this.discount.composedDiscounts !== null ?
+          this.discount.composedDiscounts : [];
+      this.labelPosition = this.discount.storeDiscount ? 'store' : 'product';
+      this.endTime = new ElementRef<Date>(this.discount.endTime);
+      this.description = new ElementRef<string>(this.discount.description);
+      this.minPrice = new ElementRef<number>(this.discount.minPrice);
+      this.selectedComposite = this.discount.compositeOperator;
     }
   }
 
   private init() {
     this.optionsProductsForApplyDiscounts = this.store.products.slice();
-    console.log(this.optionsProductsForApplyDiscounts);
     this.storeService.getDiscounts(this.store.storeId)
       .subscribe(response => {
         if (response !== null && response !== undefined) {
@@ -122,16 +133,16 @@ export class AddDiscountComponent implements OnInit {
   }
 
   onAddDiscount() {
-    if (this.discountPercentage.nativeElement.value === null || this.discountPercentage.nativeElement.value === undefined ){
+    if (this.discountPercentage.nativeElement.value === null || this.discountPercentage.nativeElement.value === undefined) {
       this.errorMessage('You must type discountPercentage');
-    }else if (this.selectedProductsForApplyDiscounts.length === 0) {
+    } else if (this.selectedProductsForApplyDiscounts.length === 0 && this.labelPosition !== 'store') {
       this.errorMessage('You must select products for apply discount');
-    }else if (this.description.nativeElement.value === null || this.description.nativeElement.value === undefined ||
-      this.description.nativeElement.value.length === 0 ) {
+    } else if (this.description.nativeElement.value === null || this.description.nativeElement.value === undefined ||
+      this.description.nativeElement.value.length === 0) {
       this.errorMessage('You must type description');
-    }else if (this.endTime.nativeElement.value === null || this.endTime.nativeElement.value === undefined  ) {
+    } else if (this.endTime.nativeElement.value === null || this.endTime.nativeElement.value === undefined) {
       this.errorMessage('You must select end time');
-    }else {
+    } else {
       const discount = new Discount(
         this.discount !== null && this.discount !== undefined ? this.discount.discountId : -1,
         this.discountPercentage.nativeElement.value,
@@ -141,11 +152,12 @@ export class AddDiscountComponent implements OnInit {
         this.selectedProductsForApplyDiscounts,
         this.minPrice.nativeElement.value,
         this.selectedComposedDiscounts,
-        this.selectedComposite);
+        this.selectedComposite,
+        this.labelPosition === 'store');
       this.storeService.addDiscount(this.store.storeId, discount)
         .subscribe(response => {
           if (response !== undefined && response !== null) {
-            this.optionsComposedDiscounts.push(response);
+            this.discountItemAdded.emit(response);
           }
         });
     }
@@ -155,18 +167,18 @@ export class AddDiscountComponent implements OnInit {
     const dialogRef = this.dialog.open(AmountProductsComponent, {
       width: '250px',
     });
-    dialogRef.afterClosed().subscribe((result: {isNotWith: boolean, amount: number}) => {
-        if (!result.isNotWith){
-          const productFound: Product = this.selectedProductUnderDiscount.find(product => product.productSn === productItem.productSn);
-          productFound.amount = result.amount;
-          console.log( productFound.amount);
-          console.log(this.selectedProductUnderDiscount);
-        }else {
-          const productFound: Product = this.selectedProductUnderDiscount.find(product => product.productSn === productItem.productSn);
-          productFound.amount = -1;
-          console.log( productFound.amount);
-          console.log(this.selectedProductUnderDiscount);
-        }
+    dialogRef.afterClosed().subscribe((result: { isNotWith: boolean, amount: number }) => {
+      if (!result.isNotWith) {
+        const productFound: Product = this.selectedProductUnderDiscount.find(product => product.productSn === productItem.productSn);
+        productFound.amount = result.amount;
+        console.log(productFound.amount);
+        console.log(this.selectedProductUnderDiscount);
+      } else {
+        const productFound: Product = this.selectedProductUnderDiscount.find(product => product.productSn === productItem.productSn);
+        productFound.amount = -1;
+        console.log(productFound.amount);
+        console.log(this.selectedProductUnderDiscount);
+      }
     });
   }
 
@@ -174,11 +186,11 @@ export class AddDiscountComponent implements OnInit {
     const dialogRef = this.dialog.open(AmountProductsComponent, {
       width: '250px',
     });
-    dialogRef.afterClosed().subscribe((result: {with: string, amount: number}) => {
-      if (result.with === 'with'){
+    dialogRef.afterClosed().subscribe((result: { with: string, amount: number }) => {
+      if (result.with === 'with') {
         const productFound: Product = this.selectedProductsForApplyDiscounts.find(product => product.productSn === productItem.productSn);
         productFound.amount = result.amount;
-      }else {
+      } else {
         const productFound: Product = this.selectedProductsForApplyDiscounts.find(product => product.productSn === productItem.productSn);
         productFound.amount = -1;
       }

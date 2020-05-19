@@ -73,6 +73,8 @@ import {MatRadioModule} from '@angular/material/radio';
 import { DiscountsComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/discounts/discounts.component';
 import { DiscontEditComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/discont-edit/discont-edit.component';
 import {DiscountItemComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/discounts/product-discount-item/discount-item.component';
+import { AddEditPolicyComponent } from './logged-in-user/owned-stores/owned-store-edit/policy/add-edit-policy/add-edit-policy.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -132,7 +134,8 @@ import {DiscountItemComponent} from './logged-in-user/owned-stores/owned-store-e
     DiscountItemComponent,
     AmountProductsComponent,
     DiscountsComponent,
-    DiscontEditComponent
+    DiscontEditComponent,
+    AddEditPolicyComponent
   ],
   imports: [
     Ng2SearchPipeModule,
@@ -156,7 +159,8 @@ import {DiscountItemComponent} from './logged-in-user/owned-stores/owned-store-e
     ReactiveFormsModule,
     FormlyBootstrapModule,
     MatDialogModule,
-    MatRadioModule
+    MatRadioModule,
+    MatCheckboxModule
   ],
   exports: [RouterModule],
   providers: [],

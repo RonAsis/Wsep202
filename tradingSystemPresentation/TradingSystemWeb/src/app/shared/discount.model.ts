@@ -9,5 +9,6 @@ export class Discount {
               public amountOfProductsForApplyDiscounts: Product[],
               public minPrice: number,
               public composedDiscounts: Discount[],
-              public compositeOperator: string) {}
+              public compositeOperator: string,
+              public storeDiscount: boolean) {}
 }

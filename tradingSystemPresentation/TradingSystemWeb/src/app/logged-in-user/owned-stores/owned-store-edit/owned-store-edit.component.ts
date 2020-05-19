@@ -49,6 +49,10 @@ export class OwnedStoreEditComponent implements OnInit {
   }
 
   onDiscounts() {
-    this.loadedFeature= 'Discounts';
+    this.loadedFeature = 'Discounts';
+  }
+
+  discountAdded() {
+    this.onDiscounts();
   }
 }

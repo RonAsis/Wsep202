@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {Store} from '../../../../shared/store.model';
 
 @Component({
   selector: 'app-policy',
@@ -7,8 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PolicyComponent implements OnInit {
 
-  constructor() { }
+  @Input() store: Store;
 
+  constructor() { }
   ngOnInit(): void {
   }
 

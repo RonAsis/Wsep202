@@ -7,12 +7,11 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.Disco
 import com.wsep202.TradingSystem.dto.*;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
-import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 public class TradingSystemMapper {
 
@@ -62,8 +61,10 @@ public class TradingSystemMapper {
                                     .collect(Collectors.toList()))
                             .build();
                 }).collect(Collectors.toList());
-                context.getDestination().clear();
-                context.getDestination().addAll(managerDtos);
+                if(Objects.nonNull(context.getDestination())){
+                    context.getDestination().clear();
+                    context.getDestination().addAll(managerDtos);
+                }
                 return context.getDestination();
             });
         }
@@ -156,25 +157,23 @@ public class TradingSystemMapper {
     public static class DiscountDtoToDiscount extends TypeMapConfigurer<DiscountDto, Discount> {
         @Override
         public void configure(TypeMap<DiscountDto, Discount> typeMap) {
-            typeMap.setConverter(context -> {
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(Discount::setAmountOfProductsForApplyDiscounts));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(Discount::setProductsUnderThisDiscount));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(Discount::setDiscountPolicies));
+
+            typeMap.setPostConverter(context -> {
                 DiscountDto discountDto = context.getSource();
                 Map<Product, Integer> amountOfProductsForApplyDiscounts = createDiscountMap(discountDto.getAmountOfProductsForApplyDiscounts());
                 Map<Product, Integer> productsUnderThisDiscount = createDiscountMap(discountDto.getProductsUnderThisDiscount());
-                CompositeOperator compositeOperators = CompositeOperator.getCompositeOperators(discountDto.getCompositeOperator());
+                CompositeOperator compositeOperators = Objects.nonNull(discountDto.getCompositeOperator()) ?
+                        CompositeOperator.getCompositeOperators(discountDto.getCompositeOperator()) : null;
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(discountDto.getEndTime());
-                return Discount.builder()
-                        .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
-                        .compositeOperator(compositeOperators)
-                        .productsUnderThisDiscount(productsUnderThisDiscount)
-                        .description(discountDto.getDescription())
-                        .discountId(discountDto.getDiscountId())
-                        .discountPercentage(discountDto.getDiscountPercentage())
-                        .endTime(calendar)
-                        .minPrice(discountDto.getMinPrice())
-                        .isStoreDiscount(discountDto.isApplied())
-                        .composedDiscounts(context.getDestination().getComposedDiscounts())
-                        .build();
+                context.getDestination().setAmountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts);
+                context.getDestination().setProductsUnderThisDiscount(productsUnderThisDiscount);
+                context.getDestination().setCompositeOperator(compositeOperators);
+                context.getDestination().setEndTime(calendar);
+                return context.getDestination();
             });
         }
 
@@ -196,5 +195,33 @@ public class TradingSystemMapper {
         }
     }
 
+    @Component
+    public static class DiscountToDiscountDto extends TypeMapConfigurer<Discount, DiscountDto> {
+        @Override
+        public void configure(TypeMap<Discount,DiscountDto> typeMap) {
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(DiscountDto::setAmountOfProductsForApplyDiscounts));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(DiscountDto::setProductsUnderThisDiscount));
+
+            typeMap.setPostConverter(context -> {
+                Discount discount = context.getSource();
+                //Map<Product, Integer> amountOfProductsForApplyDiscounts = createDiscountMap(discountDto.getAmountOfProductsForApplyDiscounts());
+               /// Map<Product, Integer> productsUnderThisDiscount = createDiscountMap(discountDto.getProductsUnderThisDiscount());
+                String compositeOperators = Objects.nonNull(discount.getCompositeOperator()) ?
+                        discount.getCompositeOperator().name : null;
+                Date date = context.getSource().getEndTime().getTime();
+//                context.getDestination().setAmountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts);
+//                context.getDestination().setProductsUnderThisDiscount(productsUnderThisDiscount);
+                context.getDestination().setCompositeOperator(compositeOperators);
+                context.getDestination().setEndTime(date);
+                return context.getDestination();
+            });
+        }
+
+//        private List<Product> createlistProductFromMap( Map<Product, Integer> productIntegerMap){
+//            return productIntegerMap.entrySet()
+//                    .stream()
+//                    .map(productIntegerEntry -> )
+//        }
+    }
 
 }

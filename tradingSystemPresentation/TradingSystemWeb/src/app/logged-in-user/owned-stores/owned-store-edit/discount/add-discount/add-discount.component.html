@@ -6,6 +6,7 @@
         <span class="required-asterisk">*</span>
       </label>
       <input type="number" [min]="1" [max]="100" id="discountPercentage" class="form-control"
+             [value]= "this.discount !== null ? this.discount.discountPercentage : 1"
              #discountPercentage/>
     </div>
 
@@ -13,7 +14,7 @@
       <label for="endTime">End Time
         <span class="required-asterisk">*</span>
       </label>
-      <input type="date" [value]="today"
+      <input type="date" [value]="this.discount !== null ? this.discount.endTime : today"
              [min]="today"
              id="endTime" class="form-control"
              #endTime/>
@@ -37,6 +38,7 @@
             [data]="optionsProductUnderDiscount"
             [(ngModel)]="selectedProductUnderDiscount"
             (onSelect)="onSelectProductUnderDiscount($event)"
+            [disabled]="labelPosition==='store'"
           >
           </ng-multiselect-dropdown>
         </div>
@@ -47,6 +49,8 @@
       <div class="col-sm-4 from-group">
         <label for="minPrice">Min Price</label>
         <input type="number" [min]="1" id="minPrice" class="form-control"
+               [disabled] = "labelPosition==='product'"
+               [value]= "this.discount !== null && this.discount.storeDiscount ? this.discount.minPrice : null"
                #minPrice/>
       </div>
     </div>
@@ -60,11 +64,14 @@
             [settings]="composedDiscountsSettings"
             [data]="optionsComposedDiscounts"
             [(ngModel)]="selectedComposedDiscounts"
+            [disabled]="labelPosition==='store'"
           >
           </ng-multiselect-dropdown>
         </div>
         <div class="col-sm-5 from-group">
-          <select [ngModel]="selectedComposite" (ngModelChange)="onSelectedCompositeOperator($event)">
+          <select                [value]= "this.discount !== null ? this.discount.compositeOperator : null"
+                                 [disabled]="labelPosition==='store'"
+                            [ngModel]="selectedComposite" (ngModelChange)="onSelectedCompositeOperator($event)">
             <option *ngFor="let compositeOperator of compositeOperators" value={{compositeOperator}}>
               {{compositeOperator}}
             </option>
@@ -81,6 +88,16 @@
     </div>
 
     <div class="col-sm-4 from-group">
+        <section class="example-section">
+          <mat-radio-group [(ngModel)]="labelPosition" [value]="this.discount !== null && this.discount.storeDiscount ? 'store': 'prodcut'">
+            <mat-radio-button class="example-margin" value="store">Apply on all Store</mat-radio-button>
+            <mat-radio-button class="example-margin" value="product">Apply on specific Product</mat-radio-button>
+          </mat-radio-group>
+        </section>
+    </div>
+
+
+    <div class="col-sm-4 from-group">
       <label>Applied Products:
         <span class="required-asterisk">*</span>
       </label>
@@ -91,6 +108,7 @@
           [data]="optionsProductsForApplyDiscounts"
           [(ngModel)]="selectedProductsForApplyDiscounts"
           (onSelect)="onSelectProductsForApplyDiscount($event)"
+          [disabled]="labelPosition==='store'"
         >
         </ng-multiselect-dropdown>
       </div>
@@ -102,6 +120,7 @@
         <span class="required-asterisk">*</span>
       </label>
       <input type="text" id="description" class="form-control"
+             [value]="this.discount !== null ? this.discount.description : ''"
              #description/>
     </div>
 

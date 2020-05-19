@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PurchaseDto {
 
-    @JsonSetter("ShoppingCartDtoDeserializer")
     private ShoppingCartDto shoppingCartDto;
 
     private PaymentDetailsDto paymentDetailsDto;
