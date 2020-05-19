@@ -63,5 +63,9 @@ public class DiscountDto {
     private String compositeOperator;
 
     private boolean isApplied;
+    /**
+     * is it discount in the store level
+     */
+    private boolean isStoreDiscount;
 
 }

@@ -67,7 +67,9 @@ public class Discount {
     private boolean isApplied;
 
     private boolean isStoreDiscount;
-
+    /**
+     * types of discounts in the store
+     */
     private Map<String, DiscountPolicy> discountPolicies;
 
     public Discount(double discountPercentage,
@@ -182,8 +184,11 @@ public class Discount {
     protected int getDiscountIdAcc() {
         return discountIdAcc++;
     }
-
+    public void setNewId() {
+        this.discountId = getDiscountIdAcc();
+    }
     public boolean isExpired() {
         return getEndTime().compareTo(Calendar.getInstance()) < 0;
     }
+
 }

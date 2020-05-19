@@ -6,6 +6,9 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import java.util.Calendar;
 import java.util.Map;
 
+/**
+ * The discount policy defines the discount interface
+ */
 public abstract class DiscountPolicy {
 
     public abstract void applyDiscount(Discount discount, Map<Product, Integer> products);
@@ -20,6 +23,12 @@ public abstract class DiscountPolicy {
 
     ////////////////////////////////////// general /////////////////////////////////////////
 
+    /**
+     * set updated cost of product by the pre received and calculated discount
+     * @param discount object related to the actual discount
+     * @param product to update its price
+     * @param discountCost to sub from the price
+     */
     public void setCostAfterDiscount(Discount discount, Product product, double discountCost) {
         product.setCost(product.getCost() - discountCost);
         discount.setApplied(true);
@@ -40,13 +49,19 @@ public abstract class DiscountPolicy {
 
     /**
      * calculate discount on product price
-     * @param price
+     * @param price of product
      * @return
      */
     public double calculateDiscount(Discount discount, double price) {
         return (discount.getDiscountPercentage() * price) / 100;
     }
 
+    /**
+     * checks if the received product is currently under discount
+     * @param discount checked current discount
+     * @param product to check
+     * @return
+     */
     public boolean isProductHaveDiscount(Discount discount, Product product) {
         return discount.getAmountOfProductsForApplyDiscounts().keySet().stream()
                 .anyMatch(integer -> product.getProductSn() == integer.getProductSn());
