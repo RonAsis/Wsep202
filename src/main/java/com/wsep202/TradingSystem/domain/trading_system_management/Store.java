@@ -269,21 +269,24 @@ public class Store {
     public boolean editProduct(UserSystem user, int productSn, String productName, String category,
                                int amount, double cost) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {   //the user is owner
-            products.stream().filter(p -> p.getProductSn() == productSn)
-                    .forEach(p -> {
-                        p.setName(productName);
-                        p.setCategory(ProductCategory.getProductCategory(category));
-                        p.setAmount(amount);
-                        if (cost != p.getOriginalCost()) {
-                            p.setOriginalCost(cost);
-                            //TODO alert the user about the edit and ask to confirm update of cart.
-                        }
-                        log.info("The product " + productName + " edited successfully");
-                    });
-            return true;
+
+            Optional<Product> optionalProduct = products.stream().
+                    filter(product -> product.getProductSn() == productSn).findFirst();
+            if (optionalProduct.isPresent()) {
+                //remove the old
+                products.remove(optionalProduct.get());
+                //replace by updated
+                optionalProduct.get().setOriginalCost(cost);
+                optionalProduct.get().setName(productName);
+                optionalProduct.get().setCategory(ProductCategory.getProductCategory(category));
+                optionalProduct.get().setAmount(amount);
+                log.info("The product " + productName + " edited successfully");
+                products.add(optionalProduct.get());
+                return true;
+            }
         }
-        log.info("Failed to edit the product: " + productName);
-        return false;
+            log.info("Failed to edit the product: " + productName);
+            return false;
     }
 
 
