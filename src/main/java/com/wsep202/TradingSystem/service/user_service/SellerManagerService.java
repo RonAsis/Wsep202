@@ -1,10 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
-import com.wsep202.TradingSystem.dto.DiscountDto;
-import com.wsep202.TradingSystem.dto.PurchaseDto;
-import com.wsep202.TradingSystem.dto.ReceiptDto;
-import com.wsep202.TradingSystem.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,7 +58,7 @@ public class SellerManagerService {
         return tradingSystemFacade.addEditDiscount(username, storeId, discountDto, uuid);
     }
 
-    public PurchaseDto addEditPurchase(String username, int storeId, PurchaseDto purchaseDto, UUID uuid) {
+    public PurchaseDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
         return tradingSystemFacade.addEditPurchase(username, storeId, purchaseDto, uuid);
     }
 }

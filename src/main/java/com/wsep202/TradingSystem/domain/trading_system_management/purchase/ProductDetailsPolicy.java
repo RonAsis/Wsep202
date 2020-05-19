@@ -1,4 +1,5 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
+import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
@@ -20,7 +21,7 @@ public class ProductDetailsPolicy extends PurchasePolicy {
 
 
     @Override
-    public boolean isApproved(Purchase purchase, Map<Product, Integer> products, UserSystem user, BillingAddress userAddress) {
+    public boolean isApproved(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {
         Optional<Product> optionalProduct = products.keySet().stream().
                 filter(product -> product.getProductSn()==purchase.getProductId()).findFirst();
 
@@ -29,14 +30,12 @@ public class ProductDetailsPolicy extends PurchasePolicy {
             int amount = products.get(productInStore);
             boolean isApproved = isStandsInTerms(amount,purchase.getMin(),purchase.getMax());
             if(!isApproved){
-                user.newNotification(Notification.builder().content("" +
-                        "Sorry, your product details are incompatible with" +
-                        "purchase policy: product '"+productInStore.getName()+"' has "
-                +amount+" items but the policy minimum required is "+purchase.getMin()+ "and maximum is "+
-                        purchase.getMax()).build());
                 log.info("bad amount of items for product: "+productInStore.getName()+" \npurchase " +
                         "policy failed");
-                return false;
+                throw new PurchasePolicyException("Sorry, your product details are incompatible with" +
+                        "purchase policy: product '"+productInStore.getName()+"' has "
+                        +amount+" items but the policy minimum required is "+purchase.getMin()+ "and maximum is "+
+                        purchase.getMax());
             }
         log.info("product: "+productInStore.getName()+" passed the product purchase policy with" +
                 "ID: "+ purchase.purchaseId);

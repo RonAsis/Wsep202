@@ -178,7 +178,7 @@ public class TradingSystemFacade {
         return modelMapper.map(store.addEditDiscount(user, discount), DiscountDto.class);
     }
 
-    public PurchaseDto addEditPurchase(String username, int storeId, PurchaseDto purchaseDto, UUID uuid) {
+    public PurchaseDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId);
         Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);

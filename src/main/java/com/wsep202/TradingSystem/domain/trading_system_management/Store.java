@@ -618,6 +618,16 @@ public class Store {
     }
 
     /**
+     * apply purchase on a shopping bag
+     */
+    public void isApprovedPurchasePolicies(HashMap<Product, Integer> productsBag,BillingAddress userAddress) {
+        updateExpiredDiscounts();
+        for (Purchase purchase : this.getPurchasePolicies()) {  //apply discounts on shoppingBag
+            purchase.isApproved(productsBag, userAddress);
+        }
+    }
+
+    /**
      * remove discounts that expired from store
      */
     private void updateExpiredDiscounts() {
