@@ -244,7 +244,7 @@ public class UserSystem implements Observer {
             log.error("the product '" + productToRemove.getName() + "' is not in cart");
             return false;
         }
-        boolean isProductRemoved = shoppingCart.removeProductInCart(storeOfProduct, shoppingCart.getShoppingBag(storeOfProduct), productToRemove);
+        boolean isProductRemoved = shoppingCart.removeProductInCart(storeOfProduct, productToRemove);
         if (isProductRemoved) {
             log.info("product '" + productToRemove.getName() + "' was removed");
             return true;
