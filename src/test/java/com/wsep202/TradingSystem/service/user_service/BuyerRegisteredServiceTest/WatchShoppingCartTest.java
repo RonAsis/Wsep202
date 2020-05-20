@@ -1,114 +1,106 @@
-//package com.wsep202.TradingSystem.service.user_service.BuyerRegisteredServiceTest;
-//
-//import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-//import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
-//import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
-//import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
-//import com.wsep202.TradingSystem.service.user_service.GuestService;
-//import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-//import com.wsep202.TradingSystem.dto.*;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//
-//import java.util.HashMap;
-//
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
-//@SpringBootTest(args = {"admin","admin"})
-//@WithModelMapper
-//
-//public class WatchShoppingCartTest {
-//    @Autowired
-//    GuestService guestService;
-//    @Autowired
-//    BuyerRegisteredService buyerRegisteredService;
-//    @Autowired
-//    SellerOwnerService sellerOwnerService;
-//
-//    StoreDto storeDto;
-//    ProductDto productDto;
-//    UserSystem userSystem;
-//    UserSystem owner;
-//
-//    @BeforeEach
-//    void setUp() {
-//        userSystem = new UserSystem("username", "name", "lname", "pass");
-//        openStore();
-//        registerUser();
-//    }
-//
-//    @AfterEach
-//    void tearDown() {
-//        this.buyerRegisteredService.clearDS();
-//    }
-//
-//    /**
-//     * view a user's empty shopping cart
-//     */
-//    @Test
-//    void viewEmptyShoppingCart() {
-//        Assertions.assertEquals(new HashMap<>(), this.buyerRegisteredService.watchShoppingCart(this.userSystem.getUserName(), uuid));
-//
-//    }
-//
-//    /**
-//     * view an invalid user's shopping cart
-//     */
-//    @Test
-//    void viewShoppingCartInvalidUser() {
-//        Assertions.assertNull(this.buyerRegisteredService.watchShoppingCart(
-//                this.userSystem.getUserName()+"Not", uuid));
-//    }
-//
-//    /**
-//     * view a valid user's shopping cart
-//     */
-//    @Test
-//    void viewShoppingCartValidUserNotEmptyCart() {
-//        Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(
-//                this.userSystem.getUserName(), this.storeDto.getStoreId(),
-//                this.productDto.getProductSn(), 1, uuid));
-//        Assertions.assertNotNull(this.buyerRegisteredService.watchShoppingCart(
-//                this.userSystem.getUserName(), uuid));
-//    }
-//
-//    /**
-//     * opening a new store.
-//     */
-//    void openStore(){
-//        owner = new UserSystem("owner","name","lname","pass");
-//        // registering the owner
-//        Assertions.assertTrue(this.guestService.registerUser(owner.getUserName(), owner.getPassword(),
-//                owner.getFirstName(), owner.getLastName()));
-//
-//        // opening a new store, owned by owner
-//        Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
-//                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName", uuid));
-//        // getting the storeDto of the store the owner opened
-//        this.storeDto = this.guestService.getStoresDtos().get(0); // getting the storeDto of the store the owner opened
-//
-//        // adding a product to the owner's store
-//        Assertions.assertTrue(this.sellerOwnerService.addProduct(owner.getUserName(), storeDto.getStoreId(),
-//                "motor", "motors", 20, 20, uuid));
-//        // getting the productDto of the added product
-//
-//        this.productDto = (ProductDto) this.buyerRegisteredService.getStoresDtos().get(0).getProducts().toArray()[0];
-//
-//    }
-//
-//    /**
-//     * register user into the system
-//     */
-//    private void registerUser() {
-//        this.guestService.registerUser(userSystem.getUserName(), userSystem.getPassword(),
-//                userSystem.getFirstName(), userSystem.getLastName());
-//    }
-//
-//}
+package com.wsep202.TradingSystem.service.user_service.BuyerRegisteredServiceTest;
+
+import com.github.rozidan.springboot.modelmapper.WithModelMapper;
+import com.wsep202.TradingSystem.config.ObjectMapperConfig;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
+import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
+import com.wsep202.TradingSystem.service.user_service.GuestService;
+import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
+import com.wsep202.TradingSystem.dto.*;
+import com.wsep202.TradingSystem.service.user_service.ServiceTestsHelper;
+import javafx.util.Pair;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.UUID;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TradingSystemConfiguration.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
+@SpringBootTest(args = {"admin","admin"})
+@WithModelMapper
+// *********** UC - ***********
+public class WatchShoppingCartTest {
+    @Autowired
+    GuestService guestService;
+    @Autowired
+    BuyerRegisteredService buyerRegisteredService;
+    @Autowired
+    SellerOwnerService sellerOwnerService;
+    ServiceTestsHelper helper;
+    UserSystemDto user = new UserSystemDto("username","name","lname");
+    String userPassword = "password";
+    MultipartFile image = null;
+    UUID uuid;
+
+    @BeforeEach
+    void setUp() {
+        if (this.helper == null || this.helper.getGuestService() == null ) {
+            this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService, this.sellerOwnerService);
+        }
+        this.helper.registerUser(this.user.getUserName(), this.userPassword,
+                this.user.getFirstName(), this.user.getLastName(), image);
+        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
+                this.userPassword);
+        if (returnedValue != null){
+            this.uuid = returnedValue.getKey();
+        }
+    }
+
+    @AfterEach
+    void tearDown(){
+        this.helper.logoutUser(this.user.getUserName(), this.uuid);
+    }
+
+    /**
+     * add a valid product in a registered user's shopping bag
+     */
+    @Test
+    void addValidProductRegisteredUser() {
+        ProductDto productDto = this.helper.openStoreAndAddProducts();
+        Assertions.assertTrue(this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
+                1, productDto, this.uuid));
+    }
+
+    /**
+     * view a user's empty shopping cart
+     */
+    @Test
+    void viewEmptyShoppingCart() {
+        Assertions.assertEquals(new HashMap<>(), this.buyerRegisteredService.watchShoppingCart(this.user.getUserName(), this.uuid));
+
+    }
+
+    /**
+     * view an invalid user's shopping cart
+     */
+    @Test
+    void viewShoppingCartInvalidUser() {
+        try{
+            Assertions.assertNull(this.buyerRegisteredService.watchShoppingCart(
+                    "NotRegistered", this.uuid));
+        } catch (Exception e){
+
+        }
+    }
+
+    /**
+     * view a valid user's shopping cart
+     */
+    @Test
+    void viewShoppingCartValidUserNotEmptyCart() {
+        this.helper.addProductToShoppingCart(this.user.getUserName(), this.uuid);
+        Assertions.assertNotNull(this.buyerRegisteredService.watchShoppingCart(
+                this.user.getUserName(), uuid));
+    }
+
+}

@@ -1,165 +1,129 @@
-//package com.wsep202.TradingSystem.service.user_service.SellerManagerTest;
-//
-//import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-//import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
-//import com.wsep202.TradingSystem.domain.trading_system_management.CardAction;
-//import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
-//import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
-//import com.wsep202.TradingSystem.service.user_service.GuestService;
-//import com.wsep202.TradingSystem.service.user_service.SellerManagerService;
-//import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-//import com.wsep202.TradingSystem.dto.*;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//
-//import java.util.LinkedList;
-//import java.util.List;
-//
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {TradingSystemConfiguration.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class, SellerManagerService.class})
-//@SpringBootTest(args = {"admin","admin"})
-//@WithModelMapper
-//
-//// *********** UC 5.1.1 - viewing purchase history ***********
-//public class ViewPurchaseHistoryTest {
-//    @Autowired
-//    GuestService guestService;
-//    @Autowired
-//    BuyerRegisteredService buyerRegisteredService;
-//    @Autowired
-//    SellerOwnerService sellerOwnerService;
-//    @Autowired
-//    SellerManagerService sellerManagerService;
-//
-//    StoreDto storeDto;
-//    UserSystem owner;
-//    UserSystem manager;
-//    ProductDto productDto;
-//    List<ReceiptDto> receiptDto;
-////
-////    @BeforeEach
-////    void setUp() {
-////        openStoreAndRegisterOwner();
-////        registerManagerAndAddAsStoreManager();
-////    }
-////
-////    @AfterEach
-////    void tearDown() {
-////        this.sellerManagerService.clearDS();
-////    }
-////
-////    /**
-////     * view the history purchase of a valid store
-////     * no purchases
-////     */
-////    @Test
-////    void ViewHistoryNoPurchases() {
-////        List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistoryOfManager(
-////                this.manager.getUserName(), this.storeDto.getStoreId(), uuid);
-////        Assertions.assertEquals(new LinkedList<>(), returnedHistory);
-////    }
-////
-////    /**
-////     * view the history purchase of a valid store
-////     * invalid manager
-////     */
-////    @Test
-////    void ViewHistoryNoPurchasesInvalidManager() {
-////        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-////                this.manager.getUserName()+"Not", this.storeDto.getStoreId(), uuid));
-////    }
-////
-////    /**
-////     * view the history purchase of an invalid store
-////     */
-////    @Test
-////    void ViewHistoryNoPurchasesInvalidStore() {
-////        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-////                this.manager.getUserName(), this.storeDto.getStoreId()+5, uuid));
-////    }
-////
-////    /**
-////     * view the history purchase of an invalid store
-////     * invalid manager
-////     */
-////    @Test
-////    void ViewHistoryNoPurchasesInvalidStoreInvalidManager() {
-////        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-////                this.manager.getUserName()+"Not", this.storeDto.getStoreId()+5, uuid));
-////    }
-////
-////    /**
-////     * view the history purchase of a valid store
-////     */
-////    @Test
-////    void ViewHistoryPurchases() {
-////        buyProduct();
-////        List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistoryOfManager(
-////                this.manager.getUserName(), this.storeDto.getStoreId(), uuid);
-////        Assertions.assertEquals(this.receiptDto.get(0).getReceiptSn(), returnedHistory.get(0).getReceiptSn());
-////    }
-////
-////
-////    /**
-////     * opening a new store and registering its owner
-////     */
-////    void openStoreAndRegisterOwner(){
-////        owner = new UserSystem("owner","name","lname","pass");
-////        // registering the owner
-////        Assertions.assertTrue(this.guestService.registerUser(owner.getUserName(), owner.getPassword(),
-////                owner.getFirstName(), owner.getLastName()));
-////
-////        // opening a new store, owned by owner
-////        Assertions.assertTrue(this.buyerRegisteredService.openStore(owner.getUserName(),
-////                new PurchasePolicyDto(), new DiscountPolicyDto(), "storeName", uuid));
-////
-////        // getting the storeDto of the store the owner opened
-////        this.storeDto = this.guestService.getStoresDtos().get(0);
-////
-////        // adding a product to the owner's store
-////        Assertions.assertTrue(this.sellerOwnerService.addProduct(owner.getUserName(), storeDto.getStoreId(),
-////                "motor", "motors", 20, 20, uuid));
-////
-////        // getting the productDto of the added product
-////        this.productDto = (ProductDto) this.guestService.getStoresDtos().get(0).getProducts().toArray()[0];
-////
-////    }
-////
-////    /**
-////     * register manager and add him as store's manager
-////     */
-////    private void registerManagerAndAddAsStoreManager() {
-////        this.manager = new UserSystem("manager", "name", "lname", "password");
-////        Assertions.assertTrue(this.guestService.registerUser(manager.getUserName(), manager.getPassword(),
-////                manager.getFirstName(), manager.getLastName()));
-////
-////        Assertions.assertTrue(this.sellerOwnerService.addManager(this.owner.getUserName(),
-////                this.storeDto.getStoreId(), this.manager.getUserName()));
-////    }
-////
-////
-////    /**
-////     * buying a product from the store
-////     */
-////    void buyProduct(){
-////        int amount = 1;
-////        Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(this.owner.getUserName(),
-////                this.storeDto.getStoreId(), this.productDto.getProductSn(), amount, uuid));
-////
-////        BillingAddressDto billingAddress = new BillingAddressDto(this.owner.getFirstName()+" "+this.owner.getLastName(),
-////                "address", "city", "country", "1234567");
-////        PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto(CardAction.PAY, "123456789", "month",
-////                "year", "Cardholder", 798, "id");
-////        this.receiptDto = this.buyerRegisteredService.purchaseShoppingCartBuyer(this.owner.getUserName(),
-////                paymentDetailsDto, billingAddress, uuid);
-////        Assertions.assertNotNull(this.receiptDto);
-////        Assertions.assertEquals(amount, this.receiptDto.get(0).getProductBoughtAmountByProductSn(this.productDto.getProductSn()));
-////    }
-//}
+package com.wsep202.TradingSystem.service.user_service.SellerManagerTest;
+
+import com.github.rozidan.springboot.modelmapper.WithModelMapper;
+import com.wsep202.TradingSystem.config.ObjectMapperConfig;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.service.user_service.*;
+import com.wsep202.TradingSystem.dto.*;
+import javafx.util.Pair;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {TradingSystemConfiguration.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class, SellerManagerService.class})
+@SpringBootTest(args = {"admin","admin"})
+@WithModelMapper
+
+// *********** UC 5.1.1 - viewing purchase history ***********
+public class ViewPurchaseHistoryTest {
+    @Autowired
+    GuestService guestService;
+    @Autowired
+    BuyerRegisteredService buyerRegisteredService;
+    @Autowired
+    SellerOwnerService sellerOwnerService;
+    @Autowired
+    SellerManagerService sellerManagerService;
+
+    ServiceTestsHelper helper;
+    UserSystemDto user = new UserSystemDto("username","name","lname");
+    UserSystemDto manager = new UserSystemDto("manager","name","lname");
+    String userPassword = "password";
+    MultipartFile image = null;
+    UUID uuid;
+    int storeId = 0;
+    private ProductDto productDto;
+
+    @BeforeEach
+    void setUp() {
+        if (this.helper == null || this.helper.getGuestService() == null ) {
+            this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService, this.sellerOwnerService);
+        }
+        this.helper.registerUser(this.manager.getUserName(), this.userPassword,
+                this.manager.getFirstName(), this.manager.getLastName(), image);
+        this.helper.registerUser(this.user.getUserName(), this.userPassword,
+                this.user.getFirstName(), this.user.getLastName(), image);
+        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
+                this.userPassword);
+        if (returnedValue != null){
+            this.uuid = returnedValue.getKey();
+        }
+        this.productDto = this.helper.openStoreAndAddProducts(this.user, this.userPassword, this.uuid);
+    }
+
+    @AfterEach
+    void tearDown(){
+        this.helper.logoutUser(this.user.getUserName(), this.uuid);
+    }
+
+
+    /**
+     * view the history purchase of a valid store
+     * no purchases
+     */
+    @Test
+    void ViewHistoryNoPurchases() {
+        List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistoryOfManager(
+                this.user.getUserName(), this.storeId, this.uuid);
+        Assertions.assertEquals(new LinkedList<>(), returnedHistory);
+    }
+
+    /**
+     * view the history purchase of a valid store
+     * invalid owner
+     */
+    @Test
+    void ViewHistoryNoPurchasesInvalidOwner() {
+        try{
+            Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
+                    this.user.getUserName()+"Not", this.storeId, this.uuid));
+        } catch (Exception e) {
+
+        }
+    }
+
+    /**
+     * view the history purchase of an invalid store
+     */
+    @Test
+    void ViewHistoryNoPurchasesInvalidStore() {
+        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
+                this.user.getUserName(), this.storeId+5, this.uuid));
+    }
+
+    /**
+     * view the history purchase of an invalid store
+     * invalid owner
+     */
+    @Test
+    void ViewHistoryNoPurchasesInvalidStoreInvalidOwner() {
+        try{
+            Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
+                    this.user.getUserName()+"Not", this.storeId+5, this.uuid));
+        } catch (Exception e) {
+
+        }
+    }
+
+    /**
+     * view the history purchase of a valid store
+     */
+    @Test
+    void ViewHistoryPurchases() {
+        this.helper.openStoreAddProductsAndBuyProduct(this.user, this.uuid, this.userPassword);
+        Assertions.assertNotNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
+                this.user.getUserName(), this.storeId, this.uuid));
+    }
+}

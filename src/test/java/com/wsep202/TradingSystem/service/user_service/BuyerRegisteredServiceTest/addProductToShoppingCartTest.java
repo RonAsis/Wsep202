@@ -3,11 +3,11 @@ package com.wsep202.TradingSystem.service.user_service.BuyerRegisteredServiceTes
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
+import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.ServiceTestsHelper;
 import javafx.util.Pair;
 import org.junit.jupiter.api.AfterEach;
@@ -21,31 +21,30 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TradingSystemConfiguration.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class})
+@ContextConfiguration(classes = {TradingSystemConfiguration.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
-
-// *********** UC 3.2 - opening a store ***********
-public class OpenStoreTest {
+// *********** UC 2.6 (inherited from guest) - saving a product in a shopping bag ***********
+public class addProductToShoppingCartTest {
     @Autowired
     GuestService guestService;
     @Autowired
     BuyerRegisteredService buyerRegisteredService;
+    @Autowired
+    SellerOwnerService sellerOwnerService;
     ServiceTestsHelper helper;
     UserSystemDto user = new UserSystemDto("username","name","lname");
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-    String storeName = "storeName";
-    String description = "description";
 
     @BeforeEach
     void setUp() {
         if (this.helper == null || this.helper.getGuestService() == null ) {
-            this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService);
+            this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService, this.sellerOwnerService);
         }
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
@@ -62,38 +61,53 @@ public class OpenStoreTest {
     }
 
     /**
-     * open a store with owner's username=""
+     * add a valid product in a registered user's shopping bag
      */
     @Test
-    void openStoreNoOwner() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore("", this.storeName
-                , this.description, this.uuid));
+    void addValidProductRegisteredUser() {
+        ProductDto productDto = this.helper.openStoreAndAddProducts();
+        Assertions.assertTrue(this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
+                1, productDto, this.uuid));
     }
 
     /**
-     * open a store with owner's username="notRegistered"
+     * add a valid product in a not registered user's shopping bag
      */
     @Test
-    void openStoreInvalidOwner() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore("notRegistered",
-                this.storeName, this.description, this.uuid));
+    void addValidProductNotRegisteredUser() {
+        try {
+            ProductDto productDto = this.helper.openStoreAndAddProducts();
+            Assertions.assertFalse(this.buyerRegisteredService.addProductToShoppingCart("notRegistered",
+                    1, productDto, this.uuid));
+        } catch (Exception e){
+
+        }
     }
 
     /**
-     * open a store with empty store name.
+     * add an invalid product in a not registered user's shopping bag
      */
     @Test
-    void openStoreEmptyStoreName() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore(this.user.getUserName(),
-                "", this.description, this.uuid));
+    void addInvalidProductNotRegisteredUser() {
+        try{
+            Assertions.assertFalse(this.buyerRegisteredService.addProductToShoppingCart("notRegistered",
+                    1, null, this.uuid));
+        } catch (Exception e){
+
+        }
     }
 
+
     /**
-     * opening a store, valid user
+     * add an invalid product in a registered user's shopping bag
      */
     @Test
-    void openStoreValidUser() {
-        Assertions.assertTrue(this.buyerRegisteredService.openStore(this.user.getUserName(),
-                this.storeName, this.description, this.uuid));
+    void addInvalidProductRegisteredUser() {
+        try {
+            Assertions.assertFalse(this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
+                    1, null, this.uuid));
+        } catch (Exception e){
+
+        }
     }
 }
