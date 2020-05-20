@@ -1,6 +1,6 @@
 package externals;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag;
 
 import java.util.List;

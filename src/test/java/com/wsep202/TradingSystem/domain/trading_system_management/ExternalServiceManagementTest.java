@@ -2,8 +2,8 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.ChargeException;
 import com.wsep202.TradingSystem.domain.exception.DeliveryRequestException;
-import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import externals.ChargeSystem;
 import externals.SecuritySystem;
 import externals.SupplySystem;

@@ -1,16 +1,14 @@
 /**
  * this class determines the rules of purchase the user and his bag should stands in.
  */
-package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
+package com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase;
 /**
  * defines the purchase policy interface
  */
 
-import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import lombok.Data;
-import lombok.Synchronized;
 
 import java.util.Map;
 

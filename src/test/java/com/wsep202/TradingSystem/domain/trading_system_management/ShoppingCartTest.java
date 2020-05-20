@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wsep202.TradingSystem.domain.trading_system_management.purchase.Formatter.formatter;
+import static com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Formatter.formatter;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

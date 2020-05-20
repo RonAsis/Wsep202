@@ -2,22 +2,13 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 
 //import Externals.PasswordSaltPair;
-import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
-import com.wsep202.TradingSystem.domain.image.ImagePath;
-import com.wsep202.TradingSystem.domain.image.ImageUtil;
-import javafx.beans.binding.When;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import javafx.util.Pair;
-import org.apache.catalina.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
 

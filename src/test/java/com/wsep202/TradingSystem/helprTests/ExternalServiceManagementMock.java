@@ -1,14 +1,11 @@
 package com.wsep202.TradingSystem.helprTests;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import externals.ChargeSystem;
-import externals.SecuritySystem;
-import externals.SupplySystem;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class ExternalServiceManagementMock  extends ExternalServiceManagement {
 
@@ -42,7 +39,7 @@ public class ExternalServiceManagementMock  extends ExternalServiceManagement {
     }
 
 
-    public boolean deliver(BillingAddress addressInfo,ShoppingCart cart){
+    public boolean deliver(BillingAddress addressInfo, ShoppingCart cart){
         return deliver;
     }
 

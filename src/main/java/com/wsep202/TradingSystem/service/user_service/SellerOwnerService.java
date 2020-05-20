@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.ShoppingBagDetailsPolicy;
 import com.wsep202.TradingSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

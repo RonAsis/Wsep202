@@ -1,13 +1,6 @@
 package com.wsep202.TradingSystem.domain.factory;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.Day;
-import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.*;
-import com.wsep202.TradingSystem.dto.DiscountDto;
-
-import java.util.*;
 
 /**
  * create all the new objects in the system

@@ -5,7 +5,7 @@ import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
 import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;

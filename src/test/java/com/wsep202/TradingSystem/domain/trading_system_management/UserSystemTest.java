@@ -2,7 +2,6 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
 import com.wsep202.TradingSystem.domain.exception.NoOwnerInStoreException;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

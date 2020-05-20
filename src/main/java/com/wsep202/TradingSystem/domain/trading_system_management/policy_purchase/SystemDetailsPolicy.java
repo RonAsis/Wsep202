@@ -1,12 +1,9 @@
-package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
+package com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase;
 
 import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
-import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
-import com.wsep202.TradingSystem.domain.trading_system_management.Day;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
-import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Set;
+
 @Setter
 @Getter
 @Slf4j
