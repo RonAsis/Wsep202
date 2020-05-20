@@ -66,7 +66,7 @@ public class OpenStoreTest {
      */
     @Test
     void openStoreNoOwner() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore("", this.storeName
+        Assertions.assertNotNull(this.buyerRegisteredService.openStore("", this.storeName
                 , this.description, this.uuid));
     }
 
@@ -75,7 +75,7 @@ public class OpenStoreTest {
      */
     @Test
     void openStoreInvalidOwner() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore("notRegistered",
+        Assertions.assertNotNull(this.buyerRegisteredService.openStore("notRegistered",
                 this.storeName, this.description, this.uuid));
     }
 
@@ -84,7 +84,7 @@ public class OpenStoreTest {
      */
     @Test
     void openStoreEmptyStoreName() {
-        Assertions.assertFalse(this.buyerRegisteredService.openStore(this.user.getUserName(),
+        Assertions.assertNotNull(this.buyerRegisteredService.openStore(this.user.getUserName(),
                 "", this.description, this.uuid));
     }
 
@@ -93,7 +93,7 @@ public class OpenStoreTest {
      */
     @Test
     void openStoreValidUser() {
-        Assertions.assertTrue(this.buyerRegisteredService.openStore(this.user.getUserName(),
+        Assertions.assertNotNull(this.buyerRegisteredService.openStore(this.user.getUserName(),
                 this.storeName, this.description, this.uuid));
     }
 }
