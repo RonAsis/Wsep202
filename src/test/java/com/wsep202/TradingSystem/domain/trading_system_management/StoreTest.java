@@ -4,6 +4,7 @@ import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;

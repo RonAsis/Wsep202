@@ -2,8 +2,8 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Purchase;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -617,7 +617,7 @@ public class Store {
     /**
      * apply purchase on a shopping bag
      */
-    public void isApprovedPurchasePolicies(Map<Product, Integer> productsBag,BillingAddress userAddress) {
+    public void isApprovedPurchasePolicies(Map<Product, Integer> productsBag, BillingAddress userAddress) {
         updateExpiredDiscounts();
         for (Purchase purchase : this.getPurchasePolicies()) {  //apply discounts on shoppingBag
             purchase.isApproved(productsBag, userAddress);
