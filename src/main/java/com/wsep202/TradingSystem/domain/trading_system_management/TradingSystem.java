@@ -54,12 +54,12 @@ public class TradingSystem {
      * @param userToRegister - the user we want to encrypt his password
      */
     private void encryptPassword(UserSystem userToRegister) {
-//        PasswordSaltPair passwordSaltPair = externalServiceManagement
-//                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
-//        //set the user password and its salt
-//        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
-//        userToRegister.setSalt(passwordSaltPair.getSalt());
-//        log.info("The user " + userToRegister.getUserName() + " got encrypted password and salt");
+        PasswordSaltPair passwordSaltPair = externalServiceManagement
+                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
+        //set the user password and its salt
+        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
+        userToRegister.setSalt(passwordSaltPair.getSalt());
+        log.info("The user " + userToRegister.getUserName() + " got encrypted password and salt");
     }
 
 
