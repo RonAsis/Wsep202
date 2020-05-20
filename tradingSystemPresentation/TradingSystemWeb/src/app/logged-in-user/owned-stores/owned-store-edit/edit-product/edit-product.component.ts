@@ -35,6 +35,7 @@ export class EditProductComponent implements OnInit {
       .subscribe(response => {
         if (response){
           this.productItems = this.productItems.filter(product => product.productSn !== productData.productSn);
+          this.store.products = this.productItems;
         }
       });
   }
