@@ -1,14 +1,10 @@
-import {EventEmitter, Injectable, Output} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {EventEmitter, Injectable} from '@angular/core';
 import {UserSystem} from '../shared/userSystem.model';
 import {Product} from '../shared/product.model';
 import {ShoppingCart} from '../shared/shoppingCart.model';
 import {ShoppingBag} from '../shared/shoppingBag.model';
-import {formatNumber} from '@angular/common';
-import {Receipt} from '../shared/receipt.model';
-import {Store} from '../shared/store.model';
 import {HttpService} from './http.service';
-import {Observable, of} from 'rxjs';
+import {of} from 'rxjs';
 import {PaymentDetails} from '../shared/paymentDetails.model';
 import {BillingAddress} from '../shared/billingAddress.model';
 import {ShareService} from './share.service';
@@ -17,7 +13,7 @@ import {ShareService} from './share.service';
   providedIn: 'root'
 })
 export class UserService {
-  private readonly shoppingCart: ShoppingCart;
+  private shoppingCart: ShoppingCart;
   private isAdmin: boolean;
   private uuid: string;
   private username: string;
@@ -155,5 +151,9 @@ export class UserService {
     }else{
       return this.httpService.purchaseShoppingCartBuyer(this.username, paymentDetails, billingAddress, this.uuid);
     }
+  }
+
+  deleteShoppingCart() {
+    this.shoppingCart = new ShoppingCart(new Map<number, ShoppingBag>());
   }
 }

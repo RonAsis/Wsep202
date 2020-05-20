@@ -86,24 +86,23 @@ public class TradingSystemMapper {
 
         @Override
         public void configure(TypeMap<Receipt, ReceiptDto> typeMap) {
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(ReceiptDto::setProductsBought));
             typeMap.setPostConverter(context -> {
                 Map<Product, Integer> productsBought = context.getSource().getProductsBought();
                 if (Objects.nonNull(productsBought)) {
-                    Map<ProductDto, Integer> productsBoughtDto = context.getDestination().getProductsBought();
-                    Map<ProductDto, Integer> productsBoughtDtoPost = productsBoughtDto.entrySet().stream()
-                            .collect(Collectors.toMap(
-                                    entry -> {
-                                        ProductDto productDto = entry.getKey();
-                                        int productSn = productDto.getProductSn();
-                                        ProductCategory productCategory = productsBought.keySet().stream()
-                                                .filter(product -> product.getProductSn() == productSn)
-                                                .map(Product::getCategory)
-                                                .findFirst().orElse(ProductCategory.TOYS_HOBBIES);
-                                        productDto.setCategory(productCategory.category);
-                                        return productDto;
-                                    }, Map.Entry::getValue
-                            ));
-                    context.getDestination().setProductsBought(productsBoughtDtoPost);
+                    List<ProductDto> productDtos = context.getSource().getProductsBought().entrySet().stream()
+                            .map(entry -> ProductDto.builder()
+                                    .cost(entry.getKey().getCost())
+                                    .name(entry.getKey().getName())
+                                    .amount(entry.getValue())
+                                    .originalCost(entry.getKey().getOriginalCost())
+                                    .productSn(entry.getKey().getProductSn())
+                                    .storeId(entry.getKey().getStoreId())
+                                    .rank(entry.getKey().getRank())
+                                    .category(entry.getKey().getCategory().category)
+                                    .build())
+                            .collect(Collectors.toList());
+                    context.getDestination().setProductsBought(productDtos);
                 }
                 return context.getDestination();
             });

@@ -38,5 +38,5 @@ public class ReceiptDto {
     /**
      * a list of all the products that the user bought in this purchase.
      */
-    private Map<ProductDto,Integer> productsBought;
+    private List<ProductDto> productsBought;
 }

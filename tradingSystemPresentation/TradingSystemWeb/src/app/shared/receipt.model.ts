@@ -6,5 +6,5 @@ export class Receipt {
               public username: string,
               public purchaseDate: Date,
               public amountToPay: number,
-              public productsBought: Map<Product, number>) {}
+              public productsBought: Product[]) {}
 }

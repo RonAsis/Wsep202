@@ -3,9 +3,9 @@
   <div class="pull-left">
     <h4 class="list-group-item-heading">{{receipt.receiptSn}}</h4>
     <p>Store :{{receipt.storeId}} , Username: {{receipt.username}} , Amount to Pay: {{receipt.amountToPay}} </p>
-    <p>Purchase Date: {{receipt.purchaseDate}}</p>
+    <p>Purchase Date: {{receipt.purchaseDate | date}} </p>
     <input type="text" [(ngModel)]="product">
-    <div *ngFor = "let productInReceipt of receipt.productsBought |filter:product | mapToArray" >
+    <div *ngFor = "let productInReceipt of receipt.productsBought |filter:product " >
       <app-product-in-receipt [product] = productInReceipt>
       </app-product-in-receipt>
     </div>

@@ -7,7 +7,7 @@ import {Product} from '../../../../shared/product.model';
   styleUrls: ['./product-in-receipt.component.css']
 })
 export class ProductInReceiptComponent implements OnInit {
-  @Input() product: { key: Product, value: number };
+  @Input() product: Product;
 
   constructor() { }
 

@@ -54,8 +54,6 @@ export class PurchaseShoppingCartComponent implements OnInit {
         this.cityInputRef.nativeElement.value,
         this.countryInputRef.nativeElement.value,
         this.zipCodeInputRef.nativeElement.value);
-      console.log(paymentDetails);
-      console.log(billingAddress);
       this.userService.purchaseShoppingCart(paymentDetails, billingAddress)
         .subscribe(response => {
           if (response === undefined){
@@ -63,10 +61,10 @@ export class PurchaseShoppingCartComponent implements OnInit {
           }else{
             console.log(response);
             this.shareService.setReceipts(response);
+            this.userService.deleteShoppingCart();
             this.shareService.featureSelected.emit('receipts-guest');
           }
         }, (error: HttpErrorResponse) => {
-          console.log(error);
           this.errorMessage(error.error.message);
           });
     }
