@@ -542,7 +542,7 @@ public class Store {
      * otherwise exception
      */
     @Synchronized("stockLock")
-    public boolean isAllInStock(ShoppingBag bag) {
+    public boolean isAllInStock(ShoppingBag bag) throws TradingSystemException{
         for (Product product : bag.getProductListFromStore().keySet()) {
             int amount = bag.getProductAmount(product.getProductSn());
             Product productInStore = getProduct(product.getProductSn());
@@ -607,7 +607,7 @@ public class Store {
      * apply discounts on a shopping bag
      * update prices of products by store discounts
      */
-    public void applyDiscountPolicies(HashMap<Product, Integer> productsBag) {
+    public void applyDiscountPolicies(Map<Product, Integer> productsBag) {
         updateExpiredDiscounts();   //remove discounts that their time is expired from store.
         for (Discount discount : this.getDiscounts()) {  //apply discounts on shoppingBag
             discount.applyDiscount(productsBag);
@@ -617,7 +617,7 @@ public class Store {
     /**
      * apply purchase on a shopping bag
      */
-    public void isApprovedPurchasePolicies(HashMap<Product, Integer> productsBag,BillingAddress userAddress) {
+    public void isApprovedPurchasePolicies(Map<Product, Integer> productsBag,BillingAddress userAddress) {
         updateExpiredDiscounts();
         for (Purchase purchase : this.getPurchasePolicies()) {  //apply discounts on shoppingBag
             purchase.isApproved(productsBag, userAddress);
@@ -635,24 +635,7 @@ public class Store {
 
     }
 
-    /**
-     * set all the products in the received list with the received discount
-     *
-     * @param discount
-     * @param owner    the owner of the store that gets the discount
-     * @return true for success
-     */
-    public boolean addDiscountForProduct(UserSystem owner, Discount discount) {
-        if (owner == null) {
-            return false;
-        }
-        if (isOwner(owner)) {
-            return this.discounts.add(discount);  //add the discount to store
-        }
-        //this is not an owner of the store
-        log.error("The received user: " + owner.getUserName() + "is not owner");
-        throw new NoOwnerInStoreException(owner.getUserName(), storeId);
-    }
+
 
 
     public List<String> getOperationsCanDo(UserSystem userSystem) {
