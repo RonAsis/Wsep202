@@ -2,11 +2,13 @@ package com.wsep202.TradingSystem;
 
 import com.github.javafaker.Faker;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.util.*;
@@ -52,6 +54,43 @@ public class AppStartupRunner implements ApplicationRunner {
         initialStores(users);
         Set<Store> stores = tradingSystem.getStores();
         initialProductsForStores(stores);
+        initialPurchase(stores.stream().findFirst().get());
+    }
+
+    private void initialPurchase(Store store) {
+        List<Product> products = new ArrayList<>(store.getProducts());
+        UserSystem userSystem = new ArrayList<>(store.getOwners()).get(0);
+        Purchase purchase1 = Purchase.builder()
+                .min(3)
+                .productId(products.get(0).getProductSn())
+                .max(Integer.MAX_VALUE)
+                .build();
+
+        log.info("for test policy !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        log.info("username: " + userSystem.getUserName() + "password: " + userSystem.getPassword());
+        log.info("product 0: " + products.get(0).getName() + "product 1: " + products.get(1).getName());
+        log.info("Store name: " + store.getStoreName());
+
+        Purchase purchase2 = Purchase.builder()
+                .min(0)
+                .isShoppingBagPurchaseLimit(false)
+                .productId(products.get(1).getProductSn())
+                .max(5)
+                .build();
+
+        List<Purchase> purchases = new LinkedList<>();
+
+        purchases.add(purchase1);
+        purchases.add(purchase2);
+        Purchase purchaseComposed = Purchase.builder()
+                .isShoppingBagPurchaseLimit(true)
+                .min(0)
+                .composedPurchasePolicies(purchases)
+                .productId(products.get(1).getProductSn())
+                .max(5)
+                .build();
+
+        store.addPurchase(userSystem, purchaseComposed);
     }
 
     private List<UserSystem> initialUsers() {
