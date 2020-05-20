@@ -1,8 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
-import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
-import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
+import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
@@ -21,7 +19,9 @@ class StoreTest {
     private UserSystem owner;   //role as appointing owner in the store
     private Store storeUT;  //unit under test
     private PurchasePolicy purchasePolicy;
-//    private DiscountPolicy discountPolicy;
+    private ShoppingBag shoppingBag;
+    private Discount discount;
+
     private Product product;    //product to add
 
     //integration attributes
@@ -39,6 +39,7 @@ class StoreTest {
 
         @BeforeEach
         void setUp() {
+
             //new manager to add
             newOwner = mock(UserSystem.class);   //the user the owner want to appoint as a new store owner
             //stubbing
@@ -58,6 +59,12 @@ class StoreTest {
             when(owner.getUserName()).thenReturn("Michael");
             storeUT = new Store(owner,"Store under test");
             product = mock(Product.class);
+
+            shoppingBag = mock(ShoppingBag.class);
+            discount = mock(Discount.class);
+            doNothing().when(discount).setNewId();
+            when(discount.getDiscountId()).thenReturn(0);
+
         }
 
         /**
@@ -487,8 +494,11 @@ class StoreTest {
         void getNotExistProductNegative() {
             when(product.getProductSn()).thenReturn(33);
             //success: get exist product
-            Throwable exception = Assertions.assertThrows(ProductDoesntExistException.class,()->storeUT.getProduct(33));
-            Assertions.assertEquals("A product with id '" + 33 + "' is not exist in store with id: '"+ storeUT.getStoreId() + "'",exception.getMessage());
+            Throwable exception = Assertions
+                    .assertThrows(ProductDoesntExistException.class,()->storeUT.getProduct(33));
+            Assertions.assertEquals("A product with id '" +
+                    33 + "' is not exist in store with id: '"+ storeUT.getStoreId() +
+                    "'",exception.getMessage());
         }
 
         /**
@@ -561,6 +571,119 @@ class StoreTest {
             Assertions.assertEquals("",storeUT.showProductsInStoreInfo());
         }
 
+
+
+        /////////////////////updates after UC 4.2//////////////////////////
+
+        /***
+         * check that when product bout is in stock return true
+         */
+        @Test
+        public void isAllInStockPositive(){
+            Map<Product,Integer> productBag = new HashMap<>();
+            productBag.put(product,1);
+            addNewProductSetUp();   //add the bought product to stock
+            when(product.getAmount()).thenReturn(1);
+            when(shoppingBag.getProductListFromStore()).thenReturn(productBag);
+            when(product.getProductSn()).thenReturn(0);
+            when(shoppingBag.getProductAmount(product.getProductSn())).thenReturn(1);//one bought
+            Assertions.assertTrue(storeUT.isAllInStock(shoppingBag));
+        }
+
+        /***
+         * check that when product bout is not in stock return exception
+         */
+        @Test
+        public void isAllInStockNegative(){
+            Map<Product,Integer> productBag = new HashMap<>();
+            productBag.put(product,1);
+            addNewProductSetUp();   //add the bought product to stock
+            when(product.getAmount()).thenReturn(1);    //amount in store
+            when(shoppingBag.getProductListFromStore()).thenReturn(productBag);
+            when(product.getProductSn()).thenReturn(0);
+            when(shoppingBag.getProductAmount(product.getProductSn())).thenReturn(5);//five bought
+            when(product.getName()).thenReturn("carbon");
+
+            Throwable exception = Assertions
+                    .assertThrows(NotInStockException.class,()->storeUT.isAllInStock(shoppingBag));
+            Assertions.assertEquals("The product: " + product.getName()
+                            + " is out of stock in store: " + storeUT.getStoreName()
+                    ,exception.getMessage());
+        }
+
+
+
+        /**
+         * check update amount of product in the stock (after purchase)
+         */
+        @Test
+        public void editProductAmountInStockPositive() {
+            addNewProductSetUp(); //add product to stock
+            when(product.getProductSn()).thenReturn(0);
+            doNothing().when(product).setAmount(3);
+            Assertions.assertTrue(storeUT.editProductAmountInStock(0,3));
+        }
+
+        /**
+         * check not update amount of inexist product in the stock
+         */
+        @Test
+        public void editProductAmountInStockNegative() {
+            addNewProductSetUp(); //add product to stock
+            when(product.getProductSn()).thenReturn(0);
+            doNothing().when(product).setAmount(3);
+            Assertions.assertFalse(storeUT.editProductAmountInStock(1,3));
+        }
+
+        /**
+         * see success of applying discount from store on product in bag
+         */
+        @Test
+        public void applyDiscountPoliciesPositive(){
+            Map<Product,Integer> productBag = new HashMap<>();
+            productBag.put(product,1);
+            addNewDiscountToStoreSetup();   //add discount
+            Calendar endTime = Calendar.getInstance();
+            //set expiration date
+            endTime.set(3000,1,1);
+            when(discount.getEndTime()).thenReturn(endTime);
+            when(discount.getAmountOfProductsForApplyDiscounts()).thenReturn(productBag);
+            when(discount.getDiscountPercentage()).thenReturn(100.0);   //set 100% discount on product
+            when(product.getOriginalCost()).thenReturn(5.0);
+            doNothing().when(product).setCost(0);
+            doNothing().when(discount).setApplied(true);
+
+        }
+
+        /**
+         *
+         * see success of applying discount from store on product in bag
+         * can't be checked under unit tests need integration
+         */
+        @Test
+        public void applyDiscountPoliciesNegative(){
+            Map<Product,Integer> productBag = new HashMap<>();
+            productBag.put(product,1);
+            addNewDiscountToStoreSetup();   //add discount
+            Calendar endTime = Calendar.getInstance();
+            //set expiration date
+            endTime.set(3000,1,1);
+            when(discount.getEndTime()).thenReturn(endTime);
+            when(discount.getAmountOfProductsForApplyDiscounts()).thenReturn(productBag);
+            when(discount.getDiscountPercentage()).thenReturn(100.0);   //set 100% discount on product
+            when(product.getOriginalCost()).thenReturn(5.0);
+            doNothing().when(product).setCost(0);
+            doNothing().when(discount).setApplied(true);
+            when(product.getCost()).thenReturn(-2.9);
+            doCallRealMethod().when(discount).applyDiscount(productBag);
+            storeUT.applyDiscountPolicies(productBag);
+            Throwable exception = Assertions
+                    .assertThrows(NotInStockException.class,()->storeUT.applyDiscountPolicies(productBag));
+            Assertions.assertEquals("The discount with id: "+discount.getDiscountId()+
+                    " caused price to be equal or less than zero!",exception.getMessage());
+
+        }
+
 //////////////////setups///////////////////////////////////
 
         private void insertReceiptsSetup(){
@@ -584,6 +707,10 @@ class StoreTest {
             storeUT.addNewProduct(owner,product);
         }
 
+        private void addNewDiscountToStoreSetup(){
+            storeUT.addDiscount(owner,discount);
+        }
+
         private void addManagerSetup(){
             storeUT.addManager(owner,managerUser);  //adding alex as new manager in the store
         }
@@ -593,6 +720,7 @@ class StoreTest {
         }
 
     }
+
 
     @Nested
     public class StoreTestIntegration {
@@ -613,6 +741,7 @@ class StoreTest {
             ownerRealUser = new UserSystem("Michael","micha","toti","pass");
             storeUT = new Store(ownerRealUser,"Store under test");
             product = new Product("Bamba",ProductCategory.SPORTING_GOODS,1,11,storeUT.getStoreId());
+
         }
 
         /**
@@ -999,7 +1128,8 @@ class StoreTest {
         @Test
         void getNotExistProductNegative() {
             //success: get exist product
-            Throwable exception = Assertions.assertThrows(ProductDoesntExistException.class,()->storeUT.getProduct(33));
+            Throwable exception = Assertions.
+                    assertThrows(ProductDoesntExistException.class,()->storeUT.getProduct(33));
             Assertions.assertEquals("A product with id '" + 33 + "' is not exist in store with id: '"+ storeUT.getStoreId() + "'",exception.getMessage());
         }
 
@@ -1073,7 +1203,77 @@ class StoreTest {
             Assertions.assertEquals("",storeUT.showProductsInStoreInfo());
         }
 
+        //////////////////////////UC 4.2 ///////////////////////////////////////
+        /**
+         * see success of applying discount from store on product in bag
+         */
+        @Test
+        public void applyDiscountPoliciesPositive(){
+            Map<Product,Integer> productBag = new HashMap<>();
+            productBag.put(product,1);
+
+
+            Calendar endTime = Calendar.getInstance();
+            //set expiration date
+            endTime.set(3000,1,1);
+
+            Discount realDiscount = Discount.builder().discountId(0)
+                    .endTime(endTime)
+                    .amountOfProductsForApplyDiscounts(productBag)
+                    .discountPercentage(100.0)
+            .build();
+            addNewDiscountToStoreSetup(realDiscount);   //add discount
+
+            storeUT.applyDiscountPolicies(productBag);
+            Assertions.assertEquals(0,product.getCost());
+        }
+
+
+
+        /**
+         *
+         * see fail of applying discount from store on product in bag
+         * because of illegal negative price after discount
+         * can't be checked under unit tests need integration
+         */
+        @Test
+        public void applyDiscountPoliciesNegative(){
+            Map<Product,Integer> productBag = new HashMap<>();
+            productBag.put(product,1);
+            Calendar endTime = Calendar.getInstance();
+            //set expiration date
+            endTime.set(3000,1,1);
+            Discount realDiscount = Discount.builder().discountId(0)
+                    .endTime(endTime)
+                    .amountOfProductsForApplyDiscounts(productBag)
+                    .discountPercentage(100.0)
+                    .build();
+            addNewDiscountToStoreSetup(realDiscount);   //add discount
+            product.setCost(-10);
+            Throwable exception = Assertions
+                    .assertThrows(IllegalProductPriceException.class,()->storeUT.applyDiscountPolicies(productBag));
+            Assertions.assertEquals("The discount with id: "+0+
+                    " caused price to be equal or less than zero!",exception.getMessage());
+        }
+
+        /**
+         * check the case of purchase that pass the exist store policy
+         * empty case: should approve there are no policies
+         */
+        @Test
+        public void isApprovedPurchasePolicies(){
+            Map<Product,Integer> productBag = new HashMap<>();
+            productBag.put(product,1);
+            BillingAddress billingAddress = BillingAddress.builder().country("Israel").build();
+            storeUT.isApprovedPurchasePolicies(productBag,billingAddress);
+        }
+
+
 //////////////////setups///////////////////////////////////
+
+        private void addNewDiscountToStoreSetup(Discount discount) {
+            storeUT.addDiscount(ownerRealUser,discount);
+        }
 
         private void insertReceiptsSetup(){
             for(int i = 0; i < 10 ; i++){
@@ -1104,44 +1304,5 @@ class StoreTest {
             storeUT.addOwner(ownerRealUser, newOwnerReal);
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        @Test
-        public void editProductAmountInStock(int productSn, int amount) {
-
-        }
-
-        @Test
-        public void addDiscountForProduct (UserSystem owner, Discount discount,
-                                              HashMap<Product,Integer> products) throws TradingSystemException {
-
-        }
-
-        @Test
-        public void applyDiscountPolicies(HashMap<Product,Integer> productsBag) {
-
-        }
-
-       @Test
-        public void applyVisibleDiscountPoliciesOnlyOnStoreProducts() {
-
-        }
-
-        @Test
-        private void updateExpiredDiscounts() {
-
-        }
-
-        @Test
-        public void addDiscountForProduct(UserSystem owner, ConditionalStoreDiscount storeDiscount) {
-
-        }
-        @Test
-        public void updateStock(ShoppingBag bag) {
-
-        }
-        @Test
-        public void isAllInStock(ShoppingBag bag){
-
-        }
     }
 }

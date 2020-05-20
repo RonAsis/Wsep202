@@ -32,7 +32,7 @@ public abstract class DiscountPolicy {
     public void setCostAfterDiscount(Discount discount, Product product, double discountCost) {
         product.setCost(product.getCost() - discountCost);
         discount.setApplied(true);
-        if (product.getCost() <= 0) {
+        if (product.getCost() < 0) {
             throw new IllegalProductPriceException(discount.getDiscountId());
         }
     }

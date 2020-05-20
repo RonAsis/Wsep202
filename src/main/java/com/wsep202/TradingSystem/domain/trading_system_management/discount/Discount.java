@@ -95,6 +95,7 @@ public class Discount {
         initDiscountPolicies();
     }
 
+
     private void initDiscountPolicies() {
         discountPolicies = new HashMap<>();
         discountPolicies.put(ConditionalProductDiscount.class.getName(), new ConditionalProductDiscount());
@@ -109,6 +110,10 @@ public class Discount {
      * @param products in store
      */
     public void applyDiscount(Map<Product, Integer> products) {
+       //in case built thru builder there are no init of policies type
+        if(discountPolicies==null){
+            initDiscountPolicies();
+        }
         if (isComposed()) {
             discountPolicies.get(ComposedDiscount.class.getName()).applyDiscount(this, products);
         } else if (isConditional()) {
@@ -171,11 +176,11 @@ public class Discount {
 
     /////////////////////////////////////is-methods/////////////////////////////////////////
     private boolean isComposed() {
-        return !composedDiscounts.isEmpty();
+        return composedDiscounts!=null && !composedDiscounts.isEmpty();
     }
 
     private boolean isConditional() {
-        return minPrice > 0 || !productsUnderThisDiscount.isEmpty();
+        return minPrice > 0 || (productsUnderThisDiscount!=null && !productsUnderThisDiscount.isEmpty());
     }
 
     ////////////////////////////////////// general /////////////////////////////////////////

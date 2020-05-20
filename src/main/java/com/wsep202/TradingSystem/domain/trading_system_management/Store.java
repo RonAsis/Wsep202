@@ -2,8 +2,8 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
-import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Purchase;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -542,7 +542,7 @@ public class Store {
      * otherwise exception
      */
     @Synchronized("stockLock")
-    public boolean isAllInStock(ShoppingBag bag) {
+    public boolean isAllInStock(ShoppingBag bag) throws TradingSystemException{
         for (Product product : bag.getProductListFromStore().keySet()) {
             int amount = bag.getProductAmount(product.getProductSn());
             Product productInStore = getProduct(product.getProductSn());
@@ -607,7 +607,7 @@ public class Store {
      * apply discounts on a shopping bag
      * update prices of products by store discounts
      */
-    public void applyDiscountPolicies(HashMap<Product, Integer> productsBag) {
+    public void applyDiscountPolicies(Map<Product, Integer> productsBag) {
         updateExpiredDiscounts();   //remove discounts that their time is expired from store.
         for (Discount discount : this.getDiscounts()) {  //apply discounts on shoppingBag
             discount.applyDiscount(productsBag);
@@ -617,7 +617,7 @@ public class Store {
     /**
      * apply purchase on a shopping bag
      */
-    public void isApprovedPurchasePolicies(HashMap<Product, Integer> productsBag, BillingAddress userAddress) {
+    public void isApprovedPurchasePolicies(Map<Product, Integer> productsBag,BillingAddress userAddress) {
         updateExpiredDiscounts();
         for (Purchase purchase : this.getPurchasePolicies()) {  //apply discounts on shoppingBag
             purchase.isApproved(productsBag, userAddress);
