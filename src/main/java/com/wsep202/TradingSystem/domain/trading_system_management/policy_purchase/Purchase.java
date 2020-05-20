@@ -90,6 +90,9 @@ public class Purchase {
     }
 
     public boolean isApproved(Map<Product, Integer> products, BillingAddress userAddress){
+        if(purchasePolicies==null){ //in case built thru bulder the init is not called
+            initPurchasePolicies();
+        }
         if (isComposed()) {
             return purchasePolicies.get(ComposedPurchase.class.getName()).isApproved(this,products,userAddress);
         } else if (isSystemDetails()) {
@@ -133,15 +136,15 @@ public class Purchase {
 
     /////////////////////////////////////is-methods/////////////////////////////////////////
     private boolean isComposed() {
-        return !composedPurchasePolicies.isEmpty();
+        return composedPurchasePolicies!=null && !composedPurchasePolicies.isEmpty();
     }
 
     private boolean isSystemDetails() {
-        return !storeWorkDays.isEmpty();
+        return storeWorkDays!=null && !storeWorkDays.isEmpty();
     }
 
     private boolean isUserDetails() {
-        return !countriesPermitted.isEmpty();
+        return countriesPermitted!=null && !countriesPermitted.isEmpty();
     }
 
     ////////////////////////////////////// general /////////////////////////////////////////

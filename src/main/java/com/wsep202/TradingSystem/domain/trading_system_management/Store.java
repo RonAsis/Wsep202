@@ -654,7 +654,11 @@ public class Store {
         throw new NoOwnerInStoreException(owner.getUserName(), storeId);
     }
 
-
+    /**
+     * get the permissions of a manager
+     * @param userSystem
+     * @return
+     */
     public List<String> getOperationsCanDo(UserSystem userSystem) {
         return managers.stream()
                 .filter(mangerStore -> mangerStore.isTheUser(userSystem))
@@ -750,6 +754,11 @@ public class Store {
 
     }
 
+    /**
+     * get the discounts in store
+     * @param user
+     * @return
+     */
     public List<Discount> getStoreDiscounts(UserSystem user) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
             return discounts;
@@ -757,6 +766,12 @@ public class Store {
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
+    /**
+     * add new discount to store
+     * @param user adder
+     * @param discount to add
+     * @return
+     */
     public Discount addDiscount(UserSystem user, Discount discount) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
             discount.setNewId();  //generate new ID for the new discount
@@ -766,6 +781,12 @@ public class Store {
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
+    /**
+     * add purchase policy to store
+     * @param user
+     * @param purchase
+     * @return
+     */
     public Purchase addPurchase(UserSystem user, Purchase purchase) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
             purchase.setNewId();  //generate new ID for the new discount
