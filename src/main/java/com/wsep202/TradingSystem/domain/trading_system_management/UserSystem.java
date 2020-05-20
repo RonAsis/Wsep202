@@ -294,4 +294,17 @@ public class UserSystem implements Observer {
     public boolean changeProductAmountInShoppingBag(int storeId,int amount, int productSn) {
         return shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
     }
+
+    /**
+     * This Method is used to add the receipts to the users receipt list
+     * @param receipts - new receipt for new purchase
+     */
+    public void addReceipts(List<Receipt> receipts){
+        if (receipts != null) {
+            for (Receipt rep : receipts) {
+                if (!this.receipts.contains(rep) && rep != null)
+                    this.receipts.add(rep);
+            }
+        }
+    }
 }

@@ -1,518 +1,593 @@
-//package com.wsep202.TradingSystem.domain.trading_system_management;
-//
-//import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-//import com.wsep202.TradingSystem.config.TestConfig;
-//import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
-//import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
-//import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
-//import com.wsep202.TradingSystem.dto.*;
-//import com.wsep202.TradingSystem.helprTests.AssertionHelperTest;
-//import com.wsep202.TradingSystem.helprTests.ExternalServiceManagementMock;
-//import org.junit.jupiter.api.*;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.modelmapper.ModelMapper;
-//import org.modelmapper.TypeToken;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//
-//import javax.validation.constraints.NotNull;
-//import java.lang.reflect.Type;
-//import java.util.*;
-//
-//import static com.wsep202.TradingSystem.helprTests.SetUpObjects.*;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(SpringExtension.class)
-//@WithModelMapper(basePackageClasses = TradingSystemMapper.class)
-//class TradingSystemFacadeTest {
-//
-//    @Autowired
-//    private ModelMapper modelMapper;
-//
-//    @Nested
-//    public class TradingSystemFacadeTestUnit {
-//
-//        private TradingSystem tradingSystem;
-//
-//        private TradingSystemFacade tradingSystemFacade;
-//
-//        private UserSystem userSystem;
-//
-//        private Store store;
-//
-//        private FactoryObjects factoryObjects;
-//
-//        private PaymentDetails paymentDetails;
-//
-//        private BillingAddress billingAddress;
-//
-//        @BeforeEach
-//        public void setUp() {
-//            store = mock(Store.class);
-//            userSystem = mock(UserSystem.class);
-//            tradingSystem = mock(TradingSystem.class);
-//            factoryObjects = mock(FactoryObjects.class);
-//            tradingSystemFacade = new TradingSystemFacade(tradingSystem, modelMapper, factoryObjects);
-//            paymentDetails = mock(PaymentDetails.class);
-//            billingAddress = mock(BillingAddress.class);
-//        }
-//
-//        @Test
-//        void viewPurchaseHistoryUser() {
-//            List<Receipt> receipts = setUpReceipts();
-//            String userNameTest = "userNameTest";
-//            when(tradingSystem.getUser(userNameTest, uuid)).thenReturn(userSystem);
-//            when(userSystem.getReceipts()).thenReturn(receipts);
-//            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(userNameTest);
-//            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
-//        }
-//
-//        @Test
-//        void viewPurchaseHistoryAdministratorOfStore() {
-//            //initial
-//            List<Receipt> receipts = setUpReceipts();
-//            Store store = mock(Store.class);
-//            String administratorUsername = "administratorUsername";
-//            int storeId = 1;
-//
-//            //mock
-//            when(tradingSystem.getStoreByAdmin(administratorUsername, storeId, uuid)).thenReturn(store);
-//            when(store.getReceipts()).thenReturn(receipts);
-//
-//            //test
-//            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId);
-//            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
-//        }
-//
-//        @Test
-//        void viewPurchaseHistoryAdministratorOfUser() {
-//            //initial
-//            List<Receipt> receipts = setUpReceipts();
-//            String administratorUsername = "administratorUsername";
-//            String username = "usernameTest";
-//
-//            //mock
-//            when(tradingSystem.getUserByAdmin(administratorUsername, username, uuid)).thenReturn(userSystem);
-//            when(userSystem.getReceipts()).thenReturn(receipts);
-//
-//            //test
-//            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, username);
-//            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
-//        }
-//
-//        @Test
-//        void viewPurchaseHistoryOfManager() {
-//            //initial
-//            List<Receipt> receipts = setUpReceipts();
-//            String managerUsername = "managerUsername";
-//            int storeId = 1;
-//
-//            //mock
-//            when(tradingSystem.getUser(managerUsername, uuid)).thenReturn(userSystem);
-//            when(userSystem.getManagerStore(storeId)).thenReturn(store);
-//            when(store.getReceipts()).thenReturn(receipts);
-//
-//            //test
-//            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(managerUsername, storeId, uuid);
-//            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
-//        }
-//
-//        @Test
-//        void viewPurchaseHistoryOfOwner() {
-//            //initial
-//            List<Receipt> receipts = setUpReceipts();
-//            String ownerUsername = "ownerUsername";
-//            int storeId = 1;
-//
-//            //mock
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-//            when(store.getReceipts()).thenReturn(receipts);
-//
-//            //test
-//            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername, storeId);
-//            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
-//        }
-//
-//        @Test
-//        void addProduct() {
-//            //initial
-//            String ownerUsername = "ownerUsername";
-//            int storeId = 1;
-//
-//            //mock
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-//            when(store.addNewProduct(any(), any())).thenReturn(true);
-//
-//            //test
-//            Arrays.stream(ProductCategory.values()).forEach(productCategory -> {
-//                String productName = "productName " + productCategory.category;
-//                Assertions.assertTrue(tradingSystemFacade
-//                        .addProduct(ownerUsername, storeId, productName,
-//                                productCategory.category, 1, 1));
-//            });
-//        }
-//
-//        @Test
-//        void deleteProductFromStore() {
-//            //initial
-//            String ownerUsername = "ownerUsername";
-//            int storeId = 1;
-//            int productSn = 1;
-//
-//            //mock
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-//            when(store.removeProductFromStore(userSystem, productSn)).thenReturn(true);
-//
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .deleteProductFromStore(ownerUsername, storeId, productSn));
-//        }
-//
-//        @Test
-//        void editProduct() {
-//            //initial
-//            String ownerUsername = "ownerUsername";
-//            int storeId = 1;
-//            int productSn = 1;
-//            String productName = "productName";
-//            String category = ProductCategory.values()[0].category;
-//            int amount = 1;
-//            double cost = 3434;
-//
-//            //mock
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-//            when(store.editProduct(userSystem, productSn, productName, category, amount, cost)).thenReturn(true);
-//
-//            //test
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost, uuid));
-//        }
-//
-//        @Test
-//        void addOwner() {
-//            //initial
-//            String ownerUsername = "ownerUsername";
-//            String newOwnerUsername = "newOwnerUsername";
-//
-//            int storeId = 1;
-//
-//            //mock
-//            UserSystem newOwner = mock(UserSystem.class);
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(tradingSystem.getUser(newOwnerUsername, uuid)).thenReturn(newOwner);
-//            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-//            when(tradingSystem.addOwnerToStore(store, userSystem, newOwner)).thenReturn(true);
-//
-//            //test
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .addOwner(ownerUsername, storeId, newOwnerUsername, uuid));
-//        }
-//
-//        @Test
-//        void addManager() {
-//            //initial
-//            String ownerUsername = "ownerUsername";
-//            String newManagerUsername = "newManagerUsername";
-//
-//            int storeId = 1;
-//
-//            //mock
-//            UserSystem newOwner = mock(UserSystem.class);
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(tradingSystem.getUser(newManagerUsername, uuid)).thenReturn(newOwner);
-//            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-//            when(tradingSystem.addMangerToStore(store, userSystem, newOwner)).thenReturn(true);
-//
-//            //test
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .addManager(ownerUsername, storeId, newManagerUsername, uuid));
-//        }
-//
-//        @Test
-//        void addPermission() {
-//            //initial
-//            String ownerUsername = "ownerUsername";
-//            String managerUsername = "newManagerUsername";
-//            String storePermission = StorePermission.VIEW.function;
-//            int storeId = 1;
-//
-//            //mock
-//            UserSystem managerStore = mock(UserSystem.class);
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-//            when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
-//            when(store.addPermissionToManager(userSystem, managerStore, StorePermission.getStorePermission(storePermission)))
-//                    .thenReturn(true);
-//            //test
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .addPermission(ownerUsername, storeId, managerUsername, storePermission, uuid));
-//        }
-//
-//        @Test
-//        void removeManager() {
-//            //initial
-//            String ownerUsername = "ownerUsername";
-//            String managerUsername = "newManagerUsername";
-//            int storeId = 1;
-//
-//            //mock
-//            UserSystem managerStore = mock(UserSystem.class);
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
-//            when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
-//            when(tradingSystem.removeManager(store, userSystem, managerStore)).thenReturn(true);
-//            //test
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .removeManager(ownerUsername, storeId, managerUsername, uuid));
-//        }
-//
-//        @Test
-//        void logout() {
-//            //initial
-//            String userName = "username";
-//
-//            //mock
-//            when(tradingSystem.getUser(userName, uuid)).thenReturn(userSystem);
-//            when(userSystem.logout()).thenReturn(true);
-//
-//            //test
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .logout(userName));
-//        }
-//
-//        @Test
-//        void openStore() {
-//            //init
-//            String ownerUsername = "ownerUsername";
-//            PurchasePolicyDto purchasePolicyDto = PurchasePolicyDto.builder().build();
-//            DiscountPolicyDto discountPolicyDto = DiscountPolicyDto.builder().build();
-//            String discountType = DiscountType.NONE.type;
-//            String purchaseType = PurchaseType.BUY_IMMEDIATELY.type;
-//            String storeName = "storeName";
-//
-//            //mock
-//            ModelMapper modelMapper = mock(ModelMapper.class);
-//            tradingSystemFacade = new TradingSystemFacade(tradingSystem, modelMapper, factoryObjects);
-//            PurchasePolicy purchasePolicy = mock(PurchasePolicy.class);
-//            DiscountPolicy discountPolicy = mock(DiscountPolicy.class);
-//
-//            when(tradingSystem.getUser(ownerUsername, uuid)).thenReturn(userSystem);
-//            when(modelMapper.map(purchasePolicyDto, PurchasePolicy.class)).thenReturn(purchasePolicy);
-//            when(modelMapper.map(discountPolicyDto, DiscountPolicy.class)).thenReturn(discountPolicy);
-//            when(tradingSystem.openStore(userSystem, purchasePolicy, discountPolicy, storeName)).thenReturn(true);
-//
-//            //test
-//            // Assertions.assertTrue(tradingSystemFacade
-//            //    .openStore(ownerUsername, purchasePolicyDto, discountPolicyDto, discountType, purchaseType, storeName));
-//        }
-//
-//        @Test
-//        void registerUser() {
-//            String userName = "username";
-//            String password = "password";
-//            String firstName = "firstName";
-//            String lastName = "lastName";
-//            when(factoryObjects.createSystemUser(userName, firstName, lastName, password)).thenReturn(userSystem);
-//            when(tradingSystem.registerNewUser(userSystem)).thenReturn(true);
-//
-//            //test
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .registerUser(userName, password, firstName, lastName));
-//        }
-//
-//        @Test
-//        void login() {
-//            //initial
-//            String userName = "username";
-//            String password = "password";
-//
-//            //mock
-//            when(tradingSystem.getUser(userName, uuid)).thenReturn(userSystem);
-//            when(tradingSystem.login(userSystem, false, password)).thenReturn(true);
-//
-//            //test
-//            Assertions.assertTrue(tradingSystemFacade
-//                    .login(userName, password));
-//        }
-//
-//        @Test
-//        void viewStoreInfo() {
-//            //init
-//            Store store = createStore();
-//            int storeId = 1;
-//
-//            //mock
-//            when(tradingSystem.getStore(storeId)).thenReturn(store);
-//            StoreDto storeDto = tradingSystemFacade.viewStoreInfo(storeId);
-//            AssertionHelperTest.assertionStore(store, storeDto);
-//        }
-//
-//        @Test
-//        void viewProduct() {
-//            //init
-//            int storeId = 1;
-//            int productId = 1;
-//            Product product = createProduct(productId);
-//
-//            //mock
-//            when(tradingSystem.getStore(storeId)).thenReturn(store);
-//            when(store.getProduct(productId)).thenReturn(product);
-//            ProductDto productDto = tradingSystemFacade.viewProduct(storeId, productId);
-//            AssertionHelperTest.assertProduct(product, productDto);
-//        }
-//
-//        @Test
-//        void searchProductByName() {
-//            List<Product> products = new ArrayList<>(setUpProducts());
-//            String productName = "productName";
-//            when(tradingSystem.searchProductByName(productName)).thenReturn(products);
-//            List<ProductDto> productDtos = tradingSystemFacade.searchProductByName(productName);
-//            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-//        }
-//
-//        @Test
-//        void searchProductByCategory() {
-//            String category = ProductCategory.values()[0].category;
-//            List<Product> products = new ArrayList<>(setUpProducts());
-//            when(tradingSystem.searchProductByCategory(ProductCategory.getProductCategory(category))).thenReturn(products);
-//            List<ProductDto> productDtos = tradingSystemFacade.searchProductByCategory(category);
-//            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-//        }
-//
-//        @Test
-//        void searchProductByKeyWords() {
-//            List<Product> products = new ArrayList<>(setUpProducts());
-//            List<String> keyWords = new LinkedList<>();
-//            keyWords.add("test-key-words");
-//            when(tradingSystem.searchProductByKeyWords(keyWords)).thenReturn(products);
-//            List<ProductDto> productDtos = tradingSystemFacade.searchProductByKeyWords(keyWords);
-//            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-//        }
-//
-//        @Test
-//        void filterByRangePrice() {
-//            int minPrice = 0;
-//            int maxPrice = 10;
-//            List<Product> products = new ArrayList<>(setUpProducts());
-//            List<ProductDto> productsDtoArg = convertProductDtoList(products);
-//            when(tradingSystem.filterByRangePrice(products, minPrice, maxPrice)).thenReturn(products);
-//            List<ProductDto> productDtos = tradingSystemFacade.filterByRangePrice(productsDtoArg, minPrice, maxPrice);
-//            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-//        }
-//
-//        @Test
-//        void filterByProductRank() {
-//            int rank = 0;
-//            List<Product> products = new ArrayList<>(setUpProducts());
-//            List<ProductDto> productsDtoArg = convertProductDtoList(products);
-//            when(tradingSystem.filterByProductRank(products, rank)).thenReturn(products);
-//            List<ProductDto> productDtos = tradingSystemFacade.filterByProductRank(productsDtoArg, rank);
-//            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-//        }
-//
-//        @Test
-//        void filterByStoreRank() {
-//            int rank = 0;
-//            List<Product> products = new ArrayList<>(setUpProducts());
-//            List<ProductDto> productsDtoArg = convertProductDtoList(products);
-//            when(tradingSystem.filterByStoreRank(products, rank)).thenReturn(products);
-//            List<ProductDto> productDtos = tradingSystemFacade.filterByStoreRank(productsDtoArg, rank);
-//            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-//        }
-//
-//        @Test
-//        void filterByStoreCategory() {
-//            String category = ProductCategory.values()[0].category;
-//            List<Product> products = new ArrayList<>(setUpProducts());
-//            List<ProductDto> productsDtoArg = convertProductDtoList(products);
-//            when(tradingSystem.filterByStoreCategory(products, ProductCategory.getProductCategory(category))).thenReturn(products);
-//            List<ProductDto> productDtos = tradingSystemFacade.filterByStoreCategory(productsDtoArg, category);
-//            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-//        }
-//
-//        @Test
-//        void saveProductInShoppingBag() {
-//            //initial
-//            String username = "username";
-//            int storeId = 1;
-//            int productSn = 1;
-//            int amount = 1;
-//
-//            //mock
-//            Product product = mock(Product.class);
-//            when(tradingSystem.getUser(username, uuid)).thenReturn(userSystem);
-//            when(tradingSystem.getStore(storeId)).thenReturn(store);
-//            when(store.getProduct(productSn)).thenReturn(product);
-//            when(userSystem.saveProductInShoppingBag(store, product, amount)).thenReturn(true);
-//
-//            Assertions.assertTrue(tradingSystemFacade.saveProductInShoppingBag(username, storeId, productSn, amount));
-//        }
-//
-//        @Test
-//        void viewProductsInShoppingCart() {
-//            //init
-//            String username = "username";
-//            ShoppingCart shoppingCart = setUpShoppingCart();
-//            //mock
-//            when(tradingSystem.getUser(username, uuid)).thenReturn(userSystem);
-//            when(userSystem.getShoppingCart()).thenReturn(shoppingCart);
-//            ShoppingCartDto shoppingCartDto = tradingSystemFacade.viewProductsInShoppingCart(username);
-//            AssertionHelperTest.assertShoppingCart(shoppingCart, shoppingCartDto);
-//        }
-//
-//        @Test
-//        void removeProductInShoppingBag() {
-//            //initial
-//            String username = "username";
-//            int storeId = 1;
-//            int productSn = 1;
-//
-//            //mock
-//            Product product = mock(Product.class);
-//            when(tradingSystem.getUser(username, uuid)).thenReturn(userSystem);
-//            when(tradingSystem.getStore(storeId)).thenReturn(store);
-//            when(store.getProduct(productSn)).thenReturn(product);
-//            when(userSystem.removeProductInShoppingBag(store, product)).thenReturn(true);
-//            Assertions.assertTrue(userSystem.removeProductInShoppingBag(store, product));
-//        }
-//
+package com.wsep202.TradingSystem.domain.trading_system_management;
+
+import com.github.rozidan.springboot.modelmapper.WithModelMapper;
+import com.wsep202.TradingSystem.config.TestConfig;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
+import com.wsep202.TradingSystem.domain.mapping.TradingSystemMapper;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
+import com.wsep202.TradingSystem.dto.*;
+import com.wsep202.TradingSystem.helprTests.AssertionHelperTest;
+import com.wsep202.TradingSystem.helprTests.ExternalServiceManagementMock;
+import com.wsep202.TradingSystem.service.ServiceFacade;
+import javafx.util.Pair;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.NotNull;
+import java.lang.reflect.Type;
+import java.util.*;
+
+import static com.wsep202.TradingSystem.helprTests.SetUpObjects.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(SpringExtension.class)
+@WithModelMapper(basePackageClasses = TradingSystemMapper.class)
+class TradingSystemFacadeTest {
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Nested
+    public class TradingSystemFacadeTestUnit {
+
+        private TradingSystem tradingSystem;
+
+        private TradingSystemFacade tradingSystemFacade;
+
+        private UserSystem userSystem;
+
+        private Store store;
+
+        private FactoryObjects factoryObjects;
+
+        private PaymentDetails paymentDetails;
+
+        private BillingAddress billingAddress;
+
+        private ServiceFacade serviceFacade;
+
+        private MultipartFile userImage;
+
+        private ShoppingCart shoppingCart;
+
+        @BeforeEach
+        public void setUp() {
+            store = mock(Store.class);
+            userSystem = mock(UserSystem.class);
+            tradingSystem = mock(TradingSystem.class);
+            factoryObjects = mock(FactoryObjects.class);
+            serviceFacade = mock(ServiceFacade.class);
+            tradingSystemFacade = new TradingSystemFacade(tradingSystem, modelMapper, factoryObjects, serviceFacade);
+            paymentDetails = mock(PaymentDetails.class);
+            billingAddress = mock(BillingAddress.class);
+            userImage = mock(MultipartFile.class);
+            shoppingCart = mock(ShoppingCart.class);
+        }
+
+        @Test
+        void viewPurchaseHistoryUser() {
+            List<Receipt> receipts = setUpReceipts();
+            String userNameTest = "userNameTest";
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(userNameTest, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getReceipts()).thenReturn(receipts);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(userNameTest, uuid.getKey());
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
+        }
+
+        @Test
+        void viewPurchaseHistoryAdministratorOfStore() {
+            //initial
+            List<Receipt> receipts = setUpReceipts();
+            Store store = mock(Store.class);
+            String administratorUsername = "administratorUsername";
+            int storeId = 1;
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getStoreByAdmin(administratorUsername, storeId, uuid.getKey())).thenReturn(store);
+            when(store.getReceipts()).thenReturn(receipts);
+
+            //test
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId, uuid.getKey());
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
+        }
+
+        @Test
+        void viewPurchaseHistoryAdministratorOfUser() {
+            //initial
+            List<Receipt> receipts = setUpReceipts();
+            String administratorUsername = "administratorUsername";
+            String username = "usernameTest";
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUserByAdmin(administratorUsername, username, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getReceipts()).thenReturn(receipts);
+
+            //test
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(administratorUsername, username, uuid.getKey());
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
+        }
+
+        @Test
+        void viewPurchaseHistoryOfManager() {
+            //initial
+            List<Receipt> receipts = setUpReceipts();
+            String managerUsername = "managerUsername";
+            int storeId = 1;
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(managerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getManagerStore(storeId)).thenReturn(store);
+            when(store.getReceipts()).thenReturn(receipts);
+
+            //test
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(managerUsername, storeId, uuid.getKey());
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
+        }
+
+        @Test
+        void viewPurchaseHistoryOfOwner() {
+            //initial
+            List<Receipt> receipts = setUpReceipts();
+            String ownerUsername = "ownerUsername";
+            int storeId = 1;
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
+            when(store.getReceipts()).thenReturn(receipts);
+
+            //test
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername, storeId, uuid.getKey());
+            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
+        }
+
+        @Test
+        void addProduct() {
+            //initial
+            String ownerUsername = "ownerUsername";
+            int storeId = 1;
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
+            when(store.addNewProduct(any(), any())).thenReturn(true);
+
+            //test
+            Arrays.stream(ProductCategory.values()).forEach(productCategory -> {
+                String productName = "productName " + productCategory.category;
+                /*Assertions.assertTrue(tradingSystemFacade
+                        .addProduct(ownerUsername, storeId, productName,
+                                productCategory.category, 1, 1, uuid.getKey()));*/
+            });
+        }
+
+        @Test
+        void deleteProductFromStore() {
+            //initial
+            String ownerUsername = "ownerUsername";
+            int storeId = 1;
+            int productSn = 1;
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
+            when(store.removeProductFromStore(userSystem, productSn)).thenReturn(true);
+
+            Assertions.assertTrue(tradingSystemFacade
+                    .deleteProductFromStore(ownerUsername, storeId, productSn, uuid.getKey()));
+        }
+
+        @Test
+        void editProduct() {
+            //initial
+            String ownerUsername = "ownerUsername";
+            int storeId = 1;
+            int productSn = 1;
+            String productName = "productName";
+            String category = ProductCategory.values()[0].category;
+            int amount = 1;
+            double cost = 3434;
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
+            when(store.editProduct(userSystem, productSn, productName, category, amount, cost)).thenReturn(true);
+
+            //test
+            Assertions.assertTrue(tradingSystemFacade
+                    .editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost, uuid.getKey()));
+        }
+
+        @Test
+        void addOwner() {
+            //initial
+            String ownerUsername = "ownerUsername";
+            String newOwnerUsername = "newOwnerUsername";
+
+            int storeId = 1;
+
+            //mock
+            UserSystem newOwner = mock(UserSystem.class);
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(tradingSystem.getUser(newOwnerUsername, uuid.getKey())).thenReturn(newOwner);
+            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
+            when(tradingSystem.addOwnerToStore(store, userSystem, newOwner.getUserName())).thenReturn(true);
+
+            //test
+            Assertions.assertTrue(tradingSystemFacade
+                    .addOwner(ownerUsername, storeId, newOwnerUsername, uuid.getKey()));
+        }
+
+        @Test
+        void addManager() {
+            //initial
+            String ownerUsername = "ownerUsername";
+            String newManagerUsername = "newManagerUsername";
+
+            int storeId = 1;
+
+            //mock
+            UserSystem newOwner = mock(UserSystem.class);
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(tradingSystem.getUser(newManagerUsername, uuid.getKey())).thenReturn(newOwner);
+            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
+            //when(tradingSystem.addMangerToStore(store, userSystem, newOwner.getUserName())).thenReturn(true);
+
+            //test
+            /*assertions.assertTrue(tradingSystemFacade
+                    .addManager(ownerUsername, storeId, newManagerUsername, uuid.getKey()));*/
+        }
+
+        @Test
+        void addPermission() {
+            //initial
+            String ownerUsername = "ownerUsername";
+            String managerUsername = "newManagerUsername";
+            String storePermission = StorePermission.VIEW.function;
+            int storeId = 1;
+
+            //mock
+            UserSystem managerStore = mock(UserSystem.class);
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
+            when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
+            when(store.addPermissionToManager(userSystem, managerStore, StorePermission.getStorePermission(storePermission)))
+                    .thenReturn(true);
+            //test
+            Assertions.assertTrue(tradingSystemFacade
+                    .addPermission(ownerUsername, storeId, managerUsername, storePermission, uuid.getKey()));
+        }
+
+        @Test
+        void removeManager() {
+            //initial
+            String ownerUsername = "ownerUsername";
+            String managerUsername = "newManagerUsername";
+            int storeId = 1;
+
+            //mock
+            UserSystem managerStore = mock(UserSystem.class);
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getOwnerStore(storeId)).thenReturn(store);
+            when(store.getManager(userSystem, managerUsername)).thenReturn(managerStore);
+            when(tradingSystem.removeManager(store, userSystem, managerStore)).thenReturn(true);
+            //test
+            Assertions.assertTrue(tradingSystemFacade
+                    .removeManager(ownerUsername, storeId, managerUsername, uuid.getKey()));
+        }
+
+        @Test
+        void logout() {
+            //initial
+            String userName = "username";
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(userName, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.logout()).thenReturn(true);
+
+            //test
+            Assertions.assertTrue(tradingSystemFacade
+                    .logout(userName, uuid.getKey()));
+        }
+
+        /*@Test
+        void openStore() {
+            //init
+            String ownerUsername = "ownerUsername";
+            PurchasePolicyDto purchasePolicyDto = PurchasePolicyDto.builder().build();
+            DiscountPolicyDto discountPolicyDto = DiscountPolicyDto.builder().build();
+            String discountType = DiscountType.NONE.type;
+            String purchaseType = PurchaseType.BUY_IMMEDIATELY.type;
+            String storeName = "storeName";
+
+            //mock
+            ModelMapper modelMapper = mock(ModelMapper.class);
+            tradingSystemFacade = new TradingSystemFacade(tradingSystem, modelMapper, factoryObjects, serviceFacade);
+            PurchasePolicy purchasePolicy = mock(PurchasePolicy.class);
+            DiscountPolicy discountPolicy = mock(DiscountPolicy.class);
+
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(ownerUsername, uuid.getKey())).thenReturn(userSystem);
+            when(modelMapper.map(purchasePolicyDto, PurchasePolicy.class)).thenReturn(purchasePolicy);
+            when(modelMapper.map(discountPolicyDto, DiscountPolicy.class)).thenReturn(discountPolicy);
+            String description = "blalbla";
+            //when(tradingSystem.openStore(userSystem, storeName, description)).thenReturn(true);
+
+            //test
+            // Assertions.assertTrue(tradingSystemFacade
+            //    .openStore(ownerUsername, purchasePolicyDto, discountPolicyDto, discountType, purchaseType, storeName));
+        }*/
+
+        @Test
+        void registerUser() {
+            String userName = "username";
+            String password = "password";
+            String firstName = "firstName";
+            String lastName = "lastName";
+            when(factoryObjects.createSystemUser(userName, firstName, lastName, password)).thenReturn(userSystem);
+            when(tradingSystem.registerNewUser(userSystem, userImage)).thenReturn(true);
+
+            //test
+            Assertions.assertTrue(tradingSystemFacade
+                    .registerUser(userName, password, firstName, lastName, userImage));
+        }
+
+        @Test
+        void login() {
+            //initial
+            String userName = "username";
+            String password = "password";
+
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(userName, uuid.getKey())).thenReturn(userSystem);
+            //when(tradingSystem.login(userSystem.getUserName(), password)).thenReturn(true);
+
+            //test
+            /*Assertions.assertTrue(tradingSystemFacade
+                    .login(userName, password));*/
+        }
+
+       /* @Test
+        void viewStoreInfo() {
+            //init
+            Store store = createStore();
+            int storeId = 1;
+
+            //mock
+            when(tradingSystem.getStore(storeId)).thenReturn(store);
+            StoreDto storeDto = tradingSystemFacade.viewStoreInfo(storeId);
+            AssertionHelperTest.assertionStore(store, storeDto);
+        }*/
+
+        @Test
+        void viewProduct() {
+            //init
+            int storeId = 1;
+            int productId = 1;
+            Product product = createProduct(productId);
+
+            //mock
+            when(tradingSystem.getStore(storeId)).thenReturn(store);
+            when(store.getProduct(productId)).thenReturn(product);
+            ProductDto productDto = tradingSystemFacade.viewProduct(storeId, productId);
+            AssertionHelperTest.assertProduct(product, productDto);
+        }
+
+        @Test
+        void searchProductByName() {
+            List<Product> products = new ArrayList<>(setUpProducts());
+            String productName = "productName";
+            when(tradingSystem.searchProductByName(productName)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.searchProductByName(productName);
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+        }
+
+        @Test
+        void searchProductByCategory() {
+            String category = ProductCategory.values()[0].category;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            when(tradingSystem.searchProductByCategory(ProductCategory.getProductCategory(category))).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.searchProductByCategory(category);
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+        }
+
+        @Test
+        void searchProductByKeyWords() {
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<String> keyWords = new LinkedList<>();
+            keyWords.add("test-key-words");
+            when(tradingSystem.searchProductByKeyWords(keyWords)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.searchProductByKeyWords(keyWords);
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+        }
+
+        @Test
+        void filterByRangePrice() {
+            int minPrice = 0;
+            int maxPrice = 10;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<ProductDto> productsDtoArg = convertProductDtoList(products);
+            when(tradingSystem.filterByRangePrice(products, minPrice, maxPrice)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.filterByRangePrice(productsDtoArg, minPrice, maxPrice);
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+        }
+
+        @Test
+        void filterByProductRank() {
+            int rank = 0;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<ProductDto> productsDtoArg = convertProductDtoList(products);
+            when(tradingSystem.filterByProductRank(products, rank)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.filterByProductRank(productsDtoArg, rank);
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+        }
+
+        @Test
+        void filterByStoreRank() {
+            int rank = 0;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<ProductDto> productsDtoArg = convertProductDtoList(products);
+            when(tradingSystem.filterByStoreRank(products, rank)).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.filterByStoreRank(productsDtoArg, rank);
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+        }
+
+        @Test
+        void filterByStoreCategory() {
+            String category = ProductCategory.values()[0].category;
+            List<Product> products = new ArrayList<>(setUpProducts());
+            List<ProductDto> productsDtoArg = convertProductDtoList(products);
+            when(tradingSystem.filterByStoreCategory(products, ProductCategory.getProductCategory(category))).thenReturn(products);
+            List<ProductDto> productDtos = tradingSystemFacade.filterByStoreCategory(productsDtoArg, category);
+            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
+        }
+
+        @Test
+        void saveProductInShoppingBag() {
+            //initial
+            String username = "username";
+            int storeId = 1;
+            int productSn = 1;
+            int amount = 1;
+
+            //mock
+            Product product = mock(Product.class);
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(username, uuid.getKey())).thenReturn(userSystem);
+            when(tradingSystem.getStore(storeId)).thenReturn(store);
+            when(store.getProduct(productSn)).thenReturn(product);
+            when(userSystem.saveProductInShoppingBag(store, product, amount)).thenReturn(true);
+
+            Assertions.assertTrue(tradingSystemFacade.saveProductInShoppingBag(username, storeId, productSn, amount, uuid.getKey()));
+        }
+
+        @Test
+        void watchShoppingCart() {
+            //init
+            String username = "username";
+            ShoppingCart shoppingCart = setUpShoppingCart();
+            //mock
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(username, uuid.getKey())).thenReturn(userSystem);
+            when(userSystem.getShoppingCart()).thenReturn(shoppingCart);
+            ShoppingCartDto shoppingCartDto = tradingSystemFacade.watchShoppingCart(username, uuid.getKey());
+            AssertionHelperTest.assertShoppingCart(shoppingCart, shoppingCartDto);
+        }
+
+        @Test
+        void removeProductInShoppingBag() {
+            //initial
+            String username = "username";
+            int storeId = 1;
+            int productSn = 1;
+
+            //mock
+            Product product = mock(Product.class);
+            when(userSystem.getUserName()).thenReturn("userNameTest");
+            doNothing().when(userSystem).login();
+            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+            when(tradingSystem.getUser(username, uuid.getKey())).thenReturn(userSystem);
+            when(tradingSystem.getStore(storeId)).thenReturn(store);
+            when(store.getProduct(productSn)).thenReturn(product);
+            when(userSystem.removeProductInShoppingBag(store, product)).thenReturn(true);
+            Assertions.assertTrue(userSystem.removeProductInShoppingBag(store, product));
+        }
+
 //        @Test
 //        void purchaseShoppingCart() {
 //            //init
 //            String username = "username";
 //            PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
 //            BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
+//            ShoppingCartDto shoppingCartDto = modelMapper.map(shoppingCart, ShoppingCartDto.class);
 //            List<Receipt> receiptsExpected = setUpReceipts();
 //            List<ReceiptDto> receiptDtos = convertReceiptDtoList(receiptsExpected);
 //            //mock
-//            when(tradingSystem.getUser(username, uuid)).thenReturn(userSystem);
+//            when(userSystem.getUserName()).thenReturn("userNameTest");
+//            doNothing().when(userSystem).login();
+//            Pair<UUID, Boolean> uuid = tradingSystem.login(userSystem.getUserName(), "passwordTest");
+//            when(tradingSystem.getUser(username, uuid.getKey())).thenReturn(userSystem);
 //            when(tradingSystem.purchaseShoppingCart(any(), any(), any())).thenReturn(receiptsExpected);
 //
-//            List<ReceiptDto> receiptDtoAcutal = tradingSystemFacade.purchaseShoppingCart(username, paymentDetailsDto, billingAddressDto);
+//            List<ReceiptDto> receiptDtoAcutal = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto,paymentDetailsDto, billingAddressDto);
 //            AssertionHelperTest.assertReceipts(receiptsExpected, receiptDtoAcutal);
 //        }
-//
-//        @Test
-//        void purchaseShoppingCartTest() {
-//            //init
-//            ShoppingCart shoppingCart = setUpShoppingCart();
-//            ShoppingCartDto shoppingCartDto = modelMapper.map(shoppingCart, ShoppingCartDto.class);
-//            PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
-//            BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
-//            List<Receipt> receiptsExpected = setUpReceipts();
-//            //mock
-//            when(tradingSystem.purchaseShoppingCartGuest(any(), any(), any())).thenReturn(receiptsExpected);
-//
-//            List<ReceiptDto> receiptDtoActual = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto, paymentDetailsDto, billingAddressDto);
-//            AssertionHelperTest.assertReceipts(receiptsExpected, receiptDtoActual);
-//        }
-//    }
-//
+
+        @Test
+        void purchaseShoppingCartTest() {
+            //init
+            ShoppingCart shoppingCart = setUpShoppingCart();
+            ShoppingCartDto shoppingCartDto = modelMapper.map(shoppingCart, ShoppingCartDto.class);
+            PaymentDetailsDto paymentDetailsDto = modelMapper.map(paymentDetails, PaymentDetailsDto.class);
+            BillingAddressDto billingAddressDto = modelMapper.map(billingAddress, BillingAddressDto.class);
+            List<Receipt> receiptsExpected = setUpReceipts();
+            //mock
+            when(tradingSystem.purchaseShoppingCartGuest(any(), any(), any())).thenReturn(receiptsExpected);
+
+            List<ReceiptDto> receiptDtoActual = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto, paymentDetailsDto, billingAddressDto);
+            AssertionHelperTest.assertReceipts(receiptsExpected, receiptDtoActual);
+        }
+    }
+
 //    // ******************************* integration test ******************************* //
 //    @Nested
 //    @ContextConfiguration(classes = {TestConfig.class, TradingSystemConfiguration.class})
@@ -526,9 +601,6 @@
 //        @Autowired
 //        private TradingSystem tradingSystem;
 //
-//        @Autowired
-//        private ExternalServiceManagementMock externalServiceManagementMock;
-//
 //        private Set<UserSystem> userSystems;
 //        private List<Receipt> receipts;
 //        private Set<Store> stores;
@@ -536,7 +608,7 @@
 //        private UserSystem testUserSystem;
 //        private UserSystem admin;
 //
-//        @BeforeEach
+////        @BeforeEach
 //        void setUp() {
 //            admin = UserSystem.builder()
 //                    .userName("admin")
@@ -546,20 +618,22 @@
 //            Optional<UserSystem> userSystemOptional = userSystems.stream().findFirst();
 //            Assertions.assertTrue(userSystemOptional.isPresent());
 //            currUser = userSystemOptional.get();
+//
 //            //addStores();
 //        }
 //
 //        private void addStores() {
 //            stores = setUpStores();
-//
+//            String decription = "blabla";
 //            stores.forEach(store ->
 //                    /*tradingSystemFacade.openStore(currUser.getUserName(), new PurchasePolicyDto(store.getPurchasePolicy().isAllAllowed(),
 //                            store.getPurchasePolicy().getWhoCanBuyStatus()), new DiscountPolicyDto(store.getDiscountPolicy().isAllAllowed(),
 //                            store.getDiscountPolicy().getWhoCanBuyStatus()), store.getDiscountType().type, store.getPurchaseType().type,
 //                            store.getStoreName()));*/
-//                    tradingSystem.openStore(currUser, store.getPurchasePolicy(), store.getDiscountPolicy(), store.getStoreName()));
-//        }
 //
+//                    tradingSystem.openStore(currUser, store.getStoreName(),decription));
+//        }
+
 //        void addUsers() {
 //            userSystems = setupUsers();
 //            userSystems.forEach(userSystem ->
@@ -574,14 +648,15 @@
 //            receipts = setUpReceipts();
 //            currUser.setReceipts(receipts);
 //            //call the function
+//
 //            tradingSystem.getUser(currUser.getUserName(), uuid).setReceipts(receipts);
 //            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(currUser.getUserName());
 //            AssertionHelperTest.assertReceipts(receipts, receiptDtos);
 //        }
-//
-//        /**
-//         * check the viewPurchaseHistoryUser() functionality in case of not exists user in the system
-//         */
+
+    /**
+     * check the viewPurchaseHistoryUser() functionality in case of not exists user in the system
+     */
 //        @Test
 //        void viewPurchaseHistoryUserNotExist() {
 //            //call the function
@@ -1944,14 +2019,14 @@
 //
 //
 //    // ******************************* General ******************************* //
-//    private List<ProductDto> convertProductDtoList(List<Product> products) {
-//        Type listType = new TypeToken<List<ProductDto>>() {
-//        }.getType();
-//        return modelMapper.map(products, listType);
-//    }
-//
-//    private List<ReceiptDto> convertReceiptDtoList(@NotNull List<@NotNull Receipt> receipts) {
-//        Type listType = new TypeToken<List<ReceiptDto>>(){}.getType();
-//        return modelMapper.map(receipts, listType);
-//    }
-//}
+    private List<ProductDto> convertProductDtoList(List<Product> products) {
+        Type listType = new TypeToken<List<ProductDto>>() {
+        }.getType();
+        return modelMapper.map(products, listType);
+    }
+
+    private List<ReceiptDto> convertReceiptDtoList(@NotNull List<@NotNull Receipt> receipts) {
+        Type listType = new TypeToken<List<ReceiptDto>>(){}.getType();
+        return modelMapper.map(receipts, listType);
+    }
+}

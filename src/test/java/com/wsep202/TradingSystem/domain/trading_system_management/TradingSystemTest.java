@@ -1143,6 +1143,7 @@ class TradingSystemTest {
                     .password("admin")
                     .build();
             userSystem2 = new UserSystem("coolAvi","Avi","Neelavi","1234erf");
+            newManager = new UserSystem("NewManagerTest", "Manager", "Test", "MyPassword345");
             tradingSystemDao = new TradingSystemDaoImpl();
             externalServiceManagement = mock(ExternalServiceManagement.class);
             tradingSystem = new TradingSystem(externalServiceManagement, admin, tradingSystemDao);
@@ -1656,86 +1657,207 @@ class TradingSystemTest {
 //            Assertions.assertNull(tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress1,testUser));
 //        }
 
-//        /**
-//         * This test check if the addManager method succeeds when the parameters
-//         * are correct.
-//         */
-//        @Test
-//        void addManagerSuccess(){
-//            setUpAddManagerAndOwner();
-//            //check that the new manager added to store
-//            Assertions.assertTrue(tradingSystem.addMangerToStore(store1, storeOwner, newManager));
-//            //check that the number of managers of the store is 1
-//            Assertions.assertEquals(1, store1.getManagers().size());
-//            //check that right manager was added
-//            Assertions.assertEquals(newManager, store1.getManager(storeOwner, newManager.getUserName()));
-//        }
+        /**
+         * This test check if the addManager method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addManagerSuccess(){
+            setUpAddManagerAndOwner();
+            //check that the new manager added to store
+            Assertions.assertNotNull(tradingSystem.addMangerToStore(store1, storeOwner, newManager.getUserName()));
+            //check that the number of managers of the store is 1
+            Assertions.assertEquals(1, store1.getManagers().size());
+            //check that right manager was added
+            Assertions.assertEquals(newManager, store1.getManager(storeOwner, newManager.getUserName()));
+        }
 
-//        /**
-//         * This test check if the addManager method fails when the parameters
-//         * are wrong.
-//         */
-//        @Test
-//        void addManagerFail(){
-//            setUpAddManagerAndOwner();
-//            //can't appoint a null manager
-//            Assertions.assertFalse(tradingSystem.addMangerToStore(store1,storeOwner,null));
-//            //not an owner of the store, can't appoint a manager
-//            Assertions.assertFalse(tradingSystem.addMangerToStore(store1,wrongOwner,newManager));
-//        }
-
-//        /**
-//         * This test check if the addOwner method succeeds when the parameters
-//         * are correct.
-//         */
-//        @Test
-//        void addOwnerSuccess(){
-//            setUpAddManagerAndOwner();
-//            //check that the new owner added to store
-//            Assertions.assertTrue(tradingSystem.addOwnerToStore(store1, storeOwner, newManager));
-//            //check that the number of owners of the store is 2
-//            Assertions.assertEquals(2, store1.getOwners().size());
-//        }
-
-//        /**
-//         * This test check if the addOwner method fails when the parameters
-//         * are wrong.
-//         */
-//        @Test
-//        void addOwnerFail(){
-//            setUpAddManagerAndOwner();
-//            //can't appoint a null owner
-//            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,storeOwner,null));
-//            //not an owner of the store, can't appoint an owner
-//            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,wrongOwner,newManager));
-//        }
-
-//        /**
-//         * This test check if the removeManager method succeeds when the parameters
-//         * are correct.
-//         */
-//        @Test
-//        void removeManagerSuccess(){
-//            setUpUsersForRemoveManagerSuc();
-//            tradingSystem.addMangerToStore(store1, storeOwner, newManager);
-//            //check that remove success
-//            Assertions.assertTrue(tradingSystem.removeManager(store1, storeOwner, newManager));
-//        }
+        private void setUpAddManagerAndOwner(){
+            storeOwner = new UserSystem("OwnerTest","IAmOwner","Test","OwnerPassword");
+            tradingSystem.registerNewUser(storeOwner,null);
+            tradingSystem.registerNewUser(newManager,null);
+            store1 = tradingSystem.openStore(storeOwner,"LeeOffice", "We Print Stuff");
+        }
 
         /**
-         * This test check if the removeManager method fails when the parameters
+         * This test check if the addManager method fails when the parameters
          * are wrong.
          */
         @Test
-        void removeManagerFail(){
-       //     setUpUsersForRemoveManager();
-            //can't remove from null store
-            Assertions.assertFalse(tradingSystem.removeManager(null,storeOwner,newManager));
-            //store does not exists
-            Assertions.assertFalse(tradingSystem.removeManager(store,storeOwner,newManager));
-            //1 users is not registered
-            Assertions.assertFalse(tradingSystem.removeManager(store1,wrongOwner,newManager));
+        void addManagerNotAnOwner(){
+            setUpAddManagerAndOwnerFail();
+            //not an owner of the store, can't appoint a manager
+            Assertions.assertNull(tradingSystem.addMangerToStore(store1,storeOwner,newManager.getUserName()));
+            //check that the number of managers of the store is still 0
+            Assertions.assertEquals(0, store1.getManagers().size());
         }
+
+        private void setUpAddManagerAndOwnerFail(){
+            storeOwner = new UserSystem("OwnerTest","IAmOwner","Test","OwnerPassword");
+            tradingSystem.registerNewUser(storeOwner,null);
+            tradingSystem.registerNewUser(newManager,null);
+            tradingSystem.registerNewUser(userSystem2, null);
+            store1 = tradingSystem.openStore(userSystem2,"LeeOffice", "We Print Stuff");
+        }
+
+        /**
+         * This test check if the addManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addManagerObjectNull(){
+            setUpAddManagerAndOwner();
+            //can't appoint a null manager
+            Assertions.assertNull(tradingSystem.addMangerToStore(store1,storeOwner,null));
+            //can't appoint a manager with null owner
+            Assertions.assertNull(tradingSystem.addMangerToStore(store1,null,newManager.getUserName()));
+            //can't appoint a manager with null store
+            Assertions.assertNull(tradingSystem.addMangerToStore(null,storeOwner,newManager.getUserName()));
+            //check that the number of managers of the store is still 0
+            Assertions.assertEquals(0, store1.getManagers().size());
+        }
+
+        /**
+         * This test check if the addManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addManagerEmptyUserNameManager(){
+            setUpAddManagerAndOwner();
+            //can't appoint a null manager
+            Assertions.assertNull(tradingSystem.addMangerToStore(store1,storeOwner,""));
+            //check that the number of managers of the store is still 0
+            Assertions.assertEquals(0, store1.getManagers().size());
+        }
+
+        /**
+         * This test check if the addManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addManagerAppointMyself(){
+            setUpAddManagerAndOwner();
+            //can't appoint a null manager
+            Assertions.assertNull(tradingSystem.addMangerToStore(store1,storeOwner,storeOwner.getUserName()));
+            //check that the number of managers of the store is still 0
+            Assertions.assertEquals(0, store1.getManagers().size());
+        }
+
+        /**
+         * This test check if the addOwner method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void addOwnerSuccess(){
+            setUpAddManagerAndOwner();
+            //check that the new owner added to store
+            Assertions.assertTrue(tradingSystem.addOwnerToStore(store1, storeOwner, newManager.getUserName()));
+            //check that the number of owners of the store is 2
+            Assertions.assertEquals(2, store1.getOwners().size());
+            //check that the new owner is in store
+            Assertions.assertTrue(store1.getOwners().contains(newManager));
+        }
+
+        /**
+         * This test check if the addOwner method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addOwnerNotAnOwner(){
+            setUpAddManagerAndOwnerFail();
+            //not an owner of the store, can't appoint an owner
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,storeOwner,newManager.getUserName()));
+            //check that the number of owners of the store is still 1
+            Assertions.assertEquals(1, store1.getOwners().size());
+        }
+
+        /**
+         * This test check if the addManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addOwnerObjectNull(){
+            setUpAddManagerAndOwner();
+            //can't appoint a null owner
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,storeOwner,null));
+            //can't appoint an owner with null owner
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,null,newManager.getUserName()));
+            //can't appoint an owner with null store
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(null,storeOwner,newManager.getUserName()));
+            //check that the number of owners of the store is still 1
+            Assertions.assertEquals(1, store1.getOwners().size());
+        }
+
+        /**
+         * This test check if the addManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addOwnerEmptyUserNameManager(){
+            setUpAddManagerAndOwner();
+            //can't appoint a null manager
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,storeOwner,""));
+            //check that the number of owners of the store is still 1
+            Assertions.assertEquals(1, store1.getOwners().size());
+        }
+
+        /**
+         * This test check if the addManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void addOwnerAppointMyself(){
+            setUpAddManagerAndOwner();
+            //can't appoint a null manager
+            Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,storeOwner,storeOwner.getUserName()));
+            //check that the number of owners of the store is still 1
+            Assertions.assertEquals(1, store1.getOwners().size());
+            //check that the new owner is in store
+            Assertions.assertTrue(store1.getOwners().contains(storeOwner));
+        }
+
+        /**
+         * This test check if the removeManager method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void removeManagerSuccess(){
+            setUpUsersForRemoveManagerSuc();
+            //before remove there is 1 manager in store
+            Assertions.assertEquals(1, store1.getManagers().size());
+            //check that the newManager is really a store manager
+            Assertions.assertEquals(newManager ,store1.getManager(storeOwner,newManager.getUserName()));
+            //check that remove success
+            Assertions.assertTrue(tradingSystem.removeManager(store1, storeOwner, newManager));
+            //after remove there are 0 managers in store
+            Assertions.assertEquals(0, store1.getManagers().size());
+            //check that the newManager is no longer a manager
+            Assertions.assertFalse(store1.getManagers().contains(newManager));
+
+        }
+
+        private void setUpUsersForRemoveManagerSuc(){
+            storeOwner = new UserSystem("OwnerTest","IAmOwner","Test","OwnerPassword");
+            tradingSystem.registerNewUser(storeOwner,null);
+            tradingSystem.registerNewUser(newManager,null);
+            store1 = tradingSystem.openStore(storeOwner,"LeeOffice", "We Print Stuff");
+            tradingSystem.addMangerToStore(store1,storeOwner,newManager.getUserName());
+        }
+
+//        /**
+//         * This test check if the removeManager method fails when the parameters
+//         * are wrong.
+//         */
+//        @Test
+//        void removeManagerFail(){
+//            setUpUsersForRemoveManager();
+//            //can't remove from null store
+//            Assertions.assertFalse(tradingSystem.removeManager(null,storeOwner,newManager));
+//            //store does not exists
+//            Assertions.assertFalse(tradingSystem.removeManager(store,storeOwner,newManager));
+//            //1 users is not registered
+//            Assertions.assertFalse(tradingSystem.removeManager(store1,wrongOwner,newManager));
+//        }
 
 
 
