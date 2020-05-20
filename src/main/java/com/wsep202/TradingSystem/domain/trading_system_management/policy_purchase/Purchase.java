@@ -1,14 +1,11 @@
-package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
+package com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase;
 /**
  * the class defines a purchase policy in store
  */
 
-import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
-import com.wsep202.TradingSystem.domain.trading_system_management.Day;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 

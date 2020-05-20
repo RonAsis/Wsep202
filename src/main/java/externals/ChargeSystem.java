@@ -1,6 +1,6 @@
 package externals;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.PaymentDetails;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 
 public class ChargeSystem {
     /**

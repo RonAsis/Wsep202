@@ -2,7 +2,7 @@
  * this class represents the address information of a user in the system
  */
 
-package com.wsep202.TradingSystem.domain.trading_system_management;
+package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

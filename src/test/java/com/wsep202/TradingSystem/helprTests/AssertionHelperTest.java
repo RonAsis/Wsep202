@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.helprTests;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import com.wsep202.TradingSystem.dto.*;
 import org.junit.jupiter.api.Assertions;
 

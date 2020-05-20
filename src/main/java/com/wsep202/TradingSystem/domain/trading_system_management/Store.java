@@ -635,7 +635,24 @@ public class Store {
 
     }
 
-
+    /**
+     * set all the products in the received list with the received discount
+     *
+     * @param discount
+     * @param owner    the owner of the store that gets the discount
+     * @return true for success
+     */
+    public boolean addDiscountForProduct(UserSystem owner, Discount discount) {
+        if (owner == null) {
+            return false;
+        }
+        if (isOwner(owner)) {
+            return this.discounts.add(discount);  //add the discount to store
+        }
+        //this is not an owner of the store
+        log.error("The received user: " + owner.getUserName() + "is not owner");
+        throw new NoOwnerInStoreException(owner.getUserName(), storeId);
+    }
 
 
     public List<String> getOperationsCanDo(UserSystem userSystem) {

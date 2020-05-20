@@ -2,7 +2,7 @@
  * this class represents all necessary payment datails of the customer for
  * purchasing the shopping items
  */
-package com.wsep202.TradingSystem.domain.trading_system_management;
+package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

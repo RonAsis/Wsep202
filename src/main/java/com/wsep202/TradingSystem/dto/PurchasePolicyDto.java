@@ -1,9 +1,9 @@
 package com.wsep202.TradingSystem.dto;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.Day;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Day;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Purchase;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

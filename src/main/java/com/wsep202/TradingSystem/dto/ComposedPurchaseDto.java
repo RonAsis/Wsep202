@@ -4,7 +4,6 @@
 package com.wsep202.TradingSystem.dto;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PurchasePolicy;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 

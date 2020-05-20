@@ -2,13 +2,14 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.ChargeException;
 import com.wsep202.TradingSystem.domain.exception.DeliveryRequestException;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import externals.ChargeSystem;
 import externals.SecuritySystem;
 import externals.SupplySystem;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 @Slf4j
@@ -148,7 +149,7 @@ public class ExternalServiceManagement {
      * @return true if the request for delivery accepted
      * otherwise returns false
      */
-    public boolean deliver(BillingAddress addressInfo,ShoppingCart cart) throws DeliveryRequestException {
+    public boolean deliver(BillingAddress addressInfo, ShoppingCart cart) throws DeliveryRequestException {
         boolean isDelivered;
         List<ShoppingBag> bags = new ArrayList<>();
         for(ShoppingBag bag : cart.getShoppingBagsList().values()){

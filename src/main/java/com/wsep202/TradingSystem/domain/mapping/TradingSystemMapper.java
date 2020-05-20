@@ -16,27 +16,6 @@ import java.util.stream.Collectors;
 public class TradingSystemMapper {
 
     @Component
-    public static class StoreToStoreDtoConverter extends TypeMapConfigurer<Store, StoreDto> {
-        @Override
-        public void configure(TypeMap<Store, StoreDto> typeMap) {
-            Converter<DiscountType, String> discountTypeStringConverter =
-                    ctx -> ctx.getSource() == null ? null : ctx.getSource().type;
-
-//            typeMap.addMappings(mapper -> mapper.using(discountTypeStringConverter)
-//                    .map(Store::getDiscountType, StoreDto::setDiscountType));
-//
-//            //
-//            Converter<PurchaseType, String> purchaseTypeStringConverter =
-//                    ctx -> ctx.getSource() == null ? null : ctx.getSource().type;
-//
-//            typeMap.addMappings(mapper -> mapper.using(purchaseTypeStringConverter)
-//                    .map(Store::getPurchaseType, StoreDto::setPurchaseType));
-
-
-        }
-    }
-
-    @Component
     public static class ProductToProductDtoConverter extends TypeMapConfigurer<Product, ProductDto> {
         @Override
         public void configure(TypeMap<Product, ProductDto> typeMap) {

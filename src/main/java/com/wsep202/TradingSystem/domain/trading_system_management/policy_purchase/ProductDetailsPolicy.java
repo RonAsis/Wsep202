@@ -1,10 +1,7 @@
-package com.wsep202.TradingSystem.domain.trading_system_management.purchase;
+package com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase;
 import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
-import com.wsep202.TradingSystem.domain.trading_system_management.BillingAddress;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
-import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
