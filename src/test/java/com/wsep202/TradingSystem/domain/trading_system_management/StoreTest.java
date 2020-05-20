@@ -4,6 +4,7 @@ import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -676,9 +677,9 @@ class StoreTest {
             doNothing().when(discount).setApplied(true);
             when(product.getCost()).thenReturn(-2.9);
             doCallRealMethod().when(discount).applyDiscount(productBag);
-            storeUT.applyDiscountPolicies(productBag);
+            //storeUT.applyDiscountPolicies(productBag);
             Throwable exception = Assertions
-                    .assertThrows(NotInStockException.class,()->storeUT.applyDiscountPolicies(productBag));
+                    .assertThrows(IllegalProductPriceException.class,()->storeUT.applyDiscountPolicies(productBag));
             Assertions.assertEquals("The discount with id: "+discount.getDiscountId()+
                     " caused price to be equal or less than zero!",exception.getMessage());
 
@@ -1013,7 +1014,7 @@ class StoreTest {
         @Test
         void addManagerPositive() {
             //success: owner can add a manager who is not already manager or owner of the store
-            Assertions.assertNull(storeUT.addManager(ownerRealUser,managerUser));
+            Assertions.assertNotNull(storeUT.addManager(ownerRealUser,managerUser));
         }
 
         /**
@@ -1252,7 +1253,7 @@ class StoreTest {
             product.setCost(-10);
             Throwable exception = Assertions
                     .assertThrows(IllegalProductPriceException.class,()->storeUT.applyDiscountPolicies(productBag));
-            Assertions.assertEquals("The discount with id: "+0+
+            Assertions.assertEquals("The discount with id: "+1+
                     " caused price to be equal or less than zero!",exception.getMessage());
         }
 
