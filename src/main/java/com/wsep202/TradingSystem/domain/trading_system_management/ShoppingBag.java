@@ -146,12 +146,9 @@ public class ShoppingBag {
     }
 
     public double getTotalCostOfBag(){
-        double price=0;
-        for(Product product: this.getProductListFromStore().keySet()){
-            price+=(product.getCost()*this.getProductListFromStore().get(product));
-        }
-        price = Double.parseDouble(formatter.format(price));
-        return price;
+        Double price = this.getProductListFromStore().entrySet().stream()
+                .reduce(0.0, (acc, entry) -> acc + entry.getKey().getCost() * entry.getValue(), Double::sum);
+        return Double.parseDouble(formatter.format(price));
     }
 
     public double getOriginalTotalCostOfBag(){

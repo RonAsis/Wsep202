@@ -740,7 +740,9 @@ public class TradingSystemFacade {
                                     Product product = store.getProduct(key);
                                     shoppingBagMap.put(product, value);
                                 });
-                        shoppingCartMap.put(store, ShoppingBag.builder().productListFromStore(shoppingBagMap).build());
+                        shoppingCartMap.put(store, ShoppingBag.builder()
+                                .productListFromStore(shoppingBagMap)
+                                .storeOfProduct(store).build());
                     });
         }
         return ShoppingCart.builder()
