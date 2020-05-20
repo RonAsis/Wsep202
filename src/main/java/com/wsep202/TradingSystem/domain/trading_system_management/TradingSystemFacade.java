@@ -370,14 +370,14 @@ public class TradingSystemFacade {
      * @param storeName     - the name of the new store
      * @return true if succeed
      */
-    public boolean openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
+    public Store openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(usernameOwner, uuid);
             Store store = tradingSystem.openStore(user, storeName, description);
-            return Objects.nonNull(store);
+            return store;
         } catch (TradingSystemException e) {
             log.error("failed to open store", e);
-            return false;
+            return null;
         }
     }
 

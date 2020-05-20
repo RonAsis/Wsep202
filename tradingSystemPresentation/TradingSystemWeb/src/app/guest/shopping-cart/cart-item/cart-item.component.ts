@@ -29,14 +29,16 @@ export class CartItemComponent implements OnInit {
   }
 
   onCartItemChanged(event) {
-    this.userService.changeItemCartAmount(this.cartItem.productSn, this.cartItem.storeId, this.amountCartItem.nativeElement.value);
-    const sn = event.target.getAttribute('productSn');
-    const storeOfId = event.target.getAttribute('storeId');
-
-    this.cartItemChanged.emit({
-      productSn: sn,
-      storeId: storeOfId
-    });
+    this.userService
+      .changeItemCartAmount(this.cartItem.productSn, this.cartItem.storeId, this.amountCartItem.nativeElement.value)
+      .subscribe(response => {
+        const sn = event.target.getAttribute('productSn');
+        const storeOfId = event.target.getAttribute('storeId');
+        this.cartItemChanged.emit({
+          productSn: sn,
+          storeId: storeOfId
+        });
+      });
   }
 
   constructor(private userService: UserService) {

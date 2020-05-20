@@ -7,7 +7,6 @@ import {BillingAddress} from '../shared/billingAddress.model';
 import {Product} from '../shared/product.model';
 import {Receipt} from '../shared/receipt.model';
 import {ShoppingBag} from '../shared/ShoppingBag.model';
-import {stringify} from 'querystring';
 import {UserSystem} from '../shared/userSystem.model';
 import {Manager} from '../shared/manager.model';
 import {ProductShoppingCartDto} from '../shared/productShoppingCartDto.model';
@@ -135,6 +134,18 @@ export class HttpService {
       `${uuid}`;
     return this.http.get<Receipt[]>(
       url);
+  }
+
+
+  changeProductAmountInShoppingBag(username: string, storeId: number, amount: number, productSn: number, uuid: string) {
+    const url = `${this.buyerUrl}/` + 'change-product-amount-in-shopping-bag/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${amount}/` +
+      `${productSn}/` +
+      `${uuid}`;
+    return this.http.post<boolean>(
+      url, null);
   }
 
   public saveProductInShoppingBag(username: string, storeId: number, productSn: number,

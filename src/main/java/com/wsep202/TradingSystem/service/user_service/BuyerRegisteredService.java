@@ -40,7 +40,7 @@ public class BuyerRegisteredService {
      * @param uuid
      * @return
      */
-    public boolean openStore(String usernameOwner,
+    public Store openStore(String usernameOwner,
                               String storeName,
                               String description,
                               UUID uuid){

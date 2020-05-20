@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.web.controllers;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.Store;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
@@ -46,10 +47,10 @@ public class BuyerRegisteredController {
     @ApiOperation(value = "open store")
     @PostMapping("open-store/{usernameOwner}/{storeName}/{description}/{uuid}")
     public boolean openStore(@PathVariable String usernameOwner,
-                              @PathVariable String storeName,
-                              @PathVariable String description,
-                              @PathVariable UUID uuid) {
-        return buyerRegisteredService.openStore(usernameOwner, storeName, description, uuid);
+                           @PathVariable String storeName,
+                           @PathVariable String description,
+                           @PathVariable UUID uuid) {
+        return buyerRegisteredService.openStore(usernameOwner, storeName, description, uuid) != null;
     }
 
     /**

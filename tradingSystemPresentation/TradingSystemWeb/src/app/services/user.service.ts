@@ -126,6 +126,9 @@ export class UserService {
   changeItemCartAmount(productSn: number, storeId: number, amount: number) {
     if (!this.isLoggingUser()){
       this.shoppingCart.addProductAmounts(productSn, storeId, amount);
+      return of(null);
+    }else{
+      return this.httpService.changeProductAmountInShoppingBag(this.username, storeId, amount, productSn, this.uuid);
     }
   }
 

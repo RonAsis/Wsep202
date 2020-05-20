@@ -18,7 +18,7 @@ export class HistoryPurchaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.shareService.receipts !== null) {
+    if (this.shareService.receipts !== null && !this.userService.isLoggingUser()) {
      this.receipts = this.shareService.receipts;
     } else {
       this.userService.viewPurchaseHistory().subscribe(response => {

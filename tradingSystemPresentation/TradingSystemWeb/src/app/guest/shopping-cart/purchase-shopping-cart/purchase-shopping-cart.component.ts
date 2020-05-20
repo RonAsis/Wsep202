@@ -62,7 +62,7 @@ export class PurchaseShoppingCartComponent implements OnInit {
             console.log(response);
             this.shareService.setReceipts(response);
             this.userService.deleteShoppingCart();
-            this.shareService.featureSelected.emit('receipts-guest');
+            this.shareService.featureSelected.emit('History-purchase');
           }
         }, (error: HttpErrorResponse) => {
           this.errorMessage(error.error.message);
