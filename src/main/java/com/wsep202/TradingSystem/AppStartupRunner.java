@@ -1,8 +1,11 @@
 package com.wsep202.TradingSystem;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.javafaker.Faker;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
+import com.wsep202.TradingSystem.dynamic_start_up.ActivationPaths;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -24,14 +27,32 @@ public class AppStartupRunner implements ApplicationRunner {
 
     private final TradingSystem tradingSystem;
 
+    private ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
+
     private final int NUM_OF_OBJECTS = 10;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         createDirForImages();
-        initialTheSystem();
+        if(thereIsInitialFiles()){
+            initialAccordingByFiles();
+        }else {
+            initialTheSystem();
+        }
     }
 
+    ///////////////////////////////////////////// for files System 1.1 /////////////////////////
+    private void initialAccordingByFiles() {
+        File initialRootDir = new File(ActivationPaths.INITIAL_FILES);
+        // TODO need to act all the files
+    }
+
+    private boolean thereIsInitialFiles() {
+        File initialRootDir = new File(ActivationPaths.INITIAL_FILES);
+        return initialRootDir.exists() && Objects.requireNonNull(initialRootDir.listFiles()).length > 0;
+    }
+
+    /////////////////////////////////////////////for images /////////////////////////////////////////
     private void createDirForImages() {
         log.info("creation the Directories for images");
         File imageRootDir = new File(ROOT_IMAGE_DIC);
