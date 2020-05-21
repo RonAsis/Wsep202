@@ -35,7 +35,7 @@ public class Context {
     }
 
     public void addStoreId(int storeId) {
-        mapStoreIdToRealStoreId.put(storeIdCounter, storeId);
+        mapStoreIdToRealStoreId.put(getStoreId(), storeId);
     }
 
     public void addUsernameUuid(String username, UUID uuid) {
@@ -50,9 +50,8 @@ public class Context {
         return productIdCounter++;
     }
 
-
     public void addProductId(int productSn) {
-        mapProductIdToRealProduct.put(productIdCounter, productSn);
+        mapProductIdToRealProduct.put(getProductId(), productSn);
     }
 
     public int getRealStoreId(int storeId) {
