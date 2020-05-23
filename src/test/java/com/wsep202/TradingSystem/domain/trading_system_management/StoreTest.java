@@ -7,6 +7,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.Disco
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -484,8 +485,12 @@ class StoreTest {
             Assertions.assertEquals(1, storeUT.getManagers().size());
         }
 
+        /**
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct, no managers was appointed by removed owner
+         */
         @Test
-        void removeOwnerSuc(){
+        void removeOwnerNoManagers(){
             setUpRemoveOwner();
             int ownerLiseSize = storeUT.getOwners().size();
             //check that the list of owners is not empty
@@ -496,6 +501,31 @@ class StoreTest {
             Assertions.assertTrue(storeUT.removeOwner(owner,managerUser));
             //removed 9 owners from store
             Assertions.assertEquals(1, storeUT.getOwners().size());
+            //check that the removed owner does not contain the store in his owned store list
+            Assertions.assertFalse(managerUser.getOwnedStores().contains(storeUT));
+        }
+
+        /**
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct, with that managers was appointed
+         * by removed owner.
+         */
+        @Test
+        void removeOwnerWithManagers(){
+            setUpRemoveOwnerManager();
+            int ownerLiseSize = storeUT.getOwners().size();
+            //check that the list of owners is not empty
+            Assertions.assertTrue(ownerLiseSize != 0);
+            //check that this user is a manager in store
+            Assertions.assertEquals(ownerRealUser,storeUT.getManager(managerUser,ownerRealUser.getUserName()));
+            //check before the remove that the user is an owner
+            Assertions.assertTrue(storeUT.getOwners().contains(managerUser));
+            //check that the removal was successful
+            Assertions.assertTrue(storeUT.removeOwner(owner,managerUser));
+            //removed 9 owners from store
+            Assertions.assertEquals(1, storeUT.getOwners().size());
+            //check that the manager was removed from store
+            Assertions.assertFalse(storeUT.getManagers().contains(ownerRealUser));
         }
 
         @Test
@@ -1542,6 +1572,18 @@ class StoreTest {
         owners.addAll(ownerSet);
         storeUT.setOwners(owners);
         storeUT.setAppointedOwners(appointedOwners);
+        Set<Store> store = new HashSet<>();
+        store.add(storeUT);
+        owner.setOwnedStores(store);
+        managerUser.setOwnedStores(store);
+    }
+
+    private void setUpRemoveOwnerManager(){
+        setUpRemoveOwner();
+        ownerRealUser = mock(UserSystem.class);
+        when(ownerRealUser.getUserName()).thenReturn("IAmAManager");
+       // when(((MangerStore)any()).getAppointedManager()).thenReturn(ownerRealUser);
+        storeUT.addManager(managerUser,ownerRealUser);
     }
 
     private UserSystem getUser(Set<UserSystem> users){
@@ -1554,8 +1596,12 @@ class StoreTest {
     private Set<UserSystem> makeOwnersSet(int length, String name){
         Set<UserSystem> tempOwners = new HashSet<>();
         for (int i=0; i < length ; i++){
-            tempOwners.add(UserSystem.builder()
-                    .userName(name+i).build());
+            Set<Store> stores = new HashSet<>();
+            stores.add(storeUT);
+            UserSystem userSystem = UserSystem.builder()
+                    .userName(name+i)
+                    .ownedStores(stores).build();
+            tempOwners.add(userSystem);
         }
         return tempOwners;
     }

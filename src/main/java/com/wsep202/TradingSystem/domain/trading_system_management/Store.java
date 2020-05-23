@@ -252,19 +252,26 @@ public class Store {
     }
 
     /**
-     * This method is used to remove all the owners that was
+     * This method is used to remove all the owners and managers that was
      * appointed by ownerToRemove.
      * @param ownerToRemove
      */
     private void removeAppointedOwners(UserSystem ownerToRemove){
         Set<UserSystem> ownersToRemove = new HashSet<>();
+        Set<MangerStore> managerToRemove = new HashSet<>();
         ownersToRemove.addAll(findOwnersToRemove(ownerToRemove,ownersToRemove));
+        ownersToRemove.add(ownerToRemove);
+        managerToRemove.addAll(findManagersToRemove(ownersToRemove,managerToRemove));
         for (UserSystem ownerToDelete: ownersToRemove) {
             appointedOwners.remove(ownerToDelete);
             owners.remove(ownerToDelete);
+            appointedManagers.remove(ownerToDelete);
+            ownerToDelete.removeOwnedStore(this);
         }
-        appointedOwners.remove(ownerToRemove);
-        owners.remove(ownerToRemove);
+        for (MangerStore manager: managerToRemove) {
+            managers.remove(manager);
+            manager.removeManagedStore(this);
+        }
     }
 
     /**
@@ -279,6 +286,18 @@ public class Store {
             }
         }
         return ownersToRemove;
+    }
+
+    /**
+     * This method is used to find all the managers that needs to be removed from the store
+     * @return set of all the managers that needs to be removed
+     */
+    private Set<MangerStore> findManagersToRemove(Set<UserSystem> ownersToRemove, Set<MangerStore> managerToRemove) {
+        for (UserSystem owner: ownersToRemove) {
+            if (appointedManagers.get(owner) != null && !appointedManagers.get(owner).isEmpty())
+                managerToRemove.addAll(appointedManagers.get(owner));
+        }
+        return managerToRemove;
     }
 
     /**
@@ -493,7 +512,7 @@ public class Store {
     }
 
     /**
-     * get the actual user of the manager appointeed by the ownerUser with managerUserName
+     * get the actual user of the manager appointed by the ownerUser with managerUserName
      *
      * @param ownerUser       - the appointing owner
      * @param ownerUserName - the appointed manager
@@ -538,7 +557,7 @@ public class Store {
     }
 
     private boolean ownersContains(UserSystem user) {
-        return (owners.stream().anyMatch(curUser -> curUser.getUserName().equals(user.getUserName())));
+            return (owners.stream().anyMatch(curUser -> curUser.getUserName().equals(user.getUserName())));
     }
 
     private boolean managersContains(MangerStore user) {

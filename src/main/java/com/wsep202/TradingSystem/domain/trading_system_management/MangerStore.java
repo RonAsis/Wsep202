@@ -68,4 +68,8 @@ public class MangerStore {
         return storePermissions.stream()
                 .anyMatch(storePermission -> storePermission==(StorePermission.EDIT));
     }
+
+    public boolean removeManagedStore(Store storeToRemove){
+      return appointedManager.removeOwnedStore(storeToRemove);
+    }
 }

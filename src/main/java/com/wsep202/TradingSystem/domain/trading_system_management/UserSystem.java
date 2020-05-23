@@ -82,7 +82,7 @@ public class UserSystem implements Observer {
     private String imageUrl;
 
     public UserSystem(String userName, String firstName, String lastName, String password) {
-        this.userName = userName;
+            this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
@@ -150,6 +150,26 @@ public class UserSystem implements Observer {
         }
         managedStores.remove(storeToRemove);
         log.info("store '" + storeToRemove.getStoreName() + "' was removed from managed store list");
+        return true;
+    }
+
+    /**
+     * This method is used to remove a store that is under a users ownership
+     *
+     * @param storeToRemove - the store that needs to be removed
+     * @return true if the store exists in ownedStores, false if not or null
+     */
+    public boolean removeOwnedStore(Store storeToRemove) {
+        if (storeToRemove == null) {
+            log.error("can't remove a null store");
+            return false;
+        }
+        if (!ownedStores.contains(storeToRemove)) {
+            log.error("store '" + storeToRemove.getStoreName() + "' is not owned by this user '" + userName + "'");
+            return false;
+        }
+        ownedStores.remove(storeToRemove);
+        log.info("store '" + storeToRemove.getStoreName() + "' was removed from owned store list");
         return true;
     }
 
