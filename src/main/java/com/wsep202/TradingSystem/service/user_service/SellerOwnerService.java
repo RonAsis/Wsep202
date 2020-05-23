@@ -73,13 +73,23 @@ public class SellerOwnerService {
     }
 
     /**
-     * remove manager
+     * remove manager - UC 4.7
      */
     public boolean removeManager(String ownerUsername,
                                  int storeId,
                                  String newManagerUsername,
                                  UUID uuid){
         return tradingSystemFacade.removeManager(ownerUsername, storeId, newManagerUsername, uuid);
+    }
+
+    /**
+     * remove owner - UC 4.4
+     */
+    public boolean removeOwner(String ownerUsername,
+                                 int storeId,
+                                 String ownerToRemove,
+                                 UUID uuid){
+        return tradingSystemFacade.removeOwner(ownerUsername, storeId, ownerToRemove, uuid);
     }
 
     /**

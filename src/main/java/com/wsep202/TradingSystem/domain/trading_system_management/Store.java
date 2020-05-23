@@ -236,6 +236,60 @@ public class Store {
         return false;
     }
 
+    /**
+     * This method is used to remove an owner from the store
+     * @param owner - the appointing owner
+     * @param ownerToRemove - the appointed owner that needs to be removed
+     * @return true if succeeded, else false
+     */
+    public boolean removeOwner(UserSystem owner, UserSystem ownerToRemove){
+        if (isOwner(owner) && isOwner(ownerToRemove)
+                && !owner.equals(ownerToRemove) && isAppointedBy(owner, ownerToRemove)){
+            removeAppointedOwners(ownerToRemove);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method is used to remove all the owners that was
+     * appointed by ownerToRemove.
+     * @param ownerToRemove
+     */
+    private void removeAppointedOwners(UserSystem ownerToRemove){
+        Set<UserSystem> ownersToRemove = new HashSet<>();
+        ownersToRemove.addAll(findOwnersToRemove(ownerToRemove,ownersToRemove));
+        for (UserSystem ownerToDelete: ownersToRemove) {
+            appointedOwners.remove(ownerToDelete);
+            owners.remove(ownerToDelete);
+        }
+        appointedOwners.remove(ownerToRemove);
+        owners.remove(ownerToRemove);
+    }
+
+    /**
+     * This method is used to find all the owners that needs to be removed from the store
+     * @return set of all the owners that needs to be removed
+     */
+    private Set<UserSystem> findOwnersToRemove(UserSystem ownerToRemove, Set<UserSystem> ownersToRemove){
+        if (appointedOwners.get(ownerToRemove)!=null && appointedOwners.get(ownerToRemove).size() > 0){
+            ownersToRemove.addAll(appointedOwners.get(ownerToRemove));
+            for (UserSystem user:appointedOwners.get(ownerToRemove)) {
+                findOwnersToRemove(user, ownersToRemove);
+            }
+        }
+        return ownersToRemove;
+    }
+
+    /**
+     * This method is used to check if owner2 was appointed by owner1
+     * @return true if owner2 was appointed by owner1, else false
+     */
+    private boolean isAppointedBy(UserSystem owner1, UserSystem owner2){
+        if (appointedOwners.get(owner1).size() > 0 && appointedOwners.get(owner1).contains(owner2))
+            return true;
+        return false;
+    }
 
     /**
      * owner adds a new product to the store
@@ -439,6 +493,25 @@ public class Store {
     }
 
     /**
+     * get the actual user of the manager appointeed by the ownerUser with managerUserName
+     *
+     * @param ownerUser       - the appointing owner
+     * @param ownerUserName - the appointed manager
+     * @return the user belongs to the manager username
+     * or exception if not appointed by the owner
+     * or null if the owner didn't appointed anyone
+     */
+    public UserSystem getAppointedOwner(UserSystem ownerUser, String ownerUserName) {
+        if (isOwner(ownerUser) && !appointedOwners.get(ownerUser).isEmpty()){
+            for (UserSystem user:appointedOwners.get(ownerUser)) {
+                if (user.getUserName().equals(ownerUserName))
+                    return user;
+            }
+        }
+        throw new NoOwnerInStoreException(ownerUserName,storeId);
+    }
+
+    /**
      * get the manager object of the manager managerUserName appointed by ownerUser
      *
      * @param ownerUser       - the appointing owner
@@ -490,7 +563,7 @@ public class Store {
      * @param user
      * @return
      */
-    private boolean isOwner(UserSystem user) {
+    public boolean isOwner(UserSystem user) {
         return ownersContains(user);
     }
 

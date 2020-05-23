@@ -342,7 +342,28 @@ public class TradingSystemFacade {
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             return tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
         } catch (TradingSystemException e) {
-            log.error("Add permission failed", e);
+            log.error("remove manager failed", e);
+            return false;
+        }
+    }
+
+    /**
+     * remove owner from the store by the owner that appointed him
+     *
+     * @param ownerUsername   owner that appointed the manger
+     * @param storeId         - the id that of the store that want remove the owner
+     * @param ownerToRemove - the owner that needs to be removed
+     * @param uuid
+     * @return true if succeed
+     */
+    public boolean removeOwner(@NotBlank String ownerUsername, int storeId, @NotBlank String ownerToRemove, UUID uuid) {
+        try {
+            UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid); //get registered user
+            Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
+            UserSystem removeOwner = ownedStore.getAppointedOwner(ownerUser, ownerToRemove);
+            return tradingSystem.removeManager(ownedStore, ownerUser, removeOwner);
+        } catch (TradingSystemException e) {
+            log.error("remove owner failed", e);
             return false;
         }
     }

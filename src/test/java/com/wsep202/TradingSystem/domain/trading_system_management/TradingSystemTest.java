@@ -8,6 +8,7 @@ import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import javafx.util.Pair;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
@@ -715,8 +716,8 @@ class TradingSystemTest {
         }
 
         /**
-         * This test check if the removeManager method fails when the parameters
-         * are wrong.
+         * This test check if the removeManager method fails
+         * when one of the parameters is null
          */
         @Test
         void removeManagerNullObject(){
@@ -727,11 +728,95 @@ class TradingSystemTest {
             //can't remove a null manager from store
             Assertions.assertFalse(tradingSystem.removeManager(store,userSystem,null));
         }
+
+        /**
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct.
+         */
+        @Test
+        void removeOwnerSuc(){
+            setUpForRemoveOwner();
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(userSystem));
+            //check that the user was successfully removed from list
+            Assertions.assertTrue(tradingSystem.removeOwner(store,userSystem1,userSystem));
+            //check that userSystem is no longer an owner of the store
+            Assertions.assertTrue(!store.getOwners().contains(userSystem));
+        }
+
+        /**
+         * This test check if the removeOwner method fails
+         * when one of the parameters is null
+         */
+        @Test
+        void removeOwnerNullObject(){
+            setUpForRemoveOwner();
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(userSystem));
+            //can't remove from null store
+            Assertions.assertFalse(tradingSystem.removeOwner(null,userSystem1,userSystem));
+            //can't remove with null owner
+            Assertions.assertFalse(tradingSystem.removeOwner(store,null,userSystem));
+            //can't remove a null owner from store
+            Assertions.assertFalse(tradingSystem.removeManager(store,userSystem1,null));
+            //check after fail remove that the userSystem is still an owner
+            Assertions.assertTrue(store.isOwner(userSystem));
+        }
+
+        /**
+         * This test check if the removeManager method fails
+         * when one of the users is not an owner of the store
+         */
+        @Test
+        void removeOwnerNotAnOwner(){
+            setUpForRemoveOwner();
+            int numberOfOwners = store.getOwners().size();
+            //check that the user is an owner of the store
+            Assertions.assertTrue(store.isOwner(userSystem));
+            //can't remove owner because userSystem2 is not an owner
+            Assertions.assertFalse(tradingSystem.removeOwner(store,userSystem2,userSystem));
+            //check that the user is still an owner of the store
+            Assertions.assertTrue(store.isOwner(userSystem));
+            //can't remove owner because userSystem2 is not an owner
+            Assertions.assertFalse(tradingSystem.removeOwner(store,userSystem1,userSystem2));
+            //check after fail remove the numbers of owners didn't change
+            Assertions.assertEquals(numberOfOwners,store.getOwners().size());
+        }
+
+        /**
+         * This test check if the removeManager method fails
+         * when both of the users are owners but for a different store
+         */
+        @Test
+        void removeOwnerWrongStore(){
+            setUpForRemoveOwner();
+            //check that the user is not an owner in this store
+            Assertions.assertFalse(store1.isOwner(userSystem));
+            //can't remove an owner that is not an owner in this store
+            Assertions.assertFalse(tradingSystem.removeOwner(store1,userSystem1,userSystem));
+            //check that the user is still not an owner in this store
+            Assertions.assertFalse(store1.isOwner(userSystem));
+        }
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // ********************************** Set Up Functions For Tests ********************************** //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+        private void setUpForRemoveOwner(){
+            when(userSystem.getUserName()).thenReturn("RemovedManager");
+            when(store.getStoreId()).thenReturn(2);
+            when(store.removeOwner(userSystem1,userSystem)).thenReturn(true);
+            Set<UserSystem> owners = new HashSet<>();
+            owners.add(userSystem1);
+            store.setOwners(owners);
+            when(store.isOwner(userSystem)).thenReturn(true);
+            when(store.removeOwner(userSystem1,userSystem2)).thenReturn(false);
+            when(store.removeOwner(userSystem2,userSystem)).thenReturn(false);
+            when(store1.removeOwner(userSystem1,userSystem)).thenReturn(false);
+            when(store1.isOwner(userSystem1)).thenReturn(false);
+            when(store1.isOwner(userSystem)).thenReturn(false);
+        }
 
         /**
          * set a user in logged in map
@@ -1858,6 +1943,127 @@ class TradingSystemTest {
 //            //1 users is not registered
 //            Assertions.assertFalse(tradingSystem.removeManager(store1,wrongOwner,newManager));
 //        }
+
+        /**
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct.
+         */
+        @Test
+        void removeOwnerSuc(){
+            setUpForRemoveOwner();
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(userToOpenStore));
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(storeOwner));
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(newManager));
+            //check that the user was successfully removed from list
+            Assertions.assertTrue(tradingSystem.removeOwner(store,userToOpenStore,storeOwner));
+            //check that userSystem is no longer an owner of the store
+            Assertions.assertFalse(store.isOwner(storeOwner));
+            //appointed by storeOwner, needs to be deleted if storeOwner wad removed
+            Assertions.assertFalse(store.isOwner(newManager));
+        }
+
+        private void setUpForRemoveOwner(){
+            userToOpenStore = new UserSystem("openStoreUserTest", "open", "storeUser", "123weer");
+            storeOwner = new UserSystem("storeOwnerTest","storeOwner","Test","456tyu");
+            newManager = new UserSystem("newManagerTest","manager","storeTest","678uio");
+            store = tradingSystem.openStore(userToOpenStore,"newKindStore","we print stuff");
+            store.addOwner(userToOpenStore,storeOwner);
+            store.addOwner(storeOwner,newManager);
+            store1 = tradingSystem.openStore(newManager,"ZARA", "cloth");
+        }
+
+        /**
+         * This test check if the removeManager method fails
+         * when 2 users are owners of the store but
+         * the removing owner didn't appoint the owner that needs to be removed
+         */
+        @Test
+        void removeOwnerNotAppointedBy(){
+            setUpForRemoveOwner();
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(userToOpenStore));
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(storeOwner));
+            //check that the method fails
+            Assertions.assertFalse(tradingSystem.removeOwner(store,storeOwner,userToOpenStore));
+            //check after fail remove userToOpenStore is still an owner of the store
+            Assertions.assertTrue(store.isOwner(userToOpenStore));
+            //check after fail remove storeOwner is still an owner of the store
+            Assertions.assertTrue(store.isOwner(storeOwner));
+        }
+
+        /**
+         * This test check if the removeOwner method fails
+         * when one of the parameters is null
+         */
+        @Test
+        void removeOwnerNullObject(){
+            setUpForRemoveOwner();
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(userToOpenStore));
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(storeOwner));
+            //can't remove from null store
+            Assertions.assertFalse(tradingSystem.removeOwner(null,userToOpenStore,storeOwner));
+            //can't remove with null owner
+            Assertions.assertFalse(tradingSystem.removeOwner(store,null,storeOwner));
+            //can't remove a null owner from store
+            Assertions.assertFalse(tradingSystem.removeManager(store,userToOpenStore,null));
+            //check after fail remove that the userSystem is still an owner
+            Assertions.assertTrue(store.isOwner(userToOpenStore));
+            //check after fail remove that the userSystem is still an owner
+            Assertions.assertTrue(store.isOwner(storeOwner));
+        }
+
+        @Test
+        void removeOwnerHimself(){
+            setUpForRemoveOwner();
+            //check before remove if userSystem is an owner of the store
+            Assertions.assertTrue(store.isOwner(userToOpenStore));
+            //can't remove himself from store
+            Assertions.assertFalse(tradingSystem.removeOwner(store,userToOpenStore,userToOpenStore));
+            //check after fail remove that the userSystem is still an owner
+            Assertions.assertTrue(store.isOwner(userToOpenStore));
+        }
+
+        /**
+         * This test check if the removeManager method fails
+         * when one of the users is not an owner of the store
+         */
+        @Test
+        void removeOwnerNotAnOwner(){
+            setUpForRemoveOwner();
+            int numberOfOwners = store.getOwners().size();
+            //check that the user is an owner of the store
+            Assertions.assertTrue(store.isOwner(storeOwner));
+            //can't remove owner because userSystem2 is not an owner
+            Assertions.assertFalse(tradingSystem.removeOwner(store,userSystem2,storeOwner));
+            //check that the user is still an owner of the store
+            Assertions.assertTrue(store.isOwner(storeOwner));
+            //can't remove owner because userSystem2 is not an owner
+            Assertions.assertFalse(tradingSystem.removeOwner(store,storeOwner,userSystem2));
+            //check after fail remove the numbers of owners didn't change
+            Assertions.assertEquals(numberOfOwners,store.getOwners().size());
+        }
+
+        /**
+         * This test check if the removeManager method fails
+         * when both of the users are owners but for a different store
+         */
+        @Test
+        void removeOwnerWrongStore(){
+            setUpForRemoveOwner();
+            //check that the user is not an owner in this store
+            Assertions.assertFalse(store1.isOwner(storeOwner));
+            //can't remove an owner that is not an owner in this store
+            Assertions.assertFalse(tradingSystem.removeOwner(store1,userToOpenStore,storeOwner));
+            //check that the user is still not an owner in this store
+            Assertions.assertFalse(store1.isOwner(storeOwner));
+        }
+
 
 
 

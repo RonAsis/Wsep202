@@ -484,6 +484,55 @@ class StoreTest {
             Assertions.assertEquals(1, storeUT.getManagers().size());
         }
 
+        @Test
+        void removeOwnerSuc(){
+            setUpRemoveOwner();
+            int ownerLiseSize = storeUT.getOwners().size();
+            //check that the list of owners is not empty
+            Assertions.assertTrue(ownerLiseSize != 0);
+            //check before the remove that the user is an owner
+            Assertions.assertTrue(storeUT.getOwners().contains(managerUser));
+            //check that the removal was successful
+            Assertions.assertTrue(storeUT.removeOwner(owner,managerUser));
+            //removed 9 owners from store
+            Assertions.assertEquals(1, storeUT.getOwners().size());
+        }
+
+        @Test
+        void removeOwnerNotAnOwner(){
+            setUpRemoveOwner();
+            int ownerLiseSize = storeUT.getOwners().size();
+            //check that the list of owners is not empty
+            Assertions.assertTrue(ownerLiseSize != 0);
+            //check before the remove that the user is an owner
+            Assertions.assertTrue(storeUT.getOwners().contains(managerUser));
+            //someone who is not an owner can't remove a real owner
+            Assertions.assertFalse(storeUT.removeOwner(fakeOwner,managerUser));
+            //can't remove someone who is not an owner of the store
+            Assertions.assertFalse(storeUT.removeOwner(owner,fakeOwner));
+            //check that the numbers of owners didn't change
+            Assertions.assertEquals(ownerLiseSize, storeUT.getOwners().size());
+            //check after fail remove that managerUser is still an owner in store
+            Assertions.assertTrue(storeUT.getOwners().contains(managerUser));
+        }
+
+        @Test
+        void removeOwnerHimself(){
+            setUpRemoveOwner();
+            int ownerLiseSize = storeUT.getOwners().size();
+            //check that the list of owners is not empty
+            Assertions.assertTrue(ownerLiseSize != 0);
+            //check before the remove that the user is an owner
+            Assertions.assertTrue(storeUT.getOwners().contains(owner));
+            //an owner can't remove himself from the store
+            Assertions.assertFalse(storeUT.removeOwner(owner,owner));
+            //check that the numbers of owners didn't change
+            Assertions.assertEquals(ownerLiseSize, storeUT.getOwners().size());
+            //check after fail remove that owner is still an owner in store
+            Assertions.assertTrue(storeUT.getOwners().contains(owner));
+        }
+
+
         /**
          * get existing product in the store
          */
@@ -507,6 +556,27 @@ class StoreTest {
             Assertions.assertEquals("A product with id '" +
                     33 + "' is not exist in store with id: '" + storeUT.getStoreId() +
                     "'", exception.getMessage());
+        }
+
+        @Test
+        void getAppointedOwnerSuc(){
+            setUpGetAppointedOwner();
+            //check that the right user returns
+            Assertions.assertEquals(newOwner,storeUT.getAppointedOwner(owner,newOwner.getUserName()));
+        }
+
+        private void setUpGetAppointedOwner(){
+            Set<UserSystem> owners = new HashSet<>();
+            owners.add(owner);
+            owners.add(newOwner);
+            storeUT.setOwners(owners);
+            Map<UserSystem,Set<UserSystem>> appointedOwners = new HashMap<>();
+            Set<UserSystem> apOwner = new HashSet<>();
+            apOwner.add(newOwner);
+            appointedOwners.put(owner,apOwner);
+            storeUT.setAppointedOwners(appointedOwners);
+            when(owner.getUserName()).thenReturn("ownerTest");
+            when(newOwner.getUserName()).thenReturn("newOwnerTest");
         }
 
         /**
@@ -1380,16 +1450,6 @@ class StoreTest {
             Assertions.assertNull(storeUT.addEditDiscount(ownerRealUser, discount));
         }
 
-
-
-
-
-
-
-
-
-
-
         /**
          * edit existed purchase in store
          */
@@ -1459,5 +1519,44 @@ class StoreTest {
             storeUT.addOwner(ownerRealUser, newOwnerReal);
         }
 
+    }
+
+    private void setUpRemoveOwner(){
+        Map<UserSystem, Set<UserSystem>> appointedOwners = new HashMap<>();
+        Set<UserSystem> owners = new HashSet<>();
+        owners.add(owner);
+        owners.add(managerUser);
+        Set<UserSystem> ownerSet = new HashSet<>();
+        ownerSet.add(managerUser);
+        appointedOwners.put(owner,ownerSet);
+        ownerSet = makeOwnersSet(4, "Erik");
+        UserSystem usr = getUser(ownerSet);
+        appointedOwners.put(managerUser,ownerSet);
+        owners.addAll(ownerSet);
+        ownerSet = makeOwnersSet(2, "Fez");
+        appointedOwners.put(usr, ownerSet);
+        owners.addAll(ownerSet);
+        usr = getUser(ownerSet);
+        ownerSet = makeOwnersSet(2, "Michael");
+        appointedOwners.put(usr, ownerSet);
+        owners.addAll(ownerSet);
+        storeUT.setOwners(owners);
+        storeUT.setAppointedOwners(appointedOwners);
+    }
+
+    private UserSystem getUser(Set<UserSystem> users){
+        for (UserSystem user: users) {
+            return user;
+        }
+        return null;
+    }
+
+    private Set<UserSystem> makeOwnersSet(int length, String name){
+        Set<UserSystem> tempOwners = new HashSet<>();
+        for (int i=0; i < length ; i++){
+            tempOwners.add(UserSystem.builder()
+                    .userName(name+i).build());
+        }
+        return tempOwners;
     }
 }

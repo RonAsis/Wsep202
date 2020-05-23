@@ -444,6 +444,23 @@ public class TradingSystem {
     }
 
     /**
+     * remove owner from store
+     * @param store  - the store
+     * @param ownerUser    - the owner of the store that want remove the other owner
+     * @param removeOwner - the owner that needs to removed
+     * @return true if manager was removed, else false
+     */
+    public boolean removeOwner(Store store, UserSystem ownerUser, UserSystem removeOwner) {
+        if (Objects.nonNull(store) && Objects.nonNull(ownerUser) && Objects.nonNull(removeOwner)
+                && store.removeOwner(ownerUser, removeOwner)) {
+            log.info(String.format("user %s was removed as owner from store '%d'", removeOwner.getUserName(), store.getStoreId()));
+            return true;
+        }
+        log.info(String.format("failed remove user as owner from store"));
+        return false;
+    }
+
+    /**
      * connect to Notification System
      */
     public void connectNotificationSystem(Observer observer, String principal) {
