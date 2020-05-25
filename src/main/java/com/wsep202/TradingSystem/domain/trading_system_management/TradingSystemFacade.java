@@ -361,7 +361,7 @@ public class TradingSystemFacade {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid); //get registered user
             Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
             UserSystem removeOwner = ownedStore.getAppointedOwner(ownerUser, ownerToRemove);
-            return tradingSystem.removeManager(ownedStore, ownerUser, removeOwner);
+            return tradingSystem.removeOwner(ownedStore, ownerUser, removeOwner);
         } catch (TradingSystemException e) {
             log.error("remove owner failed", e);
             return false;

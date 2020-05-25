@@ -14,6 +14,7 @@
           class="list-group-item"
           *ngFor="let username of owners"
           [username]=username
+          (ownerItemDeleted)="onOwnerItemDeleted($event)"
         >
         </app-owner-item>
       </div>

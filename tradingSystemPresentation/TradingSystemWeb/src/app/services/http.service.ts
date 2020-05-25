@@ -481,6 +481,16 @@ export class HttpService {
       url);
   }
 
+  public removeOwner(ownerUsername: string, storeId: number, ownerToRemove: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'remove-owner/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${ownerToRemove}/` +
+      `${uuid}`;
+    return this.http.post<Manager>(
+      url, null);
+  }
+
 
   //////////////////////////////////////// general /////////////////////////////
 

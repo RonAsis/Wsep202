@@ -143,6 +143,10 @@ export class StoreService {
 
   addDiscount(storeId: number, discount: Discount) {
     return this.httpService.addDiscount(this.userService.getUsername(), storeId, discount, this.userService.getUuid());
+  }
+
+  removeOwner(storeId: number, ownerRemove: string){
+    return this.httpService.removeOwner(this.userService.getUsername(), storeId, ownerRemove, this.userService.getUuid());
 
   }
 }

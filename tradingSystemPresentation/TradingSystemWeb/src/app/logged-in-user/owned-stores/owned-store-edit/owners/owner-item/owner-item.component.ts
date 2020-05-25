@@ -8,9 +8,13 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 export class OwnerItemComponent implements OnInit {
 
   @Input() username: string;
+  @Output() ownerItemDeleted = new EventEmitter<string>();
   constructor() { }
 
   ngOnInit(): void {
   }
 
+  onOwnerItemDeleted($event: MouseEvent) {
+    this.ownerItemDeleted.emit(this.username);
+  }
 }

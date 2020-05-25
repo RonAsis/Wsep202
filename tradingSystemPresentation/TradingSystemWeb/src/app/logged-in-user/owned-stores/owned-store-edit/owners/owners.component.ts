@@ -29,4 +29,12 @@ export class OwnersComponent implements OnInit {
     this.owners.push(newOwner);
   }
 
+  onOwnerItemDeleted(ownerUsername: string) {
+    this.storeService.removeOwner(this.store.storeId, ownerUsername)
+      .subscribe(response => {
+        if (response){
+          this.owners = this.owners.filter(username => username !== ownerUsername);
+        }
+      });
+  }
 }

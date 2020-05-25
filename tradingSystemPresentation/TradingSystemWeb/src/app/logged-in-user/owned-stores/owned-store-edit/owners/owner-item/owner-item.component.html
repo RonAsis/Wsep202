@@ -4,6 +4,19 @@
   <div>
     {{username}}
   </div>
+
+  <div>
+    <button type="button"
+            class="btn btn-default"
+            aria-label="Left Align"
+            (click)="onOwnerItemDeleted($event)"
+    >
+        <span class="glyphicon glyphicon-remove"
+              aria-hidden="true"
+              id=username>
+        </span>
+    </button>
+  </div>
 </div>
 
 

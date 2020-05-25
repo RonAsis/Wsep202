@@ -227,4 +227,17 @@ public class SellerOwnerController {
                                        @PathVariable UUID uuid) {
         return sellerOwnerService.getMySubMangers(ownerUsername, storeId,uuid);
     }
+
+    /**
+     * remove owner
+     */
+    @ApiOperation(value = "remove owner")
+    @PostMapping("remove-owner/{ownerUsername}/{storeId}/{ownerToRemove}/{uuid}")
+    public boolean removeOwner(@PathVariable String ownerUsername,
+                                 @PathVariable int storeId,
+                                 @PathVariable String ownerToRemove,
+                                 @PathVariable UUID uuid) {
+        return sellerOwnerService.removeOwner(ownerUsername, storeId, ownerToRemove, uuid);
+    }
+
 }
