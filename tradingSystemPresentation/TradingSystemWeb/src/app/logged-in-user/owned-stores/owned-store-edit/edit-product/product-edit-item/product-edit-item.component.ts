@@ -54,7 +54,11 @@ export class ProductEditItemComponent implements OnInit {
     this.storeService.editProduct(this.productItem.storeId, this.productItem.productSn,
       this.nameProductItem.nativeElement.value, this.selectedCategory, this.amountProductItem.nativeElement.value,
       this.costProductItem.nativeElement.value
-      ).subscribe();
+      ).subscribe(response => {
+        if (response){
+          this.productItemChanged.emit({productSn: this.productItem.productSn, storeId: this.productItem.storeId});
+        }
+    });
   }
 
   onSelectCategory(category: string) {

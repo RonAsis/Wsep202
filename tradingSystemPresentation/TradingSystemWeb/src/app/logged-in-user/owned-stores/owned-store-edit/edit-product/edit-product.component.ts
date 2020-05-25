@@ -41,6 +41,8 @@ export class EditProductComponent implements OnInit {
   }
 
   onProductItemChanged(productData: { productSn: number, storeId: number }) {
+    this.productItems = this.productItems.filter(product => product.productSn !== productData.productSn);
+    this.store.products = this.productItems;
     this.productItemChanged.emit({
       productSn: productData.productSn,
       storeId: productData.storeId
