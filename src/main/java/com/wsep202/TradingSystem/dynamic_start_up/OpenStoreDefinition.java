@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.dynamic_start_up;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.wsep202.TradingSystem.domain.trading_system_management.Store;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,7 +34,7 @@ public class OpenStoreDefinition extends ActivityDefinition{
 
     @Override
     public void apply(Context context, TradingSystemFacade tradingSystemFacade) {
-        Store store = tradingSystemFacade.openStore(userNameOwner, storeName, description, context.getUuid(userNameOwner));
+        StoreDto store = tradingSystemFacade.openStore(userNameOwner, storeName, description, context.getUuid(userNameOwner));
         if(Objects.nonNull(store)) {
             context.addStoreId(store.getStoreId());
         }
