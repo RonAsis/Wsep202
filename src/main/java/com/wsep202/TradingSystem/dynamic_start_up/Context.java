@@ -61,4 +61,8 @@ public class Context {
     public UUID getUuid(String userName) {
         return mapUsernameToUUID.get(userName);
     }
+
+    public void removeUuid(String username) {
+        mapUsernameToUUID.remove(username);
+    }
 }

@@ -21,7 +21,9 @@ import lombok.Data;
         @JsonSubTypes.Type(value = AddPolicyPurchaseDefinition.class, name = AddPolicyPurchaseDefinition.type),
         @JsonSubTypes.Type(value = AddProductDefinition.class, name = AddProductDefinition.type),
         @JsonSubTypes.Type(value = OpenStoreDefinition.class, name = OpenStoreDefinition.type),
-        @JsonSubTypes.Type(value = ApproveOwnerDefinition.class, name = ApproveOwnerDefinition.type)
+        @JsonSubTypes.Type(value = ApproveOwnerDefinition.class, name = ApproveOwnerDefinition.type),
+        @JsonSubTypes.Type(value = PurchaseBuyerUserDefinition.class, name = PurchaseBuyerUserDefinition.type),
+        @JsonSubTypes.Type(value = LogoutDefinition.class, name = LogoutDefinition.type),
 })
 public abstract class ActivityDefinition {
 

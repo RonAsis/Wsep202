@@ -1,0 +1,22 @@
+activities:
+  - type: register
+    userName: Bar
+    password: banana1
+    firstName: Bar
+    lastName: Perlman
+  - type: register
+    userName: Ron
+    password: banana1
+    firstName: Ron
+    lastName: Asis
+  - type: login
+    userName: Ron
+    password: banana1
+  - type: openStore
+    userNameOwner: Ron
+    storeName: Ron Store inc.
+    description: The best stoer ever
+  - type: addManager
+    ownerUserName: Ron
+    storeId: 0
+    newManagerUsername: Bar

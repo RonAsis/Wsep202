@@ -6,16 +6,22 @@ import com.github.javafaker.Faker;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.dynamic_start_up.ActivationPaths;
+import com.wsep202.TradingSystem.dynamic_start_up.InitialSystem;
+import com.wsep202.TradingSystem.dynamic_start_up.Context;
+import com.wsep202.TradingSystem.utils.FormatFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
+import org.springframework.util.ResourceUtils;
 
-import java.io.File;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.wsep202.TradingSystem.domain.image.ImagePath.ROOT_IMAGE_DIC;
 import static com.wsep202.TradingSystem.domain.image.ImagePath.USER_IMAGE_DIC;
@@ -26,6 +32,9 @@ import static com.wsep202.TradingSystem.domain.image.ImagePath.USER_IMAGE_DIC;
 public class AppStartupRunner implements ApplicationRunner {
 
     private final TradingSystem tradingSystem;
+
+    private final TradingSystemFacade tradingSystemFacade;
+
 
     private ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
 
@@ -43,8 +52,63 @@ public class AppStartupRunner implements ApplicationRunner {
 
     ///////////////////////////////////////////// for files System 1.1 /////////////////////////
     private void initialAccordingByFiles() {
-        File initialRootDir = new File(ActivationPaths.INITIAL_FILES);
-        // TODO need to act all the files
+        Context context = new Context();
+        try (Stream<Path> walk = Files.walk(ResourceUtils.getFile(ActivationPaths.INITIAL_FILES).toPath())) {
+
+            //collect all the yaml files
+            List<Path> pathList = walk.collect(Collectors.toList());
+
+            pathList = FormatFile.filterYamlFiles(pathList);
+
+            for (Path path : pathList) {
+                doActions(path, context);
+            }
+
+        } catch (IOException e) {
+            //if the directory don't exist
+            log.error("The Directory don't exists : " + "\n\t" + "  {} ", e.getMessage(), e);
+        }
+    }
+
+    private void doActions(Path path, Context context) {
+        InputStream inputStream = getInputStream(path);
+        Optional<InitialSystem> activityElement = getActivityElement(inputStream, path);
+        activityElement.ifPresent(initialSystem -> {
+            initialSystem.getActivities().forEach(activityDefinition -> activityDefinition.apply(context, tradingSystemFacade));
+        });
+    }
+
+    /**
+     * get input stream
+     *
+     * @param pathToWorkflowType - pathToWorkflowType
+     * @return InputStream
+     */
+    private InputStream getInputStream(Path pathToWorkflowType) {
+        InputStream inputstream = null;
+        try {
+            if (Objects.nonNull(pathToWorkflowType)) {
+                inputstream = new FileInputStream(pathToWorkflowType.toFile());
+            }
+        } catch (FileNotFoundException e) {
+            log.error("Cant open the file: {}", pathToWorkflowType, e);
+        }
+
+        //get the input stream
+        return inputstream;
+    }
+
+    private Optional<InitialSystem> getActivityElement(InputStream inputStream, Path path) {
+        InitialSystem initialSystem = null;
+        try {
+            // if the input stream is succeed
+            if (Objects.nonNull(inputStream)) {
+                initialSystem = FormatFile.mapper.readValue(inputStream, InitialSystem.class);
+            }
+        } catch (IOException e) {
+            log.error("The Structure of the file is invalid Activity : {}", path, e);
+        }
+        return Optional.ofNullable(initialSystem);
     }
 
     private boolean thereIsInitialFiles() {
