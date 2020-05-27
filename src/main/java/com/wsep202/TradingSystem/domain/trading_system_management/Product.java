@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -16,18 +17,16 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Slf4j
+@Entity
 public class Product {
 
     /**
      * the product serial number
      */
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     @Min(value = 0, message = "Must be greater than or equal zero")
     private int productSn;
-
-    /**
-     * saves the last productSnAcc when a new product is created
-     */
-    private static int productSnAcc = 0;
 
     /**
      * the name of the product
@@ -39,6 +38,8 @@ public class Product {
      * the category of the product
      */
     @NotNull(message = "Must be category")
+    //@OneToOne(cascade = CascadeType.ALL)
+    @Transient
     private ProductCategory category;
 
     /**
@@ -77,7 +78,6 @@ public class Product {
 
 
     public Product(String name, ProductCategory category, int amount, double cost, int storeId){
-        this.productSn = generateProductSn();
         this.name = name;
         this.category = category;
         this.amount = amount;
@@ -85,14 +85,6 @@ public class Product {
         this.originalCost = cost;
         this.rank = 5;
         this.storeId = storeId;
-    }
-
-    /**
-     * Generates a new productSn (to ensure productSn is unique).
-     * @return - the new produceSn.
-     */
-    private int generateProductSn(){
-        return productSnAcc++;
     }
 
     /**

@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
@@ -13,10 +15,11 @@ import java.util.*;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
+@Entity
 public class Receipt {
 
-    private static int receiptSnAcc = 0;
-
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private int receiptSn;
 
     /**
@@ -33,6 +36,7 @@ public class Receipt {
     /**
      * the purchase date
      */
+    @DateTimeFormat
     private Date purchaseDate;
 
     /**
@@ -45,6 +49,7 @@ public class Receipt {
      * a list of all the products that the user bought in this purchase.
      */
     @Builder.Default
+    @Transient
     private Map<Product, Integer> productsBought = new HashMap<>();
 
     /**
@@ -56,18 +61,9 @@ public class Receipt {
      */
     public Receipt(int storeId, String userName, double amountToPay, Map<Product, Integer> products){
         purchaseDate = new Date(); // sets the current date
-        this.receiptSn = getReceiptIdAcc();
         this.storeId = storeId;
         this.userName = userName;
         this.amountToPay = amountToPay;
         this.productsBought = products;
-    }
-
-    /**
-     * get and accumilate the receipt id accumulator
-     * @return the receipt serial number
-     */
-    private int getReceiptIdAcc(){
-        return receiptSnAcc++;
     }
 }
