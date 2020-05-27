@@ -63,12 +63,8 @@ public class LogoutTest {
      */
     @Test
     void logoutRegisteredUserNullUUID() {
-        try{
-            Assertions.assertFalse(this.buyerRegisteredService.logout(
-                    this.user.getUserName(), null));
-        } catch (Exception e){
-
-        }
+        Assertions.assertFalse(this.buyerRegisteredService.logout(
+                this.user.getUserName(), null));
     }
     /**
      * logout a user that isn't registered.
@@ -83,10 +79,6 @@ public class LogoutTest {
      */
     @Test
     void logoutNotRegisteredUserEmptyUsername() {
-        try {
-            Assertions.assertFalse(this.buyerRegisteredService.logout("", this.uuid));
-        } catch (Exception e){
-
-        }
+        Assertions.assertFalse(this.buyerRegisteredService.logout("", this.uuid));
     }
 }

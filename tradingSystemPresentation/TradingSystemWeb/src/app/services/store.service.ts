@@ -17,7 +17,7 @@ export class StoreService {
   private ownerStore = false;
   private mangerStore = false;
   discountSelected = new EventEmitter<Discount>();
-
+  discountAdded = new EventEmitter<Discount>();
   constructor(private httpService: HttpService, private userService: UserService) {
   }
 
@@ -138,7 +138,11 @@ export class StoreService {
   }
 
   getDiscounts(storeId: number) {
-    return this.httpService.getDiscounts(this.userService.getUsername(), storeId, this.userService.getUuid());
+    return this.httpService.getAllDiscounts(this.userService.getUsername(), storeId, this.userService.getUuid());
+  }
+
+  getSimpleDiscounts(storeId: number) {
+    return this.httpService.getSimpleDiscounts(this.userService.getUsername(), storeId, this.userService.getUuid());
   }
 
   addDiscount(storeId: number, discount: Discount) {

@@ -18,8 +18,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 class DiscountTest {
 
-    //the discounts types
-    VisibleDiscount visibleClass = new VisibleDiscount();
+//    //the discounts types
+//    VisibleDiscount visibleClass = new VisibleDiscount();
 
 
     private Discount visDiscount;
@@ -43,11 +43,11 @@ class DiscountTest {
             endTime.set(3000,1,1);
 
             //visible discount
-            visDiscount = Discount.builder()
-                    .endTime(endTime)
-                    .discountPercentage(100)
-                    .isStoreDiscount(false)
-                    .build();
+//            visDiscount = Discount.builder()
+//                    .endTime(endTime)
+//                    .discountPercentage(100)
+//                    .isStoreDiscount(false)
+//                    .build();
         }
 
 

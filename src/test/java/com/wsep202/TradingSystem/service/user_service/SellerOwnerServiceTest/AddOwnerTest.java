@@ -3,6 +3,8 @@ package com.wsep202.TradingSystem.service.user_service.SellerOwnerServiceTest;
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.*;
 import javafx.util.Pair;
@@ -40,7 +42,7 @@ public class AddOwnerTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-    int storeId = 0;
+    int storeId;
 
 
     @BeforeEach
@@ -57,7 +59,10 @@ public class AddOwnerTest {
         if (returnedValue != null){
             this.uuid = returnedValue.getKey();
         }
-        this.helper.openStoreAndAddProducts(this.user, this.userPassword, this.uuid);
+        Pair<StoreDto, ProductDto> returnedValueOpen = this.helper.openStoreAndAddProduct(this.user, this.uuid);
+        if (returnedValueOpen != null){
+            this.storeId = returnedValueOpen.getKey().getStoreId();
+        }
     }
 
     @AfterEach
@@ -79,12 +84,10 @@ public class AddOwnerTest {
      */
     @Test
     void addValidManagerNotRegisteredOwnerValidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager("NotRegistered",
-                    this.storeId, this.newOwner.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addManager("NotRegistered",
+                    this.storeId, this.newOwner.getUserName(), this.uuid);
+        });
     }
 
     /**
@@ -92,12 +95,8 @@ public class AddOwnerTest {
      */
     @Test
     void addValidManagerRegisteredOwnerInvalidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
-                    8, this.newOwner.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
+                this.storeId + 8, this.newOwner.getUserName(), this.uuid));
     }
 
     /**
@@ -105,12 +104,8 @@ public class AddOwnerTest {
      */
     @Test
     void addInvalidManagerRegisteredOwnerValidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
-                    this.storeId, "NotRegistered", this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
+                this.storeId, "NotRegistered", this.uuid));
     }
 
     /**
@@ -118,12 +113,10 @@ public class AddOwnerTest {
      */
     @Test
     void addInvalidManagerNotRegisteredOwnerValidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager("NotRegistered",
-                    this.storeId, "NotRegistered2", this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addManager("NotRegistered",
+                    this.storeId, "NotRegistered2", this.uuid);
+        });
     }
 
     /**
@@ -131,12 +124,10 @@ public class AddOwnerTest {
      */
     @Test
     void addValidManagerNotRegisteredOwnerInvalidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager("NotRegistered",
-                    8, this.newOwner.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addManager("NotRegistered",
+                    this.storeId + 8, this.newOwner.getUserName(), this.uuid);
+        });
     }
 
     /**
@@ -144,12 +135,8 @@ public class AddOwnerTest {
      */
     @Test
     void addInvalidManagerRegisteredOwnerInvalidStore() {
-        try {
-            Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
-                    8, this.newOwner.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
+                this.storeId + 8, this.newOwner.getUserName(), this.uuid));
     }
 
     /**
@@ -157,11 +144,9 @@ public class AddOwnerTest {
      */
     @Test
     void addInvalidManagerNotRegisteredOwnerInvalidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager("NotRegistered",
-                    8, "NotRegistered2", this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addManager("NotRegistered",
+                    this.storeId + 8, "NotRegistered2", this.uuid);
+        });
     }
 }

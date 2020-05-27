@@ -2,8 +2,7 @@ package com.wsep202.TradingSystem.domain.mapping;
 
 import com.github.rozidan.springboot.modelmapper.TypeMapConfigurer;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.dto.*;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
@@ -40,7 +39,7 @@ public class TradingSystemMapper {
                                     .collect(Collectors.toList()))
                             .build();
                 }).collect(Collectors.toList());
-                if(Objects.nonNull(context.getDestination())){
+                if (Objects.nonNull(context.getDestination())) {
                     context.getDestination().clear();
                     context.getDestination().addAll(managerDtos);
                 }
@@ -135,28 +134,103 @@ public class TradingSystemMapper {
     public static class DiscountDtoToDiscount extends TypeMapConfigurer<DiscountDto, Discount> {
         @Override
         public void configure(TypeMap<DiscountDto, Discount> typeMap) {
-            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(Discount::setAmountOfProductsForApplyDiscounts));
-            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(Discount::setProductsUnderThisDiscount));
-            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(Discount::setDiscountPolicies));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(Discount::setDiscountPolicy));
+
+            Converter<String, DiscountType> stringToDiscountTypeConverter =
+                    ctx -> ctx.getSource() == null ? null : DiscountType.getDiscountType(ctx.getSource());
+
+            typeMap.addMappings(mapper -> mapper.using(stringToDiscountTypeConverter)
+                    .map(DiscountDto::getDiscountType, Discount::setDiscountType));
 
             typeMap.setPostConverter(context -> {
                 DiscountDto discountDto = context.getSource();
                 Map<Product, Integer> amountOfProductsForApplyDiscounts = createDiscountMap(discountDto.getAmountOfProductsForApplyDiscounts());
                 Map<Product, Integer> productsUnderThisDiscount = createDiscountMap(discountDto.getProductsUnderThisDiscount());
-                CompositeOperator compositeOperators = Objects.nonNull(discountDto.getCompositeOperator()) ?
+                CompositeOperator compositeOperator = Objects.nonNull(discountDto.getCompositeOperator()) ?
                         CompositeOperator.getCompositeOperators(discountDto.getCompositeOperator()) : null;
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(discountDto.getEndTime());
-                context.getDestination().setAmountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts);
-                context.getDestination().setProductsUnderThisDiscount(productsUnderThisDiscount);
-                context.getDestination().setCompositeOperator(compositeOperators);
-                context.getDestination().setEndTime(calendar);
+                DiscountPolicy discountPolicy;
+                switch (context.getDestination().getDiscountType()) {
+                    case COMPOSE:
+                        discountPolicy = ComposedDiscount.builder()
+                                .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                                .compositeOperator(compositeOperator)
+                                .productsUnderThisDiscount(productsUnderThisDiscount)
+                                .composedDiscounts(convertDiscountDtoToDiscount(discountDto.getComposedDiscounts()))
+                                .build();
+                        break;
+                    case VISIBLE:
+                        discountPolicy = VisibleDiscount.builder()
+                                .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                                .build();
+                        break;
+                    case CONDITIONAL_PRODUCT:
+                        discountPolicy = ConditionalProductDiscount.builder()
+                                .productsUnderThisDiscount(productsUnderThisDiscount)
+                                .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                                .build();
+                        break;
+                    case CONDITIONAL_STORE:
+                        discountPolicy = ConditionalStoreDiscount.builder()
+                                .minPrice(discountDto.getMinPrice())
+                                .build();
+                        break;
+                    default:
+                        discountPolicy = null;
+                        break;
+                }
+                context.getDestination().setDiscountPolicy(discountPolicy);
                 return context.getDestination();
             });
         }
 
+        /**
+         * the discounts of composite
+         */
+        private List<Discount> convertDiscountDtoToDiscount(List<DiscountDto> discounts) {
+            return discounts.stream()
+                    .map(discountDto -> {
+                        Map<Product, Integer> amountOfProductsForApplyDiscounts = createDiscountMap(discountDto.getAmountOfProductsForApplyDiscounts());
+                        Map<Product, Integer> productsUnderThisDiscount = createDiscountMap(discountDto.getProductsUnderThisDiscount());
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(discountDto.getEndTime());
+                        Discount discount = Discount.builder()
+                                .endTime(calendar)
+                                .discountPercentage(discountDto.getDiscountPercentage())
+                                .discountId(discountDto.getDiscountId())
+                                .description(discountDto.getDescription())
+                                .discountType(DiscountType.getDiscountType(discountDto.getDiscountType()))
+                                .build();
+                        DiscountPolicy discountPolicy;
+                        switch (discount.getDiscountType()) {
+                            case VISIBLE:
+                                discountPolicy = VisibleDiscount.builder()
+                                        .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                                        .build();
+                                break;
+                            case CONDITIONAL_PRODUCT:
+                                discountPolicy = ConditionalProductDiscount.builder()
+                                        .productsUnderThisDiscount(productsUnderThisDiscount)
+                                        .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                                        .build();
+                                break;
+                            case CONDITIONAL_STORE:
+                                discountPolicy = ConditionalStoreDiscount.builder()
+                                        .minPrice(discountDto.getMinPrice())
+                                        .build();
+                                break;
+                            default:
+                                discountPolicy = null;
+                                break;
+                        }
+                        discount.setDiscountPolicy(discountPolicy);
+                        return discount;
+                    }).collect(Collectors.toList());
+        }
+
         Map<Product, Integer> createDiscountMap(List<ProductDto> productDtos) {
-            return productDtos.stream()
+            return Objects.isNull(productDtos) ? null : productDtos.stream()
                     .collect(Collectors.toMap(
                             productDto ->
                                     Product.builder()
@@ -176,30 +250,98 @@ public class TradingSystemMapper {
     @Component
     public static class DiscountToDiscountDto extends TypeMapConfigurer<Discount, DiscountDto> {
         @Override
-        public void configure(TypeMap<Discount,DiscountDto> typeMap) {
+        public void configure(TypeMap<Discount, DiscountDto> typeMap) {
             typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(DiscountDto::setAmountOfProductsForApplyDiscounts));
             typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(DiscountDto::setProductsUnderThisDiscount));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(DiscountDto::setCompositeOperator));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(DiscountDto::setComposedDiscounts));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(DiscountDto::setDescription));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(DiscountDto::setMinPrice));
+
+            Converter<DiscountType, String> DiscountTypeToStringConverter =
+                    ctx -> ctx.getSource() == null ? null : ctx.getSource().type;
+
+            typeMap.addMappings(mapper -> mapper.using(DiscountTypeToStringConverter)
+                    .map(Discount::getDiscountType, DiscountDto::setDiscountType));
 
             typeMap.setPostConverter(context -> {
-                Discount discount = context.getSource();
-                //Map<Product, Integer> amountOfProductsForApplyDiscounts = createDiscountMap(discountDto.getAmountOfProductsForApplyDiscounts());
-               /// Map<Product, Integer> productsUnderThisDiscount = createDiscountMap(discountDto.getProductsUnderThisDiscount());
-                String compositeOperators = Objects.nonNull(discount.getCompositeOperator()) ?
-                        discount.getCompositeOperator().name : null;
                 Date date = context.getSource().getEndTime().getTime();
-//                context.getDestination().setAmountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts);
-//                context.getDestination().setProductsUnderThisDiscount(productsUnderThisDiscount);
-                context.getDestination().setCompositeOperator(compositeOperators);
                 context.getDestination().setEndTime(date);
+                context.getDestination().setDescription(context.getSource().getDescription());
+                switch (context.getSource().getDiscountType()) {
+                    case COMPOSE:
+                        ComposedDiscount composedDiscount = (ComposedDiscount) context.getSource().getDiscountPolicy();
+                        context.getDestination().setAmountOfProductsForApplyDiscounts(convertProductsToMap(composedDiscount.getAmountOfProductsForApplyDiscounts()));
+                        context.getDestination().setProductsUnderThisDiscount(convertProductsToMap(composedDiscount.getProductsUnderThisDiscount()));
+                        context.getDestination().setCompositeOperator(composedDiscount.getCompositeOperator().name);
+                        context.getDestination().setComposedDiscounts(convertToDiscountDto(composedDiscount.getComposedDiscounts()));
+                        break;
+                    case VISIBLE:
+                        VisibleDiscount visibleDiscount = (VisibleDiscount) context.getSource().getDiscountPolicy();
+                        List<ProductDto> amountOfProductsForApplyDiscounts = convertProductsToMap(visibleDiscount.getAmountOfProductsForApplyDiscounts());
+                        context.getDestination().setAmountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts);
+                        break;
+                    case CONDITIONAL_PRODUCT:
+                        ConditionalProductDiscount conditionalProductDiscount = (ConditionalProductDiscount) context.getSource().getDiscountPolicy();
+                        context.getDestination().setAmountOfProductsForApplyDiscounts(convertProductsToMap(conditionalProductDiscount.getAmountOfProductsForApplyDiscounts()));
+                        context.getDestination().setProductsUnderThisDiscount(convertProductsToMap(conditionalProductDiscount.getProductsUnderThisDiscount()));
+                        break;
+                    case CONDITIONAL_STORE:
+                        ConditionalStoreDiscount conditionalStoreDiscount = (ConditionalStoreDiscount) context.getSource().getDiscountPolicy();
+                        context.getDestination().setMinPrice(conditionalStoreDiscount.getMinPrice());
+                        break;
+                    default:
+                        break;
+                }
                 return context.getDestination();
             });
         }
 
-//        private List<Product> createlistProductFromMap( Map<Product, Integer> productIntegerMap){
-//            return productIntegerMap.entrySet()
-//                    .stream()
-//                    .map(productIntegerEntry -> )
-//        }
+        private List<DiscountDto> convertToDiscountDto(List<Discount> composedDiscounts) {
+            return composedDiscounts.stream()
+                    .map(discount -> {
+                        DiscountDto discountDto = DiscountDto.builder()
+                                .description(discount.getDescription())
+                                .discountId(discount.getDiscountId())
+                                .discountType(discount.getDiscountType().type)
+                                .build();
+                        Date date = discount.getEndTime().getTime();
+                        discountDto.setEndTime(date);
+                        switch (discount.getDiscountType()) {
+                            case VISIBLE:
+                                VisibleDiscount visibleDiscount = (VisibleDiscount) discount.getDiscountPolicy();
+                                List<ProductDto> amountOfProductsForApplyDiscounts = convertProductsToMap(visibleDiscount.getAmountOfProductsForApplyDiscounts());
+                                discountDto.setAmountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts);
+                                break;
+                            case CONDITIONAL_PRODUCT:
+                                ConditionalProductDiscount conditionalProductDiscount = (ConditionalProductDiscount) discount.getDiscountPolicy();
+                                discountDto.setAmountOfProductsForApplyDiscounts(convertProductsToMap(conditionalProductDiscount.getAmountOfProductsForApplyDiscounts()));
+                                discountDto.setProductsUnderThisDiscount(convertProductsToMap(conditionalProductDiscount.getProductsUnderThisDiscount()));
+                                break;
+                            case CONDITIONAL_STORE:
+                                ConditionalStoreDiscount conditionalStoreDiscount = (ConditionalStoreDiscount)  discount.getDiscountPolicy();
+                                discountDto.setMinPrice(conditionalStoreDiscount.getMinPrice());
+                                break;
+                            default:
+                                break;
+                        }
+                        return discountDto;
+                    }).collect(Collectors.toList());
+        }
+
+        private List<ProductDto> convertProductsToMap(Map<Product, Integer> amountOfProductsForApplyDiscounts) {
+            return amountOfProductsForApplyDiscounts.entrySet().stream()
+                    .map(entry -> ProductDto.builder()
+                    .storeId(entry.getKey().getStoreId())
+                            .originalCost(entry.getKey().getOriginalCost())
+                            .productSn(entry.getKey().getProductSn())
+                            .rank(entry.getKey().getRank())
+                            .cost(entry.getKey().getCost())
+                            .amount(entry.getValue())
+                            .name(entry.getKey().getName())
+                            .build())
+                    .collect(Collectors.toList());
+        }
     }
 
 }

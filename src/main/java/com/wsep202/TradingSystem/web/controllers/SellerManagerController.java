@@ -93,13 +93,25 @@ public class SellerManagerController {
     /**
      * get store discounts
      */
+    @ApiOperation(value = "get simple Discounts")
+    @GetMapping("get-simple-discounts/{username}/{storeId}/{uuid}")
+    public List<DiscountDto> getSimpleDiscounts(@PathVariable String username,
+                                                @PathVariable int storeId,
+                                                @PathVariable UUID uuid) {
+        return sellerManagerService.getSimpleDiscounts(username, storeId, uuid);
+    }
+    
+    /**
+     * get store discounts
+     */
     @ApiOperation(value = "get Discounts")
     @GetMapping("get-discounts/{username}/{storeId}/{uuid}")
-    public List<DiscountDto> getDiscounts(@PathVariable String username,
+    public List<DiscountDto> getAllDiscounts(@PathVariable String username,
                                           @PathVariable int storeId,
                                           @PathVariable UUID uuid) {
-        return sellerManagerService.getDiscounts(username, storeId, uuid);
+        return sellerManagerService.getAllDiscounts(username, storeId, uuid);
     }
+    
 
     /**
      * add or edit discount

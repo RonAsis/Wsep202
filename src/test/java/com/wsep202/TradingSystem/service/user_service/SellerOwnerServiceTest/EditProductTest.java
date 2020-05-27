@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.service.user_service.SellerOwnerServiceTest;
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.*;
 import com.wsep202.TradingSystem.dto.ProductDto;
@@ -52,12 +53,16 @@ public class EditProductTest {
                 this.manager.getFirstName(), this.manager.getLastName(), image);
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
-        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
+        Pair<UUID, Boolean> returnedValueLogin = this.helper.loginUser(this.user.getUserName(),
                 this.userPassword);
-        if (returnedValue != null){
-            this.uuid = returnedValue.getKey();
+        if (returnedValueLogin != null){
+            this.uuid = returnedValueLogin.getKey();
         }
-        this.productDto = this.helper.openStoreAndAddProducts(this.user, this.userPassword, this.uuid);
+        Pair<StoreDto, ProductDto> returnedValueOpen = this.helper.openStoreAndAddProduct(this.user, this.uuid);
+        if (returnedValueOpen != null){
+            this.productDto = returnedValueOpen.getValue();
+            this.storeId = returnedValueOpen.getKey().getStoreId();
+        }
     }
 
     @AfterEach
@@ -130,14 +135,12 @@ public class EditProductTest {
      */
     @Test
     void EditValidProductInvalidOwner() {
-        try {
-        Assertions.assertFalse(this.sellerOwnerService.editProduct(this.user.getUserName()+"Not",
-                this.storeId, this.productDto.getProductSn(), this.productDto.getName(),
-                this.productDto.getCategory().toLowerCase(), this.productDto.getAmount(), this.productDto.getCost(), this.uuid));
-    }catch (Exception e) {
-
-        }
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.editProduct(this.user.getUserName()+"Not",
+                    this.storeId, this.productDto.getProductSn(), this.productDto.getName(),
+                    this.productDto.getCategory().toLowerCase(), this.productDto.getAmount(), this.productDto.getCost(), this.uuid);
+        });
+    }
 
     /**
      * edit a valid product
@@ -157,14 +160,12 @@ public class EditProductTest {
      */
     @Test
     void EditValidProductInvalidOwnerInvalidStore() {
-        try {
-        Assertions.assertFalse(this.sellerOwnerService.editProduct(this.user.getUserName()+"Not",
-                this.storeId+5, this.productDto.getProductSn(), this.productDto.getName(),
-                this.productDto.getCategory().toLowerCase(), this.productDto.getAmount(), this.productDto.getCost(), this.uuid));
-    } catch (Exception e) {
-
-        }
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.editProduct(this.user.getUserName()+"Not",
+                    this.storeId+5, this.productDto.getProductSn(), this.productDto.getName(),
+                    this.productDto.getCategory().toLowerCase(), this.productDto.getAmount(), this.productDto.getCost(), this.uuid);
+        });
+    }
 
     /**
      * invalid product

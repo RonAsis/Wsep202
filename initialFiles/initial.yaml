@@ -1,17 +1,17 @@
 activities:
   - type: register
     userName: Bar
-    password: banana1
+    password: 1
     firstName: Bar
     lastName: Perlman
   - type: register
     userName: Ron
-    password: banana1
+    password: 1
     firstName: Ron
     lastName: Asis
   - type: login
     userName: Ron
-    password: banana1
+    password: 1
   - type: openStore
     userNameOwner: Ron
     storeName: Ron Store inc.

@@ -35,7 +35,6 @@ public class ViewUserPurchaseHistoryTest {
     AdministratorService administratorService;
     ServiceTestsHelper helper;
 
-    int storeId = 0;
     String adminUsername = "admin";
     String adminPassword = "admin";
     UUID uuid;
@@ -79,12 +78,10 @@ public class ViewUserPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidAdmin() {
-        try{
-            Assertions.assertNull(this.administratorService.viewPurchaseHistory(
-                    "NotAdmin", this.user.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.administratorService.viewPurchaseHistory(
+                    "NotAdmin", this.user.getUserName(), this.uuid);
+        });
     }
 
     /**
@@ -102,12 +99,10 @@ public class ViewUserPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidUserInvalidAdmin() {
-        try{
-            Assertions.assertNull(this.administratorService.viewPurchaseHistory(
-                    "NotAdmin", this.user.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()->
+                {this.administratorService.viewPurchaseHistory(
+                        "NotAdmin", this.user.getUserName(), this.uuid);}
+        );
     }
 
     /**
@@ -115,7 +110,8 @@ public class ViewUserPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryPurchases() {
-        this.helper.openStoreAddProductsAndPurchaseShoppingCart(this.adminUsername, this.uuid);
+        Pair<StoreDto, List<ReceiptDto>> returnedValue =
+                this.helper.createOwnerOpenStoreAddProductAddAndPurchaseShoppingCart(this.adminUsername, this.uuid);
         Assertions.assertNotNull(this.administratorService.viewPurchaseHistory(
                 this.adminUsername, this.adminUsername, this.uuid));
     }

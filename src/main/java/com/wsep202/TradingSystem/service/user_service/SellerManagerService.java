@@ -45,10 +45,12 @@ public class SellerManagerService {
         return tradingSystemFacade.getCompositeOperators(username, storeId, uuid);
     }
 
-    public List<DiscountDto> getDiscounts(String username, int storeId, UUID uuid) {
-        return tradingSystemFacade.getAllStoreDiscounts(username, storeId, uuid);
+    public List<DiscountDto> getSimpleDiscounts(String username, int storeId, UUID uuid) {
+        return tradingSystemFacade.getDiscountsSimple(username, storeId, uuid);
     }
-
+    public List<DiscountDto> getAllDiscounts(String username, int storeId, UUID uuid) {
+        return tradingSystemFacade.getAlltDiscounts(username, storeId, uuid);
+    }
     public List<PurchaseDto> getPurchases(String username, int storeId, UUID uuid) {
         return tradingSystemFacade.getAllStorePurchases(username, storeId, uuid);
     }

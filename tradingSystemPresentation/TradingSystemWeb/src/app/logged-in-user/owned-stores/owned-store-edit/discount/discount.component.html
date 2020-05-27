@@ -2,9 +2,12 @@
   <div class="col-md-5">
     <app-discounts
       [store]="store"
+      (discountWasSelected)="selectedDiscount = $event"
       ></app-discounts>
   </div>
+
   <div *ngIf="selectedDiscount" class="col-md-7">
-    <app-add-discount [discount]="selectedDiscount" [store]="store"></app-add-discount>
+    <app-add-discount [discount]="selectedDiscount" [store]="store"
+    (discountItemAdded)="discountItemChanged($event)"></app-add-discount>
   </div>
 </div>

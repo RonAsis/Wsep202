@@ -43,12 +43,14 @@ public class ViewPurchaseHistoryTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
+    private int counter = 0;
 
     @BeforeEach
     void setUp() {
         if (this.helper == null || this.helper.getGuestService() == null ) {
             this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService, this.sellerOwnerService);
         }
+        this.user.setUserName(this.user.getUserName()+this.counter);
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
         Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
@@ -56,6 +58,7 @@ public class ViewPurchaseHistoryTest {
         if (returnedValue != null){
             this.uuid = returnedValue.getKey();
         }
+        this.counter++;
     }
 
     @AfterEach
@@ -68,11 +71,9 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void viewPurchaseHistoryNotRegisteredUser() {
-        try{
-            Assertions.assertNull(this.buyerRegisteredService.viewPurchaseHistory("NotRegistered", uuid));
-        } catch (Exception e){
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.buyerRegisteredService.viewPurchaseHistory("NotRegistered", uuid);
+        });
     }
 
     /**
@@ -80,18 +81,16 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void viewPurchaseHistoryNotRegisteredEmptyUsername() {
-        try{
-            Assertions.assertNull(this.buyerRegisteredService.viewPurchaseHistory("", uuid));
-        } catch (Exception e){
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+                    this.buyerRegisteredService.viewPurchaseHistory("", uuid);
+        });
     }
 
     /**
      * view the purchase history of a user that is registered, but his history is empty
      */
     @Test
-    void viewEmptyPurchaseHistoryCartRegisteredUser() {
+    void viewEmptyPurchaseHistoryRegisteredUser() {
         List<ReceiptDto> receiptDtoList = new LinkedList<>();
         Assertions.assertEquals(receiptDtoList,
                 this.buyerRegisteredService.viewPurchaseHistory(this.user.getUserName(), uuid));
@@ -101,8 +100,8 @@ public class ViewPurchaseHistoryTest {
      * view the purchase history of a user that is registered, but his history is empty
      */
     @Test
-    void viewPurchaseHistoryCartRegisteredUser() {
-        this.helper.openStoreAddProductsAndPurchaseShoppingCart(this.user.getUserName(), this.uuid);
+    void viewPurchaseHistoryRegisteredUser() {
+        this.helper.createOwnerOpenStoreAddProductAddAndPurchaseShoppingCart(this.user.getUserName(), this.uuid);
         Assertions.assertNotNull(this.buyerRegisteredService.viewPurchaseHistory(this.user.getUserName(), uuid));
     }
 }

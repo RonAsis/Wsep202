@@ -43,7 +43,7 @@ public class PurchaseShoppingCartBuyerTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-int counter = 0;
+    int counter = 0;
 
     BillingAddressDto billingAddressDto = new BillingAddressDto(this.user.getFirstName()+" "+this.user.getLastName(),
             "address", "city", "country", "1234567");
@@ -126,7 +126,7 @@ int counter = 0;
      */
     @Test
     void purchaseShoppingCartRegisteredUser() {
-        this.helper.addProductToShoppingCart(this.user.getUserName(), this.uuid);
+        this.helper.createOwnerOpenStoreAddProductAndAddToShoppingCart(this.user.getUserName(), this.uuid);
         Assertions.assertNotNull(this.buyerRegisteredService.purchaseShoppingCartBuyer(this.user.getUserName(),
                 this.purchaseRegisterBuyerDto, this.uuid));
     }

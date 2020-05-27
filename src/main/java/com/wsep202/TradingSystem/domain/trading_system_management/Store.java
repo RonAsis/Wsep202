@@ -962,8 +962,7 @@ public class Store {
             Optional<Boolean> isEdit = discounts.stream()
                     .filter(discountCur -> discountCur.getDiscountId() == discount.getDiscountId())
                     .findFirst().map(discountCur -> discountCur.editDiscount(discount.getDiscountPercentage(),
-                            discount.getEndTime(), discount.getProductsUnderThisDiscount(), discount.getDescription(), discount.getAmountOfProductsForApplyDiscounts(),
-                            discount.getMinPrice(), discount.getComposedDiscounts(), discount.getCompositeOperator(), discount.isStoreDiscount()));
+                            discount.getEndTime(),discount.getDescription(), discount.getDiscountPolicy(), discount.getDiscountType()));
             return isEdit.isPresent() ? discount : null;
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
@@ -979,5 +978,11 @@ public class Store {
             return isEdit.isPresent() ? purchase : null;
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
+    }
+
+    public List<Discount> getDiscountSimple(){
+        return discounts.stream()
+                .filter(discount -> discount.getDiscountType() != DiscountType.COMPOSE)
+                .collect(Collectors.toList());
     }
 }

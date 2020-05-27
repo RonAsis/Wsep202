@@ -4,6 +4,7 @@ import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
+import com.wsep202.TradingSystem.dto.ProductDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.*;
 import com.wsep202.TradingSystem.dto.StoreDto;
@@ -44,7 +45,7 @@ public class AddManagerTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-    int storeId = 0;
+    int storeId;
 
 
     @BeforeEach
@@ -56,12 +57,15 @@ public class AddManagerTest {
                 this.newManager.getFirstName(), this.newManager.getLastName(), image);
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
-        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
+        Pair<UUID, Boolean> returnedValueLogin = this.helper.loginUser(this.user.getUserName(),
                 this.userPassword);
-        if (returnedValue != null){
-            this.uuid = returnedValue.getKey();
+        if (returnedValueLogin != null){
+            this.uuid = returnedValueLogin.getKey();
         }
-        this.helper.openStoreAndAddProducts(this.user, this.userPassword, this.uuid);
+        Pair<StoreDto, ProductDto> returnedValueOpen = this.helper.openStoreAndAddProduct(this.user, this.uuid);
+        if (returnedValueOpen != null){
+            this.storeId = returnedValueOpen.getKey().getStoreId();
+        }
     }
 
     @AfterEach
@@ -74,12 +78,8 @@ public class AddManagerTest {
      */
     @Test
     void addValidManagerRegisteredOwnerValidStore() {
-        try{
-            Assertions.assertNotNull(this.sellerOwnerService.addManager(this.user.getUserName(),
-                    this.storeId, this.newManager.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertNotNull(this.sellerOwnerService.addManager(this.user.getUserName(),
+                this.storeId, this.newManager.getUserName(), this.uuid));
     }
 
     /**
@@ -87,12 +87,10 @@ public class AddManagerTest {
      */
     @Test
     void addValidManagerNotRegisteredOwnerValidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager("NotRegistered",
-                    this.storeId, this.newManager.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addManager("NotRegistered",
+                    this.storeId, this.newManager.getUserName(), this.uuid);
+        });
     }
 
     /**
@@ -100,12 +98,8 @@ public class AddManagerTest {
      */
     @Test
     void addValidManagerRegisteredOwnerInvalidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
-                    8, this.newManager.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
+                this.storeId+ 8, this.newManager.getUserName(), this.uuid));
     }
 
     /**
@@ -113,12 +107,8 @@ public class AddManagerTest {
      */
     @Test
     void addInvalidManagerRegisteredOwnerValidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
-                    this.storeId, "NotRegistered", this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
+                this.storeId, "NotRegistered", this.uuid));
     }
 
     /**
@@ -126,12 +116,10 @@ public class AddManagerTest {
      */
     @Test
     void addInvalidManagerNotRegisteredOwnerValidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager("NotRegistered",
-                    this.storeId, "NotRegistered2", this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addManager("NotRegistered",
+                    this.storeId, "NotRegistered2", this.uuid);
+        });
     }
 
     /**
@@ -139,12 +127,10 @@ public class AddManagerTest {
      */
     @Test
     void addValidManagerNotRegisteredOwnerInvalidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager("NotRegistered",
-                    8, this.newManager.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addManager("NotRegistered",
+                    this.storeId + 8, this.newManager.getUserName(), this.uuid);
+        });
     }
 
     /**
@@ -152,12 +138,8 @@ public class AddManagerTest {
      */
     @Test
     void addInvalidManagerRegisteredOwnerInvalidStore() {
-        try {
-            Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
-                    8, this.newManager.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertNull(this.sellerOwnerService.addManager(this.user.getUserName(),
+                this.storeId + 8, this.newManager.getUserName(), this.uuid));
     }
 
     /**
@@ -165,11 +147,9 @@ public class AddManagerTest {
      */
     @Test
     void addInvalidManagerNotRegisteredOwnerInvalidStore() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.addManager("NotRegistered",
-                    8, "NotRegistered2", this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addManager("NotRegistered",
+                    this.storeId + 8, "NotRegistered2", this.uuid);
+        });
     }
 }

@@ -29,7 +29,7 @@ class RegisterTest {
     @Autowired
     BuyerRegisteredService buyerRegisteredService;
     ServiceTestsHelper helper;
-    UserSystemDto user = new UserSystemDto("username","name","lname");
+    UserSystemDto user = new UserSystemDto("usernamee","name","lname");
     String userPassword = "password";
     MultipartFile image = null;
 
@@ -140,4 +140,4 @@ class RegisterTest {
         Assertions.assertFalse(this.guestService.registerUser(this.user.getUserName(), "1234",
                 this.user.getFirstName(), this.user.getLastName(), image));
     }
-}
+} 

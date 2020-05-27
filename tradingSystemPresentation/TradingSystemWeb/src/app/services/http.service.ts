@@ -298,8 +298,17 @@ export class HttpService {
     return this.http.get<string[]>(
       url);
   }
-  getDiscounts(username: string, storeId: number, uuid: string) {
+  getAllDiscounts(username: string, storeId: number, uuid: string) {
     const url = `${this.sellerManagerUrl}/` + 'get-discounts/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<Discount[]>(
+      url);
+  }
+
+  getSimpleDiscounts(username: string, storeId: number, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'get-simple-discounts/' +
       `${username}/` +
       `${storeId}/` +
       `${uuid}`;

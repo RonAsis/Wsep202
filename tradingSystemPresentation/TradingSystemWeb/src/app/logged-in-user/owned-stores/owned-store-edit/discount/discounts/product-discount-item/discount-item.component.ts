@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Discount} from '../../../../../../shared/discount.model';
 import {StoreService} from '../../../../../../services/store.service';
 
@@ -9,15 +9,20 @@ import {StoreService} from '../../../../../../services/store.service';
 })
 export class DiscountItemComponent implements OnInit {
 
+  @Output() discountWasSelected = new EventEmitter<Discount>();
   @Input() discount: Discount;
+  endTime: string;
 
-  constructor(private storeService: StoreService) { }
+  constructor(private storeService: StoreService) {
+  }
 
   ngOnInit(): void {
+    this.endTime = new Date(this.discount.endTime).toISOString().split('T')[0];
   }
 
   onSelected() {
-    console.log(this.discount);
+    console.log('onSelected - item discount');
+    this.discountWasSelected.emit(this.discount);
     this.storeService.discountSelected.emit(this.discount);
   }
 }

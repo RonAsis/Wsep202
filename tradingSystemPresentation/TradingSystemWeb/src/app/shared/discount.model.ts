@@ -10,5 +10,5 @@ export class Discount {
               public minPrice: number,
               public composedDiscounts: Discount[],
               public compositeOperator: string,
-              public storeDiscount: boolean) {}
+              public discountType: string) {}
 }

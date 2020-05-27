@@ -77,25 +77,19 @@ public class RemoveProductInShoppingBagTest {
      */
     @Test
     void removeProductEmptyUsername() {
-        try{
-            Assertions.assertFalse(this.buyerRegisteredService.removeProductInShoppingBag("",
-                    0, 0, uuid));
-        } catch (Exception e) {
-
-        }
-    }
+        Assertions.assertFalse(
+            this.buyerRegisteredService.removeProductInShoppingBag("",
+                0, 0, uuid));
+}
 
     /**
      * remove a product from a username who's not registered's shopping bag
      */
     @Test
     void removeProductUserNotRegistered() {
-        try{
-            Assertions.assertFalse(this.buyerRegisteredService.removeProductInShoppingBag("notRegistered",
-                    0, 0, uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertFalse(
+                    this.buyerRegisteredService.removeProductInShoppingBag("notRegistered",
+                0, 0, uuid));
     }
 
     /**
@@ -103,8 +97,8 @@ public class RemoveProductInShoppingBagTest {
      */
     @Test
     void removeProductUserRegistered() {
-        this.helper.addProductToShoppingCart(this.user.getUserName(), this.uuid);
+        Pair<StoreDto, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAddProductAndAddToShoppingCart(this.user.getUserName(), this.uuid);
         Assertions.assertTrue(this.buyerRegisteredService.removeProductInShoppingBag(this.user.getUserName(),
-                0, 0, uuid));
+                returnedValue.getKey().getStoreId(), returnedValue.getValue().getProductSn(), uuid));
     }
 }

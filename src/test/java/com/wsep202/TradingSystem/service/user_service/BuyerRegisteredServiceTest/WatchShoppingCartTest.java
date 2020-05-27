@@ -66,9 +66,9 @@ public class WatchShoppingCartTest {
      */
     @Test
     void addValidProductRegisteredUser() {
-        ProductDto productDto = this.helper.openStoreAndAddProducts();
+        Pair<StoreDto, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAndAddProduct();
         Assertions.assertTrue(this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
-                1, productDto, this.uuid));
+                1, returnedValue.getValue(), this.uuid));
     }
 
     /**
@@ -76,8 +76,7 @@ public class WatchShoppingCartTest {
      */
     @Test
     void viewEmptyShoppingCart() {
-        Assertions.assertEquals(new HashMap<>(), this.buyerRegisteredService.watchShoppingCart(this.user.getUserName(), this.uuid));
-
+        Assertions.assertEquals(new ShoppingCartDto(new HashMap<>()), this.buyerRegisteredService.watchShoppingCart(this.user.getUserName(), this.uuid));
     }
 
     /**
@@ -85,12 +84,10 @@ public class WatchShoppingCartTest {
      */
     @Test
     void viewShoppingCartInvalidUser() {
-        try{
-            Assertions.assertNull(this.buyerRegisteredService.watchShoppingCart(
-                    "NotRegistered", this.uuid));
-        } catch (Exception e){
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+                    this.buyerRegisteredService.watchShoppingCart(
+                "NotRegistered", this.uuid);
+        });
     }
 
     /**
@@ -98,9 +95,11 @@ public class WatchShoppingCartTest {
      */
     @Test
     void viewShoppingCartValidUserNotEmptyCart() {
-        this.helper.addProductToShoppingCart(this.user.getUserName(), this.uuid);
-        Assertions.assertNotNull(this.buyerRegisteredService.watchShoppingCart(
-                this.user.getUserName(), uuid));
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.helper.openStoreAndAddProduct(this.user, this.uuid);
+            this.buyerRegisteredService.watchShoppingCart(
+                    this.user.getUserName(), uuid);
+        });
     }
 
 }

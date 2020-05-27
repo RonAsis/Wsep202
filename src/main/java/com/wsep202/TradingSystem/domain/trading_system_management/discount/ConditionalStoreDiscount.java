@@ -14,16 +14,20 @@ import java.util.Map;
 
 @Setter
 @Getter
-
+@Builder
 @Slf4j
 public class ConditionalStoreDiscount extends DiscountPolicy {
 
+    /**
+     * the minimal price of purchase to apply the discount from
+     */
+    private double minPrice;
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
         //The discount time is not expired yet
         if (!isExpired(discount) && !discount.isApplied()) {
             double totalPurchasedCost = getTotalPurchasedCost(products);
-            if (discount.getMinPrice() <= totalPurchasedCost) {
+            if (minPrice <= totalPurchasedCost) {
                 products.keySet().forEach(product -> {
                     setCostAfterDiscount(discount, product, calculateDiscount(discount, product.getOriginalCost()));
                 });
@@ -36,7 +40,7 @@ public class ConditionalStoreDiscount extends DiscountPolicy {
 
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
-        return !isExpired(discount) && discount.getMinPrice() <= getTotalPurchasedCost(products);
+        return !isExpired(discount) && minPrice <= getTotalPurchasedCost(products);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.exception.NotValidEndTime;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Calendar;
@@ -15,7 +16,18 @@ import java.util.Map;
 @Setter
 @Getter
 @Slf4j
+@Builder
 public class ConditionalProductDiscount extends DiscountPolicy {
+
+    /**
+     * products that has the specified discount
+     */
+    private Map<Product, Integer> productsUnderThisDiscount;
+
+    /**
+     * amount of product from to apply discount
+     */
+    private Map<Product, Integer> amountOfProductsForApplyDiscounts;
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
@@ -44,13 +56,13 @@ public class ConditionalProductDiscount extends DiscountPolicy {
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
         return products.entrySet().stream()
                 .filter(productIntegerEntry -> isApprovedCondition(discount, productIntegerEntry.getKey(), productIntegerEntry.getValue()))
-                .toArray().length == discount.getProductsUnderThisDiscount().size();
+                .toArray().length == productsUnderThisDiscount.size();
     }
 
     @Override
     public void undoDiscount(Discount discount, Map<Product, Integer> products) {
         products.entrySet().forEach(productIntegerEntry -> {
-            if(discount.getProductsUnderThisDiscount().containsKey(productIntegerEntry.getKey())) {
+            if(productsUnderThisDiscount.containsKey(productIntegerEntry.getKey())) {
                 int amountProductInAmountOfProductsForApplyDiscounts = getAmountProductInAmountOfProductsForApplyDiscounts(discount, productIntegerEntry.getKey());
                 double discountCost = calculateDiscount(discount.getDiscountPercentage(),amountProductInAmountOfProductsForApplyDiscounts,
                         productIntegerEntry.getValue(), productIntegerEntry.getKey().getOriginalCost());
@@ -60,7 +72,7 @@ public class ConditionalProductDiscount extends DiscountPolicy {
     }
 
     private int getAmountProductInAmountOfProductsForApplyDiscounts(Discount discount, Product product) {
-        return discount.getAmountOfProductsForApplyDiscounts().entrySet().stream()
+        return amountOfProductsForApplyDiscounts.entrySet().stream()
                 .filter(productInDisCount -> productInDisCount.getKey().getProductSn() == product.getProductSn())
                 .map(Map.Entry::getValue)
                 .findFirst().orElse(-1);
@@ -81,6 +93,6 @@ public class ConditionalProductDiscount extends DiscountPolicy {
      */
 
     public boolean isApprovedCondition(Discount discount,Product product, int requiredAmount) {
-        return isProductHaveDiscount(discount, product) && getAmountProductInAmountOfProductsForApplyDiscounts(discount, product) < requiredAmount;
+        return isProductHaveDiscount(productsUnderThisDiscount, product) && getAmountProductInAmountOfProductsForApplyDiscounts(discount, product) < requiredAmount;
     }
 }
