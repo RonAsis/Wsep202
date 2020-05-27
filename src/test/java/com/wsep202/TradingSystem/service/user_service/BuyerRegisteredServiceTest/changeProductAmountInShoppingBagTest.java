@@ -4,6 +4,7 @@ import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
@@ -40,6 +41,8 @@ public class changeProductAmountInShoppingBagTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
+    private ProductDto productDto;
+    private int storeId;
 
     @BeforeEach
     void setUp() {
@@ -48,10 +51,15 @@ public class changeProductAmountInShoppingBagTest {
         }
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
-        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
+        Pair<UUID, Boolean> returnedValueLogin = this.helper.loginUser(this.user.getUserName(),
                 this.userPassword);
-        if (returnedValue != null){
-            this.uuid = returnedValue.getKey();
+        if (returnedValueLogin != null) {
+            this.uuid = returnedValueLogin.getKey();
+        }
+        Pair<StoreDto, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAddProductAndAddToShoppingCart(this.user.getUserName(), this.uuid);
+        if (returnedValueLogin != null) {
+            this.productDto = returnedValue.getValue();
+            this.storeId = returnedValue.getKey().getStoreId();
         }
     }
 
@@ -65,9 +73,8 @@ public class changeProductAmountInShoppingBagTest {
      */
     @Test
     void changeAmountValidProductRegisteredUser() {
-        ProductDto productDto = this.helper.openStoreAddProductsAndAddProductToShoppingCart(this.user.getUserName(), this.uuid);
         Assertions.assertTrue(this.buyerRegisteredService.changeProductAmountInShoppingBag(this.user.getUserName(),
-                0, 2, productDto.getProductSn(), this.uuid));
+                this.storeId, 2, this.productDto.getProductSn(), this.uuid));
     }
 
     /**
@@ -75,27 +82,21 @@ public class changeProductAmountInShoppingBagTest {
      */
     @Test
     void changeAmountValidProductUnregisteredUser() {
-        try{
-        ProductDto productDto = this.helper.openStoreAddProductsAndAddProductToShoppingCart(this.user.getUserName(), this.uuid);
-        Assertions.assertFalse(this.buyerRegisteredService.changeProductAmountInShoppingBag("NotRegistered",
-                0, 2, productDto.getProductSn(), this.uuid));
-        } catch (Exception e) {
-
-        }
-    }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.buyerRegisteredService.changeProductAmountInShoppingBag("NotRegistered",
+                this.storeId, 2, this.productDto.getProductSn(), this.uuid);
+    });
+}
 
     /**
      * change an invalid product's amount in an unregistered user's shopping bag
      */
     @Test
     void changeAmountInvalidProductUnregisteredUser() {
-        try {
-            ProductDto productDto = this.helper.openStoreAddProductsAndAddProductToShoppingCart(this.user.getUserName(), this.uuid);
-            Assertions.assertFalse(this.buyerRegisteredService.changeProductAmountInShoppingBag("NotRegistered",
-                    0, 2, productDto.getProductSn() + 10, this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+                    this.buyerRegisteredService.changeProductAmountInShoppingBag("NotRegistered",
+                this.storeId, 2, this.productDto.getProductSn() + 10, this.uuid);
+        });
     }
 
     /**
@@ -103,13 +104,10 @@ public class changeProductAmountInShoppingBagTest {
      */
     @Test
     void changeAmountInvalidProductUnregisteredUserNegativeAmount() {
-        try{
-        ProductDto productDto = this.helper.openStoreAddProductsAndAddProductToShoppingCart(this.user.getUserName(), this.uuid);
-        Assertions.assertFalse(this.buyerRegisteredService.changeProductAmountInShoppingBag("NotRegistered",
-                0, -2, productDto.getProductSn()+10, this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+                    this.buyerRegisteredService.changeProductAmountInShoppingBag("NotRegistered",
+                    this.storeId, -2, this.productDto.getProductSn()+10, this.uuid);
+        });
     }
 
     /**
@@ -117,8 +115,7 @@ public class changeProductAmountInShoppingBagTest {
      */
     @Test
     void changeAmounValidProductRegisteredUserNegativeAmount() {
-        ProductDto productDto = this.helper.openStoreAddProductsAndAddProductToShoppingCart(this.user.getUserName(), this.uuid);
         Assertions.assertFalse(this.buyerRegisteredService.changeProductAmountInShoppingBag(this.user.getUserName(),
-                0, -2, productDto.getProductSn(), this.uuid));
+                this.storeId, -2, this.productDto.getProductSn(), this.uuid));
     }
 }

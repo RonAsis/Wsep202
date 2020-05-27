@@ -4,6 +4,7 @@ import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
@@ -65,9 +66,9 @@ public class addProductToShoppingCartTest {
      */
     @Test
     void addValidProductRegisteredUser() {
-        ProductDto productDto = this.helper.openStoreAndAddProducts();
+        Pair<StoreDto, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAndAddProduct();
         Assertions.assertTrue(this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
-                1, productDto, this.uuid));
+                1, returnedValue.getValue(), this.uuid));
     }
 
     /**
@@ -75,13 +76,11 @@ public class addProductToShoppingCartTest {
      */
     @Test
     void addValidProductNotRegisteredUser() {
-        try {
-            ProductDto productDto = this.helper.openStoreAndAddProducts();
-            Assertions.assertFalse(this.buyerRegisteredService.addProductToShoppingCart("notRegistered",
-                    1, productDto, this.uuid));
-        } catch (Exception e){
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            Pair<StoreDto, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAndAddProduct();
+            this.buyerRegisteredService.addProductToShoppingCart("notRegistered",
+                    1, returnedValue.getValue(), this.uuid);
+        });
     }
 
     /**
@@ -89,12 +88,10 @@ public class addProductToShoppingCartTest {
      */
     @Test
     void addInvalidProductNotRegisteredUser() {
-        try{
-            Assertions.assertFalse(this.buyerRegisteredService.addProductToShoppingCart("notRegistered",
-                    1, null, this.uuid));
-        } catch (Exception e){
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.buyerRegisteredService.addProductToShoppingCart("notRegistered",
+                    1, null, this.uuid);
+        });
     }
 
 
@@ -103,11 +100,9 @@ public class addProductToShoppingCartTest {
      */
     @Test
     void addInvalidProductRegisteredUser() {
-        try {
-            Assertions.assertFalse(this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
-                    1, null, this.uuid));
-        } catch (Exception e){
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
+                    1, null, this.uuid);
+        });
     }
 }

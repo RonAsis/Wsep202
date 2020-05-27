@@ -3,6 +3,8 @@ package com.wsep202.TradingSystem.service.user_service.SellerOwnerServiceTest;
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.*;
 import javafx.util.Pair;
@@ -35,17 +37,17 @@ public class RemoveManagerTest {
     SellerManagerService sellerManagerService;
 
     ServiceTestsHelper helper;
-    UserSystemDto user = new UserSystemDto("username","name","lname");
-    UserSystemDto oldManager = new UserSystemDto("oldManager","name","lname");
+    UserSystemDto user = new UserSystemDto("username", "name", "lname");
+    UserSystemDto oldManager = new UserSystemDto("oldManager", "name", "lname");
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-    int storeId = 0;
+    int storeId;
 
 
     @BeforeEach
     void setUp() {
-        if (this.helper == null || this.helper.getGuestService() == null ) {
+        if (this.helper == null || this.helper.getGuestService() == null) {
             this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService, this.sellerOwnerService);
         }
         this.helper.registerUser(this.oldManager.getUserName(), this.userPassword,
@@ -54,14 +56,17 @@ public class RemoveManagerTest {
                 this.user.getFirstName(), this.user.getLastName(), image);
         Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
                 this.userPassword);
-        if (returnedValue != null){
+        if (returnedValue != null) {
             this.uuid = returnedValue.getKey();
         }
-        this.helper.openStoreAddProductsAndAddManager(this.user, this.uuid, this.userPassword, this.oldManager.getUserName());
+        StoreDto returnedValueOpen = this.helper.openStoreAddProductAndAddManager(this.user, this.uuid, this.oldManager.getUserName());
+        if (returnedValueOpen != null) {
+            this.storeId = returnedValueOpen.getStoreId();
+        }
     }
 
     @AfterEach
-    void tearDown(){
+    void tearDown() {
         this.sellerOwnerService.removeManager(this.user.getUserName(),
                 this.storeId, this.oldManager.getUserName(), this.uuid);
         this.helper.logoutUser(this.user.getUserName(), this.uuid);
@@ -82,12 +87,10 @@ public class RemoveManagerTest {
      */
     @Test
     void removeValidManagerInvalidOwner() {
-        try{
-            Assertions.assertFalse(this.sellerOwnerService.removeManager("NotOwner",
-                    this.storeId, this.oldManager.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.removeManager("NotOwner",
+                    this.storeId, this.oldManager.getUserName(), this.uuid);
+        });
     }
 
     /**
@@ -107,12 +110,10 @@ public class RemoveManagerTest {
      */
     @Test
     void removeValidManagerInvalidOwnerInvalidStore() {
-        try {
-            Assertions.assertFalse(this.sellerOwnerService.removeManager("NotOwner",
-                    8, this.oldManager.getUserName(), this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, () -> {
+            this.sellerOwnerService.removeManager("NotOwner",
+                    8, this.oldManager.getUserName(), this.uuid);
+        });
     }
 
     /**
@@ -130,12 +131,10 @@ public class RemoveManagerTest {
      */
     @Test
     void removeInvalidManagerInvalidOwner() {
-        try{
-            Assertions.assertFalse(this.sellerOwnerService.removeManager("NotOwner",
-                    this.storeId, "NotManager", this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, () -> {
+            this.sellerOwnerService.removeManager("NotOwner",
+                    this.storeId, "NotManager", this.uuid);
+        });
     }
 
     /**
@@ -146,5 +145,18 @@ public class RemoveManagerTest {
     void removeInvalidManagerInvalidStore() {
         Assertions.assertFalse(this.sellerOwnerService.removeManager(this.user.getUserName(),
                 8, "NotManager", this.uuid));
+    }
+
+    /**
+     * remove a valid manager by an own
+     */
+    @Test
+    void removeManagerNotAppointee() {
+        Assertions.assertThrows(Exception.class, () -> {
+            this.helper.registerAndLoginUser("newUser", "newUserr", "newUser", "newUser", null);
+            this.helper.addStoreOwner(this.user.getUserName(), this.storeId, "newUser", this.uuid);
+            this.sellerOwnerService.addPermission("newUser", this.storeId,
+                    this.oldManager.getUserName(), "edit", this.uuid);
+        });
     }
 }

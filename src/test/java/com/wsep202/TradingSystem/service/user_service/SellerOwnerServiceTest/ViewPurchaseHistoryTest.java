@@ -43,7 +43,6 @@ public class ViewPurchaseHistoryTest {
     MultipartFile image = null;
     UUID uuid;
     int storeId = 0;
-    private ProductDto productDto;
 
     @BeforeEach
     void setUp() {
@@ -59,7 +58,10 @@ public class ViewPurchaseHistoryTest {
         if (returnedValue != null){
             this.uuid = returnedValue.getKey();
         }
-        this.productDto = this.helper.openStoreAndAddProducts(this.user, this.userPassword, this.uuid);
+        Pair<StoreDto, ProductDto> returnedValueOpen = this.helper.openStoreAndAddProduct(this.user, this.uuid);
+        if (returnedValueOpen != null){
+            this.storeId = returnedValueOpen.getKey().getStoreId();
+        }
     }
 
     @AfterEach
@@ -85,12 +87,10 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidOwner() {
-        try{
-            Assertions.assertNull(this.sellerOwnerService.viewPurchaseHistoryOfStoreOwner(
-                    this.user.getUserName()+"Not", this.storeId, this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.viewPurchaseHistoryOfStoreOwner(
+                    this.user.getUserName()+"Not", this.storeId, this.uuid);
+        });
     }
 
     /**
@@ -108,20 +108,18 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidStoreInvalidOwner() {
-        try{
-        Assertions.assertNull(this.sellerOwnerService.viewPurchaseHistoryOfStoreOwner(
-                this.user.getUserName()+"Not", this.storeId+5, this.uuid));
-    } catch (Exception e) {
-
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.viewPurchaseHistoryOfStoreOwner(
+                    this.user.getUserName()+"Not", this.storeId+5, this.uuid);
+        });
     }
-}
 
     /**
      * view the history purchase of a valid store
      */
     @Test
     void ViewHistoryPurchases() {
-        this.helper.openStoreAddProductsAndBuyProduct(this.user, this.uuid, this.userPassword);
+        this.helper.createOwnerOpenStoreAddProductAddAndPurchaseShoppingCart(this.user.getUserName(), this.uuid);
         Assertions.assertNotNull(this.sellerOwnerService.viewPurchaseHistoryOfStoreOwner(
                 this.user.getUserName(), this.storeId, this.uuid));
     }
