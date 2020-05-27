@@ -743,53 +743,53 @@ class StoreTest {
             Assertions.assertFalse(storeUT.editProductAmountInStock(1, 3));
         }
 
-        /**
-         * see success of applying discount from store on product in bag
-         */
-        @Test
-        public void applyDiscountPoliciesPositive() {
-            Map<Product, Integer> productBag = new HashMap<>();
-            productBag.put(product, 1);
-            addNewDiscountToStoreSetup();   //add discount
-            Calendar endTime = Calendar.getInstance();
-            //set expiration date
-            endTime.set(3000, 1, 1);
-            when(discount.getEndTime()).thenReturn(endTime);
-            when(discount.getAmountOfProductsForApplyDiscounts()).thenReturn(productBag);
-            when(discount.getDiscountPercentage()).thenReturn(100.0);   //set 100% discount on product
-            when(product.getOriginalCost()).thenReturn(5.0);
-            doNothing().when(product).setCost(0);
-            doNothing().when(discount).setApplied(true);
+//        /**
+//         * see success of applying discount from store on product in bag
+//         */
+//        @Test
+//        public void applyDiscountPoliciesPositive() {
+//            Map<Product, Integer> productBag = new HashMap<>();
+//            productBag.put(product, 1);
+//            addNewDiscountToStoreSetup();   //add discount
+//            Calendar endTime = Calendar.getInstance();
+//            //set expiration date
+//            endTime.set(3000, 1, 1);
+//            when(discount.getEndTime()).thenReturn(endTime);
+//            when(discount.getAmountOfProductsForApplyDiscounts()).thenReturn(productBag);
+//            when(discount.getDiscountPercentage()).thenReturn(100.0);   //set 100% discount on product
+//            when(product.getOriginalCost()).thenReturn(5.0);
+//            doNothing().when(product).setCost(0);
+//            doNothing().when(discount).setApplied(true);
+//
+//        }
 
-        }
-
-        /**
-         * see success of applying discount from store on product in bag
-         * can't be checked under unit tests need integration
-         */
-        @Test
-        public void applyDiscountPoliciesNegative() {
-            Map<Product, Integer> productBag = new HashMap<>();
-            productBag.put(product, 1);
-            addNewDiscountToStoreSetup();   //add discount
-            Calendar endTime = Calendar.getInstance();
-            //set expiration date
-            endTime.set(3000, 1, 1);
-            when(discount.getEndTime()).thenReturn(endTime);
-            when(discount.getAmountOfProductsForApplyDiscounts()).thenReturn(productBag);
-            when(discount.getDiscountPercentage()).thenReturn(100.0);   //set 100% discount on product
-            when(product.getOriginalCost()).thenReturn(5.0);
-            doNothing().when(product).setCost(0);
-            doNothing().when(discount).setApplied(true);
-            when(product.getCost()).thenReturn(-2.9);
-            doCallRealMethod().when(discount).applyDiscount(productBag);
-            //storeUT.applyDiscountPolicies(productBag);
-            Throwable exception = Assertions
-                    .assertThrows(IllegalProductPriceException.class, () -> storeUT.applyDiscountPolicies(productBag));
-            Assertions.assertEquals("The discount with id: " + discount.getDiscountId() +
-                    " caused price to be equal or less than zero!", exception.getMessage());
-
-        }
+//        /**
+//         * see success of applying discount from store on product in bag
+//         * can't be checked under unit tests need integration
+//         */
+//        @Test
+//        public void applyDiscountPoliciesNegative() {
+//            Map<Product, Integer> productBag = new HashMap<>();
+//            productBag.put(product, 1);
+//            addNewDiscountToStoreSetup();   //add discount
+//            Calendar endTime = Calendar.getInstance();
+//            //set expiration date
+//            endTime.set(3000, 1, 1);
+//            when(discount.getEndTime()).thenReturn(endTime);
+//            when(discount.getAmountOfProductsForApplyDiscounts()).thenReturn(productBag);
+//            when(discount.getDiscountPercentage()).thenReturn(100.0);   //set 100% discount on product
+//            when(product.getOriginalCost()).thenReturn(5.0);
+//            doNothing().when(product).setCost(0);
+//            doNothing().when(discount).setApplied(true);
+//            when(product.getCost()).thenReturn(-2.9);
+//            doCallRealMethod().when(discount).applyDiscount(productBag);
+//            //storeUT.applyDiscountPolicies(productBag);
+//            Throwable exception = Assertions
+//                    .assertThrows(IllegalProductPriceException.class, () -> storeUT.applyDiscountPolicies(productBag));
+//            Assertions.assertEquals("The discount with id: " + discount.getDiscountId() +
+//                    " caused price to be equal or less than zero!", exception.getMessage());
+//
+//        }
 
 //////////////////setups///////////////////////////////////
 
@@ -1317,29 +1317,29 @@ class StoreTest {
 
         //////////////////////////UC 4.2 ///////////////////////////////////////
 
-        /**
-         * see success of applying discount from store on product in bag
-         */
-        @Test
-        public void applyDiscountPoliciesPositive() {
-            Map<Product, Integer> productBag = new HashMap<>();
-            productBag.put(product, 1);
-
-
-            Calendar endTime = Calendar.getInstance();
-            //set expiration date
-            endTime.set(3000, 1, 1);
-
-            Discount realDiscount = Discount.builder().discountId(0)
-                    .endTime(endTime)
-                    .amountOfProductsForApplyDiscounts(productBag)
-                    .discountPercentage(100.0)
-                    .build();
-            addNewDiscountToStoreSetup(realDiscount);   //add discount
-
-            storeUT.applyDiscountPolicies(productBag);
-            Assertions.assertEquals(0, product.getCost());
-        }
+//        /**
+//         * see success of applying discount from store on product in bag
+//         */
+//        @Test
+//        public void applyDiscountPoliciesPositive() {
+//            Map<Product, Integer> productBag = new HashMap<>();
+//            productBag.put(product, 1);
+//
+//
+//            Calendar endTime = Calendar.getInstance();
+//            //set expiration date
+//            endTime.set(3000, 1, 1);
+//
+//            Discount realDiscount = Discount.builder().discountId(0)
+//                    .endTime(endTime)
+//                    .amountOfProductsForApplyDiscounts(productBag)
+//                    .discountPercentage(100.0)
+//                    .build();
+//            addNewDiscountToStoreSetup(realDiscount);   //add discount
+//
+//            storeUT.applyDiscountPolicies(productBag);
+//            Assertions.assertEquals(0, product.getCost());
+//        }
 
 
         /**
@@ -1347,25 +1347,25 @@ class StoreTest {
          * because of illegal negative price after discount
          * can't be checked under unit tests need integration
          */
-        @Test
-        public void applyDiscountPoliciesNegative() {
-            Map<Product, Integer> productBag = new HashMap<>();
-            productBag.put(product, 1);
-            Calendar endTime = Calendar.getInstance();
-            //set expiration date
-            endTime.set(3000, 1, 1);
-            Discount realDiscount = Discount.builder().discountId(0)
-                    .endTime(endTime)
-                    .amountOfProductsForApplyDiscounts(productBag)
-                    .discountPercentage(100.0)
-                    .build();
-            addNewDiscountToStoreSetup(realDiscount);   //add discount
-            product.setCost(-10);
-            Throwable exception = Assertions
-                    .assertThrows(IllegalProductPriceException.class, () -> storeUT.applyDiscountPolicies(productBag));
-            Assertions.assertEquals("The discount with id: " + 3 +
-                    " caused price to be equal or less than zero!", exception.getMessage());
-        }
+//        @Test
+//        public void applyDiscountPoliciesNegative() {
+//            Map<Product, Integer> productBag = new HashMap<>();
+//            productBag.put(product, 1);
+//            Calendar endTime = Calendar.getInstance();
+//            //set expiration date
+//            endTime.set(3000, 1, 1);
+//            Discount realDiscount = Discount.builder().discountId(0)
+//                    .endTime(endTime)
+//                    .amountOfProductsForApplyDiscounts(productBag)
+//                    .discountPercentage(100.0)
+//                    .build();
+//            addNewDiscountToStoreSetup(realDiscount);   //add discount
+//            product.setCost(-10);
+//            Throwable exception = Assertions
+//                    .assertThrows(IllegalProductPriceException.class, () -> storeUT.applyDiscountPolicies(productBag));
+//            Assertions.assertEquals("The discount with id: " + 3 +
+//                    " caused price to be equal or less than zero!", exception.getMessage());
+//        }
 
         /**
          * check the case of purchase that pass the exist store policy
@@ -1439,48 +1439,48 @@ class StoreTest {
             Assertions.assertEquals(1, storeUT.getPurchasePolicies().size());
         }
 
-        /**
-         * edit existed discount in store
-         */
-        @Test
-        public void editDiscountPositive() {
-            discount = Discount.builder()
-                    .discountId(0)
-                    .discountPercentage(10)
-                    .amountOfProductsForApplyDiscounts(new HashMap<>())
-                    .endTime(Calendar.getInstance())
-                    .description("")
-                    .composedDiscounts(new ArrayList<>())
-                    .compositeOperator(CompositeOperator.OR)
-                    .isStoreDiscount(false)
-                    .minPrice(0)
-                    .productsUnderThisDiscount(new HashMap<>())
-                    .build();
-            addNewDiscountToStoreSetup(discount); //add discount to store
-            discount.setMinPrice(10); // set new min price to edit
-            Assertions.assertEquals(storeUT.addEditDiscount(ownerRealUser, discount).getMinPrice(), 10);
-        }
+//        /**
+//         * edit existed discount in store
+//         */
+//        @Test
+//        public void editDiscountPositive() {
+//            discount = Discount.builder()
+//                    .discountId(0)
+//                    .discountPercentage(10)
+//                    .amountOfProductsForApplyDiscounts(new HashMap<>())
+//                    .endTime(Calendar.getInstance())
+//                    .description("")
+//                    .composedDiscounts(new ArrayList<>())
+//                    .compositeOperator(CompositeOperator.OR)
+//                    .isStoreDiscount(false)
+//                    .minPrice(0)
+//                    .productsUnderThisDiscount(new HashMap<>())
+//                    .build();
+//            addNewDiscountToStoreSetup(discount); //add discount to store
+//            discount.setMinPrice(10); // set new min price to edit
+//            Assertions.assertEquals(storeUT.addEditDiscount(ownerRealUser, discount).getMinPrice(), 10);
+//        }
 
-        /**
-         * edit not existed discount in store
-         */
-        @Test
-        public void editDiscountNegative() {
-            discount = Discount.builder()
-                    .discountId(0)
-                    .discountPercentage(10)
-                    .amountOfProductsForApplyDiscounts(new HashMap<>())
-                    .endTime(Calendar.getInstance())
-                    .description("")
-                    .composedDiscounts(new ArrayList<>())
-                    .compositeOperator(CompositeOperator.OR)
-                    .isStoreDiscount(false)
-                    .minPrice(0)
-                    .productsUnderThisDiscount(new HashMap<>())
-                    .build();
-            discount.setMinPrice(10); // set new min price to edit
-            Assertions.assertNull(storeUT.addEditDiscount(ownerRealUser, discount));
-        }
+//        /**
+//         * edit not existed discount in store
+//         */
+//        @Test
+//        public void editDiscountNegative() {
+//            discount = Discount.builder()
+//                    .discountId(0)
+//                    .discountPercentage(10)
+//                    .amountOfProductsForApplyDiscounts(new HashMap<>())
+//                    .endTime(Calendar.getInstance())
+//                    .description("")
+//                    .composedDiscounts(new ArrayList<>())
+//                    .compositeOperator(CompositeOperator.OR)
+//                    .isStoreDiscount(false)
+//                    .minPrice(0)
+//                    .productsUnderThisDiscount(new HashMap<>())
+//                    .build();
+//            discount.setMinPrice(10); // set new min price to edit
+//            Assertions.assertNull(storeUT.addEditDiscount(ownerRealUser, discount));
+//        }
 
         /**
          * edit existed purchase in store
