@@ -14,21 +14,30 @@ export class DiscountsComponent implements OnInit {
 
   @Output() discountWasSelected = new EventEmitter<Discount>();
   @Input() store: Store;
-  discounts: Discount [] ;
+  discounts: Discount [];
 
   constructor(private storeService: StoreService, private userService: UserService) {
     this.discounts = [];
   }
 
   ngOnInit(): void {
+    this.storeService.discountAdded.subscribe(response => {
+      if (response !== undefined){
+        console.log('here');
+        this.discounts = this.discounts.filter(discount => discount.discountId !== response.discountId);
+        this.discounts.push(response);
+      }
+    });
     this.storeService.getDiscounts(this.store.storeId)
       .subscribe(discounts => {
         if (discounts !== null && discounts !== undefined) {
           this.discounts = discounts;
-          console.log(this.discounts);
         }
       });
   }
 
-
+  discountSelected($event: Discount) {
+    this.discountWasSelected.emit($event);
+    console.log($event);
+  }
 }

@@ -19,18 +19,15 @@ export class DiscountComponent implements OnInit {
   @Input() store: Store;
 
   selectedDiscount: Discount;
+  discountItemAChanged: Discount;
 
   constructor(private storeService: StoreService) { }
 
   ngOnInit(): void {
-    this.storeService.discountSelected
-      .subscribe(
-        (discount: Discount) => {
-          if (discount !== undefined ) {
-            this.selectedDiscount = discount;
-          }
-        }
-      );
   }
 
+  discountItemChanged($event: Discount) {
+    this.storeService.discountAdded.emit($event);
+    console.log('here !!!');
+  }
 }

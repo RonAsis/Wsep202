@@ -230,7 +230,7 @@ public class TradingSystemMapper {
         }
 
         Map<Product, Integer> createDiscountMap(List<ProductDto> productDtos) {
-            return productDtos.stream()
+            return Objects.isNull(productDtos) ? null : productDtos.stream()
                     .collect(Collectors.toMap(
                             productDto ->
                                     Product.builder()

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Discount} from '../../../../../../shared/discount.model';
 import {StoreService} from '../../../../../../services/store.service';
 
@@ -9,6 +9,7 @@ import {StoreService} from '../../../../../../services/store.service';
 })
 export class DiscountItemComponent implements OnInit {
 
+  @Output() discountWasSelected = new EventEmitter<Discount>();
   @Input() discount: Discount;
   endTime: string;
 
@@ -20,6 +21,8 @@ export class DiscountItemComponent implements OnInit {
   }
 
   onSelected() {
+    console.log('onSelected - item discount');
+    this.discountWasSelected.emit(this.discount);
     this.storeService.discountSelected.emit(this.discount);
   }
 }

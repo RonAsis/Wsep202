@@ -3,6 +3,7 @@ import {ShareService} from '../../../services/share.service';
 import {Store} from '../../../shared/store.model';
 import {StoreService} from '../../../services/store.service';
 import {UserService} from '../../../services/user.service';
+import {Discount} from '../../../shared/discount.model';
 
 @Component({
   selector: 'app-owned-store-edit',
@@ -52,7 +53,8 @@ export class OwnedStoreEditComponent implements OnInit {
     this.loadedFeature = 'Discounts';
   }
 
-  discountAdded() {
+  discountAdded($event: Discount) {
     this.onDiscounts();
   }
+
 }

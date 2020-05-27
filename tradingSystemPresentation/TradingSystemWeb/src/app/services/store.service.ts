@@ -17,7 +17,7 @@ export class StoreService {
   private ownerStore = false;
   private mangerStore = false;
   discountSelected = new EventEmitter<Discount>();
-
+  discountAdded = new EventEmitter<Discount>();
   constructor(private httpService: HttpService, private userService: UserService) {
   }
 

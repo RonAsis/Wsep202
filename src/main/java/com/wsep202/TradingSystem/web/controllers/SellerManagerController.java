@@ -109,7 +109,7 @@ public class SellerManagerController {
     public List<DiscountDto> getAllDiscounts(@PathVariable String username,
                                           @PathVariable int storeId,
                                           @PathVariable UUID uuid) {
-        return sellerManagerService.getSimpleDiscounts(username, storeId, uuid);
+        return sellerManagerService.getAllDiscounts(username, storeId, uuid);
     }
     
 

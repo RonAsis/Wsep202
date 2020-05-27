@@ -81,13 +81,11 @@
             [settings]="composedDiscountsSettings"
             [data]="optionsComposedDiscounts"
             [(ngModel)]="selectedComposedDiscounts"
-            [disabled]="labelPosition==='store'"
           >
           </ng-multiselect-dropdown>
         </div>
         <div class="col-sm-5 from-group">
           <select [value]="this.discount !== undefined ? this.discount.compositeOperator : null"
-                  [disabled]="labelPosition==='store'"
                   [ngModel]="selectedComposite" (ngModelChange)="onSelectedCompositeOperator($event)">
             <option *ngFor="let compositeOperator of compositeOperators" value={{compositeOperator}}>
               {{compositeOperator}}
