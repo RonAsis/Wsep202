@@ -16,10 +16,10 @@ import java.util.Set;
 @Slf4j
 @Builder
 @Entity
-public class AppointeeAppointed {
+public class OwnersAppointee {
 
     @Id
-    private String appinteeUser;
+    private String appointeeUser;
 
     @OneToMany(cascade = CascadeType.ALL)
     private Set<UserSystem> appointedUsers;

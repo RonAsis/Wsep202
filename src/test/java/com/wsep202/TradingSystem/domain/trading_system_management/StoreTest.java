@@ -1,13 +1,9 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.ConditionalStoreDiscount;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
-import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
-import org.apache.catalina.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -603,11 +599,11 @@ class StoreTest {
             owners.add(owner);
             owners.add(newOwner);
             storeUT.setOwners(owners);
-            List<AppointeeAppointed> appointedOwners = new ArrayList<>();
+            List<OwnersAppointee> appointedOwners = new ArrayList<>();
             Set<UserSystem> apOwner = new HashSet<>();
             apOwner.add(newOwner);
-            AppointeeAppointed appointeeAppointed = new AppointeeAppointed(owner.getUserName(),apOwner);
-            appointedOwners.add(appointeeAppointed);
+            OwnersAppointee ownersAppointee = new OwnersAppointee(owner.getUserName(),apOwner);
+            appointedOwners.add(ownersAppointee);
             storeUT.setAppointedOwners(appointedOwners);
         }
 
@@ -1554,23 +1550,23 @@ class StoreTest {
     }
 
     private void setUpRemoveOwner(){
-        List<AppointeeAppointed> appointedOwners = new ArrayList<>();
+        List<OwnersAppointee> appointedOwners = new ArrayList<>();
         Set<UserSystem> owners = new HashSet<>();
         owners.add(owner);
         owners.add(managerUser);
         Set<UserSystem> ownerSet = new HashSet<>();
         ownerSet.add(managerUser);
-        appointedOwners.add(new AppointeeAppointed(owner.getUserName(),ownerSet));
+        appointedOwners.add(new OwnersAppointee(owner.getUserName(),ownerSet));
         ownerSet = makeOwnersSet(4, "Erik");
         UserSystem usr = getUser(ownerSet);
-        appointedOwners.add(new AppointeeAppointed(managerUser.getUserName(),ownerSet));
+        appointedOwners.add(new OwnersAppointee(managerUser.getUserName(),ownerSet));
         owners.addAll(ownerSet);
         ownerSet = makeOwnersSet(2, "Fez");
-        appointedOwners.add(new AppointeeAppointed(usr.getUserName(), ownerSet));
+        appointedOwners.add(new OwnersAppointee(usr.getUserName(), ownerSet));
         owners.addAll(ownerSet);
         usr = getUser(ownerSet);
         ownerSet = makeOwnersSet(2, "Michael");
-        appointedOwners.add(new AppointeeAppointed(usr.getUserName(), ownerSet));
+        appointedOwners.add(new OwnersAppointee(usr.getUserName(), ownerSet));
         owners.addAll(ownerSet);
         storeUT.setOwners(owners);
         storeUT.setAppointedOwners(appointedOwners);
