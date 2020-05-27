@@ -37,7 +37,7 @@ public class Store {
     @Builder.Default
     @JoinTable
     @OneToMany(cascade = CascadeType.ALL)
-    private List<AppointeeAppointed> appointedOwners = new ArrayList<>();
+    private List<OwnersAppointee> appointedOwners = new ArrayList<>();
 
     //map  that holds users as key and their appointed managers as value
     @Builder.Default
@@ -114,7 +114,7 @@ public class Store {
 
         if (isOwner(owner) && !isOwner(willBeOwner)) {
             if(!checkIfAppointeeExists(owner.getUserName()))
-                appointedOwners.add(new AppointeeAppointed(owner.getUserName(), new HashSet<>()));
+                appointedOwners.add(new OwnersAppointee(owner.getUserName(), new HashSet<>()));
             int ownerIndex = getAppointeeIndex(owner.getUserName());
             if(ownerIndex !=-1)
                 appointedOwners.get(ownerIndex).getAppointedUsers().add(willBeOwner);
@@ -130,8 +130,8 @@ public class Store {
     }
 
     private boolean checkIfAppointeeExists(String userName) {
-        for(AppointeeAppointed appointeeAppointed : appointedOwners){
-            if(appointeeAppointed.getAppinteeUser().equals(userName)) {
+        for(OwnersAppointee ownersAppointee : appointedOwners){
+            if(ownersAppointee.getAppointeeUser().equals(userName)) {
                 return true;
             }
         }
@@ -140,8 +140,8 @@ public class Store {
 
     private int getAppointeeIndex(String userName) {
         int i=0;
-        for(AppointeeAppointed appointeeAppointed : appointedOwners){
-            if(appointeeAppointed.getAppinteeUser().equals(userName)) {
+        for(OwnersAppointee ownersAppointee : appointedOwners){
+            if(ownersAppointee.getAppointeeUser().equals(userName)) {
                 return i;
             }
             else {
@@ -829,9 +829,9 @@ public class Store {
 
     public List<String> getMySubOwners(String ownerUsername) {
         return appointedOwners.stream()
-                .filter(userSystemSetEntry -> userSystemSetEntry.getAppinteeUser().equals(ownerUsername))
+                .filter(userSystemSetEntry -> userSystemSetEntry.getAppointeeUser().equals(ownerUsername))
                 .findFirst()
-                .map(AppointeeAppointed::getAppointedUsers)
+                .map(OwnersAppointee::getAppointedUsers)
                 .orElse(new HashSet<>()).stream()
                 .map(UserSystem::getUserName)
                 .collect(Collectors.toList());
