@@ -7,6 +7,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Billi
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,42 +17,60 @@ import java.util.stream.Collectors;
 @Slf4j
 @Setter
 @Getter
+@Entity
 public class Store {
-
+    @Transient
     private final Object stockLock = new Object();
 
-    public static int storeIdAcc = 0;
-
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private int storeId;        //unique identifier for the store
 
     private String storeName;
 
     //map to find all the owners as value appointed the owner who is in the fit key
+
+//    @JoinTable(name = "A",
+//            joinColumns = {@JoinColumn(name = "userSystem_userName", referencedColumnName = "userName")},
+//            inverseJoinColumns = {@JoinColumn(name = "USER_SYSTEM_USER_NAME", referencedColumnName = "userName")})
+
     @Builder.Default
-    private Map<UserSystem, Set<UserSystem>> appointedOwners = new HashMap<>();
+    @JoinTable
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<AppointeeAppointed> appointedOwners = new ArrayList<>();
 
     //map  that holds users as key and their appointed managers as value
     @Builder.Default
+    @Transient
     private Map<UserSystem, Set<MangerStore>> appointedManagers = new HashMap<>();
 
     //The products that the store holds in it
     @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL)
     Set<Product> products = new HashSet<>();
 
     //The set purchase policy for the store
+    //@OneToMany(cascade = CascadeType.ALL)
+    @Transient
     private List<Purchase> purchasePolicies;
 
     //The set purchase policy for the store
+    //@OneToMany(cascade = CascadeType.ALL)
+    @Transient
     private List<Discount> discounts;
 
     //owners of the store
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<UserSystem> owners;
 
     //managers in the store
+    //@OneToMany(cascade = CascadeType.ALL)
+    @Transient
     private Set<MangerStore> managers;
 
     //list of purchases made in the store
 
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Receipt> receipts;
 
     //the store rank
@@ -68,29 +87,19 @@ public class Store {
         this.purchasePolicies = new ArrayList<>();
         this.discounts = new ArrayList<>();
         receipts = new LinkedList<>();
-        appointedOwners = new HashMap<>();
+        appointedOwners = new ArrayList<>();
         appointedManagers = new HashMap<>();
         products = new HashSet<>();
         owners = new HashSet<>();
         managers = new HashSet<>();
         this.storeName = storeName;
         owners.add(owner);
-        this.storeId = getStoreIdAcc();
         this.rank = 5;
     }
 
     public Store(UserSystem owner, String storeName, String description) {
         initStore(owner, storeName);
         this.description = description;
-    }
-
-    /**
-     * get and accumilate the store id accumulator
-     *
-     * @return the store Id
-     */
-    private int getStoreIdAcc() {
-        return storeIdAcc++;
     }
 
     /**
@@ -104,8 +113,11 @@ public class Store {
         boolean appointed = false;
 
         if (isOwner(owner) && !isOwner(willBeOwner)) {
-            appointedOwners.putIfAbsent(owner, new HashSet<>());
-            appointedOwners.get(owner).add(willBeOwner);
+            if(!checkIfAppointeeExists(owner.getUserName()))
+                appointedOwners.add(new AppointeeAppointed(owner.getUserName(), new HashSet<>()));
+            int ownerIndex = getAppointeeIndex(owner.getUserName());
+            if(ownerIndex !=-1)
+                appointedOwners.get(ownerIndex).getAppointedUsers().add(willBeOwner);
             appointed = true;
             log.info("The user: " + willBeOwner.getUserName() + " added as appointed owner by the owner: " + owner.getUserName() + "" +
                     " for the store:" + this.storeName);
@@ -115,6 +127,28 @@ public class Store {
                     "for the store: " + this.storeName);
         }
         return appointed;
+    }
+
+    private boolean checkIfAppointeeExists(String userName) {
+        for(AppointeeAppointed appointeeAppointed : appointedOwners){
+            if(appointeeAppointed.getAppinteeUser().equals(userName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int getAppointeeIndex(String userName) {
+        int i=0;
+        for(AppointeeAppointed appointeeAppointed : appointedOwners){
+            if(appointeeAppointed.getAppinteeUser().equals(userName)) {
+                return i;
+            }
+            else {
+                i++;
+            }
+        }
+        return -1; // userName doesn't exist in appointedOwners
     }
 
     /**
@@ -279,12 +313,14 @@ public class Store {
      * @return set of all the owners that needs to be removed
      */
     private Set<UserSystem> findOwnersToRemove(UserSystem ownerToRemove, Set<UserSystem> ownersToRemove){
-        if (appointedOwners.get(ownerToRemove)!=null && appointedOwners.get(ownerToRemove).size() > 0){
-            ownersToRemove.addAll(appointedOwners.get(ownerToRemove));
-            for (UserSystem user:appointedOwners.get(ownerToRemove)) {
-                findOwnersToRemove(user, ownersToRemove);
+        int ownerToRemoveIndex = getAppointeeIndex(ownerToRemove.getUserName());
+        if(ownerToRemoveIndex !=-1)
+            if (appointedOwners.get(ownerToRemoveIndex).getAppointedUsers()!=null && appointedOwners.get(ownerToRemoveIndex).getAppointedUsers().size() > 0){
+                ownersToRemove.addAll(appointedOwners.get(ownerToRemoveIndex).getAppointedUsers());
+                for (UserSystem user:appointedOwners.get(ownerToRemoveIndex).getAppointedUsers()) {
+                    findOwnersToRemove(user, ownersToRemove);
+                }
             }
-        }
         return ownersToRemove;
     }
 
@@ -305,8 +341,10 @@ public class Store {
      * @return true if owner2 was appointed by owner1, else false
      */
     private boolean isAppointedBy(UserSystem owner1, UserSystem owner2){
-        if (appointedOwners.get(owner1).size() > 0 && appointedOwners.get(owner1).contains(owner2))
-            return true;
+        int owner1Index = getAppointeeIndex(owner1.getUserName());
+        if(owner1Index !=-1)
+            if (appointedOwners.get(owner1Index).getAppointedUsers().size() > 0 && appointedOwners.get(owner1Index).getAppointedUsers().contains(owner2))
+                return true;
         return false;
     }
 
@@ -521,12 +559,14 @@ public class Store {
      * or null if the owner didn't appointed anyone
      */
     public UserSystem getAppointedOwner(UserSystem ownerUser, String ownerUserName) {
-        if (isOwner(ownerUser) && !appointedOwners.get(ownerUser).isEmpty()){
-            for (UserSystem user:appointedOwners.get(ownerUser)) {
-                if (user.getUserName().equals(ownerUserName))
-                    return user;
+        int ownerUserIndex = getAppointeeIndex(ownerUser.getUserName());
+        if(ownerUserIndex !=-1)
+            if (isOwner(ownerUser) && !appointedOwners.get(ownerUserIndex).getAppointedUsers().isEmpty()){
+                for (UserSystem user:appointedOwners.get(ownerUserIndex).getAppointedUsers()) {
+                    if (user.getUserName().equals(ownerUserName))
+                        return user;
+                }
             }
-        }
         throw new NoOwnerInStoreException(ownerUserName,storeId);
     }
 
@@ -785,11 +825,13 @@ public class Store {
         throw new NoOwnerInStoreException(userSystem.getUserName(), this.getStoreId());
     }
 
+
+
     public List<String> getMySubOwners(String ownerUsername) {
-        return appointedOwners.entrySet().stream()
-                .filter(userSystemSetEntry -> userSystemSetEntry.getKey().getUserName().equals(ownerUsername))
+        return appointedOwners.stream()
+                .filter(userSystemSetEntry -> userSystemSetEntry.getAppinteeUser().equals(ownerUsername))
                 .findFirst()
-                .map(Map.Entry::getValue)
+                .map(AppointeeAppointed::getAppointedUsers)
                 .orElse(new HashSet<>()).stream()
                 .map(UserSystem::getUserName)
                 .collect(Collectors.toList());

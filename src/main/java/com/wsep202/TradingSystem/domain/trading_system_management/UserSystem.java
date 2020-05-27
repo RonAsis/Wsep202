@@ -7,7 +7,9 @@ import com.wsep202.TradingSystem.domain.trading_system_management.notification.S
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
+import org.hibernate.annotations.Type;
 
+import javax.persistence.*;
 import java.util.*;
 
 /**
@@ -19,19 +21,23 @@ import java.util.*;
 @NoArgsConstructor
 @Slf4j
 @Builder
+@Entity
 public class UserSystem implements Observer {
 
     /**
      * the user name
      */
+    @Id
     private String userName;
     /**
      * the encryption password of the the user
      */
+    @Lob
     private String password;
     /**
      * the salt we use to hash the password for the user
      */
+    @Lob
     private String salt;
     /**
      * the first name of the user
@@ -45,16 +51,19 @@ public class UserSystem implements Observer {
      * The stores that the user manages
      */
     @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<Store> managedStores = new HashSet<>();
     /**
      * The stores that the user own
      */
     @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<Store> ownedStores = new HashSet<>();
     /**
      * The user personal shopping cart
      */
     @Builder.Default
+    @OneToOne(cascade = CascadeType.ALL)
     private ShoppingCart shoppingCart = new ShoppingCart();
     /**
      * Show the stage of the user, logged-in or logged-out
@@ -65,27 +74,48 @@ public class UserSystem implements Observer {
      * The users personal receipts list
      */
     @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Receipt> receipts = new LinkedList<>();
 
     /**
      * for notification
      */
     @Builder.Default
+    //@OneToMany(cascade = CascadeType.ALL)
+    @Transient
     private List<Notification> notifications = new LinkedList<>();
 
     //need ignore in Db;
+    @Transient
     private Subject subject;
 
     //need ignore in Db;
+    @Transient
     private String principal;
+
+    private boolean isAdmin;
 
     private String imageUrl;
 
+    public UserSystem(String userName, String firstName,boolean isLogin, String lastName, String password, boolean isAdmin) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.isLogin = isLogin;
+        this.lastName = lastName;
+        this.password = password;
+        this.isAdmin = isAdmin;
+        this.notifications = new LinkedList<>();
+        this.shoppingCart = new ShoppingCart();
+        this.ownedStores = new HashSet<>();
+        managedStores = new HashSet<>();
+    }
+
     public UserSystem(String userName, String firstName, String lastName, String password) {
-            this.userName = userName;
+        this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
+        this.isAdmin = false;
         this.notifications = new LinkedList<>();
         this.shoppingCart = new ShoppingCart();
         this.ownedStores = new HashSet<>();

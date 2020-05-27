@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,15 +17,22 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
 public class ShoppingBag {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private int id;
 
     /**
      * the store of the products
      */
+    @OneToOne(cascade = CascadeType.ALL)
     private Store storeOfProduct;
     /**
      * list of all of the products and the amount of each product
      */
+    @Transient
     private Map<Product, Integer> productListFromStore;
 
 

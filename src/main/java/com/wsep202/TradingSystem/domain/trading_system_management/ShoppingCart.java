@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,12 +16,17 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @Data
+@Entity
 public class ShoppingCart {
 
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private int id;
     /**
      * list of stores and there shopping bags
      */
     @Builder.Default
+    @Transient
     private Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
 
 

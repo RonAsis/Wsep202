@@ -108,6 +108,7 @@ class StoreTest {
             addNewProductSetUp();
             ProductCategory category = ProductCategory.HEALTH;
             when(product.getCategory()).thenReturn(category);
+            when(product.getCategory()).thenReturn(category);
             Set<Product> resultsForSearch = storeUT.searchProductByCategory(ProductCategory.HEALTH);
             for (Product product : resultsForSearch) {
                 //success: all products in the list are in the same category
@@ -596,17 +597,18 @@ class StoreTest {
         }
 
         private void setUpGetAppointedOwner(){
+            when(owner.getUserName()).thenReturn("ownerTest");
+            when(newOwner.getUserName()).thenReturn("newOwnerTest");
             Set<UserSystem> owners = new HashSet<>();
             owners.add(owner);
             owners.add(newOwner);
             storeUT.setOwners(owners);
-            Map<UserSystem,Set<UserSystem>> appointedOwners = new HashMap<>();
+            List<AppointeeAppointed> appointedOwners = new ArrayList<>();
             Set<UserSystem> apOwner = new HashSet<>();
             apOwner.add(newOwner);
-            appointedOwners.put(owner,apOwner);
+            AppointeeAppointed appointeeAppointed = new AppointeeAppointed(owner.getUserName(),apOwner);
+            appointedOwners.add(appointeeAppointed);
             storeUT.setAppointedOwners(appointedOwners);
-            when(owner.getUserName()).thenReturn("ownerTest");
-            when(newOwner.getUserName()).thenReturn("newOwnerTest");
         }
 
         /**
@@ -1552,23 +1554,23 @@ class StoreTest {
     }
 
     private void setUpRemoveOwner(){
-        Map<UserSystem, Set<UserSystem>> appointedOwners = new HashMap<>();
+        List<AppointeeAppointed> appointedOwners = new ArrayList<>();
         Set<UserSystem> owners = new HashSet<>();
         owners.add(owner);
         owners.add(managerUser);
         Set<UserSystem> ownerSet = new HashSet<>();
         ownerSet.add(managerUser);
-        appointedOwners.put(owner,ownerSet);
+        appointedOwners.add(new AppointeeAppointed(owner.getUserName(),ownerSet));
         ownerSet = makeOwnersSet(4, "Erik");
         UserSystem usr = getUser(ownerSet);
-        appointedOwners.put(managerUser,ownerSet);
+        appointedOwners.add(new AppointeeAppointed(managerUser.getUserName(),ownerSet));
         owners.addAll(ownerSet);
         ownerSet = makeOwnersSet(2, "Fez");
-        appointedOwners.put(usr, ownerSet);
+        appointedOwners.add(new AppointeeAppointed(usr.getUserName(), ownerSet));
         owners.addAll(ownerSet);
         usr = getUser(ownerSet);
         ownerSet = makeOwnersSet(2, "Michael");
-        appointedOwners.put(usr, ownerSet);
+        appointedOwners.add(new AppointeeAppointed(usr.getUserName(), ownerSet));
         owners.addAll(ownerSet);
         storeUT.setOwners(owners);
         storeUT.setAppointedOwners(appointedOwners);
