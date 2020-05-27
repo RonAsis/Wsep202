@@ -1220,7 +1220,6 @@ class TradingSystemTest {
             userToRegister = new UserSystem(username,fName,lName,password);
             store = new Store();
             product = new Product();
-            store.setStoreId(1);
             product.setName("dollhouse");
             product.setCategory(ProductCategory.TOYS_HOBBIES);
             admin = UserSystem.builder()
@@ -1238,139 +1237,191 @@ class TradingSystemTest {
             factoryObjects = new FactoryObjects();
         }
 
-//        /**
-//         * the following checks registration of valid user
-//         */
-//        @Test
-//        void registerNewUser() {
-//            //the following user details are necessary for the login tests
-//            Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister, null));
-//        }
+        /**
+         * the following checks registration of valid user
+         */
+        @Test
+        void registerNewUser() {
+            //the following user details are necessary for the login tests
+            Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister, null));
+            //check that the user that was just registered is in the users list
+            Assertions.assertTrue(tradingSystemDao.getUsers().contains(userToRegister));
+        }
 
-//        /**
-//         * checks handling with failure of registration
-//         * this test has to run after its respective positive test
-//         */
-//        @Test
-//        void registerNewUserNegative() {
-//            //registration with already registered user
-//            registerAsSetup(); //first registration
-//            Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister,null));  //second registration
-//        }
+        /**
+         * checks handling with failure of registration
+         * this test has to run after its respective positive test
+         */
+        @Test
+        void registerNewUserNegative() {
+            //registration with already registered user
+            registerAsSetup(); //first registration
+            //check that the user we want to register is already registered
+            Assertions.assertTrue(tradingSystemDao.getUsers().contains(userToRegister));
+            // try to registered again
+            Assertions.assertFalse(tradingSystem.registerNewUser(userToRegister,null));  //second registration
+        }
 
-//        /**
-//         * check if the login method works
-//         */
-//        @Test
-//        void login() {
-//            //check login of regular user
-//            String password = "test login";
-//            UserSystem user = UserSystem.builder()
-//                    .userName("test login")
-//                    .password(password)
-//                    .build();
-//            tradingSystem.registerNewUser(user);
-//            tradingSystem.login(user, false, password);
-//            //the following register should register usernameTest as username
-//            // and passwordTest as password
-//            registerAsSetup();  //register user test as setup for login
-//            boolean ans = tradingSystem.login(userToRegister.getUserName(),"passwordTest");
-//            Assertions.assertTrue(ans);
-//            //check login of admin
-//            //TODO
-//        }
+        /**
+         * check if the login method works
+         */
+        @Test
+        void login() {
+            //register a user first
+            when(externalServiceManagement.isAuthenticatedUserPassword(userToRegister.getPassword()
+                    ,userToRegister)).thenReturn(true);
+            tradingSystem.registerNewUser(userToRegister,null);
+            //try to login
+            Pair<UUID,Boolean> ans = tradingSystem.login(userToRegister.getUserName(),userToRegister.getPassword());
+            //check that login process worked
+            Assertions.assertNotNull(ans);
+            //check that it's not an admin
+            Assertions.assertFalse(ans.getValue());
+            //check login of admin
+            //TODO
+        }
 
-//        /**
-//         * test handling with login failure
-//         */
-//        @Test
-//        void loginNegative(){
-//            String username = "username";
-//            String password = "password";
-//            String fName = "mati";
-//            String lName = "Tut";
-//            UserSystem user = new UserSystem(username,fName,lName,password);
-//            user.setSalt("salt");
-//            Pair<UUID, Boolean> loggedIn = tradingSystem.login(user.getUserName(),"password");
-//            Assertions.assertTrue(loggedIn == null);
-//        }
+        /**
+         * check if the login method works for an admin
+         */
+        @Test
+        void loginAdmin() {
+            when(externalServiceManagement.isAuthenticatedUserPassword(admin.getPassword()
+                    ,admin)).thenReturn(true);
+            //try to login
+            Pair<UUID,Boolean> ans = tradingSystem.login(admin.getUserName(),admin.getPassword());
+            //check that login process worked
+            Assertions.assertNotNull(ans);
+            //check that it's an admin
+            Assertions.assertTrue(ans.getValue());
+        }
 
-//        /**
-//         * check the logout functionality of exists user in the system
-//         */
-//        @Test
-//        void logout() {
-//            //setup of login for the logout
-//            String password = "Moti";
-//            UserSystem user = UserSystem.builder()
-//                    .userName("usernameTest")
-//                    .password(password)
-//                    .firstName("Banana")
-//                    .lastName("passwordTest").build();
-//            tradingSystem.registerNewUser(user);
-//            tradingSystem.login(user, false, password);
-//            Assertions.assertTrue(tradingSystem.logout(user));
-//        }
+        /**
+         * test handling with login failure
+         */
+        @Test
+        void loginNegative(){
+            UserSystem user = new UserSystem("TestUser","mati","tut","passwordForTest");
+            user.setSalt("salt");
+            //try to login a non-registered user
+            Pair<UUID, Boolean> loggedIn = tradingSystem.login(user.getUserName(),user.getPassword());
+            //check that login method failed
+            Assertions.assertTrue(loggedIn == null);
+            //check that the user is not in logged-in map
+            Assertions.assertFalse(tradingSystem.getUsersLogin().containsKey(user.getUserName()));
+        }
+
+        /**
+         * check the logout functionality of exists user in the system
+         */
+        @Test
+        void logout() {
+            //setup of login for the logout
+            String password = "passwordTest";
+            UserSystem user = UserSystem.builder()
+                    .userName("logoutTestUser")
+                    .password(password)
+                    .firstName("Banana")
+                    .lastName("Mort").build();
+            //register the user first
+            tradingSystem.registerNewUser(user,null);
+            when(externalServiceManagement.isAuthenticatedUserPassword(user.getPassword()
+                    ,user)).thenReturn(true);
+            //login
+            tradingSystem.login(user.getUserName(), password);
+            //check that the user is in logged-in map
+            Assertions.assertTrue(tradingSystem.getUsersLogin().containsKey(user.getUserName()));
+            //check that the logout method works
+            Assertions.assertTrue(tradingSystem.logout(user));
+            //check that the user is not in logged-in map
+            Assertions.assertFalse(tradingSystem.getUsersLogin().containsKey(user.getUserName()));
+        }
 
         /**
          * check handling with logout failure
          */
         @Test
         void logoutNegative() {
+            //check that the user is not in logged-in map
+            Assertions.assertFalse(tradingSystem.getUsersLogin().containsKey(userToRegister.getUserName()));
+            //try to logout a not logged-in user
             Assertions.assertFalse(tradingSystem.logout(userToRegister));
+            //check that the user is not in logged-in map
+            Assertions.assertFalse(tradingSystem.getUsersLogin().containsKey(userToRegister.getUserName()));
         }
 
 
-//        /**
-//         * check the getStoreByAdmin() functionality in case of exists admin in the system
-//         */
-//        @Test
-//        void getStoreByAdminPositive() {
-//            tradingSystem.insertStoreToStores(store);
-//            Assertions.assertEquals(tradingSystem.getStoreByAdmin("admin", 1, uuid),store);
-//        }
-//
-//        /**
-//         * check the getStoreByAdmin() functionality in case of not exists admin in the system
-//         */
-//        @Test
-//        void getStoreByAdminNegative() {
-//            Assertions.assertThrows(NotAdministratorException.class, () -> {
-//                tradingSystem.insertStoreToStores(store);
-//                tradingSystem.getStoreByAdmin("userSystem", 1, uuid);
-//            });
-//        }
+        /**
+         * check the getStoreByAdmin() functionality in case of exists admin in the system
+         */
+        @Test
+        void getStoreByAdminPositive() {
+            setUpStore();
+            //login first
+            when(externalServiceManagement.isAuthenticatedUserPassword(admin.getPassword()
+                    ,admin)).thenReturn(true);
+            Pair<UUID,Boolean> ans = tradingSystem.login(admin.getUserName(),admin.getPassword());
+            //check that the returned store is the correct one
+            Assertions.assertEquals(store,
+                    tradingSystem.getStoreByAdmin("admin", store.getStoreId(), ans.getKey()));
+        }
 
-//        /**
-//         * check the getStore() functionality in case of exists store in the system
-//         */
-//        @Test
-//        void getStorePositive() {
-//            tradingSystem.insertStoreToStores(store);
-//            Assertions.assertEquals(tradingSystem.getStore(1),store);
-//        }
-//
-//        /**
-//         * check the getStore() functionality in case of not exists store in the system
-//         */
-//        @Test
-//        void getStoreNegative() {
-//            Assertions.assertThrows(StoreDontExistsException.class, () -> {
-//                tradingSystem.insertStoreToStores(store);
-//                tradingSystem.getStore(2);
-//            });
-//        }
+        /**
+         *open a store for the test
+         */
+        private void setUpStore(){
+            userToOpenStore = new UserSystem("userToGetStoreTest","myFirstName",
+                    "myLastName","myPassword");
+            tradingSystem.registerNewUser(userToOpenStore,null);
+            store = tradingSystem.openStore(userToOpenStore,"StoreForTest","We-Test-Staff");
+        }
 
-//        /**
-//         * check the getUser() functionality in case of exists user in the system
-//         */
-//        @Test
-//        void getUserPositive() {
-//            // register "userToRegister" to the users list in trading system
-//            registerAsSetup();
-//            Assertions.assertEquals(tradingSystem.getUser("usernameTest", uuid),userToRegister);
-//        }
-//
+        /**
+         * check the getStoreByAdmin() functionality in case of not exists admin in the system
+         */
+        @Test
+        void getStoreByAdminNegative() {
+            setUpStore();
+            Assertions.assertThrows(NotAdministratorException.class, () -> {
+                tradingSystem.getStoreByAdmin("userSystem", store.getStoreId(), null);
+            });
+        }
+
+        /**
+         * check the getStore() functionality in case of exists store in the system
+         */
+        @Test
+        void getStorePositive() {
+            setUpStore();
+            //check that the right store returns
+            Assertions.assertEquals(store,tradingSystem.getStore(store.getStoreId()));
+        }
+
+        /**
+         * check the getStore() functionality in case of not exists store in the system
+         */
+        @Test
+        void getStoreNegative() {
+            Assertions.assertThrows(StoreDontExistsException.class, () -> {
+                tradingSystem.getStore(2);
+            });
+        }
+
+        /**
+         * check the getUser() functionality in case of exists user in the system
+         */
+        @Test
+        void getUserPositive() {
+            // register "userToRegister" to the users list in trading system
+            tradingSystem.registerNewUser(userToRegister,null);
+            when(externalServiceManagement.isAuthenticatedUserPassword(userToRegister.getPassword()
+                    ,userToRegister)).thenReturn(true);
+            //login user
+            Pair<UUID,Boolean> login = tradingSystem.login(userToRegister.getUserName(),userToRegister.getPassword());
+            //check that the right user returns
+            Assertions.assertEquals(userToRegister,tradingSystem.getUser("usernameTest", login.getKey()));
+        }
+
 //        /**
 //         * check the getUser() functionality in case of not exists user in the system
 //         */
@@ -1378,8 +1429,8 @@ class TradingSystemTest {
 //        void getUserNegative() {
 //            // register "userToRegister" to the users list in trading system
 //            Assertions.assertThrows(UserDontExistInTheSystemException.class, () -> {
-//                registerAsSetup();
-//                tradingSystem.getUser("userToRegister", uuid);
+//                //registerAsSetup();
+//                tradingSystem.getUser("iAmNotHereTest", null);
 //            });
 //        }
 
@@ -2073,7 +2124,7 @@ class TradingSystemTest {
          * set up of successful pre registration
          */
         private void registerAsSetup(){
-           // tradingSystem.registerNewUser(userToRegister);
+            tradingSystem.registerNewUser(userToRegister,null);
         }
 
         /**

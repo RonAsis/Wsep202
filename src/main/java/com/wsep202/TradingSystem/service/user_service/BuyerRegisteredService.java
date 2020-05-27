@@ -40,7 +40,7 @@ public class BuyerRegisteredService {
      * @param uuid
      * @return
      */
-    public Store openStore(String usernameOwner,
+    public StoreDto openStore(String usernameOwner,
                               String storeName,
                               String description,
                               UUID uuid){

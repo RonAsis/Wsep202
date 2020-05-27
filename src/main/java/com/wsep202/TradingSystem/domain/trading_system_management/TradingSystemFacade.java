@@ -391,15 +391,33 @@ public class TradingSystemFacade {
      * @param storeName     - the name of the new store
      * @return true if succeed
      */
-    public Store openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
+    public StoreDto openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(usernameOwner, uuid);
             Store store = tradingSystem.openStore(user, storeName, description);
-            return store;
+            Set<ProductDto> products = makeProductDto(store.getProducts());
+            StoreDto storeDto = new StoreDto(store.getStoreId(),store.getStoreName(),products,
+                    store.getDescription(),store.getRank());
+            return storeDto;
         } catch (TradingSystemException e) {
             log.error("failed to open store", e);
             return null;
         }
+    }
+
+    /**
+     * make product dto from product
+     * @param products - set of products that need to be changed to dto
+     * @return a set of product dtos
+     */
+    private Set<ProductDto> makeProductDto(Set<Product> products){
+        Set<ProductDto> productDtos = new HashSet<>();
+        for (Product product: products) {
+            ProductDto productDto = new ProductDto(product.getProductSn(),product.getName(), product.getCategory().category,
+                    product.getAmount(),product.getCost(),product.getOriginalCost(),product.getRank(),product.getStoreId());
+            productDtos.add(productDto);
+        }
+        return productDtos;
     }
 
     /**
