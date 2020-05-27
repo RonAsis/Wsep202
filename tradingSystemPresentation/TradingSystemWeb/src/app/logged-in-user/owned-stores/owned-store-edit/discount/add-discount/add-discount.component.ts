@@ -29,6 +29,7 @@ export class AddDiscountComponent implements OnInit {
   selectedComposedDiscounts: Discount[];
   composedDiscountsSettings: IDropdownSettings;
 
+  discountType: string;
 
   @ViewChild('discountPercentage', {static: false}) discountPercentage: ElementRef;
   @ViewChild('endTime', {static: false}) endTime: ElementRef;
@@ -46,15 +47,14 @@ export class AddDiscountComponent implements OnInit {
   today: string;
 
   constructor(private storeService: StoreService, public dialog: MatDialog) {
-
   }
 
   ngOnInit(): void {
+    this.discountType = 'visible';
     this.selectedProductUnderDiscount = [];
     this.selectedProductsForApplyDiscounts = [];
     this.selectedComposedDiscounts = [];
     this.today = new Date().toISOString().split('T')[0];
-
     this.productUnderDiscountSettings = {
       singleSelection: false,
       idField: 'productSn',
@@ -88,7 +88,9 @@ export class AddDiscountComponent implements OnInit {
           this.compositeOperators = response;
         }
       });
+    console.log(this.discount);
     if (this.discount !== null && this.discount !== undefined) {
+      console.log('in');
       this.selectedProductUnderDiscount =
         this.discount.productsUnderThisDiscount !== undefined && this.discount.productsUnderThisDiscount !== null ?
           this.discount.productsUnderThisDiscount : [];
@@ -98,17 +100,19 @@ export class AddDiscountComponent implements OnInit {
       this.selectedComposedDiscounts =
         this.discount.composedDiscounts !== undefined && this.discount.composedDiscounts !== null ?
           this.discount.composedDiscounts : [];
-      this.labelPosition = this.discount.storeDiscount ? 'store' : 'product';
-      this.endTime = new ElementRef<Date>(this.discount.endTime);
+      this.endTime = new ElementRef<Date>(new Date(this.discount.endTime));
+      this.today = new Date(this.discount.endTime).toISOString().split('T')[0];
       this.description = new ElementRef<string>(this.discount.description);
       this.minPrice = new ElementRef<number>(this.discount.minPrice);
       this.selectedComposite = this.discount.compositeOperator;
+      this.discountType = this.discount.discountType;
+      console.log(this.discountType);
     }
   }
 
   private init() {
     this.optionsProductsForApplyDiscounts = this.store.products.slice();
-    this.storeService.getDiscounts(this.store.storeId)
+    this.storeService.getSimpleDiscounts(this.store.storeId)
       .subscribe(response => {
         if (response !== null && response !== undefined) {
           this.optionsComposedDiscounts = response;
@@ -150,10 +154,10 @@ export class AddDiscountComponent implements OnInit {
         this.selectedProductUnderDiscount,
         this.description.nativeElement.value,
         this.selectedProductsForApplyDiscounts,
-        this.minPrice.nativeElement.value,
+        this.minPrice !== undefined ? this.minPrice.nativeElement.value : 1,
         this.selectedComposedDiscounts,
         this.selectedComposite,
-        this.labelPosition === 'store');
+        this.discountType);
       this.storeService.addDiscount(this.store.storeId, discount)
         .subscribe(response => {
           if (response !== undefined && response !== null) {
@@ -171,13 +175,9 @@ export class AddDiscountComponent implements OnInit {
       if (!result.isNotWith) {
         const productFound: Product = this.selectedProductUnderDiscount.find(product => product.productSn === productItem.productSn);
         productFound.amount = result.amount;
-        console.log(productFound.amount);
-        console.log(this.selectedProductUnderDiscount);
       } else {
         const productFound: Product = this.selectedProductUnderDiscount.find(product => product.productSn === productItem.productSn);
         productFound.amount = -1;
-        console.log(productFound.amount);
-        console.log(this.selectedProductUnderDiscount);
       }
     });
   }
@@ -197,4 +197,19 @@ export class AddDiscountComponent implements OnInit {
     });
   }
 
+  onVisibleDiscount() {
+    this.discountType = 'visible';
+  }
+
+  onConditionalStoreDiscount() {
+    this.discountType = 'conditional store';
+  }
+
+  onConditionalProductDiscount() {
+    this.discountType = 'conditional product';
+  }
+
+  onComposeDiscount() {
+    this.discountType = 'compose';
+  }
 }

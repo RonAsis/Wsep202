@@ -10,14 +10,16 @@ import {StoreService} from '../../../../../../services/store.service';
 export class DiscountItemComponent implements OnInit {
 
   @Input() discount: Discount;
+  endTime: string;
 
-  constructor(private storeService: StoreService) { }
+  constructor(private storeService: StoreService) {
+  }
 
   ngOnInit(): void {
+    this.endTime = new Date(this.discount.endTime).toISOString().split('T')[0];
   }
 
   onSelected() {
-    console.log(this.discount);
     this.storeService.discountSelected.emit(this.discount);
   }
 }

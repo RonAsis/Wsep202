@@ -26,7 +26,6 @@ export class DiscountComponent implements OnInit {
     this.storeService.discountSelected
       .subscribe(
         (discount: Discount) => {
-          console.log(discount);
           if (discount !== undefined ) {
             this.selectedDiscount = discount;
           }

@@ -779,12 +779,20 @@ public class TradingSystemFacade {
      * @param uuid
      * @return
      */
-    public List<DiscountDto> getAllStoreDiscounts(String ownerUsername, int storeId, UUID uuid) {
+    public List<DiscountDto> getDiscountsSimple(String ownerUsername, int storeId, UUID uuid) {
+        UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
+        Store store = user.getOwnerStore(storeId);
+        List<Discount> allDiscounts = store.getDiscountSimple();
+        return convertDiscountList(allDiscounts);
+    }
+
+    public List<DiscountDto> getAlltDiscounts(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
         Store store = user.getOwnerStore(storeId);
         List<Discount> allDiscounts = store.getDiscounts();
         return convertDiscountList(allDiscounts);
     }
+
     public List<PurchaseDto> getAllStorePurchases(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
         Store store = user.getOwnerStore(storeId);
@@ -884,7 +892,7 @@ public class TradingSystemFacade {
     }
 
     private List<DiscountDto> convertDiscountList(@NotNull List<@NotNull Discount> discounts) {
-        Type listType = new TypeToken<List<Discount>>() {}.getType();
+        Type listType = new TypeToken<List<DiscountDto>>() {}.getType();
         return modelMapper.map(discounts, listType);
     }
 

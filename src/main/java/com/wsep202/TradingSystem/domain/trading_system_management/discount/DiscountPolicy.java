@@ -58,12 +58,9 @@ public abstract class DiscountPolicy {
 
     /**
      * checks if the received product is currently under discount
-     * @param discount checked current discount
-     * @param product to check
-     * @return
      */
-    public boolean isProductHaveDiscount(Discount discount, Product product) {
-        return discount.getAmountOfProductsForApplyDiscounts().keySet().stream()
+    public boolean isProductHaveDiscount(Map<Product, Integer> amountOfProductsForApplyDiscounts, Product product) {
+        return amountOfProductsForApplyDiscounts.keySet().stream()
                 .anyMatch(integer -> product.getProductSn() == integer.getProductSn());
     }
 }

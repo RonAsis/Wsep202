@@ -4,7 +4,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,20 +14,41 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @NoArgsConstructor
 @Builder
+@AllArgsConstructor
 public class ComposedDiscount extends DiscountPolicy {
+
+    /**
+     * amount of product from to apply discount
+     */
+    private Map<Product, Integer> amountOfProductsForApplyDiscounts;
+
+    /**
+     * products that has the specified discount
+     */
+    private Map<Product, Integer> productsUnderThisDiscount;
+
+    /**
+     * children components of the composite conditional discount
+     */
+    private List<Discount> composedDiscounts;
+
+    /**
+     * the operation between the conditionals discounts
+     */
+    private CompositeOperator compositeOperator;
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
-        if (!discount.getAmountOfProductsForApplyDiscounts().isEmpty() && isApprovedProducts(discount, products)) {
-            discount.applyConditionalDiscount(products);
+        if (!amountOfProductsForApplyDiscounts.isEmpty() && isApprovedProducts(discount, products)) {
+            createConditionalDiscount().applyDiscount(discount, products);
         } else {
-            switch (discount.getCompositeOperator()) {
+            switch (compositeOperator) {
                 case AND:
-                    discount.getComposedDiscounts().forEach(discountPolicy -> discountPolicy.applyDiscount(products));
+                    composedDiscounts.forEach(discountPolicy -> discountPolicy.applyDiscount(products));
                     break;
                 case OR:
                     AtomicBoolean oneAlreadyApply = new AtomicBoolean(false);
-                    discount.getComposedDiscounts().forEach(discountCur -> {
+                    composedDiscounts.forEach(discountCur -> {
                         if (!oneAlreadyApply.get()) {
                             if (discountCur.isApprovedProducts(products)) {
                                 discountCur.applyDiscount(products);
@@ -41,7 +62,7 @@ public class ComposedDiscount extends DiscountPolicy {
                     AtomicInteger numOfPolicyApproved = new AtomicInteger(getNumOfPolicyApproved(discount, products));
                     numOfPolicyApproved = numOfPolicyApproved.get() % 2 != 0 ? numOfPolicyApproved : new AtomicInteger(numOfPolicyApproved.get() - 1);
                     AtomicInteger finalNumOfPolicyApproved = numOfPolicyApproved;
-                    discount.getComposedDiscounts().forEach(discountCur -> {
+                    composedDiscounts.forEach(discountCur -> {
                         if (finalNumOfPolicyApproved.get() > 0) {
                             if (discountCur.isApprovedProducts(products)) {
                                 finalNumOfPolicyApproved.getAndDecrement();
@@ -55,16 +76,22 @@ public class ComposedDiscount extends DiscountPolicy {
         }
     }
 
+    private ConditionalProductDiscount createConditionalDiscount(){
+        return ConditionalProductDiscount.builder()
+                .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                .productsUnderThisDiscount(productsUnderThisDiscount)
+                .build();
+    }
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
         boolean isApproved = !isExpired(discount);
-        switch (discount.getCompositeOperator()) {
+        switch (compositeOperator) {
             case AND:
-                isApproved = isApproved && discount.getComposedDiscounts().stream()
+                isApproved = isApproved && composedDiscounts.stream()
                         .allMatch(discountPolicy -> discountPolicy.isApprovedProducts(products));
                 break;
             case OR:
-                isApproved = isApproved && discount.getComposedDiscounts().stream()
+                isApproved = isApproved && composedDiscounts.stream()
                         .anyMatch(discountCur -> discountCur.isApprovedProducts(products));
                 break;
             case XOR:
@@ -80,7 +107,7 @@ public class ComposedDiscount extends DiscountPolicy {
     }
 
     private int getNumOfPolicyApproved(Discount discount, Map<Product, Integer> products) {
-        return discount.getComposedDiscounts().stream()
+        return composedDiscounts.stream()
                 .filter(discountCur -> discountCur.isApprovedProducts(products))
                 .toArray().length;
     }
