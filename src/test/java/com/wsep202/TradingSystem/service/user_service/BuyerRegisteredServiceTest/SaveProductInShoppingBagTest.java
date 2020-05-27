@@ -36,27 +36,34 @@ public class SaveProductInShoppingBagTest {
     @Autowired
     SellerOwnerService sellerOwnerService;
     ServiceTestsHelper helper;
-    UserSystemDto user = new UserSystemDto("username","name","lname");
+    UserSystemDto user = new UserSystemDto("username", "name", "lname");
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
+    private StoreDto storeDto;
+    private ProductDto productDto;
 
     @BeforeEach
     void setUp() {
-        if (this.helper == null || this.helper.getGuestService() == null ) {
+        if (this.helper == null || this.helper.getGuestService() == null) {
             this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService, this.sellerOwnerService);
         }
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
-        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
+        Pair<UUID, Boolean> returnedValueLogin = this.helper.loginUser(this.user.getUserName(),
                 this.userPassword);
-        if (returnedValue != null){
-            this.uuid = returnedValue.getKey();
+        if (returnedValueLogin != null) {
+            this.uuid = returnedValueLogin.getKey();
+        }
+        Pair<StoreDto, ProductDto> returnedValueOpen = this.helper.createOwnerOpenStoreAndAddProduct();
+        if (returnedValueOpen != null) {
+            this.storeDto = returnedValueOpen.getKey();
+            this.productDto = returnedValueOpen.getValue();
         }
     }
 
     @AfterEach
-    void tearDown(){
+    void tearDown() {
         this.helper.logoutUser(this.user.getUserName(), this.uuid);
     }
 
@@ -65,9 +72,8 @@ public class SaveProductInShoppingBagTest {
      */
     @Test
     void saveValidProductRegisteredUser() {
-        ProductDto productDto = this.helper.openStoreAndAddProducts();
         Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
-                0, productDto.getProductSn(), 1, this.uuid));
+                this.storeDto.getStoreId(), this.productDto.getProductSn(), 1, this.uuid));
     }
 
     /**
@@ -75,27 +81,19 @@ public class SaveProductInShoppingBagTest {
      */
     @Test
     void saveValidProductNotRegisteredUser() {
-        try {
-            ProductDto productDto = this.helper.openStoreAndAddProducts();
-            Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag("notRegistered",
-                    0, productDto.getProductSn(), 1, this.uuid));
-        } catch (Exception e){
-
-        }
-    }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.buyerRegisteredService.saveProductInShoppingBag("notRegistered",
+                this.storeDto.getStoreId(), this.productDto.getProductSn(), 1, this.uuid);
+    });
+}
 
     /**
      * save an invalid product in a not registered user's shopping bag
      */
     @Test
     void saveInvalidProductNotRegisteredUser() {
-        try{
-            ProductDto productDto = this.helper.openStoreAndAddProducts();
-            Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag("notRegistered",
-                    0, productDto.getProductSn()+10, 1, this.uuid));
-        } catch (Exception e){
-
-        }
+        Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag("notRegistered",
+                this.storeDto.getStoreId(), this.productDto.getProductSn() + 10, 1, this.uuid));
     }
 
 
@@ -104,27 +102,17 @@ public class SaveProductInShoppingBagTest {
      */
     @Test
     void saveInvalidProductRegisteredUser() {
-        try {
-        ProductDto productDto = this.helper.openStoreAndAddProducts();
         Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
-                0, productDto.getProductSn()+10, 1, this.uuid));
-    } catch (Exception e){
-
+                this.storeDto.getStoreId(), this.productDto.getProductSn() + 10, 1, this.uuid));
     }
-}
 
     /**
      * save a valid product from invalid store in a registered user's shopping bag
      */
     @Test
     void saveValidProductInvalidStoreRegisteredUser() {
-        try{
-        ProductDto productDto = this.helper.openStoreAndAddProducts();
         Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
-                10, productDto.getProductSn(), 1, this.uuid));
-        } catch (Exception e){
-
-        }
+                this.storeDto.getStoreId() + 10, this.productDto.getProductSn(), 1, this.uuid));
     }
 
     /**
@@ -132,13 +120,8 @@ public class SaveProductInShoppingBagTest {
      */
     @Test
     void saveInvalidProductInvalidStoreRegisteredUser() {
-        try{
-        ProductDto productDto = this.helper.openStoreAndAddProducts();
         Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
-                10, productDto.getProductSn()+10, 1, this.uuid));
-        } catch (Exception e){
-
-        }
+                this.storeDto.getStoreId() + 10, this.productDto.getProductSn() + 10, 1, this.uuid));
     }
 
     /**
@@ -146,12 +129,27 @@ public class SaveProductInShoppingBagTest {
      */
     @Test
     void saveInvalidProductInvalidStoreNotRegisteredUser() {
-        try{
-            ProductDto productDto = this.helper.openStoreAndAddProducts();
         Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag("notRegistered",
-                10, productDto.getProductSn()+10, 1, this.uuid));
-    } catch (Exception e){
-
+                this.storeDto.getStoreId() + 10, this.productDto.getProductSn() + 10, 1, this.uuid));
     }
-}
+
+    /**
+     * save a valid product from a valid store in a registered user's shopping bag,
+     * negative amount
+     */
+    @Test
+    void saveProductNegativeAmount() {
+        Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
+                this.storeDto.getStoreId(), this.productDto.getProductSn(), -1, this.uuid));
+    }
+
+    /**
+     * save a valid product from a valid store in a registered user's shopping bag,
+     * large amount
+     */
+    @Test
+    void saveProductLargeAmount() {
+        Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
+                this.storeDto.getStoreId(), this.productDto.getProductSn(), 10000, this.uuid));
+    }
 }

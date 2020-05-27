@@ -43,7 +43,7 @@ public class AddProductTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-    int storeId = 0;
+    int storeId;
     private ProductDto productDto;
 
     @BeforeEach
@@ -55,12 +55,16 @@ public class AddProductTest {
                 this.manager.getFirstName(), this.manager.getLastName(), image);
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
-        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
+        Pair<UUID, Boolean> returnedValueLogin = this.helper.loginUser(this.user.getUserName(),
                 this.userPassword);
-        if (returnedValue != null){
-            this.uuid = returnedValue.getKey();
+        if (returnedValueLogin != null){
+            this.uuid = returnedValueLogin.getKey();
         }
-        this.productDto = this.helper.openStoreAndAddProducts(this.user, this.userPassword, this.uuid);
+        Pair<StoreDto, ProductDto> returnedValueOpen = this.helper.openStoreAndAddProduct(this.user, this.uuid);
+        if (returnedValueOpen != null){
+            this.productDto = returnedValueOpen.getValue();
+            this.storeId = returnedValueOpen.getKey().getStoreId();
+        }
     }
 
     @AfterEach
@@ -75,7 +79,7 @@ public class AddProductTest {
     @Test
     void addValidProduct() {
         Assertions.assertNotNull(this.sellerOwnerService.addProduct(this.user.getUserName(),
-                this.storeId, this.productDto.getName()+"new", this.productDto.getCategory().toLowerCase(), 10, 20, uuid));
+                this.storeId, this.productDto.getName(), this.productDto.getCategory().toLowerCase(), 10, 20, uuid));
     }
 
     /**
@@ -84,12 +88,10 @@ public class AddProductTest {
      */
     @Test
     void addProductInvalidOwner() {
-        try{
-        Assertions.assertNull(this.sellerOwnerService.addProduct(this.user.getUserName()+"Not",
-                this.storeId, this.productDto.getName()+"new", this.productDto.getCategory().toLowerCase(), 10, 20, uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addProduct(this.user.getUserName()+"Not",
+                    this.storeId, this.productDto.getName()+"new", this.productDto.getCategory().toLowerCase(), 10, 20, uuid);
+        });
     }
 
     /**
@@ -109,13 +111,11 @@ public class AddProductTest {
      */
     @Test
     void addProductInvalidOwnerInvalidStore() {
-        try {
-        Assertions.assertNull(this.sellerOwnerService.addProduct(this.user.getUserName()+"Not",
-                this.storeId+5, this.productDto.getName()+"new", this.productDto.getCategory().toLowerCase(), 10, 20, uuid));
-        } catch (Exception e) {
-
-        }
-    }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addProduct(this.user.getUserName()+"Not",
+                this.storeId+5, this.productDto.getName()+"new", this.productDto.getCategory().toLowerCase(), 10, 20, uuid);
+    });
+}
 
     /**
      * add a valid product
@@ -134,12 +134,10 @@ public class AddProductTest {
      */
     @Test
     void addProductInvalidOwnerInvalidCategory() {
-        try {
-        Assertions.assertNull(this.sellerOwnerService.addProduct(this.user.getUserName()+"Not",
-                this.storeId, this.productDto.getName()+"new", this.productDto.getCategory().toLowerCase()+"Not", 10, 20, uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addProduct(this.user.getUserName()+"Not",
+                    this.storeId, this.productDto.getName()+"new", this.productDto.getCategory().toLowerCase()+"Not", 10, 20, uuid);
+        });
     }
 
     /**
@@ -161,11 +159,9 @@ public class AddProductTest {
      */
     @Test
     void addProductInvalidOwnerInvalidStoreInvalidCategory() {
-        try {
-            Assertions.assertNull(this.sellerOwnerService.addProduct(this.user.getUserName() + "Not",
-                    this.storeId + 5, this.productDto.getName() + "new", this.productDto.getCategory().toLowerCase() + 5, 10, 20, uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addProduct(this.user.getUserName() + "Not",
+                    this.storeId + 5, this.productDto.getName() + "new", this.productDto.getCategory().toLowerCase() + 5, 10, 20, uuid);
+        });
     }
 }

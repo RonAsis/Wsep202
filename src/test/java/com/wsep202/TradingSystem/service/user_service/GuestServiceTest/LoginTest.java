@@ -49,7 +49,7 @@ public class LoginTest {
     @Test
     void loginRegisteredUser() {
         Pair<UUID, Boolean> returnedValue = this.guestService.login(this.user.getUserName(),
-                                                                        this.userPassword);
+                this.userPassword);
         Assertions.assertNotNull(returnedValue);
         this.helper.logoutUser(this.user.getUserName(), returnedValue.getKey());
     }
@@ -89,13 +89,12 @@ public class LoginTest {
      */
     @Test
     void loginRegisteredUserNullPassword() {
-        try {
-            Pair<UUID, Boolean> returnedValue = this.guestService.login(this.user.getUserName(),
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.guestService.login(this.user.getUserName(),
                     null);
-            Assertions.assertNull(returnedValue);
-        } catch (Exception e ){
-        }
+        });
     }
+
     /**
      * log a registered user with empty username in to the system.
      */
@@ -112,7 +111,7 @@ public class LoginTest {
     @Test
     void loginRegisteredUserEmptyPassword() {
         Pair<UUID, Boolean> returnedValue = this.guestService.login(this.user.getUserName(),
-            "");
+                "");
         Assertions.assertNull(returnedValue);
     }
 }

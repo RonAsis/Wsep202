@@ -43,24 +43,31 @@ public class ViewPurchaseHistoryTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-    int storeId = 0;
+    private StoreDto storeDto;
     private ProductDto productDto;
+    int counter = 0;
 
     @BeforeEach
     void setUp() {
         if (this.helper == null || this.helper.getGuestService() == null ) {
             this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService, this.sellerOwnerService);
         }
+        this.manager.setUserName(this.manager.getUserName()+counter);
         this.helper.registerUser(this.manager.getUserName(), this.userPassword,
                 this.manager.getFirstName(), this.manager.getLastName(), image);
+        this.user.setUserName(this.user.getUserName()+counter);
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
-        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
+        Pair<UUID, Boolean> returnedValueLogin = this.helper.loginUser(this.user.getUserName(),
                 this.userPassword);
-        if (returnedValue != null){
-            this.uuid = returnedValue.getKey();
+        if (returnedValueLogin != null){
+            this.uuid = returnedValueLogin.getKey();
         }
-        this.productDto = this.helper.openStoreAndAddProducts(this.user, this.userPassword, this.uuid);
+        Pair<StoreDto, ProductDto> returnedValueOpen = this.helper.openStoreAndAddProduct(this.user, this.uuid);
+        if (returnedValueOpen != null){
+            this.storeDto = returnedValueOpen.getKey();
+            this.productDto = returnedValueOpen.getValue();
+        }
     }
 
     @AfterEach
@@ -76,8 +83,8 @@ public class ViewPurchaseHistoryTest {
     @Test
     void ViewHistoryNoPurchases() {
         List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistoryOfManager(
-                this.user.getUserName(), this.storeId, this.uuid);
-        Assertions.assertEquals(new LinkedList<>(), returnedHistory);
+                this.user.getUserName(), this.storeDto.getStoreId(), this.uuid);
+        Assertions.assertNull(returnedHistory);
     }
 
     /**
@@ -86,12 +93,10 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidOwner() {
-        try{
-            Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-                    this.user.getUserName()+"Not", this.storeId, this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerManagerService.viewPurchaseHistoryOfManager(
+                    this.user.getUserName()+"Not", this.storeDto.getStoreId(), this.uuid);
+        });
     }
 
     /**
@@ -100,7 +105,7 @@ public class ViewPurchaseHistoryTest {
     @Test
     void ViewHistoryNoPurchasesInvalidStore() {
         Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-                this.user.getUserName(), this.storeId+5, this.uuid));
+                this.user.getUserName(), this.storeDto.getStoreId()+5, this.uuid));
     }
 
     /**
@@ -109,12 +114,10 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryNoPurchasesInvalidStoreInvalidOwner() {
-        try{
-            Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-                    this.user.getUserName()+"Not", this.storeId+5, this.uuid));
-        } catch (Exception e) {
-
-        }
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerManagerService.viewPurchaseHistoryOfManager(
+                    this.user.getUserName()+"Not", this.storeDto.getStoreId()+5, this.uuid);
+        });
     }
 
     /**
@@ -122,8 +125,8 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void ViewHistoryPurchases() {
-        this.helper.openStoreAddProductsAndBuyProduct(this.user, this.uuid, this.userPassword);
+        this.helper.addProductToShoppingCartAndPurchase(this.user.getUserName(), this.storeDto.getStoreId(), this.productDto.getProductSn(), this.uuid);
         Assertions.assertNotNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-                this.user.getUserName(), this.storeId, this.uuid));
+                this.user.getUserName(), this.storeDto.getStoreId(), this.uuid));
     }
 }

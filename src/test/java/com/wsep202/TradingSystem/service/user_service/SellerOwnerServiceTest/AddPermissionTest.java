@@ -3,6 +3,8 @@ package com.wsep202.TradingSystem.service.user_service.SellerOwnerServiceTest;
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.*;
 import javafx.util.Pair;
@@ -39,7 +41,7 @@ public class AddPermissionTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-    int storeId = 0;
+    int storeId;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +57,10 @@ public class AddPermissionTest {
         if (returnedValue != null){
             this.uuid = returnedValue.getKey();
         }
-        this.helper.openStoreAddProductsAndAddManager(this.user, this.uuid, this.userPassword, this.manager.getUserName());
+        StoreDto returnedValueOpen = this.helper.openStoreAddProductAndAddManager(this.user, this.uuid, this.manager.getUserName());
+        if (returnedValueOpen != null){
+            this.storeId = returnedValueOpen.getStoreId();
+        }
     }
 
     @AfterEach
@@ -70,7 +75,7 @@ public class AddPermissionTest {
     @Test
     void addAddedPermission() {
         Assertions.assertFalse(this.sellerOwnerService.addPermission(this.user.getUserName(), this.storeId,
-                this.manager.getUserName(), "view",this.uuid));
+                this.manager.getUserName(), "view", this.uuid));
     }
 
     /**
@@ -108,13 +113,9 @@ public class AddPermissionTest {
      */
     @Test
     void addInvalidPermissionInvalidManagerInvalidOwnerInvalidStore() {
-        try {
-            Assertions.assertFalse(this.sellerOwnerService.addPermission("NotOwner", this.storeId,
-                    "NotManager", "NotPermission", this.uuid));
-        } catch ( Exception e) {
-
-        }
-    }
-
-
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerOwnerService.addPermission("NotOwner", this.storeId,
+                "NotManager", "NotPermission", this.uuid);
+    });
+}
 }
