@@ -3,13 +3,22 @@ package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Calendar;
 import java.util.Map;
 
 /**
  * The discount policy defines the discount interface
  */
+@Entity
 public abstract class DiscountPolicy {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private int id;
 
     public abstract void applyDiscount(Discount discount, Map<Product, Integer> products);
 

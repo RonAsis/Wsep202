@@ -64,7 +64,7 @@ class StoreTest {
 
             shoppingBag = mock(ShoppingBag.class);
             discount = mock(Discount.class);
-            doNothing().when(discount).setNewId();
+            //doNothing().when(discount).setNewId();
             when(discount.getDiscountId()).thenReturn(0);
 
         }

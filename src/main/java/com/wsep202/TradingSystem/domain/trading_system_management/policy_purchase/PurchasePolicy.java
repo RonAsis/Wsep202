@@ -10,10 +10,16 @@ import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Billi
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.Data;
 
+import javax.persistence.*;
 import java.util.Map;
 
 @Data
+@Entity
 public abstract class PurchasePolicy {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private int id;
     /**
      * check if the purchase details stands in the purchase policy of the store
      * purchase details: user details/shopping bag details

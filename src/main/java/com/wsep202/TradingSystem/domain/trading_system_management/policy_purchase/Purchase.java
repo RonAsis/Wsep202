@@ -9,6 +9,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.Compo
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,16 +20,23 @@ import java.util.Set;
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Purchase {
-    protected static int purchaseIdAcc = 0;
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     protected int purchaseId;
+
     /**
      * list of countries that the store have deliveries to
      */
+    @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     private Set<String> countriesPermitted;
     /**
      * the days in the week any user is permitted to perform a purchase
      */
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = Day.class, fetch = FetchType.EAGER)
     private Set<Day> storeWorkDays;
     /**
      * the valid range of amount of products to buy in a purchase
@@ -43,15 +51,20 @@ public class Purchase {
     /**
      * logical operator between policies
      */
+    @Enumerated(EnumType.STRING)
     private CompositeOperator compositeOperator;
+
     /**
      * children components of the composite Purchase policy
      * the operands of the composed Purchase policy
      */
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Purchase> composedPurchasePolicies;
     /**
      * the types of purchase exist in the store
      */
+    @ManyToMany
+    @JoinTable()
     private Map<String, PurchasePolicy> purchasePolicies;
     /**
      * tells if its purchase policy at the shopping bag level
@@ -147,13 +160,4 @@ public class Purchase {
         return countriesPermitted!=null && !countriesPermitted.isEmpty();
     }
 
-    ////////////////////////////////////// general /////////////////////////////////////////
-
-    @Synchronized
-    protected int getPurchaseIdAcc() {
-        return purchaseIdAcc++;
-    }
-    public void setNewId() {
-        this.purchaseId = getPurchaseIdAcc();
-    }
 }
