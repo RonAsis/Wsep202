@@ -38,8 +38,7 @@ public class Product {
      * the category of the product
      */
     @NotNull(message = "Must be category")
-    //@OneToOne(cascade = CascadeType.ALL)
-    @Transient
+    @Enumerated(EnumType.STRING)
     private ProductCategory category;
 
     /**
@@ -74,8 +73,6 @@ public class Product {
      * the storeId that connected to the store that the product exists in it.
      */
     private int storeId;
-
-
 
     public Product(String name, ProductCategory category, int amount, double cost, int storeId){
         this.name = name;

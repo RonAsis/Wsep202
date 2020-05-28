@@ -51,13 +51,13 @@ public class UserSystem implements Observer {
      * The stores that the user manages
      */
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private Set<Store> managedStores = new HashSet<>();
     /**
      * The stores that the user own
      */
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private Set<Store> ownedStores = new HashSet<>();
     /**
      * The user personal shopping cart
@@ -81,8 +81,7 @@ public class UserSystem implements Observer {
      * for notification
      */
     @Builder.Default
-    //@OneToMany(cascade = CascadeType.ALL)
-    @Transient
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Notification> notifications = new LinkedList<>();
 
     //need ignore in Db;

@@ -1,9 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -11,10 +9,12 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
 
-@Builder
+@Getter
+@Setter
 @AllArgsConstructor
-@Data
 @NoArgsConstructor
+@Builder
+@Slf4j
 @Entity
 public class Receipt {
 
@@ -49,7 +49,8 @@ public class Receipt {
      * a list of all the products that the user bought in this purchase.
      */
     @Builder.Default
-    @Transient
+    @ElementCollection
+    @JoinTable()
     private Map<Product, Integer> productsBought = new HashMap<>();
 
     /**

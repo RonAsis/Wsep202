@@ -1,29 +1,41 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
-import lombok.Data;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Slf4j
+@Entity
 public class MangerStore {
-
-    public MangerStore(UserSystem appointedManager) {
-        this.storePermissions = new HashSet<>(Arrays.asList(StorePermission.VIEW));
-        this.appointedManager = appointedManager;
-    }
 
     /**
      *  the permissions that were given to the manager
      */
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = StorePermission.class, fetch = FetchType.EAGER)
     private Set<StorePermission> storePermissions;
 
     /**
      *  the actual user that appointed to be manager
      */
+    @OneToOne(cascade = CascadeType.ALL)
     private UserSystem appointedManager;
+
+    @Id
+    private String appointedManagerName;
+
+    public MangerStore(UserSystem appointedManager) {
+        this.storePermissions = new HashSet<>(Arrays.asList(StorePermission.VIEW));
+        this.appointedManager = appointedManager;
+        this.appointedManagerName = appointedManager.getUserName();
+    }
 
     /**
      * returns the actual user system object of the user wrapped by the manager object

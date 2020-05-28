@@ -26,7 +26,8 @@ public class ShoppingCart {
      * list of stores and there shopping bags
      */
     @Builder.Default
-    @Transient
+    @JoinTable()
+    @ManyToMany(cascade = CascadeType.ALL)
     private Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
 
 

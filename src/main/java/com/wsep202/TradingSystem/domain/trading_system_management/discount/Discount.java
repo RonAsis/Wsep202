@@ -8,6 +8,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,9 +20,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Discount {
 
-    protected static int discountIdAcc = 0;
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     protected int discountId;
 
     /**
@@ -44,8 +47,10 @@ public class Discount {
     /**
      * types of discounts in the store
      */
+    @OneToOne(cascade = CascadeType.ALL)
     private DiscountPolicy discountPolicy;
 
+    @Enumerated(EnumType.STRING)
     private DiscountType discountType;
 
     public Discount(double discountPercentage,
@@ -56,7 +61,6 @@ public class Discount {
         this.discountPercentage = discountPercentage;
         this.endTime = endTime;
         this.description = description;
-        this.discountId = getDiscountIdAcc();
         this.isApplied = false;
         this.discountPolicy = discountPolicy;
         this.discountType = discountType;
@@ -91,13 +95,6 @@ public class Discount {
 
     ////////////////////////////////////// general /////////////////////////////////////////
 
-    @Synchronized
-    protected int getDiscountIdAcc() {
-        return discountIdAcc++;
-    }
-    public void setNewId() {
-        this.discountId = getDiscountIdAcc();
-    }
     public boolean isExpired() {
         return getEndTime().compareTo(Calendar.getInstance()) < 0;
     }
