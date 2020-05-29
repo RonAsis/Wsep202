@@ -1206,6 +1206,7 @@ class TradingSystemTest {
         private ShoppingCart testShoppingCart;
         private ShoppingBag testShoppingBag1;
         private ShoppingBag testShoppingBag2;
+        private UUID uuid;
         ExternalServiceManagement externalServiceManagement;
 
         @MockBean // for pass compilation
@@ -1277,8 +1278,6 @@ class TradingSystemTest {
             Assertions.assertNotNull(ans);
             //check that it's not an admin
             Assertions.assertFalse(ans.getValue());
-            //check login of admin
-            //TODO
         }
 
         /**
@@ -1422,140 +1421,132 @@ class TradingSystemTest {
             Assertions.assertEquals(userToRegister,tradingSystem.getUser("usernameTest", login.getKey()));
         }
 
-//        /**
-//         * check the getUser() functionality in case of not exists user in the system
-//         */
-//        @Test
-//        void getUserNegative() {
-//            // register "userToRegister" to the users list in trading system
-//            Assertions.assertThrows(UserDontExistInTheSystemException.class, () -> {
-//                //registerAsSetup();
-//                tradingSystem.getUser("iAmNotHereTest", null);
-//            });
-//        }
+        /**
+         * check the getUser() functionality in case of not exists user in the system
+         */
+        @Test
+        void getUserNegative() {
+            // register "userToRegister" to the users list in trading system
+            //check that there is no user with this name
+            Assertions.assertNull(tradingSystem.getUser("iAmNotHereTest", UUID.randomUUID()));
+        }
 
-//        /**
-//         * check the getUserByAdmin() functionality in case of exists admin in the system
-//         */
-//        @Test
-//        void getUserByAdminPositive() {
-//            registerAsSetup();
-//            Assertions.assertEquals(tradingSystem.getUserByAdmin("admin", "usernameTest", uuid),userToRegister);
-//        }
-//
-//        /**
-//         * check the getUserByAdmin() functionality in case of not exists admin in the system
-//         */
-//        @Test
-//        void getUserByAdminNegative(){
-//            Assertions.assertThrows(NotAdministratorException.class, () -> {
-//                registerAsSetup();
-//                tradingSystem.getUserByAdmin("userSystem", "usernameTest", uuid);
-//            });
-//        }
+        /**
+         * check the getUserByAdmin() functionality in case of exists admin in the system
+         */
+        @Test
+        void getUserByAdminPositive() {
+            setUpGetUserByAdmin();
+            Assertions.assertEquals(userToRegister,tradingSystem.getUserByAdmin("admin",
+                    "usernameTest", uuid));
+        }
 
-//        /**
-//         * check the searchProductByName() functionality in case of exists product in store in the system
-//         */
-//        @Test
-//        void searchProductByNamePositive() {
-//            tradingSystem.insertStoreToStores(store);
-//            HashSet<Product> products = new HashSet<Product>();
-//            products.add(product);
-//            HashSet<UserSystem> owners = new HashSet<UserSystem>();
-//            owners.add(userToRegister);
-//            store.setOwners(owners);
-//            store.addNewProduct(userToRegister, product);
-//            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
-//            Assertions.assertArrayEquals(tradingSystem.searchProductByName("dollhouse").toArray(),products.toArray());
-//        }
+        private void setUpGetUserByAdmin(){
+            registerAsSetup();
+            when(externalServiceManagement.isAuthenticatedUserPassword(admin.getPassword(),admin)).thenReturn(true);
+            uuid = tradingSystem.login(admin.getUserName(),admin.getPassword()).getKey();
+        }
 
-//        /**
-//         * check the searchProductByName() functionality in case of not exists product in store in the system
-//         */
-//        @Test
-//        void searchProductByNameNegative() {
-//            tradingSystem.insertStoreToStores(store);
-//            HashSet<Product> products = new HashSet<Product>();
-//            products.add(product);
-//            HashSet<UserSystem> owners = new HashSet<UserSystem>();
-//            owners.add(userToRegister);
-//            store.setOwners(owners);
-//            store.addNewProduct(userToRegister, product);
-//            // The disjoint method returns true if its two arguments have no elements in common.
-//            Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByName("puppy"), products));
-//        }
+        /**
+         * check the getUserByAdmin() functionality in case of not exists admin in the system
+         */
+        @Test
+        void getUserByAdminNegative(){
+            registerAsSetup();
+            //check that the method fails
+            Assertions.assertNull(tradingSystem.getUserByAdmin("userSystem", "usernameTest", uuid));
+        }
 
-//        /**
-//         * check the searchProductByCategory() functionality in case of exists product in store in the system
-//         */
-//        @Test
-//        void searchProductByCategoryPositive() {
-//            tradingSystem.insertStoreToStores(store);
-//            HashSet<Product> products = new HashSet<Product>();
-//            products.add(product);
-//            HashSet<UserSystem> owners = new HashSet<UserSystem>();
-//            owners.add(userToRegister);
-//            store.setOwners(owners);
-//            store.addNewProduct(userToRegister, product);
-//            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
-//            Assertions.assertArrayEquals(tradingSystem.searchProductByCategory(ProductCategory.TOYS_HOBBIES).toArray(),products.toArray());
-//        }
+        /**
+         * check the searchProductByName() functionality in case of exists product in store in the system
+         */
+        @Test
+        void searchProductByNamePositive() {
+            setUpSearchProduct();
+            HashSet<Product> products = new HashSet<>();
+            products.add(product);
+            store.addNewProduct(userToRegister, product);
+            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+            Assertions.assertArrayEquals(products.toArray(),
+                    tradingSystem.searchProductByName("dollhouse").toArray());
+        }
 
-//        /**
-//         * check the searchProductByCategory() functionality in case of not exists product in store in the system
-//         */
-//        @Test
-//        void searchProductByCategoryNegative() {
-//            tradingSystem.insertStoreToStores(store);
-//            HashSet<Product> products = new HashSet<Product>();
-//            products.add(product);
-//            product.setCategory(ProductCategory.BOOKS_MOVIES_MUSIC);
-//            HashSet<UserSystem> owners = new HashSet<UserSystem>();
-//            owners.add(userToRegister);
-//            store.setOwners(owners);
-//            store.addNewProduct(userToRegister, product);
-//            // The disjoint method returns true if its two arguments have no elements in common.
-//            Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByCategory(ProductCategory.TOYS_HOBBIES), products));
-//        }
+        private void setUpSearchProduct(){
+            storeOwner = new UserSystem("ownerForSearchTest", "owner", "store","12345fg");
+            tradingSystem.registerNewUser(storeOwner,null);
+            store = tradingSystem.openStore(storeOwner,"Dolls","we have dolls");
+            store.addNewProduct(storeOwner,product);
+        }
 
-//        /**
-//         * check the searchProductByKeyWords() functionality in case of exists product in store in the system
-//         */
-//        @Test
-//        void searchProductByKeyWordsPositive() {
-//            tradingSystem.insertStoreToStores(store);
-//            HashSet<Product> products = new HashSet<Product>();
-//            products.add(product);
-//            HashSet<UserSystem> owners = new HashSet<UserSystem>();
-//            owners.add(userToRegister);
-//            store.setOwners(owners);
-//            store.addNewProduct(userToRegister, product);
-//            List<String> keyWords = new ArrayList<String>();
-//            keyWords.add("doll");
-//            keyWords.add("house");
-//            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
-//            Assertions.assertArrayEquals(tradingSystem.searchProductByKeyWords(keyWords).toArray(),products.toArray());
-//        }
+        /**
+         * check the searchProductByName() functionality in case of not exists product in store in the system
+         */
+        @Test
+        void searchProductByNameNegative() {
+            setUpSearchProduct();
+            HashSet<Product> products = new HashSet<>();
+            products.add(product);
+            // The disjoint method returns true if its two arguments have no elements in common.
+            Assertions.assertTrue(Collections.disjoint(products, tradingSystem.searchProductByName("puppy")));
+        }
 
-//        /**
-//         * check the searchProductByKeyWords() functionality in case of not exists product in store in the system
-//         */
-//        @Test
-//        void searchProductByKeyWordsNegative() {
-//            tradingSystem.insertStoreToStores(store);
-//            HashSet<Product> products = new HashSet<Product>();
-//            products.add(product);
-//            HashSet<UserSystem> owners = new HashSet<UserSystem>();
-//            owners.add(userToRegister);
-//            store.setOwners(owners);
-//            store.addNewProduct(userToRegister, product);
-//            List<String> keyWords = new ArrayList<String>();
-//            keyWords.add("elephant");
-//            keyWords.add("pig");
-//            // The disjoint method returns true if its two arguments have no elements in common.
-//            Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByKeyWords(keyWords), products));
-//        }
+        /**
+         * check the searchProductByCategory() functionality in case of exists product in store in the system
+         */
+        @Test
+        void searchProductByCategoryPositive() {
+            setUpSearchProduct();
+            HashSet<Product> products = new HashSet<>();
+            products.add(product);
+            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+            Assertions.assertArrayEquals(products.toArray(),
+                    tradingSystem.searchProductByCategory(ProductCategory.TOYS_HOBBIES).toArray());
+        }
+
+        /**
+         * check the searchProductByCategory() functionality in case of not exists product in store in the system
+         */
+        @Test
+        void searchProductByCategoryNegative() {
+            setUpSearchProduct();
+            HashSet<Product> products = new HashSet<>();
+            product.setCategory(ProductCategory.BOOKS_MOVIES_MUSIC);
+            products.add(product);
+            // The disjoint method returns true if its two arguments have no elements in common.
+            Assertions.assertTrue(Collections.disjoint(products,
+                    tradingSystem.searchProductByCategory(ProductCategory.TOYS_HOBBIES)));
+        }
+
+        /**
+         * check the searchProductByKeyWords() functionality in case of exists product in store in the system
+         */
+        @Test
+        void searchProductByKeyWordsPositive() {
+            setUpSearchProduct();
+            HashSet<Product> products = new HashSet<>();
+            products.add(product);
+            List<String> keyWords = new ArrayList<>();
+            keyWords.add("doll");
+            keyWords.add("house");
+            // converted both to arrays because one ahd ArrayList type and the other has Set<Product> type
+            Assertions.assertArrayEquals(products.toArray(),
+                    tradingSystem.searchProductByKeyWords(keyWords).toArray());
+        }
+
+        /**
+         * check the searchProductByKeyWords() functionality in case of not exists product in store in the system
+         */
+        @Test
+        void searchProductByKeyWordsNegative() {
+            setUpSearchProduct();
+            HashSet<Product> products = new HashSet<>();
+            products.add(product);
+            List<String> keyWords = new ArrayList<>();
+            keyWords.add("elephant");
+            keyWords.add("pig");
+            // The disjoint method returns true if its two arguments have no elements in common.
+            Assertions.assertTrue(Collections.disjoint(tradingSystem.searchProductByKeyWords(keyWords), products));
+        }
 
         /**
          * check the filterByRangePrice method, checks that the returned products are filtered by a given price
@@ -1576,36 +1567,36 @@ class TradingSystemTest {
             }
         }
 
-        /**
-         * check the filterByStoreRank method, checks that the returned products are filtered by a given store rank
-         */
-        @Test
-        @Disabled
-        void filterByStoreRank() {
-            //initial
-            List<Product> products = setUpProductsForFilterTests();
-            List<Store> stores = (setUpStoresForFilterTests(products));
-            Set<Store> storesSet = new HashSet<>((stores));
-            /*UserSystem admin = UserSystem.builder()
-                    .userName("admin")
-                    .password("admin")
-                    .build();*/
-           //tradingSystem = new TradingSystem(new ExternalServiceManagement(), storesSet, admin);
-
-            // the tests
-            for (int rank = -1; rank < 100; rank++) {
-                List<Product> productsActual = tradingSystem.filterByStoreRank(products, rank);
-                int finalRank = rank;
-                List<Product> productsExpected = products.stream()
-                        .filter(product -> {
-                            int storeId = product.getStoreId();
-                            Store store = stores.get(storeId);
-                            return finalRank <= store.getRank();
-                        })
-                        .collect(Collectors.toList());
-                Assertions.assertEquals(productsExpected, productsActual);
-            }
-        }
+//        /**
+//         * check the filterByStoreRank method, checks that the returned products are filtered by a given store rank
+//         */
+//        @Test
+//        @Disabled
+//        void filterByStoreRank() {
+//            //initial
+//            List<Product> products = setUpProductsForFilterTests();
+//            List<Store> stores = (setUpStoresForFilterTests(products));
+//            Set<Store> storesSet = new HashSet<>((stores));
+//            /*UserSystem admin = UserSystem.builder()
+//                    .userName("admin")
+//                    .password("admin")
+//                    .build();*/
+//           //tradingSystem = new TradingSystem(new ExternalServiceManagement(), storesSet, admin);
+//
+//            // the tests
+//            for (int rank = -1; rank < 100; rank++) {
+//                List<Product> productsActual = tradingSystem.filterByStoreRank(products, rank);
+//                int finalRank = rank;
+//                List<Product> productsExpected = products.stream()
+//                        .filter(product -> {
+//                            int storeId = product.getStoreId();
+//                            Store store = stores.get(storeId);
+//                            return finalRank <= store.getRank();
+//                        })
+//                        .collect(Collectors.toList());
+//                Assertions.assertEquals(productsExpected, productsActual);
+//            }
+//        }
 
         /**
          * check the filterByStoreCategory method, checks that the returned products are filtered by a given store category
@@ -1626,35 +1617,69 @@ class TradingSystemTest {
             }
         }
 
-//        /**
-//         * This test check if the openStore method succeeds when the parameters
-//         * are correct.
-//         */
-//        @Test
-//        void openStoreSuccess(){
-//            setUpForOpenStoreSuc();
-//            //before open store there is no stores in the system
-//            Assertions.assertEquals(0, tradingSystem.getStoresList().size());
-//            //check that the store opened
-//            Assertions.assertTrue(tradingSystem.openStore(userToOpenStore, new PurchasePolicy(), new DiscountPolicy(), "castro"));
-//            //after opening 1 store there needs to be a store in the system
-//            Assertions.assertEquals(1, tradingSystem.getStoresList().size());
-//        }
+        /**
+         * This test check if the openStore method succeeds when the parameters
+         * are correct.
+         */
+        @Test
+        void openStoreSuccess(){
+            setUpForOpenStoreSuc();
+            //before open store there is no stores in the system
+            Assertions.assertEquals(0, tradingSystem.getStores().size());
+            //check that the store opened
+            store = tradingSystem.openStore(userToOpenStore, "castro", "cloth");
+            Assertions.assertNotNull(store);
+            //after opening 1 store there needs to be a store in the system
+            Assertions.assertEquals(1, tradingSystem.getStores().size());
+            //check that the store that opened has the same name
+            Assertions.assertEquals(store.getStoreName(), tradingSystem.getStore(store.getStoreId()).getStoreName());
+            //check the owner is userToOpenStore
+            Assertions.assertTrue(store.getOwners().contains(userToOpenStore));
+            //check that the user is really an owner
+            Assertions.assertEquals(store ,userToOpenStore.getOwnerStore(store.getStoreId()));
+        }
 
-//        /**
-//         * This test check if the openStore method fails when the parameters
-//         * are wrong.
-//         */
-//        @Test
-//        void openStoreFail(){
-//            setUpForOpenStoreFail();
-//            //before open store there is 1 (added in setUp) store in the system
-//            Assertions.assertEquals(1, tradingSystem.getStoresList().size());
-//            //fail to open an existing store
-//            Assertions.assertFalse(tradingSystem.openStore(userToOpenStore, storeToOpen.getPurchasePolicy(), storeToOpen.getDiscountPolicy(), storeToOpen.getStoreName()));
-//            //after fail opening there is still  1 store in the system
-//            Assertions.assertEquals(1, tradingSystem.getStoresList().size());
-//        }
+        /**
+         * This test check if the openStore method fails
+         * when the user that try's to open the store is not registered
+         */
+        @Test
+        void openStoreNonRegisterUser(){
+            UserSystem userTest = new UserSystem("NotRegistered","notIn","system","23rfgt");
+            //before open store there are 0 stores in the system
+            Assertions.assertEquals(0, tradingSystem.getStores().size());
+            //fail to open an existing store
+            Assertions.assertNull(tradingSystem.openStore(userTest, "Can'tOpen","This store"));
+            //after fail opening there are still 0 stores in the system
+            Assertions.assertEquals(0, tradingSystem.getStores().size());
+        }
+
+        /**
+         * This test check if the openStore method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void openStoreNullObject(){
+            setUpOpenStore();
+            //before open store there is 1 store in the system
+            Assertions.assertEquals(1, tradingSystem.getStores().size());
+            //fail to open with null parameters
+            Assertions.assertNull(tradingSystem.openStore(userToOpenStore,null,"i am a bad store"));
+            //fail to open with null parameters
+            Assertions.assertNull(tradingSystem.openStore(userToOpenStore,"badStore",null));
+            //fail to open with null parameters
+            Assertions.assertNull(tradingSystem.openStore(null, "nullUser","can't open"));
+            //after fail opening there is still 1 store in the system
+            Assertions.assertEquals(1, tradingSystem.getStores().size());
+        }
+
+        private void setUpOpenStore(){
+            userToOpenStore = new UserSystem("ownerForTestOpenStore","ownerStore","Test","34546trgf");
+            tradingSystem.registerNewUser(userToOpenStore,null);
+            when(externalServiceManagement.isAuthenticatedUserPassword(userToOpenStore.getPassword(),userToOpenStore)).thenReturn(true);
+            tradingSystem.login(userToOpenStore.getUserName(),userToOpenStore.getPassword());
+            store = tradingSystem.openStore(userToOpenStore, "Toys","we sell toys");
+        }
 
         /**
          * This test check if the purchaseShoppingCart method succeeds
@@ -1673,87 +1698,87 @@ class TradingSystemTest {
 
         }
 
-        /**
-         * This test check if the purchaseShoppingCart method fails
-         * when the cart is empty.
-         */
-        @Test
-        void guestPurchaseShoppingCartEmptyCart() {
-            setUpEmptyCart();
-            //check that the system does not allow to buy an empty cart
-            Assertions.assertNull(tradingSystem.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
-        }
+//        /**
+//         * This test check if the purchaseShoppingCart method fails
+//         * when the cart is empty.
+//         */
+//        @Test
+//        void guestPurchaseShoppingCartEmptyCart() {
+//            setUpEmptyCart();
+//            //check that the system does not allow to buy an empty cart
+//            Assertions.assertNull(tradingSystem.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
+//        }
 
-        /**
-         * This test check if the purchaseShoppingCart method fails
-         * when one of the insert parameters is null.
-         */
-        @Test
-        void guestPurchaseShoppingCartNullObject() {
-            setUpNotEmptyCart();
-            //check that the system does not allow to buy a null cart
-            Assertions.assertNull(tradingSystem.purchaseShoppingCartGuest(null,paymentDetails,billingAddress));
-            //check that the system does not allow to use a null payment details
-            Assertions.assertNull(tradingSystem.purchaseShoppingCartGuest(testShoppingCart,null,billingAddress));
-            //check that the system does not allow to use a null billing address
-            Assertions.assertNull(tradingSystem.purchaseShoppingCartGuest(null,paymentDetails,null));
-        }
+//        /**
+//         * This test check if the purchaseShoppingCart method fails
+//         * when one of the insert parameters is null.
+//         */
+//        @Test
+//        void guestPurchaseShoppingCartNullObject() {
+//            setUpNotEmptyCart();
+//            //check that the system does not allow to buy a null cart
+//            Assertions.assertNull(tradingSystem.purchaseShoppingCartGuest(null,paymentDetails,billingAddress));
+//            //check that the system does not allow to use a null payment details
+//            Assertions.assertNull(tradingSystem.purchaseShoppingCartGuest(testShoppingCart,null,billingAddress));
+//            //check that the system does not allow to use a null billing address
+//            Assertions.assertNull(tradingSystem.purchaseShoppingCartGuest(null,paymentDetails,null));
+//        }
 
-        /**
-         * This test check if the purchaseShoppingCart method fails
-         * when one of the products is not in stock.
-         */
-        @Test
-        void guestPurchaseShoppingCartProductsNotInStock() {
-            setUpProductNotInStock();
-            //check that the system does not allow to buy an empty cart
-            Assertions.assertThrows(NotInStockException.class, ()->
-                    tradingSystem.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
-        }
+//        /**
+//         * This test check if the purchaseShoppingCart method fails
+//         * when one of the products is not in stock.
+//         */
+//        @Test
+//        void guestPurchaseShoppingCartProductsNotInStock() {
+//            setUpProductNotInStock();
+//            //check that the system does not allow to buy an empty cart
+//            Assertions.assertThrows(NotInStockException.class, ()->
+//                    tradingSystem.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
+//        }
 
-        /**
-         * This test check if the purchaseShoppingCart method fails
-         * when there is a problem with charge system and the product are not removed from cart.
-         */
-        @Test
-        void guestPurchaseShoppingCartChargeFail() {
-            setUpChargeFail();
-            //check that the charge fails
-            Assertions.assertThrows(ChargeException.class, ()->
-                    tradingSystem.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
-            //check that product is in the cart after charge failed
-            Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
-        }
+//        /**
+//         * This test check if the purchaseShoppingCart method fails
+//         * when there is a problem with charge system and the product are not removed from cart.
+//         */
+//        @Test
+//        void guestPurchaseShoppingCartChargeFail() {
+//            setUpChargeFail();
+//            //check that the charge fails
+//            Assertions.assertThrows(ChargeException.class, ()->
+//                    tradingSystem.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
+//            //check that product is in the cart after charge failed
+//            Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
+//        }
 
-        /**
-         * This test check if the purchaseShoppingCart method fails
-         * when there is a problem with deliver system and the product are not removed from cart.
-         */
-        @Test
-        void guestPurchaseShoppingCartDeliverFail() {
-            setUpFailDelivery();
-            //check that the deliver fails
-            Assertions.assertThrows(DeliveryRequestException.class, ()->
-                    tradingSystem.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
-            //check that product is in the cart after deliver failed
-            Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
-        }
+//        /**
+//         * This test check if the purchaseShoppingCart method fails
+//         * when there is a problem with deliver system and the product are not removed from cart.
+//         */
+//        @Test
+//        void guestPurchaseShoppingCartDeliverFail() {
+//            setUpFailDelivery();
+//            //check that the deliver fails
+//            Assertions.assertThrows(DeliveryRequestException.class, ()->
+//                    tradingSystem.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
+//            //check that product is in the cart after deliver failed
+//            Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
+//        }
 
-        /**
-         * This test check if the purchaseShoppingCart method succeeds when the parameters
-         * are correct.
-         */
-        @Test
-        void registeredPurchaseShoppingCartPositive() {
-            setUpForRegisteredPurchaseSuc();
-            when(userSystem2.getShoppingCart()).thenReturn(testShoppingCart);
-            when(userSystem2.getUserName()).thenReturn("PurchaseRegisteredUser");
-            List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress,userSystem2);
-            //check that the returned object is not null
-            Assertions.assertNotNull(receipts);
-            //check that the returned object contains the right receipt
-           // Assertions.assertTrue(receipts.contains(receipt));
-        }
+//        /**
+//         * This test check if the purchaseShoppingCart method succeeds when the parameters
+//         * are correct.
+//         */
+//        @Test
+//        void registeredPurchaseShoppingCartPositive() {
+//            setUpForRegisteredPurchaseSuc();
+//            when(userSystem2.getShoppingCart()).thenReturn(testShoppingCart);
+//            when(userSystem2.getUserName()).thenReturn("PurchaseRegisteredUser");
+//            List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails,billingAddress,userSystem2);
+//            //check that the returned object is not null
+//            Assertions.assertNotNull(receipts);
+//            //check that the returned object contains the right receipt
+//           // Assertions.assertTrue(receipts.contains(receipt));
+//        }
 //        /**
 //         * This test check if the purchaseShoppingCart method succeeds when the parameters
 //         * are correct. for guest and registered it's the same process.
@@ -1980,20 +2005,57 @@ class TradingSystemTest {
             tradingSystem.addMangerToStore(store1,storeOwner,newManager.getUserName());
         }
 
-//        /**
-//         * This test check if the removeManager method fails when the parameters
-//         * are wrong.
-//         */
-//        @Test
-//        void removeManagerFail(){
-//            setUpUsersForRemoveManager();
-//            //can't remove from null store
-//            Assertions.assertFalse(tradingSystem.removeManager(null,storeOwner,newManager));
-//            //store does not exists
-//            Assertions.assertFalse(tradingSystem.removeManager(store,storeOwner,newManager));
-//            //1 users is not registered
-//            Assertions.assertFalse(tradingSystem.removeManager(store1,wrongOwner,newManager));
-//        }
+        /**
+         * This test check if the removeManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void removeManagerNotAnOwner(){
+            setUpRemoveManagerFail();
+            //check that newManager is a manager in store
+            Assertions.assertEquals(newManager,store.getManager(userToOpenStore,newManager.getUserName()));
+            //check that the method fails
+            Assertions.assertFalse(tradingSystem.removeManager(store,wrongOwner,newManager));
+            //check that newManager is a manager in store
+            Assertions.assertEquals(newManager,store.getManager(userToOpenStore,newManager.getUserName()));
+        }
+
+        /**
+         * This test check if the removeManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void removeManagerNotAManager(){
+            setUpRemoveManagerFail();
+            //check that there are managers in store
+            Assertions.assertEquals(1,store.getManagers().size());
+            //check that the method fails
+            Assertions.assertFalse(tradingSystem.removeManager(store,userToOpenStore,wrongOwner));
+            //check that the number of managers didn't change
+            Assertions.assertEquals(1,store.getManagers().size());
+        }
+
+        /**
+         * This test check if the removeManager method fails when the parameters
+         * are wrong.
+         */
+        @Test
+        void removeManagerNullObject(){
+            setUpRemoveManagerFail();
+            //can't remove from null store
+            Assertions.assertFalse(tradingSystem.removeManager(null,storeOwner,newManager));
+            //can't remove with null owner
+            Assertions.assertFalse(tradingSystem.removeManager(store,null,newManager));
+            //can't remove a null manager
+            Assertions.assertFalse(tradingSystem.removeManager(store1,wrongOwner,null));
+        }
+
+        private void setUpRemoveManagerFail(){
+            userToOpenStore = new UserSystem("removeManagerTest","user","forTest", "1234rfght");
+            tradingSystem.registerNewUser(userToOpenStore,null);
+            store = tradingSystem.openStore(userToOpenStore,"StoreForTest","i dont know");
+            store.addManager(userToOpenStore,newManager);
+        }
 
         /**
          * This test check if the removeOwner method succeeds
@@ -2020,6 +2082,9 @@ class TradingSystemTest {
             userToOpenStore = new UserSystem("openStoreUserTest", "open", "storeUser", "123weer");
             storeOwner = new UserSystem("storeOwnerTest","storeOwner","Test","456tyu");
             newManager = new UserSystem("newManagerTest","manager","storeTest","678uio");
+            tradingSystem.registerNewUser(userToOpenStore,null);
+            tradingSystem.registerNewUser(storeOwner,null);
+            tradingSystem.registerNewUser(newManager,null);
             store = tradingSystem.openStore(userToOpenStore,"newKindStore","we print stuff");
             store.addOwner(userToOpenStore,storeOwner);
             store.addOwner(storeOwner,newManager);
@@ -2162,10 +2227,9 @@ class TradingSystemTest {
          */
         private void setUpForOpenStoreSuc(){
             userToOpenStore = getUserSystemBuild();
-            //Set<UserSystem> users = new HashSet<>();
-            //users.add(userToOpenStore);
-            //tradingSystem.setUsersList(users);
-           // tradingSystem.registerNewUser(userToOpenStore);
+            tradingSystem.registerNewUser(userToOpenStore,null);
+            when(externalServiceManagement.isAuthenticatedUserPassword(userToOpenStore.getPassword(),userToOpenStore)).thenReturn(true);
+            uuid = tradingSystem.login(userToOpenStore.getUserName(),userToOpenStore.getPassword()).getKey();
         }
 
         /**

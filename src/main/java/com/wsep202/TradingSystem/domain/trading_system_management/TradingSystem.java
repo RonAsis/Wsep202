@@ -370,8 +370,8 @@ public class TradingSystem {
     public Store openStore(UserSystem user,
                            String storeName,
                            String description) {
-        if (Objects.nonNull(user) &&
-                Strings.isNotBlank(storeName)) {
+        if (Objects.nonNull(user) && Strings.isNotBlank(storeName) && Strings.isNotBlank(description)
+            && tradingSystemDao.isRegistered(user)) {
             Store newStore = new Store(user, storeName, description);
             tradingSystemDao.addStore(newStore);
             user.addNewOwnedStore(newStore);
