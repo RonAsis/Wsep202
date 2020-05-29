@@ -421,7 +421,26 @@ public class TradingSystem {
             log.info(String.format("user %s was added as manager in store '%d'", newOwnerUser, ownedStore.getStoreId()));
             return userSystem.addNewOwnedStore(ownedStore);
         }
-        log.info("failed add user as manager in store");
+        log.info("failed add user as owner in store");
+        return false;
+    }
+
+    /**
+     * This method is used to create a new appointing agreement to a new owner
+     *
+     * @param ownedStore   - The store to which you want to add a manager
+     * @param ownerUser    - owner of the store
+     * @param newOwnerUser - the user that needs to be added as an owner
+     * @return true if the creation of the appointing agreement was successful, false if there were a problem
+     */
+    public boolean createNewAppointingAgreement(Store ownedStore, UserSystem ownerUser, String newOwnerUser) {
+        UserSystem userSystem = tradingSystemDao.getUserSystem(newOwnerUser).orElse(null);
+        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(userSystem)
+                && ownedStore.createNewAppointingAgreement(ownerUser, userSystem)) {
+            log.info(String.format("A new appointing agreement was created for user %s in store %d", newOwnerUser, ownedStore.getStoreId()));
+            return true;
+        }
+        log.info("failed add user as owner in store");
         return false;
     }
 

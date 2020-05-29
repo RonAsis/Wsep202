@@ -69,6 +69,10 @@ public class Store {
     //description
     private String description;
 
+    //list of appointing agreements of owners in the store
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<AppointingAgreement> appointingAgreements;
+
     public Store(UserSystem owner, String storeName) {
         initStore(owner, storeName);
     }
@@ -77,6 +81,7 @@ public class Store {
         this.purchasePolicies = new ArrayList<>();
         this.discounts = new ArrayList<>();
         receipts = new LinkedList<>();
+        appointingAgreements = new LinkedList<>();
         appointedOwners = new ArrayList<>();
         appointedManagers = new ArrayList<>();
         products = new HashSet<>();
@@ -93,6 +98,43 @@ public class Store {
     }
 
     /**
+     * creating a new appointing agreement for the given new owner
+     * @param owner - the user that wants to appoint new owner as an owner
+     * @param newOwner - the user that owner wants to appoint as an owner
+     * @return true if an appointing agreement was created successfully
+     */
+    public boolean createNewAppointingAgreement(UserSystem owner, UserSystem newOwner) {
+        if (isOwner(owner) && !isOwner(newOwner)) {
+            if (!checkIfAppointeeExists(owner.getUserName()) && !checkIfNewOwnerHasAppointingAgreement(newOwner.getUserName())) {
+                this.appointingAgreements.add(new AppointingAgreement(newOwner.getUserName(),
+                        owner.getUserName(), this.owners));
+                log.info("A new appointing agreement was created for the user: " + newOwner.getUserName() +
+                        " by the owner: " + owner.getUserName() +
+                        " for the store: " + this.storeName);
+                return true;
+            }
+        }
+        log.info("Can't create a new appointing agreement for the user: " + newOwner.getUserName() +
+                " by the owner: " + owner.getUserName() +
+                " for the store: " + this.storeName);
+        return false;
+    }
+
+    /**
+     * checking if the given user has an appointing agreement
+     * @param userName - the user to be checked
+     * @return true if the user has an appointing agreement
+     */
+    private boolean checkIfNewOwnerHasAppointingAgreement(String userName) {
+        for(AppointingAgreement appointingAgreement : appointingAgreements){
+            if(appointingAgreement.getNewOwner().equals(userName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * add new owner to the appointed owners of the store
      *
      * @param owner
@@ -103,8 +145,9 @@ public class Store {
         boolean appointed = false;
 
         if (isOwner(owner) && !isOwner(willBeOwner)) {
-            if(!checkIfAppointeeExists(owner.getUserName()))
+            if(!checkIfAppointeeExists(owner.getUserName())) {
                 appointedOwners.add(new OwnersAppointee(owner.getUserName(), new HashSet<>()));
+            }
             int ownerIndex = getAppointeeOwnersIndex(owner.getUserName());
             if(ownerIndex !=-1)
                 appointedOwners.get(ownerIndex).getAppointedUsers().add(willBeOwner);
@@ -407,8 +450,8 @@ public class Store {
                 return true;
             }
         }
-            log.info("Failed to edit the product: " + productName);
-            return false;
+        log.info("Failed to edit the product: " + productName);
+        return false;
     }
 
 
@@ -622,7 +665,7 @@ public class Store {
     }
 
     private boolean ownersContains(UserSystem user) {
-            return (owners.stream().anyMatch(curUser -> curUser.getUserName().equals(user.getUserName())));
+        return (owners.stream().anyMatch(curUser -> curUser.getUserName().equals(user.getUserName())));
     }
 
     private boolean managersContains(MangerStore user) {

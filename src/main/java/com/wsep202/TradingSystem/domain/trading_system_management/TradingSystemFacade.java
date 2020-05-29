@@ -248,7 +248,8 @@ public class TradingSystemFacade {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
             Store ownerStore = ownerUser.getOwnerStore(storeId);
-            return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
+            return tradingSystem.createNewAppointingAgreement(ownerStore, ownerUser, newOwnerUsername);
+            //return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
         } catch (TradingSystemException e) {
             log.error("Add owner failed", e);
             return false;
