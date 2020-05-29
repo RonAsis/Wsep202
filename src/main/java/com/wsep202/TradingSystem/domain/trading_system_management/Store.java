@@ -23,7 +23,7 @@ public class Store {
     private final Object stockLock = new Object();
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int storeId;        //unique identifier for the store
 
     private String storeName;
