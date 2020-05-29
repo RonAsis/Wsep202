@@ -115,6 +115,7 @@ public class UserSystem implements Observer {
         this.lastName = lastName;
         this.password = password;
         this.isAdmin = false;
+        this.isLogin = false;
         this.notifications = new LinkedList<>();
         this.shoppingCart = new ShoppingCart();
         this.ownedStores = new HashSet<>();

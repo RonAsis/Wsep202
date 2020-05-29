@@ -2,12 +2,11 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NotInStockException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,12 +14,14 @@ import java.util.Map;
 @Slf4j
 @Builder
 @AllArgsConstructor
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 public class ShoppingCart {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
     /**
      * list of stores and there shopping bags
@@ -30,12 +31,9 @@ public class ShoppingCart {
     @ManyToMany(cascade = CascadeType.ALL)
     private Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
 
-
-    public ShoppingCart(){
-        this.shoppingBagsList = new HashMap<>();
+    public ShoppingCart(Map<Store,ShoppingBag> shoppingBagsList){
+        this.shoppingBagsList=shoppingBagsList;
     }
-
-
     /**
      * This method is used to add a bag from the cart.
      * @param storeOfBag - the store of the bag

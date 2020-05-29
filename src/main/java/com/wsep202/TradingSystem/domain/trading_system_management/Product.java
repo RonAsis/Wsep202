@@ -24,7 +24,7 @@ public class Product {
      * the product serial number
      */
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Min(value = 0, message = "Must be greater than or equal zero")
     private int productSn;
 

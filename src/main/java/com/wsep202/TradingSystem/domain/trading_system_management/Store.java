@@ -23,7 +23,7 @@ public class Store {
     private final Object stockLock = new Object();
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int storeId;        //unique identifier for the store
 
     private String storeName;
@@ -407,8 +407,8 @@ public class Store {
                 return true;
             }
         }
-            log.info("Failed to edit the product: " + productName);
-            return false;
+        log.info("Failed to edit the product: " + productName);
+        return false;
     }
 
 
@@ -622,7 +622,7 @@ public class Store {
     }
 
     private boolean ownersContains(UserSystem user) {
-            return (owners.stream().anyMatch(curUser -> curUser.getUserName().equals(user.getUserName())));
+        return (owners.stream().anyMatch(curUser -> curUser.getUserName().equals(user.getUserName())));
     }
 
     private boolean managersContains(MangerStore user) {

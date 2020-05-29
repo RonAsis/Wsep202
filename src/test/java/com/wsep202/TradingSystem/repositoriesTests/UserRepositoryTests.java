@@ -18,9 +18,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TradingSystemApplication.class, TradingSystemDataBaseDao.class})
 //@SpringBootTest(args = {"admin","admin"})
@@ -35,6 +37,13 @@ public class UserRepositoryTests {
 
     @BeforeEach
     void setUp() {
+    }
+
+    @Test
+    void registerAdminPositive(){
+        UserSystem  userSystemAdmin = new UserSystem("usernameAdmin","name",false,"lname","password", true);
+        tradingSystemDataBaseDao.registerAdmin(userSystemAdmin);
+        assertTrue(tradingSystemDataBaseDao.isRegistered(userSystemAdmin));
     }
 
     @Test
@@ -119,5 +128,19 @@ public class UserRepositoryTests {
         UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", false);
         tradingSystemDataBaseDao.addUserSystem(userSystem,image);
         assertFalse(tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).isPresent());
+    }
+
+    @Test
+    void getUsersPositive(){
+        UserSystem  userSystem1 = new UserSystem("usernamePos1","name",false,"lname","password", false);
+        UserSystem  userSystem2 = new UserSystem("usernamePos2","name",false,"lname","password", false);
+        UserSystem  userSystem3 = new UserSystem("usernamePos3","name",false,"lname","password", false);
+        UserSystem  userSystem4 = new UserSystem("usernamePos4","name",false,"lname","password", false);
+        tradingSystemDataBaseDao.addUserSystem(userSystem1,image);
+        tradingSystemDataBaseDao.addUserSystem(userSystem2,image);
+        tradingSystemDataBaseDao.addUserSystem(userSystem3,image);
+        tradingSystemDataBaseDao.addUserSystem(userSystem4,image);
+        Set<UserSystem> res = tradingSystemDataBaseDao.getUsers();
+        assertEquals(4,res.size());
     }
 }

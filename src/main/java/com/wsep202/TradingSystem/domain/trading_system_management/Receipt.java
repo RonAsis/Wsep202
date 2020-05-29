@@ -19,7 +19,7 @@ import java.util.*;
 public class Receipt {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int receiptSn;
 
     /**

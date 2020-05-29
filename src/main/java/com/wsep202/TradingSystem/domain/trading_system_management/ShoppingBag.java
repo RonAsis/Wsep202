@@ -21,7 +21,7 @@ import java.util.Map;
 public class ShoppingBag {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
 
     /**
@@ -32,7 +32,8 @@ public class ShoppingBag {
     /**
      * list of all of the products and the amount of each product
      */
-    @Transient
+    @ElementCollection
+    @JoinTable()
     private Map<Product, Integer> productListFromStore;
 
 
