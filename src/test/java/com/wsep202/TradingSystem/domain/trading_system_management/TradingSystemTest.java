@@ -88,20 +88,22 @@ class TradingSystemTest {
            // doNothing().when(tradingSystemDao).registerAdmin(admin);
         }
 
-//        /**
-//         * the following checks registration of valid user
-//         */
-//        @Test
-//        void registerNewUserPositive() {
-//            //mockup
-//            registerAsSetupPass();
-//            //setup
-//            //the following user details are necessary for the login tests
-//            //success: registration done. valid user details
-//            Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister,null));
-//        }
+        /**
+         * UC 2.2
+         * the following checks registration of valid user
+         */
+        @Test
+        void registerNewUserPositive() {
+            //mockup
+            registerAsSetupPass();
+            //setup
+            //the following user details are necessary for the login tests
+            //success: registration done. valid user details
+            Assertions.assertTrue(tradingSystem.registerNewUser(userToRegister,null));
+        }
 
         /**
+         * UC 2.2
          * checks handling with failure of registration
          * this test has to run after its respective positive test
          */
@@ -114,6 +116,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.2
          * checks handling with failure of null
          */
         @Test
@@ -124,6 +127,7 @@ class TradingSystemTest {
 
 
         /**
+         * UC 2.3
          * This test check if the login method succeeds when the parameters
          * are correct.
          */
@@ -137,6 +141,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.3
          * check that for a non-registered user the method login() fails
          */
         @Test
@@ -148,6 +153,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.3
          * check that for a logged in user the method login() fails
          */
         @Test
@@ -159,6 +165,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.1
          * check the logout functionality of exists user in the system
          */
         @Test
@@ -178,6 +185,7 @@ class TradingSystemTest {
 
 
         /**
+         * UC 3.1
          * check handling with logout failure
          */
         @Test
@@ -189,6 +197,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.1
          * check that for null object returns false
          */
         @Test
@@ -341,7 +350,9 @@ class TradingSystemTest {
 
 
         /**
-         * check the addMangerToStore() functionality in case of success in addNewManageStore and addManager
+         * UC 4.5
+         * check the addMangerToStore() functionality in case of success in
+         * addNewManageStore and addManager
          */
         @Test
         void addMangerToStorePositive() {
@@ -353,6 +364,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.5
          * check the addMangerToStore() functionality in case of not initialized parameters.
          */
         @Test
@@ -364,7 +376,9 @@ class TradingSystemTest {
         }
 
         /**
-         * check the addMangerToStore() functionality in case of failure in addNewManageStore and addManager
+         * UC 4.5
+         * check the addMangerToStore() functionality in case of failure in
+         * addNewManageStore and addManager
          */
         @Test
         void addMangerToStoreNegative() {
@@ -376,7 +390,9 @@ class TradingSystemTest {
         }
 
         /**
-         * check the addOwnerToStore() functionality in case of success in addNewOwnedStore and addOwner
+         * UC 4.3
+         * check the addOwnerToStore() functionality in case of success in
+         * addNewOwnedStore and addOwner
          */
         @Test
         void addOwnerToStorePositive() {
@@ -390,6 +406,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.3
          * check the addOwnerToStore() functionality in case of not initialized parameters.
          */
         @Test
@@ -406,7 +423,9 @@ class TradingSystemTest {
         }
 
         /**
-         * check the addOwnerToStore() functionality in case of failure in addNewOwnedStore and addOwner
+         * UC 4.3
+         * check the addOwnerToStore() functionality in case of failure
+         * in addNewOwnedStore and addOwner
          */
         @Test
         void addOwnerToStoreWrongStoreOwner() {
@@ -420,6 +439,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.3
          * check the addOwnerToStore() method when one of the parameters is null
          */
         @Test
@@ -434,6 +454,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the filterByRangePrice method, checks that the returned products are filtered by a given price
          */
         @Test
@@ -453,6 +474,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the filterByProductRank method, checks that the returned products are filtered by a given product rank
          */
         @Test
@@ -469,6 +491,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the filterByStoreRank method, checks that the returned products are filtered by a given store rank
          */
         @Test
@@ -501,6 +524,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the filterByStoreCategory method, checks that the returned products are filtered by a given store category
          */
         @Test
@@ -520,6 +544,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.8
          * This test check if the purchaseShoppingCart method succeeds
          * when all the parameters are correct.
          */
@@ -534,6 +559,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.8
          * This test check if the purchaseShoppingCart method fails
          * when the cart is empty.
          */
@@ -545,6 +571,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.8
          * This test check if the purchaseShoppingCart method fails
          * when one of the insert parameters is null.
          */
@@ -560,6 +587,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.8
          * This test check if the purchaseShoppingCart method fails
          * when one of the products is not in stock.
          */
@@ -572,6 +600,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.8
          * This test check if the purchaseShoppingCart method fails
          * when there is a problem with charge system and the product are not removed from cart.
          */
@@ -586,6 +615,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.8
          * This test check if the purchaseShoppingCart method fails
          * when there is a problem with deliver system and the product are not removed from cart.
          */
@@ -626,6 +656,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.2
          * This test checks that the store's opening succeeds
          */
         @Test
@@ -642,6 +673,7 @@ class TradingSystemTest {
 
 
         /**
+         * UC 3.2
          * This test check if the openStore method fails when
          * one of the parameters is null.
          */
@@ -654,6 +686,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.2
          * This test check if the openStore method fails when store name is empty
          */
         @Test
@@ -663,6 +696,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method succeeds when the parameters
          * are correct.
          */
@@ -677,6 +711,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method fails
          * when trying to remove an user who is not a manager.
          */
@@ -692,6 +727,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method fails
          * when inserting the wrong owner
          */
@@ -705,6 +741,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method fails
          * when inserting the wrong store.
          */
@@ -716,6 +753,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method fails
          * when one of the parameters is null
          */
@@ -730,6 +768,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeOwner method succeeds
          * when the parameters are correct.
          */
@@ -745,6 +784,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeOwner method fails
          * when one of the parameters is null
          */
@@ -764,6 +804,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeManager method fails
          * when one of the users is not an owner of the store
          */
@@ -784,6 +825,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeManager method fails
          * when both of the users are owners but for a different store
          */
@@ -907,8 +949,6 @@ class TradingSystemTest {
             when(externalServiceManagement.getEncryptedPasswordAndSalt(userToRegister.getPassword())).thenReturn(passwordSaltPair);
             when(passwordSaltPair.getHashedPassword()).thenReturn("123345543gf");
             when(passwordSaltPair.getSalt()).thenReturn("salt");
-          //  doNothing().when(ImageUtil.saveImage(ImagePath.USER_IMAGE_DIC + userToRegister.getUserName(), userImage));
-//            when(ImageUtil.saveImage(ImagePath.USER_IMAGE_DIC + userToRegister.getUserName(), userImage)).thenReturn("IAmPass");
         }
         /**
          * setup of successful pre registration
@@ -1239,6 +1279,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.2
          * the following checks registration of valid user
          */
         @Test
@@ -1250,6 +1291,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.2
          * checks handling with failure of registration
          * this test has to run after its respective positive test
          */
@@ -1264,6 +1306,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.3
          * check if the login method works
          */
         @Test
@@ -1296,6 +1339,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.3
          * test handling with login failure
          */
         @Test
@@ -1311,6 +1355,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.1
          * check the logout functionality of exists user in the system
          */
         @Test
@@ -1337,6 +1382,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.1
          * check handling with logout failure
          */
         @Test
@@ -1458,6 +1504,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the searchProductByName() functionality in case of exists product in store in the system
          */
         @Test
@@ -1479,6 +1526,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the searchProductByName() functionality in case of not exists product in store in the system
          */
         @Test
@@ -1491,6 +1539,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the searchProductByCategory() functionality in case of exists product in store in the system
          */
         @Test
@@ -1504,6 +1553,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the searchProductByCategory() functionality in case of not exists product in store in the system
          */
         @Test
@@ -1518,6 +1568,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the searchProductByKeyWords() functionality in case of exists product in store in the system
          */
         @Test
@@ -1534,6 +1585,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the searchProductByKeyWords() functionality in case of not exists product in store in the system
          */
         @Test
@@ -1549,6 +1601,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.5
          * check the filterByRangePrice method, checks that the returned products are filtered by a given price
          */
         @Test
@@ -1599,6 +1652,7 @@ class TradingSystemTest {
 //        }
 
         /**
+         * UC 2.5
          * check the filterByStoreCategory method, checks that the returned products are filtered by a given store category
          */
         @Test
@@ -1618,6 +1672,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.2
          * This test check if the openStore method succeeds when the parameters
          * are correct.
          */
@@ -1640,6 +1695,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.2
          * This test check if the openStore method fails
          * when the user that try's to open the store is not registered
          */
@@ -1655,6 +1711,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 3.2
          * This test check if the openStore method fails when the parameters
          * are wrong.
          */
@@ -1682,6 +1739,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 2.8
          * This test check if the purchaseShoppingCart method succeeds
          * when all the parameters are correct.
          */
@@ -1699,6 +1757,7 @@ class TradingSystemTest {
         }
 
 //        /**
+//         * UC 2.8
 //         * This test check if the purchaseShoppingCart method fails
 //         * when the cart is empty.
 //         */
@@ -1710,6 +1769,7 @@ class TradingSystemTest {
 //        }
 
 //        /**
+//         * UC 2.8
 //         * This test check if the purchaseShoppingCart method fails
 //         * when one of the insert parameters is null.
 //         */
@@ -1725,6 +1785,7 @@ class TradingSystemTest {
 //        }
 
 //        /**
+//         * UC 2.8
 //         * This test check if the purchaseShoppingCart method fails
 //         * when one of the products is not in stock.
 //         */
@@ -1737,6 +1798,7 @@ class TradingSystemTest {
 //        }
 
 //        /**
+//         * UC 2.8
 //         * This test check if the purchaseShoppingCart method fails
 //         * when there is a problem with charge system and the product are not removed from cart.
 //         */
@@ -1751,6 +1813,7 @@ class TradingSystemTest {
 //        }
 
 //        /**
+//         * UC 2.8
 //         * This test check if the purchaseShoppingCart method fails
 //         * when there is a problem with deliver system and the product are not removed from cart.
 //         */
@@ -1765,6 +1828,7 @@ class TradingSystemTest {
 //        }
 
 //        /**
+//         * UC 2.8
 //         * This test check if the purchaseShoppingCart method succeeds when the parameters
 //         * are correct.
 //         */
@@ -1819,6 +1883,7 @@ class TradingSystemTest {
 //        }
 
         /**
+         * UC 4.5
          * This test check if the addManager method succeeds when the parameters
          * are correct.
          */
@@ -1841,6 +1906,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.5
          * This test check if the addManager method fails when the parameters
          * are wrong.
          */
@@ -1862,6 +1928,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.5
          * This test check if the addManager method fails when the parameters
          * are wrong.
          */
@@ -1879,6 +1946,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.5
          * This test check if the addManager method fails when the parameters
          * are wrong.
          */
@@ -1892,6 +1960,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.5
          * This test check if the addManager method fails when the parameters
          * are wrong.
          */
@@ -1905,6 +1974,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.3
          * This test check if the addOwner method succeeds when the parameters
          * are correct.
          */
@@ -1920,6 +1990,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.3
          * This test check if the addOwner method fails when the parameters
          * are wrong.
          */
@@ -1933,6 +2004,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.3
          * This test check if the addManager method fails when the parameters
          * are wrong.
          */
@@ -1950,19 +2022,21 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.3
          * This test check if the addManager method fails when the parameters
          * are wrong.
          */
         @Test
-        void addOwnerEmptyUserNameManager(){
+        void addOwnerEmptyUserNameOwner(){
             setUpAddManagerAndOwner();
-            //can't appoint a null manager
+            //can't appoint a empty owner
             Assertions.assertFalse(tradingSystem.addOwnerToStore(store1,storeOwner,""));
             //check that the number of owners of the store is still 1
             Assertions.assertEquals(1, store1.getOwners().size());
         }
 
         /**
+         * UC 4.3
          * This test check if the addManager method fails when the parameters
          * are wrong.
          */
@@ -1978,6 +2052,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method succeeds when the parameters
          * are correct.
          */
@@ -2006,6 +2081,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method fails when the parameters
          * are wrong.
          */
@@ -2021,6 +2097,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method fails when the parameters
          * are wrong.
          */
@@ -2036,6 +2113,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.7
          * This test check if the removeManager method fails when the parameters
          * are wrong.
          */
@@ -2058,6 +2136,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeOwner method succeeds
          * when the parameters are correct.
          */
@@ -2092,6 +2171,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeManager method fails
          * when 2 users are owners of the store but
          * the removing owner didn't appoint the owner that needs to be removed
@@ -2112,6 +2192,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeOwner method fails
          * when one of the parameters is null
          */
@@ -2134,6 +2215,11 @@ class TradingSystemTest {
             Assertions.assertTrue(store.isOwner(storeOwner));
         }
 
+        /**
+         * UC 4.4
+         * This test check if the removeOwner method fails
+         * when an owner try's to remove himself
+         */
         @Test
         void removeOwnerHimself(){
             setUpForRemoveOwner();
@@ -2146,6 +2232,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeManager method fails
          * when one of the users is not an owner of the store
          */
@@ -2166,6 +2253,7 @@ class TradingSystemTest {
         }
 
         /**
+         * UC 4.4
          * This test check if the removeManager method fails
          * when both of the users are owners but for a different store
          */
@@ -2232,17 +2320,6 @@ class TradingSystemTest {
             uuid = tradingSystem.login(userToOpenStore.getUserName(),userToOpenStore.getPassword()).getKey();
         }
 
-        /**
-         * setUp for openStore
-         */
-        private void setUpForOpenStoreFail(){
-            userToOpenStore = getUserSystemBuild();
-            Set<UserSystem> users = new HashSet<>();
-            users.add(userToOpenStore);
-         //   tradingSystem.setUsersList(users);
-            storeToOpen = new Store(userToOpenStore, "castro");
-          //  tradingSystem.insertStoreToStores(storeToOpen);
-        }
 
         /**
          * setUp for purchaseCart

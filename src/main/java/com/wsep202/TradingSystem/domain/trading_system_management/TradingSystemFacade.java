@@ -45,8 +45,8 @@ public class TradingSystemFacade {
     private final ServiceFacade serviceFacade;
 
     /**
+     * UC 3.7
      * view purchase history of user logged in
-     *
      * @param userName - must be logged in
      * @return all the receipt of the user
      */
@@ -62,8 +62,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 6.4.1
      * administrator view purchase history of store
-     *
      * @param administratorUsername the user name of the admin
      * @param storeId               - the store id of the store that want view purchase history
      * @return all the receipt of the store
@@ -81,8 +81,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 6.4.2
      * administrator view purchase history of user
-     *
      * @param administratorUsername the user name of the admin
      * @param userName              - the userName that want view purchase history
      * @return all the receipt of the user
@@ -98,8 +98,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 5.1
      * Manager view purchase history of store
-     *
      * @param managerUsername - the manager Username of the store manger that want view purchase history
      * @param storeId         - the store that want view the purchase history
      * @param uuid
@@ -117,8 +117,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 4.10
      * Owner view purchase history of store
-     *
      * @param ownerUserName the owner Username of the store manger that want view purchase history
      * @param storeId       - the store that want view the purchase history
      * @return all the receipt of the store
@@ -134,8 +134,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 4.1
      * add product to store
-     *
      * @param ownerUsername the username of the owner store
      * @param storeId       - of the store that want add product
      * @param productName   - the name of the new product
@@ -167,12 +167,29 @@ public class TradingSystemFacade {
             return convertDiscountList(storeDiscounts);
     }
 
+    /**
+     * UC 4.2
+     * owner wants remove a discount policy from store
+     * @param username - name of owner
+     * @param storeId - the id of the store
+     * @param discountId - id of discount to remove
+     * @param uuid - users UUID
+     * @return true if success, else false
+     */
     public boolean removeDiscount(String username, int storeId, int discountId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
         return store.removeDiscount(user, discountId);
     }
 
+    /**
+     * UC 4.2
+     * owner wants add a new policy ir edit an existing one a discount policy from store
+     * @param username - name of owner
+     * @param storeId - the id of the store
+     * @param uuid - users UUID
+     * @return true if success, else false
+     */
     public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId);
@@ -180,6 +197,14 @@ public class TradingSystemFacade {
         return modelMapper.map(store.addEditDiscount(user, discount), DiscountDto.class);
     }
 
+    /**
+     * UC 4.2
+     * owner wants add a new policy ir edit an existing one a discount policy from store
+     * @param username - name of owner
+     * @param storeId - the id of the store
+     * @param uuid - users UUID
+     * @return true if success, else false
+     */
     public PurchaseDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId);
@@ -192,8 +217,8 @@ public class TradingSystemFacade {
         return CompositeOperator.getStringCompositeOperators();
     }
     /**
+     * UC 4.1
      * delete product form store
-     *
      * @param ownerUsername the username of the owner store
      * @param storeId       - of the store that want delete product
      * @param productSn     - the sn of the product
@@ -211,8 +236,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 4.1
      * edit product
-     *
      * @param ownerUsername the username of the owner store
      * @param storeId       - of the store that want edit product
      * @param productSn     - the sn of the product
@@ -236,8 +261,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 4.3
      * add new owner to store
-     *
      * @param ownerUsername    the username of the owner store
      * @param storeId          - of the store that want add new owner
      * @param newOwnerUsername - the new owner
@@ -257,8 +282,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 4.5
      * add manger to the store with the default permission
-     *
      * @param ownerUsername      the username of the owner store
      * @param storeId            - of the store that want add new owner
      * @param newManagerUsername - the new manger
@@ -278,8 +303,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 4.6
      * add permission the manger in the store
-     *
      * @param ownerUsername   the username of the owner store
      * @param storeId         - of the store that want add permission the manger
      * @param managerUsername - the user name of the manger
@@ -300,7 +325,16 @@ public class TradingSystemFacade {
         }
     }
 
-
+    /**
+     * UC 4.6
+     * remove permissions from manager
+     * @param ownerUsername - owner of the store
+     * @param storeId - id of store
+     * @param managerUsername - manager of store
+     * @param permission - permission to remove
+     * @param uuid - UUID of owner
+     * @return true if success, else false
+     */
     public boolean removePermission(String ownerUsername, int storeId, String managerUsername, String permission, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -314,6 +348,14 @@ public class TradingSystemFacade {
         }
     }
 
+    /**
+     * see managers permissions
+     * @param ownerUsername - owner of store
+     * @param storeId - store id
+     * @param managerUsername - manager of store
+     * @param uuid - UUID of owner
+     * @return
+     */
     public List<String> getPermissionOfManager(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -328,8 +370,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 4.7
      * remove manger from the store by the owner that appointed him
-     *
      * @param ownerUsername   owner that appointed the manger
      * @param storeId         - the id that of the store that want remove the manger
      * @param managerUsername - the manger that want remove
@@ -349,8 +391,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 4.4
      * remove owner from the store by the owner that appointed him
-     *
      * @param ownerUsername   owner that appointed the manger
      * @param storeId         - the id that of the store that want remove the owner
      * @param ownerToRemove - the owner that needs to be removed
@@ -370,8 +412,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 3.1
      * the user name logout from the system
-     *
      * @param username - the username that want logout
      * @return true if succeed
      */
@@ -386,8 +428,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 3.2
      * open new store
-     *
      * @param usernameOwner - the user that open the store
      * @param storeName     - the name of the new store
      * @return true if succeed
@@ -422,8 +464,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.2
      * register new user to the system
-     *
      * @param userName  - the new username
      * @param password  - the password of the user
      * @param firstName - the first name of the new user
@@ -440,8 +482,8 @@ public class TradingSystemFacade {
 
 
     /**
+     * UC 2.3
      * user login to the system
-     *
      * @param userName - the username need to be register to the system for suc
      * @param password - the password must be the correct password of the user
      * @return true if succeed
@@ -456,8 +498,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.4
      * view product of specific store
-     *
      * @param storeId   - the store id that include the product
      * @param productId - the product id that want view the product details
      * @return the product details
@@ -474,8 +516,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.5
      * search product by name
-     *
      * @param productName - the product name that want to search
      * @return list of all the product with this name
      */
@@ -486,6 +528,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.5
      * search product by category
      *
      * @param category - the category of product that want to search
@@ -504,6 +547,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.5
      * search product by keyWords
      *
      * @param keyWords - the keyWords that want search with
@@ -516,6 +560,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.5
      * filter by range price
      *
      * @param productDtos the list of products
@@ -531,6 +576,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.5
      * filter by product rank
      *
      * @param productDtos the list of products
@@ -545,6 +591,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.5
      * filter by store rank
      *
      * @param productDtos the list of products
@@ -559,6 +606,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.5
      * filter by category
      *
      * @param productDtos the list of products
@@ -579,6 +627,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.6
      * @param username  the username that want save ShoppingBag
      * @param storeId   the storeId that the product belong to
      * @param productSn - the sn of the prodcut
@@ -600,8 +649,8 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.7
      * view products in shopping cart
-     *
      * @param username the username that want view the ShoppingBag
      * @return shopping bag
      */
@@ -618,6 +667,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.7
      * remove product in shopping bag
      *
      * @param username  the username that want remove product from the ShoppingBag
@@ -638,6 +688,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.8
      * purchase shopping cart use for guest
      *
      * @param shoppingCartDto the shopping cart
@@ -654,6 +705,7 @@ public class TradingSystemFacade {
     }
 
     /**
+     * UC 2.8
      * purchase shopping cart of resisted user
      *
      * @param username - the username that want purchase shopping cart
@@ -739,6 +791,15 @@ public class TradingSystemFacade {
         return tradingSystem.getTotalPrices(shoppingCart);
     }
 
+    /**
+     * UC 2.7
+     * add a new product to cart
+     * @param username - name of the user
+     * @param amount - amount of the product
+     * @param productDto - the product details
+     * @param uuid - users UUID
+     * @return true if added, else false
+     */
     public boolean addProductToShoppingCart(String username, int amount, ProductDto productDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username,uuid);
         Product product = modelMapper.map(productDto, Product.class);
@@ -857,6 +918,11 @@ public class TradingSystemFacade {
         return ownerUser.isOwner(storeId);
     }
 
+    /**
+     * UC 2.7
+     * edit products in cart
+     * @return true if changed
+     */
     public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid);
         return user.changeProductAmountInShoppingBag(storeId, amount, productSn);
