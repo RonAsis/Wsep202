@@ -143,39 +143,39 @@ public class AppStartupRunner implements ApplicationRunner {
     }
 
     private void initialPurchase(Store store) {
-        List<Product> products = new ArrayList<>(store.getProducts());
-        UserSystem userSystem = new ArrayList<>(store.getOwners()).get(0);
-        Purchase purchase1 = Purchase.builder()
-                .min(3)
-                .productId(products.get(0).getProductSn())
-                .max(Integer.MAX_VALUE)
-                .build();
-
-        log.info("for test policy !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        log.info("username: " + userSystem.getUserName() + "password: " + userSystem.getPassword());
-        log.info("product 0: " + products.get(0).getName() + "product 1: " + products.get(1).getName());
-        log.info("Store name: " + store.getStoreName());
-
-        Purchase purchase2 = Purchase.builder()
-                .min(0)
-                .isShoppingBagPurchaseLimit(false)
-                .productId(products.get(1).getProductSn())
-                .max(5)
-                .build();
-
-        List<Purchase> purchases = new LinkedList<>();
-
-        purchases.add(purchase1);
-        purchases.add(purchase2);
-        Purchase purchaseComposed = Purchase.builder()
-                .isShoppingBagPurchaseLimit(true)
-                .min(0)
-                .composedPurchasePolicies(purchases)
-                .productId(products.get(1).getProductSn())
-                .max(5)
-                .build();
-
-        store.addPurchase(userSystem, purchaseComposed);
+//        List<Product> products = new ArrayList<>(store.getProducts());
+//        UserSystem userSystem = new ArrayList<>(store.getOwners()).get(0);
+//        Purchase purchase1 = Purchase.builder()
+//                .min(3)
+//                .productId(products.get(0).getProductSn())
+//                .max(Integer.MAX_VALUE)
+//                .build();
+//
+//        log.info("for test policy !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//        log.info("username: " + userSystem.getUserName() + "password: " + userSystem.getPassword());
+//        log.info("product 0: " + products.get(0).getName() + "product 1: " + products.get(1).getName());
+//        log.info("Store name: " + store.getStoreName());
+//
+//        Purchase purchase2 = Purchase.builder()
+//                .min(0)
+//                .isShoppingBagPurchaseLimit(false)
+//                .productId(products.get(1).getProductSn())
+//                .max(5)
+//                .build();
+//
+//        List<Purchase> purchases = new LinkedList<>();
+//
+//        purchases.add(purchase1);
+//        purchases.add(purchase2);
+//        Purchase purchaseComposed = Purchase.builder()
+//                .isShoppingBagPurchaseLimit(true)
+//                .min(0)
+//                .composedPurchasePolicies(purchases)
+//                .productId(products.get(1).getProductSn())
+//                .max(5)
+//                .build();
+//
+//        store.addPurchase(userSystem, purchaseComposed);
     }
 
     private List<UserSystem> initialUsers() {

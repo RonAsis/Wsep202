@@ -1,6 +1,5 @@
 package com.wsep202.TradingSystem.dto;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.PurchaseType;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
