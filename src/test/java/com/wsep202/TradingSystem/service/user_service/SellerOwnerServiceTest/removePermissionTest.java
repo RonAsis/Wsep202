@@ -25,7 +25,7 @@ import java.util.UUID;
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
 
-// *********** UC 4.6 - removing a permission from a manager ***********
+// *********** UC 4.6 - removing a manager's permission ***********
 public class removePermissionTest {
     @Autowired
     GuestService guestService;

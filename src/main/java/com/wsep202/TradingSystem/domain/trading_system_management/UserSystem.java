@@ -123,6 +123,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 4.3
      * This method is used to add a new owned store to the user
      *
      * @param store - the store that needs to be added
@@ -133,6 +134,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 4.5
      * This method is used to add a new managed store to the user
      *
      * @param store - the store that needs to be added
@@ -143,6 +145,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 4.5, 4.4
      * This method is used to add a store to the relevant list (owned OR managed)
      *
      * @param storeToAdd   - the store that needs to be added
@@ -164,6 +167,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 4.7
      * This method is used to remove a store that is under a users management
      *
      * @param storeToRemove - the store that needs to be removed
@@ -184,6 +188,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 4.4
      * This method is used to remove a store that is under a users ownership
      *
      * @param storeToRemove - the store that needs to be removed
@@ -204,6 +209,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 2.3
      * This method is used to change the stage of the user to logged-in
      */
     public void login() {
@@ -214,6 +220,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 3.1
      * This method is used to change the stage of the user to logged-out
      *
      * @return always true, because the user is now logged-out
@@ -262,6 +269,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 2.7
      * This method is used to add a product to the users cart.
      * The method use the methods getShoppingBag & addBagToCart in ShoppingCart and addProductToBag in ShoppingBag.
      *
@@ -284,6 +292,7 @@ public class UserSystem implements Observer {
     }
 
     /**
+     * UC 2.7
      * This method is used to remove a product from the cart.
      * The method use the methods getShoppingBag in ShoppingCart and removeProductFromBag in ShoppingBag
      *
@@ -341,6 +350,10 @@ public class UserSystem implements Observer {
 
     }
 
+    /**
+     * UC 2.7
+     * change the amount of product in the bag
+     */
     public boolean changeProductAmountInShoppingBag(int storeId,int amount, int productSn) {
         return shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
     }

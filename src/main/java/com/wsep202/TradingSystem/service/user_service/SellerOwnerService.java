@@ -17,6 +17,8 @@ public class SellerOwnerService {
     private final TradingSystemFacade tradingSystemFacade;
 
     /**
+     * UC 4.10 - viewing store's history purchase.
+     *
      * View store purchase history
      */
     public List<ReceiptDto> viewPurchaseHistoryOfStoreOwner(String ownerUsername,
@@ -26,6 +28,8 @@ public class SellerOwnerService {
     }
 
     /**
+     * UC 4.1.1 - adding products to store.
+     *
      * add product
      */
     public ProductDto addProduct(String ownerUsername,
@@ -39,6 +43,8 @@ public class SellerOwnerService {
     }
 
     /**
+     * UC 4.1.2 - removing a product.
+     *
      * remove product
      */
     public boolean deleteProductFromStore(String ownerUsername,
@@ -49,6 +55,8 @@ public class SellerOwnerService {
     }
 
     /**
+     * UC 4.1.3 - editing a product’s detail.
+     *
      * edit product
      */
     public boolean editProduct(String ownerUsername,
@@ -63,6 +71,8 @@ public class SellerOwnerService {
     }
 
     /**
+     * UC 4.3 - appointing a new store owner.
+     *
      * add owner
      */
     public boolean addOwner(String ownerUsername,
@@ -73,7 +83,7 @@ public class SellerOwnerService {
     }
 
     /**
-     * remove manager - UC 4.7
+     * UC 4.7 - removing a store manager.
      */
     public boolean removeManager(String ownerUsername,
                                  int storeId,
@@ -83,7 +93,7 @@ public class SellerOwnerService {
     }
 
     /**
-     * remove owner - UC 4.4
+     * UC 4.4 - removing a store owner.
      */
     public boolean removeOwner(String ownerUsername,
                                  int storeId,
@@ -93,6 +103,8 @@ public class SellerOwnerService {
     }
 
     /**
+     * UC 4.6 - adding a permission to a manager.
+     *
      * add permission
      */
     public boolean addPermission(String ownerUsername,
@@ -104,6 +116,8 @@ public class SellerOwnerService {
     }
 
     /**
+     * UC 4.5 - appointing a new store manager.
+     *
      * add manager
      */
     public ManagerDto addManager(String ownerUsername,
@@ -111,6 +125,13 @@ public class SellerOwnerService {
                               String newManagerUsername,
                               UUID uuid){
         return tradingSystemFacade.addManager(ownerUsername, storeId, newManagerUsername, uuid);
+    }
+
+    /**
+     * UC 4.6 - removing a manager's permission
+     */
+    public boolean removePermission(String ownerUsername, int storeId, String managerUsername, String permission, UUID uuid) {
+        return tradingSystemFacade.removePermission(ownerUsername, storeId, managerUsername, permission, uuid);
     }
 
     public List<StoreDto> getOwnerStores(String ownerUsername, UUID uuid) {
@@ -134,10 +155,6 @@ public class SellerOwnerService {
 
     public List<ManagerDto> getMySubMangers(String ownerUsername, int storeId, UUID uuid) {
         return tradingSystemFacade.getMySubMangers(ownerUsername, storeId, uuid);
-    }
-
-    public boolean removePermission(String ownerUsername, int storeId, String managerUsername, String permission, UUID uuid) {
-        return tradingSystemFacade.removePermission(ownerUsername, storeId, managerUsername, permission, uuid);
     }
 
     public List<String> getPermissionOfManager(String ownerUsername, int storeId, String managerUsername, UUID uuid) {

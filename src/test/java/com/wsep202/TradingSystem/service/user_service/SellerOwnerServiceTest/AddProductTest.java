@@ -83,6 +83,26 @@ public class AddProductTest {
     }
 
     /**
+     * add a valid product,
+     * negative amount
+     */
+    @Test
+    void addValidProductNegativeAmount() {
+        Assertions.assertNull(this.sellerOwnerService.addProduct(this.user.getUserName(),
+                this.storeId, this.productDto.getName(), this.productDto.getCategory().toLowerCase(), -10, 20, uuid));
+    }
+
+    /**
+     * add a valid product,
+     * negative cost
+     */
+    @Test
+    void addValidProductNegativeCost() {
+        Assertions.assertNull(this.sellerOwnerService.addProduct(this.user.getUserName(),
+                this.storeId, this.productDto.getName(), this.productDto.getCategory().toLowerCase(), 10, -20, uuid));
+    }
+
+    /**
      * add product
      * invalid owner
      */

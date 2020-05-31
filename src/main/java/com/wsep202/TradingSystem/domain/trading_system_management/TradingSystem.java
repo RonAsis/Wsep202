@@ -64,9 +64,9 @@ public class TradingSystem {
 
 
     /**
+     * UC 2.2
      * register new user in the system
      * with its password
-     *
      * @param userToRegister the user we want to register
      * @param image
      * @return true if the registration succeeded
@@ -85,8 +85,8 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.3
      * This method is used to make a login for a the user
-     *
      * @param password - the users password
      * @return true if the user logged-in, false if nots
      */
@@ -110,8 +110,8 @@ public class TradingSystem {
     }
 
     /**
+     * UC 3.1
      * logout the user from the system
-     *
      * @param user - the user that asks to log out
      * @return true if logged out, otherwise false
      */
@@ -200,6 +200,7 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.5
      * searches all the products that there name is productName in all stores.
      *
      * @param productName - the name of product we want to search.
@@ -211,6 +212,7 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.5
      * searches all the products that there category is productCategory in all stores.
      *
      * @param productCategory - the category of product we want to search.
@@ -221,6 +223,7 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.5
      * searches all the products that there name contains keyWords in all stores.
      *
      * @param keyWords - the key words that contained in product name.
@@ -231,6 +234,7 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.5
      * filter products by range price
      *
      * @param products - the list of products
@@ -245,6 +249,7 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.5
      * filter products by product rank
      *
      * @param products - the list of products
@@ -258,6 +263,7 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.5
      * filter products by store rank
      *
      * @param products - the list of products
@@ -274,6 +280,7 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.5
      * filter products by category
      *
      * @param products - the list of products
@@ -287,8 +294,8 @@ public class TradingSystem {
     }
 
     /**
+     * UC 2.8
      * This method is used to purchase all the products that the unregistered user added to his cart.
-     *
      * @param shoppingCart   - the users personal shopping cart
      * @param paymentDetails - the user credit card number & expiration date
      * @return list of receipts for stores where payment has been made
@@ -299,8 +306,8 @@ public class TradingSystem {
 
 
     /**
+     * UC 2.8
      * This method is used to purchase all the products that the registered user added to his cart.
-     *
      * @param paymentDetails - the user credit card number & expiration date
      * @param user           - the user that made
      * @return list of receipts for stores where payment has been made
@@ -324,6 +331,7 @@ public class TradingSystem {
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
+    @Synchronized
     private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
                                              ShoppingCart shoppingCart, BillingAddress billingAddress,
                                              String customerName)
@@ -362,8 +370,8 @@ public class TradingSystem {
 
 
     /**
+     * UC 3.2
      * This method is used to open a new store in the system
-     *
      * @param user      - the user that wants to open the store
      * @param storeName - the name of the store that the user decided
      * @return - false if the user is not registered, and true after the new store is added to store list
@@ -371,8 +379,8 @@ public class TradingSystem {
     public Store openStore(UserSystem user,
                            String storeName,
                            String description) {
-        if (Objects.nonNull(user) &&
-                Strings.isNotBlank(storeName)) {
+        if (Objects.nonNull(user) && Strings.isNotBlank(storeName) && Strings.isNotBlank(description)
+            && tradingSystemDao.isRegistered(user)) {
             Store newStore = new Store(user, storeName, description);
             user.addNewOwnedStore(newStore);
             tradingSystemDao.addStore(newStore, user);
@@ -385,8 +393,8 @@ public class TradingSystem {
 
 
     /**
+     * UC 4.5
      * This method is used to add a new manager to an existing store
-     *
      * @param ownedStore     - The store to which you want to add a manager
      * @param ownerUser      - owner of the store
      * @return true if the addition was successful, false if there were a problem
@@ -408,8 +416,8 @@ public class TradingSystem {
     }
 
     /**
+     * UC 4.3
      * This method is used to add a new owner to an existing store
-     *
      * @param ownedStore   - The store to which you want to add a manager
      * @param ownerUser    - owner of the store
      * @param newOwnerUser - the user that needs to be added as an owner
@@ -422,13 +430,32 @@ public class TradingSystem {
             log.info(String.format("user %s was added as manager in store '%d'", newOwnerUser, ownedStore.getStoreId()));
             return userSystem.addNewOwnedStore(ownedStore);
         }
-        log.info("failed add user as manager in store");
+        log.info("failed add user as owner in store");
         return false;
     }
 
     /**
+     * UC 4.3
+     * This method is used to create a new appointing agreement to a new owner
+     * @param ownedStore   - The store to which you want to add a manager
+     * @param ownerUser    - owner of the store
+     * @param newOwnerUser - the user that needs to be added as an owner
+     * @return true if the creation of the appointing agreement was successful, false if there were a problem
+     */
+    public boolean createNewAppointingAgreement(Store ownedStore, UserSystem ownerUser, String newOwnerUser) {
+        UserSystem userSystem = tradingSystemDao.getUserSystem(newOwnerUser).orElse(null);
+        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(userSystem)
+                && ownedStore.createNewAppointingAgreement(ownerUser, userSystem)) {
+            log.info(String.format("A new appointing agreement was created for user %s in store %d", newOwnerUser, ownedStore.getStoreId()));
+            return true;
+        }
+        log.info("failed add user as owner in store");
+        return false;
+    }
+
+    /**
+     * UC 4.7
      * remove manager from the store
-     *
      * @param ownedStSore  - the store
      * @param ownerUser    - the owner of the store that want remove the manager
      * @param managerStore - the manager that want to remove
@@ -445,6 +472,7 @@ public class TradingSystem {
     }
 
     /**
+     * UC 4.4
      * remove owner from store
      * @param store  - the store
      * @param ownerUser    - the owner of the store that want remove the other owner

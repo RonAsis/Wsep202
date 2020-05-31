@@ -25,6 +25,7 @@ import java.util.UUID;
 @ContextConfiguration(classes = {TradingSystemConfiguration.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class, SellerManagerService.class})
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
+
 // *********** UC 4.1.2 - removing a product ***********
 public class RemoveProductTest {
     @Autowired

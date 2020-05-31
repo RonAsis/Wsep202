@@ -3,6 +3,8 @@
  * apply the discount on the sum of the purchase cost.
  */
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
+import com.wsep202.TradingSystem.domain.exception.IllegalMinPriceException;
+import com.wsep202.TradingSystem.domain.exception.IllegalPercentageException;
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.exception.NotValidEndTime;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
@@ -24,6 +26,7 @@ public class ConditionalStoreDiscount extends DiscountPolicy {
     private double minPrice;
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         //The discount time is not expired yet
         if (!isExpired(discount) && !discount.isApplied()) {
             double totalPurchasedCost = getTotalPurchasedCost(products);
@@ -38,8 +41,19 @@ public class ConditionalStoreDiscount extends DiscountPolicy {
         }
     }
 
+    private void verifyValidity(Discount discount) {
+        if(discount.getDiscountPercentage()<0){
+            throw new IllegalPercentageException(discount.getDiscountId(),discount.getDiscountPercentage());
+        }
+        if(minPrice<0){
+            throw new IllegalMinPriceException(discount.getDiscountId(),minPrice);
+        }
+    }
+
+
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         return !isExpired(discount) && minPrice <= getTotalPurchasedCost(products);
     }
 

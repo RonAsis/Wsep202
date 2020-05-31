@@ -26,13 +26,22 @@ public abstract class DiscountPolicy {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Min(value = 1, message = "Must be greater than or equal zero")
     private int id = generateDiscountPolicySn();
-
+  
+    /**
+     * apply discounts according to the type of the executing discount
+     */
     public abstract void applyDiscount(Discount discount, Map<Product, Integer> products);
-
+    /**
+     * checks weather the terms for applying the discount are existing
+     */
     public abstract boolean isApprovedProducts(Discount discount, Map<Product, Integer> products);
-
+    /**
+     * responsible for undoing the discount decrementing from product price in case it has been expired
+     */
     public abstract void undoDiscount(Discount discount, Map<Product, Integer> products);
-
+    /**
+     * check if the discount date has expired
+     */
     public boolean isExpired(Discount discount) {
         return discount.getEndTime().compareTo(Calendar.getInstance()) < 0;
     }
