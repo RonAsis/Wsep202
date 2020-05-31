@@ -152,6 +152,10 @@ public class TradingSystemFacade {
             Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
             //convert to a category we can add to the product
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
+            if (amount<0 || cost<0 ){
+                log.error("add product failed, cost/amount must be greater than 0");
+                return null;
+            }
             Product product = new Product(productName, productCategory, amount, cost, storeId);
             return ownerStore.addNewProduct(user, product)? modelMapper.map(product, ProductDto.class) : null;
         } catch (TradingSystemException e) {
@@ -253,6 +257,10 @@ public class TradingSystemFacade {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
             Store ownerStore = user.getOwnerOrManagerStore(storeId);
+            if (amount<0 || cost<0){
+                log.error("editProduct failed- amount/cost must be greater than 0");
+                return false;
+            }
             return ownerStore.editProduct(user, productSn, productName, category, amount, cost);
         } catch (TradingSystemException e) {
             log.error("editProduct failed", e);

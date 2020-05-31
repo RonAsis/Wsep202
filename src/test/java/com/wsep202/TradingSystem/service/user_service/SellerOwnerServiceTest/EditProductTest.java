@@ -187,4 +187,25 @@ public class EditProductTest {
                 this.storeId + 5, this.productDto.getProductSn(), this.productDto.getName(),
                 this.productDto.getCategory().toLowerCase(), this.productDto.getAmount(), this.productDto.getCost() - 100, this.uuid));
     }
+
+    /**
+     * edit a valid product
+     * negative amount
+     */
+    @Test
+    void EditValidProductNegativeAmount() {
+        Assertions.assertFalse(this.sellerOwnerService.editProduct(this.user.getUserName(),
+                this.storeId, this.productDto.getProductSn(), this.productDto.getName(),
+                this.productDto.getCategory().toLowerCase(), -this.productDto.getAmount(), this.productDto.getCost(), this.uuid));
+    }
+    /**
+     * edit a valid product
+     * negative cost
+     */
+    @Test
+    void EditValidProductNegativeCost() {
+        Assertions.assertFalse(this.sellerOwnerService.editProduct(this.user.getUserName(),
+                this.storeId, this.productDto.getProductSn(), this.productDto.getName(),
+                this.productDto.getCategory().toLowerCase(), this.productDto.getAmount(), -this.productDto.getCost(), this.uuid));
+    }
 }

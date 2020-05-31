@@ -26,8 +26,8 @@ import java.util.UUID;
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
 
-// *********** UC 5.1.1 - viewing the store's purchase history ***********
-public class ViewPurchaseHistoryTest {
+// *********** UC 4.2 (inherited from owner) - adding/ editing the store's discounts ***********
+public class addEditDiscountTest {
     @Autowired
     GuestService guestService;
     @Autowired
@@ -85,48 +85,5 @@ public class ViewPurchaseHistoryTest {
         List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistoryOfManager(
                 this.user.getUserName(), this.storeDto.getStoreId(), this.uuid);
         Assertions.assertNull(returnedHistory);
-    }
-
-    /**
-     * view the history purchase of a valid store
-     * invalid owner
-     */
-    @Test
-    void ViewHistoryNoPurchasesInvalidOwner() {
-        Assertions.assertThrows(Exception.class, ()-> {
-            this.sellerManagerService.viewPurchaseHistoryOfManager(
-                    this.user.getUserName()+"Not", this.storeDto.getStoreId(), this.uuid);
-        });
-    }
-
-    /**
-     * view the history purchase of an invalid store
-     */
-    @Test
-    void ViewHistoryNoPurchasesInvalidStore() {
-        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-                this.user.getUserName(), this.storeDto.getStoreId()+5, this.uuid));
-    }
-
-    /**
-     * view the history purchase of an invalid store
-     * invalid owner
-     */
-    @Test
-    void ViewHistoryNoPurchasesInvalidStoreInvalidOwner() {
-        Assertions.assertThrows(Exception.class, ()-> {
-            this.sellerManagerService.viewPurchaseHistoryOfManager(
-                    this.user.getUserName()+"Not", this.storeDto.getStoreId()+5, this.uuid);
-        });
-    }
-
-    /**
-     * view the history purchase of a valid store
-     */
-    @Test
-    void ViewHistoryPurchases() {
-        this.helper.addProductToShoppingCartAndPurchase(this.user.getUserName(), this.storeDto.getStoreId(), this.productDto.getProductSn(), this.uuid);
-        Assertions.assertNotNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-                this.user.getUserName(), this.storeDto.getStoreId(), this.uuid));
     }
 }
