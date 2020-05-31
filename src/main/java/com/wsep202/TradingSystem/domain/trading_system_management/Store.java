@@ -2,6 +2,8 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.AllPurchaseArgs;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Day;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import lombok.*;
@@ -1017,11 +1019,14 @@ public class Store {
         }
     }
 
-    public Purchase addEditPurchase(UserSystem user, Purchase purchase) {
+    public Purchase addEditPurchase(UserSystem user, Purchase purchase, Set<String> countriesPermitted,
+                                    Set<Day> storeWorkDays, int min, int max, int productId,
+                                    CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies) {
         if (purchase.getPurchaseId() < 0) {
             return addPurchase(user, purchase);
         } else {
-            return editPurchase(user, purchase);
+            return editPurchase(user, purchase, countriesPermitted,storeWorkDays,
+                    min,max,productId,compositeOperator, composedPurchasePolicies);
         }
     }
 
@@ -1036,13 +1041,14 @@ public class Store {
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
-    private Purchase editPurchase(UserSystem user, Purchase purchase) {
+    private Purchase editPurchase(UserSystem user, Purchase purchase, Set<String> countriesPermitted,
+                                  Set<Day> storeWorkDays, int min, int max, int productId,
+                                  CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies) {
         if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
             Optional<Boolean> isEdit = purchasePolicies.stream()
                     .filter(purchaseCur -> purchaseCur.getPurchaseId() == purchase.getPurchaseId())
-                    .findFirst().map(purchaseCur -> purchaseCur.editPurchase(purchase.getCountriesPermitted(),purchase.getStoreWorkDays(),
-                            purchase.getMin(),purchase.getMax(),purchase.getProductId(),purchase.getCompositeOperator(),
-                            purchase.getComposedPurchasePolicies(),purchase.isShoppingBagPurchaseLimit()));
+                    .findFirst().map(purchaseCur -> purchaseCur.edit(countriesPermitted,storeWorkDays,
+                            min,max,productId,compositeOperator, composedPurchasePolicies));
             return isEdit.isPresent() ? purchase : null;
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
