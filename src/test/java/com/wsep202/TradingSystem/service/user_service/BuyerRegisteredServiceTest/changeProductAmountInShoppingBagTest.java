@@ -28,7 +28,8 @@ import java.util.UUID;
 @ContextConfiguration(classes = {TradingSystemConfiguration.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
-// *********** UC 3. - ***********
+
+// *********** UC 2.7.2 (inherited from guest) - editing a product in a shopping bag ***********
 public class changeProductAmountInShoppingBagTest {
     @Autowired
     GuestService guestService;

@@ -20,14 +20,18 @@ public class AdministratorService {
     private final TradingSystemFacade tradingSystemFacade;
 
     /**
-     * View store purchase history
+     * UC 6.4.1 - viewing store's purchase history.
+     *
+     * View store purchase history.
      */
     public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, int storeId, UUID uuid){
         return tradingSystemFacade.viewPurchaseHistory(administratorUsername, storeId, uuid);
     }
 
     /**
-     * View buyer purchase history
+     * UC 6.4.2 - viewing user's purchase history.
+     *
+     * View buyer purchase history.
      */
     public List<ReceiptDto> viewPurchaseHistory(String administratorUsername, String userName, UUID uuid){
         return tradingSystemFacade.viewPurchaseHistory(administratorUsername, userName, uuid);

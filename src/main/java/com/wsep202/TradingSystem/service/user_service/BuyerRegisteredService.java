@@ -23,6 +23,8 @@ public class BuyerRegisteredService {
     private final ObjectMapper objectMapper;
 
     /**
+     * UC 3.1 - logging out from the system.
+     *
      * logout username from the system
      * @param userName user to logout
      * @param uuid
@@ -34,6 +36,8 @@ public class BuyerRegisteredService {
     }
 
     /**
+     * UC 3.2 - opening a store.
+     *
      * open store
      * @param usernameOwner the opener and first owner of store
      * @param storeName
@@ -48,6 +52,8 @@ public class BuyerRegisteredService {
     }
 
     /**
+     * UC 3.7 - viewing personal purchase history.
+     *
      * View buyer purchase history
      * @param userName of the user the history belongs to
      * @param uuid
@@ -58,7 +64,9 @@ public class BuyerRegisteredService {
     }
 
     /**
-     *      * save product in shopping bag
+     * UC 2.6 (inherited from guest) - saving a product in a shopping bag.
+     *
+     * save product in shopping bag
      * @param userName the username of the user which save in his bag
      * @param storeId store belobgs to the bag
      * @param productSn the identifier of the product
@@ -75,6 +83,8 @@ public class BuyerRegisteredService {
     }
 
     /**
+     * UC 2.7.1 (inherited from guest) - watching the shopping cart.
+     *
      * view product in shopping bag
      * @param userName the user the bag belongs to
      * @param uuid
@@ -85,7 +95,9 @@ public class BuyerRegisteredService {
     }
 
     /**
-     *      * remove product in shopping bag (edit)
+     * UC 2.7.2 (inherited from guest) - removing a product from shopping bag.
+     *
+     * remove product in shopping bag (edit)
      * @param userName the user which edit
      * @param storeId the store belongs to the product
      * @param productSn identifier of product
@@ -100,6 +112,8 @@ public class BuyerRegisteredService {
     }
 
     /**
+     * UC 2.8 (inherited from guest) - purchasing shopping cart.
+     *
      * purchase shopping cart
      * @param userName user that purchase
      * @param uuid
@@ -112,8 +126,31 @@ public class BuyerRegisteredService {
                 purchaseRegisterBuyerDto.getPaymentDetailsDto(), purchaseRegisterBuyerDto.getBillingAddressDto(),  uuid);
     }
 
+    /**
+     * UC 2.6 (inherited from guest) - saving a product in a shopping bag.
+     *
+     * @param username - the user who wants to add the product to his shopping cart
+     * @param amount - the new amount of the product in the shopping bag
+     * @param productDto - the product which needs to be added to the shopping cart
+     * @param uuid - the uuid of the user
+     * @return
+     */
     public boolean addProductToShoppingCart(String username, int amount, ProductDto productDto, UUID uuid) {
         return tradingSystemFacade.addProductToShoppingCart(username, amount, productDto, uuid);
+    }
+
+    /**
+     * UC 2.7.2 (inherited from guest) - editing a product in a shopping bag.
+     *
+     * @param username - the user who's shopping bag needs to be edited
+     * @param storeId - the store to which the product belongs to
+     * @param amount - the new amount of the product in the shopping bag
+     * @param productSn - the product which amount is to be changed
+     * @param uuid - the uuid of the user
+     * @return true if the change happened successfully
+     */
+    public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
+        return tradingSystemFacade.changeProductAmountInShoppingBag(username, storeId, amount, productSn, uuid);
     }
 
     public List<ProductShoppingCartDto> getShoppingCart(String username, UUID uuid) {
@@ -124,7 +161,4 @@ public class BuyerRegisteredService {
         return tradingSystemFacade.getTotalPriceOfShoppingCart(username, uuid);
     }
 
-    public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
-        return tradingSystemFacade.changeProductAmountInShoppingBag(username, storeId, amount, productSn, uuid);
-    }
 }

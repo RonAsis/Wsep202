@@ -28,7 +28,8 @@ import java.util.UUID;
 @ContextConfiguration(classes = {TradingSystemConfiguration.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
-// *********** UC - ***********
+
+// *********** UC 2.7.1 (inherited from guest) - watching the shopping cart ***********
 public class WatchShoppingCartTest {
     @Autowired
     GuestService guestService;
@@ -67,8 +68,9 @@ public class WatchShoppingCartTest {
     @Test
     void addValidProductRegisteredUser() {
         Pair<StoreDto, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAndAddProduct();
-        Assertions.assertTrue(this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
-                1, returnedValue.getValue(), this.uuid));
+        this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
+                1, returnedValue.getValue(), this.uuid);
+        Assertions.assertNotNull(this.buyerRegisteredService.watchShoppingCart(this.user.getUserName(), this.uuid));
     }
 
     /**
