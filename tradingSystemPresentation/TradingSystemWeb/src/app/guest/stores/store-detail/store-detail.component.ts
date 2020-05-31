@@ -44,7 +44,7 @@ export class StoreDetailComponent implements OnInit, AfterViewInit{
         .subscribe((response: string[]) => {
           console.log(response);
           if (response !== null && response !== undefined){
-            this.managerWithPermissionEdit = response.includes('edit');
+            this.managerWithPermissionEdit = response.filter(permission => permission.startsWith('edit')).length > 0;
             this.managerWithPermissionView = response.includes('view');
           }
         });

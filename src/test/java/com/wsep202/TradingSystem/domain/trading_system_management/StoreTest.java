@@ -404,9 +404,9 @@ class StoreTest {
             //mock
             managerStore = mock(MangerStore.class);
             when(managerStore.getAppointedManager()).thenReturn(managerUser);
-            when(managerStore.addStorePermission(StorePermission.EDIT)).thenReturn(true);
+            when(managerStore.addStorePermission(StorePermission.EDIT_PRODUCT)).thenReturn(true);
             //success: permission added to manager
-            Assertions.assertTrue(storeUT.addPermissionToManager(owner, managerUser, StorePermission.EDIT));
+            Assertions.assertTrue(storeUT.addPermissionToManager(owner, managerUser, StorePermission.EDIT_PRODUCT));
         }
 
         /**
@@ -418,9 +418,9 @@ class StoreTest {
             //mock
             managerStore = mock(MangerStore.class);
             when(managerStore.getAppointedManager()).thenReturn(managerUser);
-            when(managerStore.addStorePermission(StorePermission.EDIT)).thenReturn(true);
+            when(managerStore.addStorePermission(StorePermission.EDIT_PRODUCT)).thenReturn(true);
             //fail: permission is not added to manager
-            Assertions.assertFalse(storeUT.addPermissionToManager(fakeOwner, managerUser, StorePermission.EDIT));
+            Assertions.assertFalse(storeUT.addPermissionToManager(fakeOwner, managerUser, StorePermission.EDIT_PRODUCT));
         }
 
         /**
@@ -1162,7 +1162,7 @@ class StoreTest {
         void addPermissionToManagerPositive() {
             addManagerSetup();  //add a manager to the store
             //success: permission added to manager
-            Assertions.assertTrue(storeUT.addPermissionToManager(ownerRealUser, managerUser, StorePermission.EDIT));
+            Assertions.assertTrue(storeUT.addPermissionToManager(ownerRealUser, managerUser, StorePermission.EDIT_PRODUCT));
         }
 
         /**
@@ -1172,7 +1172,7 @@ class StoreTest {
         void notOwnerAddPermissionToManagerNegative() {
             addManagerSetup();  //add a manager to the store
             //fail: permission is not added to manager
-            Assertions.assertFalse(storeUT.addPermissionToManager(fakeOwnerReal, managerUser, StorePermission.EDIT));
+            Assertions.assertFalse(storeUT.addPermissionToManager(fakeOwnerReal, managerUser, StorePermission.EDIT_PRODUCT));
         }
 
         /**
