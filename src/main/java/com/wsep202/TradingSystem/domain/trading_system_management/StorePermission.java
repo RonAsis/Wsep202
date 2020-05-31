@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
 public enum StorePermission {
 
     VIEW("view"),
-    EDIT("edit");
+    EDIT_PRODUCT("edit product"),
+    EDIT_DISCOUNT("edit discount"),
+    EDIT_PURCHASE_POLICY("edit purchase policy");
 
     public final String function;
 

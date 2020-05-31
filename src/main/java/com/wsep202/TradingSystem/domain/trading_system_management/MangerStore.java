@@ -78,9 +78,23 @@ public class MangerStore {
 
     public boolean canEdit() {
         return storePermissions.stream()
-                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT));
+                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_PRODUCT));
     }
 
+    public boolean canEditProduct() {
+        return storePermissions.stream()
+                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_PRODUCT));
+    }
+
+    public boolean canEditDiscount() {
+        return storePermissions.stream()
+                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_DISCOUNT));
+    }
+
+    public boolean canEditPurchasePolicy() {
+        return storePermissions.stream()
+                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_PURCHASE_POLICY));
+    }
     public boolean removeManagedStore(Store storeToRemove){
       return appointedManager.removeOwnedStore(storeToRemove);
     }
