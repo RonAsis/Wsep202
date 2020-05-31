@@ -2,23 +2,31 @@ package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
+import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.Calendar;
 import java.util.Map;
 
 /**
  * The discount policy defines the discount interface
  */
+@Data
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class DiscountPolicy {
 
+    /**
+     * saves the last discountPolicySnAcc when a new product is created
+     */
+    private static int discountPolicySnAcc = 1;
+
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private int id;
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Min(value = 1, message = "Must be greater than or equal zero")
+    private int id = generateDiscountPolicySn();
+  
     /**
      * apply discounts according to the type of the executing discount
      */
@@ -79,5 +87,9 @@ public abstract class DiscountPolicy {
     public boolean isProductHaveDiscount(Map<Product, Integer> amountOfProductsForApplyDiscounts, Product product) {
         return amountOfProductsForApplyDiscounts.keySet().stream()
                 .anyMatch(integer -> product.getProductSn() == integer.getProductSn());
+    }
+
+    private int generateDiscountPolicySn(){
+        return discountPolicySnAcc++;
     }
 }

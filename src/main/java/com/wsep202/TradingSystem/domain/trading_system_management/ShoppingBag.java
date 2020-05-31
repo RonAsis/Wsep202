@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,26 +21,38 @@ import java.util.Map;
 @Entity
 public class ShoppingBag {
 
+    /**
+     * saves the last shoppingBagSnAcc when a new product is created
+     */
+    private static int shoppingBagSnAcc = 1;
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Min(value = 1, message = "Must be greater than or equal zero")
     private int id;
 
     /**
      * the store of the products
      */
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Store storeOfProduct;
     /**
      * list of all of the products and the amount of each product
      */
     @ElementCollection
-    @JoinTable()
+    @JoinTable
     private Map<Product, Integer> productListFromStore;
 
 
     public ShoppingBag(Store storeOfProduct){
+        id = generateShoppingBagSn();
         this.storeOfProduct = storeOfProduct;
         productListFromStore = new HashMap<>();
+    }
+
+
+    private int generateShoppingBagSn(){
+        return shoppingBagSnAcc++;
     }
 
     /**

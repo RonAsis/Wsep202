@@ -193,9 +193,9 @@ class StoreTest {
          */
         @Test
         void addNewProductPositive() {
-            Assertions.assertEquals(0, storeUT.products.size());     //verify there are no products in store
+            Assertions.assertEquals(0, storeUT.getProducts().size());     //verify there are no products in store
             Assertions.assertTrue(storeUT.addNewProduct(owner, product));    //success: the product added by the owner
-            Assertions.assertEquals(1, storeUT.products.size());     //verify amount of products in list increased
+            Assertions.assertEquals(1, storeUT.getProducts().size());     //verify amount of products in list increased
         }
 
         /**
@@ -203,12 +203,12 @@ class StoreTest {
          */
         @Test
         void addNewProductNegative() {
-            Assertions.assertEquals(0, storeUT.products.size());     //verify there are no products in store
+            Assertions.assertEquals(0, storeUT.getProducts().size());     //verify there are no products in store
             UserSystem fakeOwner = mock(UserSystem.class);
             when(fakeOwner.getUserName()).thenReturn("Donald");
             //fail: user which is no owner cannot add product to store
             Assertions.assertFalse(storeUT.addNewProduct(fakeOwner, product));
-            Assertions.assertEquals(0, storeUT.products.size());     //verify there are no products in store
+            Assertions.assertEquals(0, storeUT.getProducts().size());     //verify there are no products in store
         }
 
         /**
@@ -218,11 +218,11 @@ class StoreTest {
         void removeExistsProductFromStorePositive() {
             //setup for remove product
             addNewProductSetUp();  //add product to the store
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we starts with no products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we starts with no products in store
             //add a product to the store which will be removed for the test
             when(product.getProductSn()).thenReturn(12);    // let product SN to for the check which one to remove
             Assertions.assertTrue(storeUT.removeProductFromStore(owner, 12));    //success: product is removed
-            Assertions.assertEquals(0, storeUT.products.size()); //verify we decreased no. of products in store
+            Assertions.assertEquals(0, storeUT.getProducts().size()); //verify we decreased no. of products in store
         }
 
         /**
@@ -232,11 +232,11 @@ class StoreTest {
         void removeNotExistsProductFromStoreNegative() {
             //setup for remove product
             addNewProductSetUp();  //add product to the store
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we starts with no products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we starts with no products in store
             //add a product to the store which will be removed for the test
             when(product.getProductSn()).thenReturn(12);    // let product SN to for the check which one to remove
             Assertions.assertFalse(storeUT.removeProductFromStore(owner, 4));    //fail: product not exist is not removed
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we decreased no. of products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we decreased no. of products in store
         }
 
         /**
@@ -247,12 +247,12 @@ class StoreTest {
             UserSystem notOwner = mock(UserSystem.class);   //not an owner
             //setup for remove product. add a product to the store which will be removed for the test
             addNewProductSetUp();  //add product to the store
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we starts with no products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we starts with no products in store
             //stubs
             when(notOwner.getUserName()).thenReturn("Philip");
             when(product.getProductSn()).thenReturn(12);    // let product SN to for the check which one to remove
             Assertions.assertFalse(storeUT.removeProductFromStore(notOwner, 12));    //fail: not owner cannot remove product
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we decreased no. of products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we decreased no. of products in store
         }
 
         /**
@@ -962,9 +962,9 @@ class StoreTest {
          */
         @Test
         void addNewProductPositive() {
-            Assertions.assertEquals(0, storeUT.products.size());     //verify there are no products in store
+            Assertions.assertEquals(0, storeUT.getProducts().size());     //verify there are no products in store
             Assertions.assertTrue(storeUT.addNewProduct(ownerRealUser, product));    //success: the product added by the owner
-            Assertions.assertEquals(1, storeUT.products.size());     //verify amount of products in list increased
+            Assertions.assertEquals(1, storeUT.getProducts().size());     //verify amount of products in list increased
         }
 
         /**
@@ -972,10 +972,10 @@ class StoreTest {
          */
         @Test
         void addNewProductNegative() {
-            Assertions.assertEquals(0, storeUT.products.size());     //verify there are no products in store
+            Assertions.assertEquals(0, storeUT.getProducts().size());     //verify there are no products in store
             //fail: user which is no owner cannot add product to store
             Assertions.assertFalse(storeUT.addNewProduct(fakeOwnerReal, product));
-            Assertions.assertEquals(0, storeUT.products.size());     //verify there are no products in store
+            Assertions.assertEquals(0, storeUT.getProducts().size());     //verify there are no products in store
         }
 
         /**
@@ -985,10 +985,10 @@ class StoreTest {
         void removeExistsProductFromStorePositive() {
             //setup for remove product
             addNewProductSetUp();  //add product to the store
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we starts with no products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we starts with no products in store
             //success: remove product from store
             Assertions.assertTrue(storeUT.removeProductFromStore(ownerRealUser, product.getProductSn()));    //success: product is removed
-            Assertions.assertEquals(0, storeUT.products.size()); //verify we decreased no. of products in store
+            Assertions.assertEquals(0, storeUT.getProducts().size()); //verify we decreased no. of products in store
         }
 
         /**
@@ -998,11 +998,11 @@ class StoreTest {
         void removeNotExistsProductFromStoreNegative() {
             //setup for remove product
             addNewProductSetUp();  //add product to the store
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we starts with no products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we starts with no products in store
             //add a product to the store which will be removed for the test
             //fail: cant remove product which is not exist
             Assertions.assertFalse(storeUT.removeProductFromStore(ownerRealUser, 122));    //fail: product not exist is not removed
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we decreased no. of products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we decreased no. of products in store
         }
 
         /**
@@ -1012,10 +1012,10 @@ class StoreTest {
         void notOwnerRemoveExistsProductFromStoreNegative() {
             //setup for remove product. add a product to the store which will be removed for the test
             addNewProductSetUp();  //add product to the store
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we starts with no products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we starts with no products in store
             //fail: only owner can remove products from his store
             Assertions.assertFalse(storeUT.removeProductFromStore(fakeOwnerReal, product.getProductSn()));    //fail: not owner cannot remove product
-            Assertions.assertEquals(1, storeUT.products.size()); //verify we decreased no. of products in store
+            Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we decreased no. of products in store
         }
 
         /**

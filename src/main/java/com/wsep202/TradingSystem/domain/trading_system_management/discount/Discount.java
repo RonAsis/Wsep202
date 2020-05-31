@@ -9,6 +9,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,8 +24,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Entity
 public class Discount {
 
+
+    /**
+     * saves the last discountSnAcc when a new product is created
+     */
+    private static int discountSnAcc = 1;
+
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Min(value = 1, message = "Must be greater than or equal zero")
     protected int discountId;
 
     /**
@@ -47,7 +55,7 @@ public class Discount {
     /**
      * types of discounts in the store
      */
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private DiscountPolicy discountPolicy;
 
     @Enumerated(EnumType.STRING)
@@ -58,12 +66,17 @@ public class Discount {
                     String description,
                     DiscountPolicy discountPolicy,
                     DiscountType discountType) {
+        discountId = generateDiscountSn();
         this.discountPercentage = discountPercentage;
         this.endTime = endTime;
         this.description = description;
         this.isApplied = false;
         this.discountPolicy = discountPolicy;
         this.discountType = discountType;
+    }
+
+    private int generateDiscountSn(){
+        return discountSnAcc++;
     }
 
     /**
