@@ -5,7 +5,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Publisher;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
 import com.wsep202.TradingSystem.service.ServiceFacade;
-import com.wsep202.TradingSystem.service.user_service.NotificationService;
+import com.wsep202.TradingSystem.service.user_service.NotificationServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -45,7 +45,7 @@ public class TradingSystemConfiguration {
     }
 
     @Bean
-    public ServiceFacade serviceFacade(@Lazy NotificationService notificationService){
+    public ServiceFacade serviceFacade(@Lazy NotificationServiceImpl notificationService){
         return new ServiceFacade(notificationService);
     }
 

@@ -72,7 +72,7 @@ class MangerStoreTest {
         @Test
         void addStorePermissionPositive() {
             int amountPerms = mangerStore.getStorePermissions().size();
-            Assertions.assertTrue(mangerStore.addStorePermission(StorePermission.EDIT));
+            Assertions.assertTrue(mangerStore.addStorePermission(StorePermission.EDIT_PRODUCT));
             Assertions.assertTrue(mangerStore.getStorePermissions().size()>amountPerms);
         }
 
@@ -103,7 +103,7 @@ class MangerStoreTest {
         @Test
         void removeStorePermissionNegative() {
             int amountPerms = mangerStore.getStorePermissions().size();
-            Assertions.assertFalse(mangerStore.removeStorePermission(StorePermission.EDIT));
+            Assertions.assertFalse(mangerStore.removeStorePermission(StorePermission.EDIT_PRODUCT));
             Assertions.assertFalse(mangerStore.getStorePermissions().size()<amountPerms);
 
         }
@@ -162,7 +162,7 @@ class MangerStoreTest {
         @Test
         void addStorePermissionPositive() {
             int amountPerms = mangerStore.getStorePermissions().size();
-            Assertions.assertTrue(mangerStore.addStorePermission(StorePermission.EDIT));
+            Assertions.assertTrue(mangerStore.addStorePermission(StorePermission.EDIT_PRODUCT));
             Assertions.assertTrue(mangerStore.getStorePermissions().size()>amountPerms);
         }
 
@@ -193,7 +193,7 @@ class MangerStoreTest {
         @Test
         void removeStorePermissionNegative() {
             int amountPerms = mangerStore.getStorePermissions().size();
-            Assertions.assertFalse(mangerStore.removeStorePermission(StorePermission.EDIT));
+            Assertions.assertFalse(mangerStore.removeStorePermission(StorePermission.EDIT_PRODUCT));
             Assertions.assertFalse(mangerStore.getStorePermissions().size()<amountPerms);
 
         }

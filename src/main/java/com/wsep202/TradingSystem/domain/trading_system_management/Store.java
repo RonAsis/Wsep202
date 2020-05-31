@@ -424,7 +424,7 @@ public class Store {
      * @return true for success
      */
     public boolean addNewProduct(UserSystem user, Product product) {
-        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+        if (isOwner(user) || managerCanEditProduct(user.getUserName())) {  //verify the user is owner of the store
             products.add(product);
             log.info("The product: " + product.getName() + " added to the store: " + this.storeName);
             return true;
@@ -447,7 +447,7 @@ public class Store {
      */
     public boolean editProduct(UserSystem user, int productSn, String productName, String category,
                                int amount, double cost) {
-        if (isOwner(user) || managerCanEdit(user.getUserName())) {   //the user is owner
+        if (isOwner(user) || managerCanEditProduct(user.getUserName())) {   //the user is owner
 
             Optional<Product> optionalProduct = products.stream().
                     filter(product -> product.getProductSn() == productSn).findFirst();
@@ -470,7 +470,7 @@ public class Store {
 
 
     public boolean removeProductFromStore(UserSystem user, int productSn) {
-        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //only owner can remove products from its store
+        if (isOwner(user) || managerCanEditProduct(user.getUserName())) {  //only owner can remove products from its store
             Set<Product> duplicate = new HashSet<>(products);
             duplicate.stream()
                     .filter(product -> product.getProductSn()==productSn)
@@ -898,7 +898,7 @@ public class Store {
     }
 
     public boolean removeDiscount(UserSystem userSystem, int discountId) {
-        if (isOwner(userSystem) || isManager(userSystem)) {
+        if (isOwner(userSystem) || managerCanEditDiscount(userSystem.getUserName())) {
             Discount discount = discounts.stream()
                     .filter(discountPolicy -> discountPolicy.getDiscountId() == discountId)
                     .findFirst().orElseThrow(() -> new TradingSystemException(String.format("the discount %d don't exist on store %d", discountId, storeId)));
@@ -970,13 +970,28 @@ public class Store {
 
     }
 
+    public boolean managerCanEditProduct(String userName) {
+        return managers.stream()
+                .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.canEditProduct());
+    }
+
+    public boolean managerCanEditDiscount(String userName) {
+        return managers.stream()
+                .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.canEditDiscount());
+    }
+
+    public boolean managerCanEditPurchasePolicy(String userName) {
+        return managers.stream()
+                .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.canEditPurchasePolicy());
+    }
+
     /**
      * get the discounts in store
      * @param user
      * @return
      */
     public List<Discount> getStoreDiscounts(UserSystem user) {
-        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+        if (isOwner(user) || managerCanEditDiscount(user.getUserName())) {  //verify the user is owner of the store
             return discounts;
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
@@ -989,7 +1004,7 @@ public class Store {
      * @return
      */
     public Discount addDiscount(UserSystem user, Discount discount) {
-        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+        if (isOwner(user) || managerCanEditDiscount(user.getUserName())) {  //verify the user is owner of the store
             //discount.setNewId();  //generate new ID for the new discount
             discounts.add(discount);
             return discount;
@@ -1004,7 +1019,7 @@ public class Store {
      * @return
      */
     public Purchase addPurchase(UserSystem user, Purchase purchase) {
-        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+        if (isOwner(user) || managerCanEditPurchasePolicy(user.getUserName())) {  //verify the user is owner of the store
             //purchase.setNewId();  //generate new ID for the new discount
             purchasePolicies.add(purchase);
             return purchase;
@@ -1043,7 +1058,7 @@ public class Store {
     }
 
     private Discount editDiscount(UserSystem user, Discount discount) {
-        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
+        if (isOwner(user) || managerCanEditDiscount(user.getUserName())) {  //verify the user is owner of the store
             Optional<Boolean> isEdit = discounts.stream()
                     .filter(discountCur -> discountCur.getDiscountId() == discount.getDiscountId())
                     .findFirst().map(discountCur -> discountCur.editDiscount(discount.getDiscountPercentage(),
@@ -1053,16 +1068,16 @@ public class Store {
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
-    private Purchase editPurchase(UserSystem user, Purchase purchase, Set<String> countriesPermitted,
+    private Purchase editPurchase(UserSystem user, Purchase purchase,  Set<String> countriesPermitted,
                                   Set<Day> storeWorkDays, int min, int max, int productId,
                                   CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies) {
-        if (isOwner(user) || managerCanEdit(user.getUserName())) {  //verify the user is owner of the store
-            Optional<Boolean> isEdit = purchasePolicies.stream()
-                    .filter(purchaseCur -> purchaseCur.getPurchaseId() == purchase.getPurchaseId())
-                    .findFirst().map(purchaseCur -> purchaseCur.edit(countriesPermitted,storeWorkDays,
-                            min,max,productId,compositeOperator, composedPurchasePolicies));
-            return isEdit.isPresent() ? purchase : null;
-        }
+//        if (isOwner(user) || managerCanEditPurchasePolicy(user.getUserName())) {  //verify the user is owner of the store
+//            Optional<Boolean> isEdit = purchasePolicies.stream()
+//                    .filter(purchaseCur -> purchaseCur.getPurchaseId() == purchase.getPurchaseId())
+//                    .findFirst().map(purchaseCur -> purchaseCur.edit(countriesPermitted,storeWorkDays,
+//                            min,max,productId,compositeOperator, composedPurchasePolicies));
+//            return isEdit.isPresent() ? purchase : null;
+//        }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 

@@ -51,19 +51,19 @@ public class UserSystem implements Observer {
      * The stores that the user manages
      */
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Store> managedStores = new HashSet<>();
     /**
      * The stores that the user own
      */
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Store> ownedStores = new HashSet<>();
     /**
      * The user personal shopping cart
      */
     @Builder.Default
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
     private ShoppingCart shoppingCart = new ShoppingCart();
     /**
      * Show the stage of the user, logged-in or logged-out
@@ -81,7 +81,7 @@ public class UserSystem implements Observer {
      * for notification
      */
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new LinkedList<>();
 
     //need ignore in Db;
