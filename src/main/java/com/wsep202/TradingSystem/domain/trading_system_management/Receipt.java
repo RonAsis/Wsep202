@@ -18,8 +18,14 @@ import java.util.*;
 @Entity
 public class Receipt {
 
+    /**
+     * saves the last receiptSnAcc when a new receipt is created
+     */
+    private static int receiptSnAcc = 1;
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Min(value = 1, message = "Must be greater than or equal zero")
     private int receiptSn;
 
     /**
@@ -61,10 +67,15 @@ public class Receipt {
      * @param products - the products that the buyer bought.
      */
     public Receipt(int storeId, String userName, double amountToPay, Map<Product, Integer> products){
+        receiptSn = generateReceiptSn();
         purchaseDate = new Date(); // sets the current date
         this.storeId = storeId;
         this.userName = userName;
         this.amountToPay = amountToPay;
         this.productsBought = products;
+    }
+
+    private int generateReceiptSn(){
+        return receiptSnAcc++;
     }
 }

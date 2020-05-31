@@ -10,6 +10,8 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,9 +24,14 @@ import java.util.Set;
 @Entity
 public class Purchase {
 
-    protected static int purchaseIdAcc = 0;
+    protected static int purchaseIdAcc = 1;
+    /**
+     * saves the last purchaseSnAcc when a new product is created
+     */
+
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Min(value = 1, message = "Must be greater than or equal zero")
     protected int purchaseId;
 
     /**
@@ -33,13 +40,18 @@ public class Purchase {
     @OneToOne(cascade = CascadeType.ALL)
     private PurchasePolicy purchasePolicy;
 
+
     private PurchaseType purchaseType;
 
     public Purchase(PurchasePolicy purchasePolicy,
                     PurchaseType purchaseType) {
         this.purchasePolicy = purchasePolicy;
         this.purchaseType = purchaseType;
-        purchaseId = getPurchaseIdAcc();
+        purchaseId = generatePurchaseSn();
+    }
+
+    private int generatePurchaseSn(){
+        return purchaseIdAcc++;
     }
 
     /**
@@ -86,9 +98,6 @@ public class Purchase {
 
     }
 
-    private int getPurchaseIdAcc(){
-        return purchaseIdAcc++;
-    }
 
     /////////////////////////////////////is-methods/////////////////////////////////////////
 
