@@ -60,7 +60,7 @@ public class PurchaseShoppingCartGuestTest {
     @Test
     void purchaseEmptyShoppingCart() {
         this.shoppingCartDto = new ShoppingCartDto();
-        PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, this.billingAddressDto);
+      //  PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, this.billingAddressDto);
         //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
         //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
     }
@@ -71,7 +71,7 @@ public class PurchaseShoppingCartGuestTest {
     @Test
     void purchaseShoppingCartNullPaymentDetails() {
         this.shoppingCartDto = new ShoppingCartDto();
-        PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, null, this.billingAddressDto);
+     //   PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, null, this.billingAddressDto);
         //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
         //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
 
@@ -83,7 +83,7 @@ public class PurchaseShoppingCartGuestTest {
     @Test
     void purchaseShoppingCartNullBillingAddress() {
         this.shoppingCartDto = new ShoppingCartDto();
-        PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, null);
+       // PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, null);
         //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
         //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
 
@@ -94,7 +94,7 @@ public class PurchaseShoppingCartGuestTest {
     @Test
     void purchaseShoppingCartInvalidPaymentDetails() {
         this.shoppingCartDto = new ShoppingCartDto();
-        PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.invalidPaymentDetailsDto, this.billingAddressDto);
+      //  PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.invalidPaymentDetailsDto, this.billingAddressDto);
         //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
         //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
 
@@ -106,7 +106,7 @@ public class PurchaseShoppingCartGuestTest {
     @Test
     void purchaseShoppingCartInvalidBillingAddress() {
         this.shoppingCartDto = new ShoppingCartDto();
-        PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, this.invalidBillingAddressDto);
+       // PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, this.invalidBillingAddressDto);
         //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
         //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
 
