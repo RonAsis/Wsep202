@@ -43,7 +43,7 @@ public class ConditionalProductDiscount extends DiscountPolicy {
                         double discountCost = calculateDiscount(discount.getDiscountPercentage(), amountProductInAmountOfProductsForApplyDiscounts,
                                 amount, product.getOriginalCost());
                         product.setCost(product.getCost() - discountCost);    //update the price by discountCost
-                        if (product.getCost() <= 0) {
+                        if (product.getCost() < 0) {
                             throw new IllegalProductPriceException(discount.getDiscountId()); //if the inserted percentage is not reasonable
                         }
                     }
