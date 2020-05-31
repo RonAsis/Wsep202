@@ -24,7 +24,7 @@ public interface StoreRepository extends JpaRepository<Store, String> {
 
     List<Store> findAll();
 
-    Store save(Store userSystem);
+    Store save(Store store);
     Store findByStoreId(int storeId);
 
 }

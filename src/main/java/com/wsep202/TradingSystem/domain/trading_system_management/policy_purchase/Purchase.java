@@ -10,6 +10,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,14 @@ import java.util.Set;
 @Entity
 public class Purchase {
 
+    /**
+     * saves the last purchaseSnAcc when a new product is created
+     */
+    private static int purchaseSnAcc = 1;
+
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Min(value = 1, message = "Must be greater than or equal zero")
     protected int purchaseId;
 
     /**
@@ -58,7 +65,7 @@ public class Purchase {
      * children components of the composite Purchase policy
      * the operands of the composed Purchase policy
      */
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Purchase> composedPurchasePolicies;
     /**
      * the types of purchase exist in the store
@@ -78,6 +85,7 @@ public class Purchase {
                     CompositeOperator compositeOperator,
                     List<Purchase> composedPurchasePolicies,
                     boolean isShoppingBagPurchaseLimit) {
+        purchaseId = generatePurchaseSn();
         this.countriesPermitted = countriesPermitted;
         this.storeWorkDays = storeWorkDays;
         this.min = min;
@@ -87,6 +95,10 @@ public class Purchase {
         this.composedPurchasePolicies = composedPurchasePolicies;
         this.isShoppingBagPurchaseLimit = isShoppingBagPurchaseLimit;
         initPurchasePolicies();
+    }
+
+    private int generatePurchaseSn(){
+        return purchaseSnAcc++;
     }
 
     /**

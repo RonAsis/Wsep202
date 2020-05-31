@@ -868,7 +868,7 @@ class TradingSystemTest {
             Set<UserSystem> owners = new HashSet<>();
             owners.add(userSystem1);
             when(store.getOwners()).thenReturn(owners);
-            doNothing().when(tradingSystemDao).addStore(store);
+            doNothing().when(tradingSystemDao).addStore(store,userSystem1);
             when(store.getStoreName()).thenReturn("castro");
             when(userSystem.addNewOwnedStore(any())).thenReturn(true);
         }

@@ -4,6 +4,7 @@ import com.wsep202.TradingSystem.domain.exception.NotAdministratorException;
 import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import javafx.util.Pair;
+import org.apache.catalina.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
@@ -116,7 +117,7 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
     }
 
     @Override
-    public void addStore(Store newStore) {
+    public void addStore(Store newStore, UserSystem userSystem) {
         this.stores.add(newStore);
     }
 
