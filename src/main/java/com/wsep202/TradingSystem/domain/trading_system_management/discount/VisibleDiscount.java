@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management.discount;
  * products under discount with no condition
  */
 
+import com.wsep202.TradingSystem.domain.exception.IllegalPercentageException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,9 @@ public class VisibleDiscount extends DiscountPolicy {
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
         if (!isExpired(discount)) {
+            if(discount.getDiscountPercentage()<0){
+                throw new IllegalPercentageException(discount.getDiscountId(),discount.getDiscountPercentage());
+            }
             products.keySet().forEach(product -> {
                 if (isProductHaveDiscount(amountOfProductsForApplyDiscounts, product)) {
                     double discountCost = (discount.getDiscountPercentage() / 100) * product.getOriginalCost();

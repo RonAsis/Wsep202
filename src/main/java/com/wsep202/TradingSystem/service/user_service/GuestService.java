@@ -18,19 +18,13 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class GuestService {
+public class GuestService { //notice: most of the UCs related to the guest cart implemented at the client.
 
     private final TradingSystemFacade tradingSystemFacade;
 
     private final ObjectMapper objectMapper;
     /**
-     * register user to the system
-     * @param username user to register - unique
-     * @param password
-     * @param firstName
-     * @param lastName
-     * @param image
-     * @return
+     * Guest registration - UC 2.2
      */
     public boolean registerUser(String username,
                                 String password,
@@ -41,10 +35,7 @@ public class GuestService {
     }
 
     /**
-     * login user to the system
-     * @param username
-     * @param password
-     * @return
+     * Guest login - UC 2.3
      */
     public Pair<UUID, Boolean> login(String username,
                                      String password){
@@ -52,20 +43,24 @@ public class GuestService {
     }
 
     /**
-     *purchase shopping cart
-     * @return
-     * @param purchaseJsonNode
+     * Guest purchase products - UC 2.8
      */
     public List<ReceiptDto> purchaseShoppingCartGuest(String purchaseJsonNode){
         PurchaseDto purchaseDto = createPurchaseDto(purchaseJsonNode);
         return tradingSystemFacade.purchaseShoppingCart(purchaseDto.getShoppingCartDto(),
                 purchaseDto.getPaymentDetailsDto(), purchaseDto.getBillingAddressDto());
     }
-
+    //UC 2.4
+    /**
+     * Guest watch on stores - UC 2.4.1
+     */
     public List<StoreDto> getStores() {
         return tradingSystemFacade.getStores();
     }
 
+    /**
+     * Guest watch on products - UC 2.4.2
+     */
     public List<ProductDto> getProducts() {
         return tradingSystemFacade.getProducts();
     }
@@ -75,7 +70,7 @@ public class GuestService {
     }
 
     public Pair<Double, Double> getTotalPriceOfShoppingCart(String shoppingCart) {
-       return tradingSystemFacade.getTotalPriceOfShoppingCart(createShoppingCartDto(shoppingCart));
+        return tradingSystemFacade.getTotalPriceOfShoppingCart(createShoppingCartDto(shoppingCart));
     }
 
     private ShoppingCartDto createShoppingCartDto(String shoppingCart){
