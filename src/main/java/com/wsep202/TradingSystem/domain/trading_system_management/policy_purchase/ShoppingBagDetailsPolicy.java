@@ -45,7 +45,7 @@ public class ShoppingBagDetailsPolicy extends PurchasePolicy {
      * @return
      */
     private boolean isStandsInTerms(int amount,int min,int max) {
-        return amount >= min && amount <= max;
+        return amount >= min && amount <= max && min>=0 && max>0;
     }
 
     /**

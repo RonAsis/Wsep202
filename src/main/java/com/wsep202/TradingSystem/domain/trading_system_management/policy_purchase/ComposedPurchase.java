@@ -6,6 +6,8 @@ import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Billi
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.CascadeType;
 import javax.persistence.EnumType;
@@ -13,6 +15,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.OneToMany;
 import java.util.*;
 
+@Getter
+@Setter
 @AllArgsConstructor
 public class ComposedPurchase extends PurchasePolicy{
 
