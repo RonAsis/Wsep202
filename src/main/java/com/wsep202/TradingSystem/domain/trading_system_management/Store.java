@@ -2,7 +2,6 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
-import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.AllPurchaseArgs;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Day;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;

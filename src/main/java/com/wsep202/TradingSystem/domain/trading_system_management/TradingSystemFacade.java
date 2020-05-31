@@ -209,11 +209,23 @@ public class TradingSystemFacade {
      * @param uuid - users UUID
      * @return true if success, else false
      */
-    public PurchaseDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
+    public PurchasePolicyDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId);
         Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);
-        return modelMapper.map(store.addEditPurchase(user, purchase), PurchaseDto.class);
+        return modelMapper.map(store.addEditPurchase(user, purchase, purchaseDto.getCountriesPermitted(),
+                purchaseDto.getStoreWorkDays(),purchaseDto.getMin(),purchaseDto.getMax(),
+                purchaseDto.getProductId(),purchaseDto.getCompositeOperator(),
+                convert(purchaseDto.getComposedPurchasePolicies())), PurchasePolicyDto.class);
+    }
+
+    private List<Purchase> convert(List<PurchasePolicyDto> list){
+        List<Purchase> purchases = new LinkedList<>();
+        for (PurchasePolicyDto ppd: list) {
+            Purchase purchase = new Purchase(ppd.getPurchasePolicy(),ppd.getPurchaseType());
+            purchases.add(purchase);
+        }
+        return purchases;
     }
 
     public List<String> getCompositeOperators(String username, int storeId, UUID uuid) {
