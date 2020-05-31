@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
+import com.wsep202.TradingSystem.domain.exception.CompositeOperatorNullException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -39,14 +40,16 @@ public class ComposedDiscount extends DiscountPolicy {
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
-        if (!amountOfProductsForApplyDiscounts.isEmpty() && isApprovedProducts(discount, products)) {
+        verifyValidity(discount);
+        if (amountOfProductsForApplyDiscounts!=null&&!amountOfProductsForApplyDiscounts.isEmpty() && isApprovedProducts(discount, products)) {
+            //composed discount terms are met so apply the discount as set in its properties.
             createConditionalDiscount().applyDiscount(discount, products);
-        } else {
+        } else {    //for support in no "kefel mivtzaim" etc....
             switch (compositeOperator) {
-                case AND:
+                case AND:   //here we will try to apply all discounts
                     composedDiscounts.forEach(discountPolicy -> discountPolicy.applyDiscount(products));
                     break;
-                case OR:
+                case OR:    //no multiple discount applying - the first will be applied only
                     AtomicBoolean oneAlreadyApply = new AtomicBoolean(false);
                     composedDiscounts.forEach(discountCur -> {
                         if (!oneAlreadyApply.get()) {
@@ -55,10 +58,10 @@ public class ComposedDiscount extends DiscountPolicy {
                                 oneAlreadyApply.set(true);
                             }
                         }
-                        discountCur.setApplied(true);
+                        //discountCur.setApplied(true); they do it by alone
                     });
                     break;
-                case XOR:
+                case XOR:   //as logic xor, we will try to apply odd amount of discounts
                     AtomicInteger numOfPolicyApproved = new AtomicInteger(getNumOfPolicyApproved(discount, products));
                     numOfPolicyApproved = numOfPolicyApproved.get() % 2 != 0 ? numOfPolicyApproved : new AtomicInteger(numOfPolicyApproved.get() - 1);
                     AtomicInteger finalNumOfPolicyApproved = numOfPolicyApproved;
@@ -69,10 +72,16 @@ public class ComposedDiscount extends DiscountPolicy {
                                 discountCur.applyDiscount(products);
                             }
                         }
-                        discountCur.setApplied(true);
+                        //discountCur.setApplied(true); they do it by alone
                     });
                     break;
             }
+        }
+    }
+
+    private void verifyValidity(Discount discount) {
+        if(compositeOperator==null){
+            throw new CompositeOperatorNullException(discount.getDiscountId());
         }
     }
 
@@ -84,6 +93,7 @@ public class ComposedDiscount extends DiscountPolicy {
     }
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         boolean isApproved = !isExpired(discount);
         switch (compositeOperator) {
             case AND:
@@ -101,7 +111,7 @@ public class ComposedDiscount extends DiscountPolicy {
         return isApproved;
     }
 
-    @Override
+    @Override   //the undo will be done for each of the simple discounts in store anyway
     public void undoDiscount(Discount discount, Map<Product, Integer> products) {
 
     }

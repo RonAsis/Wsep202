@@ -330,6 +330,7 @@ public class TradingSystem {
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
+    @Synchronized
     private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
                                              ShoppingCart shoppingCart, BillingAddress billingAddress,
                                              String customerName)

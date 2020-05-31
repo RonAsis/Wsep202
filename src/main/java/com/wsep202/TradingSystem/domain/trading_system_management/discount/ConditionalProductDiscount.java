@@ -3,6 +3,8 @@
  */
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
+import com.wsep202.TradingSystem.domain.exception.ConditionalProductException;
+import com.wsep202.TradingSystem.domain.exception.IllegalPercentageException;
 import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.exception.NotValidEndTime;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
@@ -31,6 +33,7 @@ public class ConditionalProductDiscount extends DiscountPolicy {
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         if (!isExpired(discount) && !discount.isApplied()) {
             boolean allConditionalPass = isApprovedProducts(discount, products);
             if (allConditionalPass) {
@@ -48,15 +51,19 @@ public class ConditionalProductDiscount extends DiscountPolicy {
             }
             discount.setApplied(true);  //discount already performed
         } else {  //check if needs to update back the price
-            undoDiscount(discount, products);
+            if(discount.isApplied()) {
+                undoDiscount(discount, products);
+            }
         }
     }
 
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
-        return products.entrySet().stream()
+        verifyValidity(discount);
+        return productsUnderThisDiscount.isEmpty() || !isExpired(discount) && products.entrySet().stream()
                 .filter(productIntegerEntry -> isApprovedCondition(discount, productIntegerEntry.getKey(), productIntegerEntry.getValue()))
                 .toArray().length == productsUnderThisDiscount.size();
+
     }
 
     @Override
@@ -93,6 +100,20 @@ public class ConditionalProductDiscount extends DiscountPolicy {
      */
 
     public boolean isApprovedCondition(Discount discount,Product product, int requiredAmount) {
-        return isProductHaveDiscount(productsUnderThisDiscount, product) && getAmountProductInAmountOfProductsForApplyDiscounts(discount, product) < requiredAmount;
+        return productsUnderThisDiscount.isEmpty() || (isProductHaveDiscount(productsUnderThisDiscount, product) && getAmountProductInAmountOfProductsForApplyDiscounts(discount, product) < requiredAmount);
     }
+
+    private void verifyValidity(Discount discount) {
+        if(discount.getDiscountPercentage()<0){
+            throw new IllegalPercentageException(discount.getDiscountId(),discount.getDiscountPercentage());
+        }
+        if(this.productsUnderThisDiscount==null){
+            throw new ConditionalProductException("There are no products as condition. check discountId: "+discount.getDiscountId());
+        }
+        if(this.amountOfProductsForApplyDiscounts==null||
+                amountOfProductsForApplyDiscounts.isEmpty()){
+            throw new ConditionalProductException("There are no products amounts to apply discount. check discountId: "+discount.getDiscountId());
+        }
+    }
+
 }
