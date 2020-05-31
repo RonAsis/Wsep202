@@ -1058,13 +1058,13 @@ public class Store {
     private Purchase editPurchase(UserSystem user, Purchase purchase,  Set<String> countriesPermitted,
                                   Set<Day> storeWorkDays, int min, int max, int productId,
                                   CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies) {
-        if (isOwner(user) || managerCanEditPurchasePolicy(user.getUserName())) {  //verify the user is owner of the store
-            Optional<Boolean> isEdit = purchasePolicies.stream()
-                    .filter(purchaseCur -> purchaseCur.getPurchaseId() == purchase.getPurchaseId())
-                    .findFirst().map(purchaseCur -> purchaseCur.edit(countriesPermitted,storeWorkDays,
-                            min,max,productId,compositeOperator, composedPurchasePolicies));
-            return isEdit.isPresent() ? purchase : null;
-        }
+//        if (isOwner(user) || managerCanEditPurchasePolicy(user.getUserName())) {  //verify the user is owner of the store
+//            Optional<Boolean> isEdit = purchasePolicies.stream()
+//                    .filter(purchaseCur -> purchaseCur.getPurchaseId() == purchase.getPurchaseId())
+//                    .findFirst().map(purchaseCur -> purchaseCur.edit(countriesPermitted,storeWorkDays,
+//                            min,max,productId,compositeOperator, composedPurchasePolicies));
+//            return isEdit.isPresent() ? purchase : null;
+//        }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 

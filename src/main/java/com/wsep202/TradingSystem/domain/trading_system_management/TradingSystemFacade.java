@@ -213,7 +213,8 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId);
         Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);
-        return modelMapper.map(store.addEditPurchase(user, purchase), PurchaseDto.class);
+        return null;
+        //return modelMapper.map(store.addEditPurchase(user, purchase), PurchaseDto.class);
     }
 
     public List<String> getCompositeOperators(String username, int storeId, UUID uuid) {
