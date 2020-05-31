@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.google.common.base.Strings;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -21,11 +22,16 @@ import java.util.List;
 public class Product {
 
     /**
+     * saves the last productSnAcc when a new product is created
+     */
+    private static int productSnAcc = 1;
+
+    /**
      * the product serial number
      */
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Min(value = 0, message = "Must be greater than or equal zero")
+    @Min(value = 1, message = "Must be greater than or equal zero")
     private int productSn;
 
     /**
@@ -75,6 +81,7 @@ public class Product {
     private int storeId;
 
     public Product(String name, ProductCategory category, int amount, double cost, int storeId){
+        this.productSn = generateProductSn();
         this.name = name;
         this.category = category;
         this.amount = amount;
@@ -82,6 +89,14 @@ public class Product {
         this.originalCost = cost;
         this.rank = 5;
         this.storeId = storeId;
+    }
+
+    /**
+     * Generates a new productSn (to ensure productSn is unique).
+     * @return - the new produceSn.
+     */
+    private int generateProductSn(){
+        return productSnAcc++;
     }
 
     /**

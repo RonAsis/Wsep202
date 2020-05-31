@@ -44,13 +44,19 @@ public class TradingSystemDataBaseDao implements TradingSystemDao{
         String urlImage = null;
         if (Objects.nonNull(image)) {
             urlImage = ImageUtil.saveImage(ImagePath.ROOT_IMAGE_DIC + ImagePath.USER_IMAGE_DIC + image.getOriginalFilename(), image);
+            userToRegister.setImageUrl(urlImage);
         }
-        userToRegister.setImageUrl(urlImage);
         userRepository.save(userToRegister);
     }
 
     @Override
     public Optional<UserSystem> getUserSystem(String username) {
+        /*UserSystem userSystem = userRepository.findByUserName(username);
+        if(userSystem != null){
+            Set<Store> ownedStores = userRepository.queryUserSystemByOwnedStores(userSystem.getUserName()).stream().collect(Collectors.toSet());
+            userSystem.setOwnedStores(ownedStores);
+        }
+        return Optional.ofNullable(userSystem);*/
         return Optional.ofNullable(userRepository.findByUserName(username));
     }
 
@@ -107,8 +113,9 @@ public class TradingSystemDataBaseDao implements TradingSystemDao{
     }
 
     @Override
-    public void addStore(Store newStore) {
+    public void addStore(Store newStore, UserSystem userSystem) {
         storeRepository.save(newStore);
+        userRepository.save(userSystem);
     }
 
     @Override

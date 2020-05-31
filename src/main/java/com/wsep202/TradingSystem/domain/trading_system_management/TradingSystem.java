@@ -98,6 +98,7 @@ public class TradingSystem {
                 externalServiceManagement.isAuthenticatedUserPassword(password, userSystem.get()) &&
                 Objects.isNull(usersLogin.get(userName))) {
             userSystem.get().login();
+            tradingSystemDao.addUserSystem(userSystem.get(),null);
             UUID uuid = UUID.randomUUID();
             usersLogin.put(userName, uuid);
             boolean isAdmin = tradingSystemDao.isAdmin(userName);
@@ -381,8 +382,8 @@ public class TradingSystem {
         if (Objects.nonNull(user) && Strings.isNotBlank(storeName) && Strings.isNotBlank(description)
             && tradingSystemDao.isRegistered(user)) {
             Store newStore = new Store(user, storeName, description);
-            tradingSystemDao.addStore(newStore);
             user.addNewOwnedStore(newStore);
+            tradingSystemDao.addStore(newStore, user);
             log.info(String.format("A new store '%s' was opened in the system, %s is the owner", storeName, user.getUserName()));
             return newStore;
         }

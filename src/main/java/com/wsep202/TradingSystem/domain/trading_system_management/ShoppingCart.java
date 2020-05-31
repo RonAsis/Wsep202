@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,26 +15,42 @@ import java.util.Map;
 @Slf4j
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 @Getter
 @Setter
 @Entity
 public class ShoppingCart {
 
+    /**
+     * saves the last shoppingCartSnAcc when a new product is created
+     */
+    private static int shoppingCartSnAcc = 1;
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Min(value = 1, message = "Must be greater than or equal zero")
     private int id;
     /**
      * list of stores and there shopping bags
      */
     @Builder.Default
     @JoinTable()
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Map<Store, ShoppingBag> shoppingBagsList = new HashMap<>();
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Map<Store, ShoppingBag> shoppingBagsList;
 
     public ShoppingCart(Map<Store,ShoppingBag> shoppingBagsList){
+        id = generateShoppingCartSn();
         this.shoppingBagsList=shoppingBagsList;
     }
+
+    public ShoppingCart(){
+        id = generateShoppingCartSn();
+    }
+
+    private int generateShoppingCartSn(){
+        return shoppingCartSnAcc++;
+    }
+
     /**
      * This method is used to add a bag from the cart.
      * @param storeOfBag - the store of the bag

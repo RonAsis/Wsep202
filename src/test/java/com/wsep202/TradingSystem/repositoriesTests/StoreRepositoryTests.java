@@ -43,7 +43,7 @@ public class StoreRepositoryTests {
     void addStoreANDgetStorePositive() {
         UserSystem userSystemOwner = new UserSystem("usernamePos", "name", false, "lname", "password", false);
         Store store = new Store(userSystemOwner,"storeName");
-        tradingSystemDataBaseDao.addStore(store);
+        tradingSystemDataBaseDao.addStore(store,userSystemOwner);
         assertEquals(tradingSystemDataBaseDao.getStore(store.getStoreId()).get(),store);
     }
 
@@ -54,10 +54,10 @@ public class StoreRepositoryTests {
         Store store1 = new Store(userSystemOwner,"storeName1");
         Store store2 = new Store(userSystemOwner,"storeName2");
         Store store3 = new Store(userSystemOwner,"storeName3");
-        tradingSystemDataBaseDao.addStore(store0);
-        tradingSystemDataBaseDao.addStore(store1);
-        tradingSystemDataBaseDao.addStore(store2);
-        tradingSystemDataBaseDao.addStore(store3);
+        tradingSystemDataBaseDao.addStore(store0,userSystemOwner);
+        tradingSystemDataBaseDao.addStore(store1,userSystemOwner);
+        tradingSystemDataBaseDao.addStore(store2,userSystemOwner);
+        tradingSystemDataBaseDao.addStore(store3,userSystemOwner);
         Set<Store> res = tradingSystemDataBaseDao.getStores();
         assertEquals(4,res.size());
     }
@@ -79,8 +79,8 @@ public class StoreRepositoryTests {
         store1.addNewProduct(userSystemOwner,product3);
         store1.addNewProduct(userSystemOwner,product4);
         store1.addNewProduct(userSystemOwner,product2);
-        tradingSystemDataBaseDao.addStore(store0);
-        tradingSystemDataBaseDao.addStore(store1);
+        tradingSystemDataBaseDao.addStore(store0,userSystemOwner);
+        tradingSystemDataBaseDao.addStore(store1,userSystemOwner);
         Set<Product> res = tradingSystemDataBaseDao.getProducts();
         assertEquals(5,res.size());
 //        System.out.println(res.size());
@@ -105,8 +105,8 @@ public class StoreRepositoryTests {
         store1.addNewProduct(userSystemOwner,product3);
         store1.addNewProduct(userSystemOwner,product4);
         store1.addNewProduct(userSystemOwner,product2);
-        tradingSystemDataBaseDao.addStore(store0);
-        tradingSystemDataBaseDao.addStore(store1);
+        tradingSystemDataBaseDao.addStore(store0,userSystemOwner);
+        tradingSystemDataBaseDao.addStore(store1,userSystemOwner);
         List<Product> res = tradingSystemDataBaseDao.searchProductByName("coockie0");
         assertEquals(3,res.size());
     }
@@ -128,8 +128,8 @@ public class StoreRepositoryTests {
         store1.addNewProduct(userSystemOwner,product3);
         store1.addNewProduct(userSystemOwner,product4);
         store1.addNewProduct(userSystemOwner,product2);
-        tradingSystemDataBaseDao.addStore(store0);
-        tradingSystemDataBaseDao.addStore(store1);
+        tradingSystemDataBaseDao.addStore(store0,userSystemOwner);
+        tradingSystemDataBaseDao.addStore(store1,userSystemOwner);
         List<Product> res = tradingSystemDataBaseDao.searchProductByCategory(ProductCategory.HEALTH);
         assertEquals(3,res.size());
     }
@@ -151,8 +151,8 @@ public class StoreRepositoryTests {
         store1.addNewProduct(userSystemOwner,product3);
         store1.addNewProduct(userSystemOwner,product4);
         store1.addNewProduct(userSystemOwner,product2);
-        tradingSystemDataBaseDao.addStore(store0);
-        tradingSystemDataBaseDao.addStore(store1);
+        tradingSystemDataBaseDao.addStore(store0,userSystemOwner);
+        tradingSystemDataBaseDao.addStore(store1,userSystemOwner);
         List<String> keyWords = new ArrayList<String>();
         keyWords.add("kie");
         keyWords.add("co");

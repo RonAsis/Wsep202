@@ -10,6 +10,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,45 +25,51 @@ public class Store {
     @Transient
     private final Object stockLock = new Object();
 
+    /**
+     * saves the last storeSnAcc when a new product is created
+     */
+    private static int storeSnAcc = 1;
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Min(value = 1, message = "Must be greater than or equal zero")
     private int storeId;        //unique identifier for the store
 
     private String storeName;
 
     //map to find all the owners as value appointed the owner who is in the fit key
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OwnersAppointee> appointedOwners = new ArrayList<>();
 
     //map  that holds users as key and their appointed managers as value
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ManagersAppointee> appointedManagers = new ArrayList<>();
 
     //The products that the store holds in it
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL)
-    Set<Product> products = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Product> products = new HashSet<>();
 
     //The set purchase policy for the store
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Purchase> purchasePolicies;
 
     //The set purchase policy for the store
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Discount> discounts;
 
     //owners of the store
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserSystem> owners;
 
     //managers in the store
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MangerStore> managers;
 
     //list of purchases made in the store
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Receipt> receipts;
 
     //the store rank
@@ -80,6 +87,7 @@ public class Store {
     }
 
     private void initStore(UserSystem owner, String storeName) {
+        storeId = generateStoreSn();
         this.purchasePolicies = new ArrayList<>();
         this.discounts = new ArrayList<>();
         receipts = new LinkedList<>();
@@ -95,8 +103,13 @@ public class Store {
     }
 
     public Store(UserSystem owner, String storeName, String description) {
+        storeId = generateStoreSn();
         initStore(owner, storeName);
         this.description = description;
+    }
+
+    private int generateStoreSn(){
+        return storeSnAcc++;
     }
 
     /**
