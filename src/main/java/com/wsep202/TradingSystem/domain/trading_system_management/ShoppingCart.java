@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NotInStockException;
+import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -236,10 +237,11 @@ public class ShoppingCart {
 
     }
 
-    public void ApprovePurchasePolicy(BillingAddress billingAddress) {
+    public boolean ApprovePurchasePolicy(BillingAddress billingAddress) throws PurchasePolicyException {
         for (Store store: this.getShoppingBagsList().keySet()){
             store.isApprovedPurchasePolicies((HashMap<Product, Integer>) shoppingBagsList
                     .get(store).getProductListFromStore(),billingAddress);
         }
+        return true;
     }
 }
