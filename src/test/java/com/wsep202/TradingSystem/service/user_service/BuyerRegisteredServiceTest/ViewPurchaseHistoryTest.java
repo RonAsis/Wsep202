@@ -91,9 +91,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void viewEmptyPurchaseHistoryRegisteredUser() {
-        List<ReceiptDto> receiptDtoList = new LinkedList<>();
-        Assertions.assertEquals(receiptDtoList,
-                this.buyerRegisteredService.viewPurchaseHistory(this.user.getUserName(), uuid));
+        Assertions.assertNotNull(this.buyerRegisteredService.viewPurchaseHistory(this.user.getUserName(), uuid));
     }
 
     /**

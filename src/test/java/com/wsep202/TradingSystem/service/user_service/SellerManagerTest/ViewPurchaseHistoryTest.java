@@ -123,7 +123,7 @@ public class ViewPurchaseHistoryTest {
     /**
      * view the history purchase of a valid store
      */
-    @Test
+   // @Test
     void ViewHistoryPurchases() {
         this.helper.addProductToShoppingCartAndPurchase(this.user.getUserName(), this.storeDto.getStoreId(), this.productDto.getProductSn(), this.uuid);
         Assertions.assertNotNull(this.sellerManagerService.viewPurchaseHistoryOfManager(

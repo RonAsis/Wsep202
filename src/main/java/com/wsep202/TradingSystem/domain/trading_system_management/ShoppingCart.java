@@ -46,6 +46,7 @@ public class ShoppingCart {
 
     public ShoppingCart(){
         id = generateShoppingCartSn();
+        this.shoppingBagsList = new HashMap<>();
     }
 
     private int generateShoppingCartSn(){
