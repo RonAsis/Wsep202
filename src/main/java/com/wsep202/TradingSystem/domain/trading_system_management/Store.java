@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Day;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
@@ -367,10 +368,14 @@ public class Store {
             owners.remove(ownerToDelete);
             appointedManagers.remove(ownerToDelete);
             ownerToDelete.removeOwnedStore(this);
+            ownerToDelete.newNotification(Notification.builder().content("you are fired").build());
+
         }
         for (MangerStore manager: managerToRemove) {
             managers.remove(manager);
             manager.removeManagedStore(this);
+            manager.getAppointedManager()
+                    .newNotification(Notification.builder().content("you are fired").build());
         }
     }
 
@@ -831,7 +836,8 @@ public class Store {
     /**
      * apply purchase on a shopping bag
      */
-    public void isApprovedPurchasePolicies(Map<Product, Integer> productsBag, BillingAddress userAddress) {
+    public void isApprovedPurchasePolicies(Map<Product, Integer> productsBag, BillingAddress userAddress)
+            throws PurchasePolicyException{
         updateExpiredDiscounts();
         for (Purchase purchase : this.getPurchasePolicies()) {  //apply discounts on shoppingBag
             purchase.isApproved(productsBag, userAddress);
