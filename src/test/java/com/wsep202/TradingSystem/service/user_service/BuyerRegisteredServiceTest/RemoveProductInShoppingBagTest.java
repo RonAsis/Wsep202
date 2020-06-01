@@ -77,8 +77,7 @@ public class RemoveProductInShoppingBagTest {
      */
     @Test
     void removeProductEmptyUsername() {
-        Assertions.assertFalse(
-            this.buyerRegisteredService.removeProductInShoppingBag("",
+        Assertions.assertFalse(this.buyerRegisteredService.removeProductInShoppingBag("",
                 0, 0, uuid));
 }
 
@@ -87,8 +86,7 @@ public class RemoveProductInShoppingBagTest {
      */
     @Test
     void removeProductUserNotRegistered() {
-        Assertions.assertFalse(
-                    this.buyerRegisteredService.removeProductInShoppingBag("notRegistered",
+        Assertions.assertFalse(this.buyerRegisteredService.removeProductInShoppingBag("notRegistered",
                 0, 0, uuid));
     }
 

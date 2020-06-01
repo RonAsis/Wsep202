@@ -9,6 +9,8 @@ import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.ServiceTestsHelper;
+import externals.ChargeSystem;
+import externals.SupplySystem;
 import javafx.util.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -23,6 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(SpringExtension.class)
@@ -55,6 +61,10 @@ public class PurchaseShoppingCartBuyerTest {
     PurchaseRegisterBuyerDto purchaseRegisterBuyerDtoInvalidBilling = new PurchaseRegisterBuyerDto(this.paymentDetailsDto, this.invalidBillingAddressDto);
     PurchaseRegisterBuyerDto purchaseRegisterBuyerDtoInvalidPayment = new PurchaseRegisterBuyerDto(this.invalidPaymentDetailsDto, this.billingAddressDto);
 
+    //the external systems
+    private ChargeSystem chargeSystem = mock(ChargeSystem.class);
+    private SupplySystem supplySystem = mock(SupplySystem.class);
+
     @BeforeEach
     void setUp() {
         if (this.helper == null || this.helper.getGuestService() == null ) {
@@ -69,6 +79,9 @@ public class PurchaseShoppingCartBuyerTest {
             this.uuid = returnedValue.getKey();
         }
         this.counter++;
+
+       // when(chargeSystem.sendPaymentTransaction(any(), any(), any())).thenReturn(true);
+        when(supplySystem.deliver(any(), any())).thenReturn(true);
     }
 
     @AfterEach
@@ -81,8 +94,10 @@ public class PurchaseShoppingCartBuyerTest {
      */
     @Test
     void purchaseShoppingCartEmptyUsername() {
-        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCartBuyer("",
-                this.purchaseRegisterBuyerDto, this.uuid));
+        Assertions.assertThrows(Exception.class, ()->
+                {this.buyerRegisteredService.purchaseShoppingCartBuyer("",
+                this.purchaseRegisterBuyerDto, this.uuid);}
+                );
     }
 
     /**
@@ -90,8 +105,10 @@ public class PurchaseShoppingCartBuyerTest {
      */
     @Test
     void purchaseShoppingCartUserNotRegistered() {
-        Assertions.assertNull(this.buyerRegisteredService.purchaseShoppingCartBuyer("NotRegistered",
-                this.purchaseRegisterBuyerDto, this.uuid));
+        Assertions.assertThrows(Exception.class, ()->
+                {this.buyerRegisteredService.purchaseShoppingCartBuyer("NotRegistered",
+                this.purchaseRegisterBuyerDto, this.uuid);}
+                );
     }
 
     /**
