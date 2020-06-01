@@ -17,23 +17,18 @@ import java.util.Map;
 @Slf4j
 @Builder
 @AllArgsConstructor
-@Getter
-@Setter
-@Entity(name = "shopping_cart")
+@Data
+@Entity
 public class ShoppingCart {
 
     @Id
-    @GeneratedValue
-    @Column(columnDefinition = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     /**
      * list of stores and there shopping bags
      */
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "hopping_cart_shopping_bag_mapping",
-            joinColumns = {@JoinColumn(name = "shopping_cart_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "shopping_bag_id", referencedColumnName = "id")})
     @MapKeyJoinColumn(name = "store_store_id")
     private Map<Store, ShoppingBag> shoppingBagsList;
 

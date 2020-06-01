@@ -61,6 +61,8 @@ class TradingSystemFacadeTest {
 
         private ShoppingCart shoppingCart;
 
+        private TradingSystemDao tradingSystemDao;
+
         @BeforeEach
         public void setUp() {
             store = mock(Store.class);
@@ -68,7 +70,8 @@ class TradingSystemFacadeTest {
             tradingSystem = mock(TradingSystem.class);
             factoryObjects = mock(FactoryObjects.class);
             serviceFacade = mock(ServiceFacade.class);
-            tradingSystemFacade = new TradingSystemFacade(tradingSystem, modelMapper, factoryObjects, serviceFacade);
+            tradingSystemDao = mock(TradingSystemDaoImpl.class);
+            tradingSystemFacade = new TradingSystemFacade(tradingSystem, modelMapper, factoryObjects, serviceFacade, tradingSystemDao);
             paymentDetails = mock(PaymentDetails.class);
             billingAddress = mock(BillingAddress.class);
             userImage = mock(MultipartFile.class);
@@ -426,75 +429,6 @@ class TradingSystemFacadeTest {
             when(store.getProduct(productId)).thenReturn(product);
             ProductDto productDto = tradingSystemFacade.viewProduct(storeId, productId);
             AssertionHelperTest.assertProduct(product, productDto);
-        }
-
-        @Test
-        void searchProductByName() {
-            List<Product> products = new ArrayList<>(setUpProducts());
-            String productName = "productName";
-            when(tradingSystem.searchProductByName(productName)).thenReturn(products);
-            List<ProductDto> productDtos = tradingSystemFacade.searchProductByName(productName);
-            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-        }
-
-        @Test
-        void searchProductByCategory() {
-            String category = ProductCategory.values()[0].category;
-            List<Product> products = new ArrayList<>(setUpProducts());
-            when(tradingSystem.searchProductByCategory(ProductCategory.getProductCategory(category))).thenReturn(products);
-            List<ProductDto> productDtos = tradingSystemFacade.searchProductByCategory(category);
-            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-        }
-
-        @Test
-        void searchProductByKeyWords() {
-            List<Product> products = new ArrayList<>(setUpProducts());
-            List<String> keyWords = new LinkedList<>();
-            keyWords.add("test-key-words");
-            when(tradingSystem.searchProductByKeyWords(keyWords)).thenReturn(products);
-            List<ProductDto> productDtos = tradingSystemFacade.searchProductByKeyWords(keyWords);
-            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-        }
-
-        @Test
-        void filterByRangePrice() {
-            int minPrice = 0;
-            int maxPrice = 10;
-            List<Product> products = new ArrayList<>(setUpProducts());
-            List<ProductDto> productsDtoArg = convertProductDtoList(products);
-            when(tradingSystem.filterByRangePrice(products, minPrice, maxPrice)).thenReturn(products);
-            List<ProductDto> productDtos = tradingSystemFacade.filterByRangePrice(productsDtoArg, minPrice, maxPrice);
-            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-        }
-
-        @Test
-        void filterByProductRank() {
-            int rank = 0;
-            List<Product> products = new ArrayList<>(setUpProducts());
-            List<ProductDto> productsDtoArg = convertProductDtoList(products);
-            when(tradingSystem.filterByProductRank(products, rank)).thenReturn(products);
-            List<ProductDto> productDtos = tradingSystemFacade.filterByProductRank(productsDtoArg, rank);
-            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-        }
-
-        @Test
-        void filterByStoreRank() {
-            int rank = 0;
-            List<Product> products = new ArrayList<>(setUpProducts());
-            List<ProductDto> productsDtoArg = convertProductDtoList(products);
-            when(tradingSystem.filterByStoreRank(products, rank)).thenReturn(products);
-            List<ProductDto> productDtos = tradingSystemFacade.filterByStoreRank(productsDtoArg, rank);
-            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
-        }
-
-        @Test
-        void filterByStoreCategory() {
-            String category = ProductCategory.values()[0].category;
-            List<Product> products = new ArrayList<>(setUpProducts());
-            List<ProductDto> productsDtoArg = convertProductDtoList(products);
-            when(tradingSystem.filterByStoreCategory(products, ProductCategory.getProductCategory(category))).thenReturn(products);
-            List<ProductDto> productDtos = tradingSystemFacade.filterByStoreCategory(productsDtoArg, category);
-            AssertionHelperTest.assertProducts(new HashSet<>(products), new HashSet<>(productDtos));
         }
 
         @Test

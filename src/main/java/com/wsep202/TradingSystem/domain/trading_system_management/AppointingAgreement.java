@@ -16,19 +16,19 @@ import java.util.Set;
 @Entity
 public class AppointingAgreement {
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private int appointingAgreementNumber;
 
         @Builder.Default
-        String newOwner;
+        private String newOwner;
 
         @Builder.Default
-        String appointee;
+        private String appointee;
 
         @Builder.Default
         @ElementCollection
-        @JoinTable()
-        Map<String, Boolean> ownersAndApproval;
+        @MapKeyColumn(name = "owner_name")
+        private Map<String, Boolean> ownersAndApproval;
 
         public AppointingAgreement() {
         }

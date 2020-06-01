@@ -1,5 +1,7 @@
 package com.wsep202.TradingSystem.config;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemDao;
+import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemDaoImpl;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Publisher;
@@ -57,8 +59,12 @@ public class TradingSystemConfiguration {
     }
 
     @Bean
-    public TradingSystemFacade tradingSystemFacade(ModelMapper modelMapper, TradingSystem tradingSystem, FactoryObjects factoryObjects, ServiceFacade serviceFacade){
-        return new TradingSystemFacade(tradingSystem,modelMapper, factoryObjects, serviceFacade);
+    public TradingSystemFacade tradingSystemFacade(ModelMapper modelMapper,
+                                                   TradingSystem tradingSystem,
+                                                   FactoryObjects factoryObjects,
+                                                   ServiceFacade serviceFacade,
+                                                   TradingSystemDao tradingSystemDao){
+        return new TradingSystemFacade(tradingSystem,modelMapper, factoryObjects, serviceFacade, tradingSystemDao);
     }
 
 }

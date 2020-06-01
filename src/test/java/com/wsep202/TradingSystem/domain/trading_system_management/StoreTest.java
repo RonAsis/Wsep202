@@ -599,7 +599,7 @@ class StoreTest {
             owners.add(owner);
             owners.add(newOwner);
             storeUT.setOwners(owners);
-            List<OwnersAppointee> appointedOwners = new ArrayList<>();
+            Set<OwnersAppointee> appointedOwners = new HashSet<>();
             Set<UserSystem> apOwner = new HashSet<>();
             apOwner.add(newOwner);
             OwnersAppointee ownersAppointee = new OwnersAppointee(owner.getUserName(),apOwner);
@@ -1570,7 +1570,7 @@ class StoreTest {
     }
 
     private void setUpRemoveOwner(){
-        List<OwnersAppointee> appointedOwners = new ArrayList<>();
+        Set<OwnersAppointee> appointedOwners = new HashSet<>();
         Set<UserSystem> owners = new HashSet<>();
         owners.add(owner);
         owners.add(managerUser);

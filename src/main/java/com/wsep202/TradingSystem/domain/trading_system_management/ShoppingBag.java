@@ -18,12 +18,11 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "shopping_bag")
+@Entity
 public class ShoppingBag {
 
     @Id
-    @GeneratedValue
-    @Column(columnDefinition = "shopping_bag_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     /**
@@ -35,9 +34,8 @@ public class ShoppingBag {
      * list of all of the products and the amount of each product
      */
     @ElementCollection
-    @JoinTable
+    @MapKeyColumn(name = "products")
     private Map<Product, Integer> productListFromStore;
-
 
     public ShoppingBag(Store storeOfProduct){
         this.storeOfProduct = storeOfProduct;

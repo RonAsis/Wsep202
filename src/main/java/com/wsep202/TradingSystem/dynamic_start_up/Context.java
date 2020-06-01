@@ -31,6 +31,7 @@ public class Context {
     public Context() {
         mapUsernameToUUID = new HashMap<>();
         mapStoreIdToRealStoreId = new HashMap<>();
+        mapProductIdToRealProduct = new HashMap<>();
         storeIdCounter = 0;
     }
 

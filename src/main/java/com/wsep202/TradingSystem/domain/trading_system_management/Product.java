@@ -22,16 +22,10 @@ import java.util.List;
 public class Product {
 
     /**
-     * saves the last productSnAcc when a new product is created
-     */
-    private static int productSnAcc = 1;
-
-    /**
      * the product serial number
      */
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Min(value = 1, message = "Must be greater than or equal zero")
     private int productSn;
 
     /**

@@ -33,6 +33,7 @@ public class TradingSystemFacade {
      */
     private final TradingSystem tradingSystem;
 
+
     /**
      * inorder to convert dto to object
      */
@@ -44,6 +45,8 @@ public class TradingSystemFacade {
     private final FactoryObjects factoryObjects;
 
     private final ServiceFacade serviceFacade;
+
+    private final TradingSystemDao tradingSystemDao;
 
     /**
      * UC 3.7
@@ -153,16 +156,9 @@ public class TradingSystemFacade {
             Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
             //convert to a category we can add to the product
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
-            if (amount<0 || cost<0 ){
-                log.error("add product failed, cost/amount must be greater than 0");
-                return null;
-            }
-            Product product = new Product(productName, productCategory, amount, cost, storeId);
-            if(ownerStore.addNewProduct(user, product)) {
-                tradingSystem.getTradingSystemDao().addStore(ownerStore);
-                return modelMapper.map(product, ProductDto.class);
-            }
-            else return null;
+            Product product = factoryObjects.createProduct(productName, productCategory, amount, cost, storeId);
+            Product productRes = tradingSystemDao.addProductToStore(ownerStore, user, product);
+            return Objects.nonNull(productRes)? modelMapper.map(product, ProductDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("add product failed", e);
             return null;
@@ -188,9 +184,7 @@ public class TradingSystemFacade {
     public boolean removeDiscount(String username, int storeId, int discountId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
-        Boolean ans = store.removeDiscount(user, discountId);
-        tradingSystem.getTradingSystemDao().addStore(store);
-        return ans;
+        return tradingSystemDao.removeDiscount(store, user, discountId);
     }
 
     /**
@@ -205,9 +199,8 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId);
         Discount discount = modelMapper.map(discountDto, Discount.class);
-        DiscountDto ans = modelMapper.map(store.addEditDiscount(user, discount), DiscountDto.class);
-        tradingSystem.getTradingSystemDao().addStore(store);
-        return ans;
+        Discount discountRes = tradingSystemDao.addEditDiscount(store, user, discount);
+        return Objects.nonNull(discountRes)? modelMapper.map(discountRes, DiscountDto.class) : null;
     }
 
     /**
@@ -219,6 +212,8 @@ public class TradingSystemFacade {
      * @return true if success, else false
      */
     public PurchasePolicyDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
+        // TODO need organize : PurchasePolicyDto not define good -domain ==> need do like discount
+        //                      need convert PurchasePolicyDto to PurchasePolicy and not send the vaule inside
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId);
         Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);
@@ -226,11 +221,11 @@ public class TradingSystemFacade {
                 purchaseDto.getStoreWorkDays(),purchaseDto.getMin(),purchaseDto.getMax(),
                 purchaseDto.getProductId(),purchaseDto.getCompositeOperator(),
                 convert(purchaseDto.getComposedPurchasePolicies())), PurchasePolicyDto.class);
-        tradingSystem.getTradingSystemDao().addStore(store);
         return ans;
     }
 
     private List<Purchase> convert(List<PurchasePolicyDto> list) {
+        // TODO need remove from here the convert purchase need to be in the model mapper
         List<Purchase> purchases = new LinkedList<>();
         for (PurchasePolicyDto ppd : list) {
             Purchase purchase = new Purchase(ppd.getPurchasePolicy(), ppd.getPurchaseType());
@@ -240,7 +235,7 @@ public class TradingSystemFacade {
     }
 
     public List<String> getCompositeOperators(String username, int storeId, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
+        UserSystem user = tradingSystem.getUser(username, uuid);
         return CompositeOperator.getStringCompositeOperators();
     }
     /**
@@ -255,9 +250,7 @@ public class TradingSystemFacade {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get the registered user
             Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he is owner of the store
-            Boolean ans = ownerStore.removeProductFromStore(user, productSn);
-            tradingSystem.getTradingSystemDao().addStore(ownerStore);
-            return ans;
+            return tradingSystemDao.deleteProductFromStore(ownerStore, user, productSn);
         } catch (TradingSystemException e) {
             log.error("deleteProduct from store failed", e);
             return false;
@@ -286,9 +279,7 @@ public class TradingSystemFacade {
                 log.error("editProduct failed- amount/cost must be greater than 0");
                 return false;
             }
-            Boolean ans = ownerStore.editProduct(user, productSn, productName, category, amount, cost);
-            tradingSystem.getTradingSystemDao().addStore(ownerStore);
-            return ans;
+            return tradingSystemDao.editProduct(ownerStore, user, productSn, productName, category, amount, cost);
         } catch (TradingSystemException e) {
             log.error("editProduct failed", e);
             return false;
@@ -308,10 +299,8 @@ public class TradingSystemFacade {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
             Store ownerStore = ownerUser.getOwnerStore(storeId);
-            //return tradingSystem.createNewAppointingAgreement(ownerStore, ownerUser, newOwnerUsername);
-            Boolean ans = tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
-            tradingSystem.getTradingSystemDao().addStore(ownerStore);
-            return ans;
+//            return tradingSystem.createNewAppointingAgreement(ownerStore, ownerUser, newOwnerUsername);
+            return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
         } catch (TradingSystemException e) {
             log.error("Add owner failed", e);
             return false;
@@ -332,7 +321,6 @@ public class TradingSystemFacade {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
             Store ownedStore = ownerUser.getOwnerStore(storeId);
             MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUsername);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore);
             return Objects.nonNull(mangerStore) ? modelMapper.map(mangerStore, ManagerDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("Add manager failed", e);
@@ -356,9 +344,7 @@ public class TradingSystemFacade {
             Store ownedStore = ownerUser.getOwnerStore(storeId);
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             StorePermission storePermission = StorePermission.getStorePermission(permission);
-            Boolean ans = ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore);
-            return ans;
+            return tradingSystemDao.addPermissionToManager(ownedStore, ownerUser, managerStore, storePermission);
         } catch (TradingSystemException e) {
             log.error("Add permission failed", e);
             return false;
@@ -381,9 +367,7 @@ public class TradingSystemFacade {
             Store ownedStore = ownerUser.getOwnerStore(storeId);
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             StorePermission storePermission = StorePermission.getStorePermission(permission);
-            Boolean ans = ownedStore.removePermission(ownerUser, managerStore, storePermission);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore);
-            return ans;
+            return tradingSystemDao.removePermission(ownedStore, ownerUser, managerStore, storePermission);
         } catch (TradingSystemException e) {
             log.error("Add permission failed", e);
             return false;
@@ -425,9 +409,7 @@ public class TradingSystemFacade {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid); //get registered user
             Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
-            Boolean ans = tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore);
-            return ans;
+            return tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
         } catch (TradingSystemException e) {
             log.error("remove manager failed", e);
             return false;
@@ -448,9 +430,7 @@ public class TradingSystemFacade {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid); //get registered user
             Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
             UserSystem removeOwner = ownedStore.getAppointedOwner(ownerUser, ownerToRemove);
-            Boolean ans = tradingSystem.removeOwner(ownedStore, ownerUser, removeOwner);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore);
-            return ans;
+            return tradingSystem.removeOwner(ownedStore, ownerUser, removeOwner);
         } catch (TradingSystemException e) {
             log.error("remove owner failed", e);
             return false;
@@ -466,9 +446,7 @@ public class TradingSystemFacade {
     public boolean logout(@NotBlank String username, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(username, uuid);
-            Boolean ans = this.tradingSystem.logout(user);
-            tradingSystem.getTradingSystemDao().addUserSystem(user, null);
-            return ans;
+            return this.tradingSystem.logout(user);
         } catch (TradingSystemException e) {
             log.error("Failed to logout", e);
             return false;
@@ -486,29 +464,11 @@ public class TradingSystemFacade {
         try {
             UserSystem user = tradingSystem.getUser(usernameOwner, uuid);
             Store store = tradingSystem.openStore(user, storeName, description);
-            Set<ProductDto> products = makeProductDto(store.getProducts());
-            StoreDto storeDto = new StoreDto(store.getStoreId(),store.getStoreName(),products,
-                    store.getDescription(),store.getRank());
-            return storeDto;
+            return modelMapper.map(store, StoreDto.class);
         } catch (TradingSystemException e) {
             log.error("failed to open store", e);
             return null;
         }
-    }
-
-    /**
-     * make product dto from product
-     * @param products - set of products that need to be changed to dto
-     * @return a set of product dtos
-     */
-    private Set<ProductDto> makeProductDto(Set<Product> products){
-        Set<ProductDto> productDtos = new HashSet<>();
-        for (Product product: products) {
-            ProductDto productDto = new ProductDto(product.getProductSn(),product.getName(), product.getCategory().category,
-                    product.getAmount(),product.getCost(),product.getOriginalCost(),product.getRank(),product.getStoreId());
-            productDtos.add(productDto);
-        }
-        return productDtos;
     }
 
     /**
@@ -527,7 +487,6 @@ public class TradingSystemFacade {
         UserSystem userSystem = factoryObjects.createSystemUser(userName, firstName, lastName, password);
         return tradingSystem.registerNewUser(userSystem, image);
     }
-
 
     /**
      * UC 2.3
@@ -564,117 +523,6 @@ public class TradingSystemFacade {
     }
 
     /**
-     * UC 2.5
-     * search product by name
-     * @param productName - the product name that want to search
-     * @return list of all the product with this name
-     */
-    public List<ProductDto> searchProductByName(@NotBlank String productName) {
-        log.info("search product by name: " + productName);
-        List<Product> products = tradingSystem.searchProductByName(productName);
-        return convertProductDtoList(products);
-    }
-
-    /**
-     * UC 2.5
-     * search product by category
-     *
-     * @param category - the category of product that want to search
-     * @return list of all the products that belong to this category
-     */
-    public List<ProductDto> searchProductByCategory(@NotBlank String category) {
-        try {
-            log.info("search product by category: " + category);
-            ProductCategory productCategory = ProductCategory.getProductCategory(category);
-            List<Product> products = tradingSystem.searchProductByCategory(productCategory);
-            return convertProductDtoList(products);
-        } catch (TradingSystemException e) {
-            log.error("failed search product by category", e);
-            return null;
-        }
-    }
-
-    /**
-     * UC 2.5
-     * search product by keyWords
-     *
-     * @param keyWords - the keyWords that want search with
-     * @return list of all the products that include the keyWords
-     */
-    public List<ProductDto> searchProductByKeyWords(@NotNull List<@NotBlank String> keyWords) {
-        log.info("search product by keywords: " + keyWords);
-        List<Product> products = tradingSystem.searchProductByKeyWords(keyWords);
-        return convertProductDtoList(products);
-    }
-
-    /**
-     * UC 2.5
-     * filter by range price
-     *
-     * @param productDtos the list of products
-     * @param minPrice    - the minPrice price
-     * @param maxPrice    - the maxPrice price
-     * @return list of all the products filtered by range price
-     */
-    public List<ProductDto> filterByRangePrice(@NotNull List<@NotNull ProductDto> productDtos, double minPrice, double maxPrice) {
-        log.info("filter products by price range [" + minPrice + "," + maxPrice + "]");
-        List<Product> products = converterProductsList(productDtos);
-        List<Product> productsFiltered = tradingSystem.filterByRangePrice(products, minPrice, maxPrice);
-        return convertProductDtoList(productsFiltered);
-    }
-
-    /**
-     * UC 2.5
-     * filter by product rank
-     *
-     * @param productDtos the list of products
-     * @param rank        - the product rank
-     * @return list of all the products filtered by the product rank
-     */
-    public List<ProductDto> filterByProductRank(@NotNull List<@NotNull ProductDto> productDtos, int rank) {
-        log.info("filter products by product rank " + rank);
-        List<Product> products = converterProductsList(productDtos);
-        List<Product> productsFiltered = tradingSystem.filterByProductRank(products, rank);
-        return convertProductDtoList(productsFiltered);
-    }
-
-    /**
-     * UC 2.5
-     * filter by store rank
-     *
-     * @param productDtos the list of products
-     * @param rank        the rank of the store
-     * @return list of all the products filtered by the store rank
-     */
-    public List<ProductDto> filterByStoreRank(@NotNull List<@NotNull ProductDto> productDtos, int rank) {
-        log.info("filter products by store rank " + rank);
-        List<Product> products = converterProductsList(productDtos);
-        List<Product> productsFiltered = tradingSystem.filterByStoreRank(products, rank);
-        return convertProductDtoList(productsFiltered);
-    }
-
-    /**
-     * UC 2.5
-     * filter by category
-     *
-     * @param productDtos the list of products
-     * @param category    the category of the product
-     * @return list of all the products filtered by the category
-     */
-    public List<ProductDto> filterByStoreCategory(@NotNull List<@NotNull ProductDto> productDtos, @NotBlank String category) {
-        try {
-            log.info("filter products by category " + category);
-            List<Product> products = converterProductsList(productDtos);
-            ProductCategory productCategory = ProductCategory.getProductCategory(category);
-            List<Product> productsFiltered = tradingSystem.filterByStoreCategory(products, productCategory);
-            return convertProductDtoList(productsFiltered);
-        } catch (TradingSystemException e) {
-            log.error("filter by store category", e);
-            return null;
-        }
-    }
-
-    /**
      * UC 2.6
      * @param username  the username that want save ShoppingBag
      * @param storeId   the storeId that the product belong to
@@ -688,10 +536,7 @@ public class TradingSystemFacade {
             UserSystem user = tradingSystem.getUser(username, uuid);
             Store store = tradingSystem.getStore(storeId);
             Product product = store.getProduct(productSn);
-            Product clonedProduct = product.cloneProduct(); //save copy of product in bag
-            Boolean ans = user.saveProductInShoppingBag(store, clonedProduct, amount);
-            tradingSystem.getTradingSystemDao().addUserSystem(user, null);
-            return ans;
+            return tradingSystemDao.saveProductInShoppingBag(user, store, product, amount);
         } catch (TradingSystemException e) {
             log.error("saveInBag", e);
             return false;
@@ -708,7 +553,6 @@ public class TradingSystemFacade {
         try {
             UserSystem user = tradingSystem.getUser(username, uuid);
             ShoppingCart shoppingCart = user.getShoppingCart();
-            shoppingCart.applyDiscountPolicies();   //apply discount policies and verify the prices are updated
             return Objects.nonNull(shoppingCart) ?modelMapper.map(shoppingCart, ShoppingCartDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("view products in shopping bag", e);
@@ -730,9 +574,7 @@ public class TradingSystemFacade {
             UserSystem user = tradingSystem.getUser(username, uuid);
             Store store = tradingSystem.getStore(storeId);
             Product product = store.getProduct(productSn);
-            Boolean ans = user.removeProductInShoppingBag(store, product);
-            tradingSystem.getTradingSystemDao().addUserSystem(user, null);
-            return ans;
+            return tradingSystemDao.removeProductInShoppingBag(user, store, product);
         } catch (TradingSystemException e) {
             log.error("Remove product in shopping bag failed", e);
             return false;
@@ -771,7 +613,6 @@ public class TradingSystemFacade {
             PaymentDetails paymentDetails = Objects.nonNull(paymentDetailsDto) ? modelMapper.map(paymentDetailsDto, PaymentDetails.class) : null;
             BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
             List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, user);
-            tradingSystem.getTradingSystemDao().addUserSystem(user, null);
             return Objects.nonNull(receipts) ? convertReceiptList(receipts) : null;
     }
 
@@ -819,25 +660,6 @@ public class TradingSystemFacade {
         return StorePermission.getStringPermissions();
     }
 
-
-    /**
-     * convert from hash of ProductDto with their amounts into
-     * Product map with its amount
-     * @param productsUnderThisDiscount
-     * @param store the store that products belongs to
-     * @return productsHash
-     */
-    private Map<Product, Integer> convertDtoProductHashToProductHashFromStore
-    (Map<ProductDto, Integer> productsUnderThisDiscount, Store store) {
-        Map<Product, Integer> productsHash = new HashMap<>();
-        for (ProductDto productDto : productsUnderThisDiscount.keySet()) {
-            Product productFromStore = store.getProduct(productDto.getProductSn());
-            //add the product object exist in store with the required amount for discount
-            productsHash.put(productFromStore, productsUnderThisDiscount.get(productDto));
-        }
-        return productsHash;
-    }
-
     public Pair<Double, Double> getTotalPriceOfShoppingCart(ShoppingCartDto shoppingCartDto) {
         log.info("get Total Price Of Shopping Cart");
         ShoppingCart shoppingCart = convertToShoppingCart(shoppingCartDto);
@@ -857,9 +679,7 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username,uuid);
         Product product = modelMapper.map(productDto, Product.class);
         Store store = tradingSystem.getStore(product.getStoreId());
-        Boolean ans = user.saveProductInShoppingBag(store, product, amount);
-        tradingSystem.getTradingSystemDao().addUserSystem(user, null);
-        return ans;
+        return tradingSystemDao.saveProductInShoppingBag(user, store, product, amount);
     }
 
     public  List<ProductShoppingCartDto> getShoppingCart(String username, UUID uuid) {
@@ -980,9 +800,7 @@ public class TradingSystemFacade {
      */
     public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid);
-        Boolean ans = user.changeProductAmountInShoppingBag(storeId, amount, productSn);
-        tradingSystem.getTradingSystemDao().addUserSystem(user, null);
-        return ans;
+        return tradingSystemDao.changeProductAmountInShoppingBag(user, storeId, amount, productSn);
     }
 
     /**
@@ -1018,16 +836,6 @@ public class TradingSystemFacade {
         return modelMapper.map(products, listType);
     }
 
-    /**
-     * converter of ProductDto list to Product list
-     * @param productDtos - list of productDtos
-     * @return list of products
-     */
-    private List<Product> converterProductsList(@NotNull List<@NotNull ProductDto> productDtos) {
-        Type listType = new TypeToken<List<Product>>() {}.getType();
-        return modelMapper.map(productDtos, listType);
-    }
-
     private List<NotificationDto> convertNotificationList(@NotNull List<@NotNull Notification> notifications) {
         Type listType = new TypeToken<List<NotificationDto>>() {}.getType();
         return modelMapper.map(notifications, listType);
@@ -1047,6 +855,5 @@ public class TradingSystemFacade {
         Type listType = new TypeToken<Set<UserSystemDto>>() {}.getType();
         return modelMapper.map(users, listType);
     }
-
 
 }

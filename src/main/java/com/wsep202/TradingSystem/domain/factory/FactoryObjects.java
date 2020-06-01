@@ -1,5 +1,7 @@
 package com.wsep202.TradingSystem.domain.factory;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.Product;
+import com.wsep202.TradingSystem.domain.trading_system_management.ProductCategory;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 
 /**
@@ -17,4 +19,13 @@ public class FactoryObjects {
                 .lastName(lastName).build();
     }
 
+    public Product createProduct(String productName, ProductCategory productCategory, int amount, double cost, int storeId) {
+        return Product.builder()
+                .name(productName)
+                .category(productCategory)
+                .amount(amount)
+                .cost(cost)
+                .storeId(storeId)
+                .build();
+    }
 }

@@ -321,6 +321,7 @@ public class TradingSystem {
         }
         List<Receipt> receipts = purchaseAndDeliver(paymentDetails, user.getShoppingCart(), billingAddress, user.getUserName());
         user.addReceipts(receipts);
+        tradingSystemDao.updateUser(user);
         return receipts;
     }
 
@@ -385,7 +386,7 @@ public class TradingSystem {
             && tradingSystemDao.isRegistered(user)) {
             Store newStore = new Store(user, storeName, description);
             user.addNewOwnedStore(newStore);
-            tradingSystemDao.addStore(newStore);
+            tradingSystemDao.updateStoreAndUserSystem(newStore, user);
             log.info(String.format("A new store '%s' was opened in the system, %s is the owner", storeName, user.getUserName()));
             return newStore;
         }
@@ -409,6 +410,7 @@ public class TradingSystem {
             if(Objects.nonNull(mangerStore)) {
                 log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.get().getUserName(), ownedStore.getStoreId()));
                 if(newManagerUser.get().addNewManageStore(ownedStore)){
+                    tradingSystemDao.updateStoreAndUserSystem(ownedStore, newManagerUser.get());
                     return mangerStore;
                 }
             }
@@ -426,14 +428,18 @@ public class TradingSystem {
      * @return true if the addition was successful, false if there were a problem
      */
     public boolean addOwnerToStore(Store ownedStore, UserSystem ownerUser, String newOwnerUser) {
+        boolean res= false;
         UserSystem userSystem = tradingSystemDao.getUserSystem(newOwnerUser).orElse(null);
         if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(userSystem)
                 && ownedStore.addOwner(ownerUser, userSystem)) {
             log.info(String.format("user %s was added as manager in store '%d'", newOwnerUser, ownedStore.getStoreId()));
-            return userSystem.addNewOwnedStore(ownedStore);
+            res = userSystem.addNewOwnedStore(ownedStore);
+        }
+        if(res){
+            tradingSystemDao.updateStoreAndUserSystem(ownedStore, userSystem);
         }
         log.info("failed add user as owner in store");
-        return false;
+        return res;
     }
 
     /**
@@ -466,6 +472,7 @@ public class TradingSystem {
     public boolean removeManager(Store ownedStSore, UserSystem ownerUser, UserSystem managerStore) {
         if (Objects.nonNull(ownedStSore) && Objects.nonNull(ownerUser) && Objects.nonNull(managerStore)
                 && ownedStSore.removeManager(ownerUser, managerStore)) {
+            tradingSystemDao.updateStoreAndUserSystem(ownedStSore, ownerUser);
             log.info(String.format("user %s was removed as manager from store '%d'", managerStore.getUserName(), ownedStSore.getStoreId()));
             return true;
         }
@@ -484,6 +491,7 @@ public class TradingSystem {
     public boolean removeOwner(Store store, UserSystem ownerUser, UserSystem removeOwner) {
         if (Objects.nonNull(store) && Objects.nonNull(ownerUser) && Objects.nonNull(removeOwner)
                 && store.removeOwner(ownerUser, removeOwner)) {
+            tradingSystemDao.updateStoreAndUserSystem(store, ownerUser);
             log.info(String.format("user %s was removed as owner from store '%d'", removeOwner.getUserName(), store.getStoreId()));
             return true;
         }

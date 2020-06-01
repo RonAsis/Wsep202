@@ -18,13 +18,8 @@ import java.util.*;
 @Entity
 public class Receipt {
 
-    /**
-     * saves the last receiptSnAcc when a new receipt is created
-     */
-    private static int receiptSnAcc = 1;
-
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int receiptSn;
 
     /**

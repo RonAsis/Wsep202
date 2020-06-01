@@ -52,13 +52,14 @@ public class UserSystem implements Observer, Serializable {
      * The stores that the user manages
      */
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @Column(unique = true)
     private Set<Store> managedStores = new HashSet<>();
     /**
      * The stores that the user own
      */
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<Store> ownedStores = new HashSet<>();
     /**
      * The user personal shopping cart
@@ -75,7 +76,7 @@ public class UserSystem implements Observer, Serializable {
      * The users personal receipts list
      */
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(orphanRemoval = true)
     private List<Receipt> receipts = new LinkedList<>();
 
     /**
@@ -370,5 +371,10 @@ public class UserSystem implements Observer, Serializable {
                     this.receipts.add(rep);
             }
         }
+    }
+
+    public ShoppingCart getShoppingCart(){
+        shoppingCart.applyDiscountPolicies();
+        return shoppingCart;
     }
 }

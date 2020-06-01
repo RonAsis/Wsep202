@@ -8,14 +8,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
 @Entity
+@Data
 public class MangerStore implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     /**
      *  the permissions that were given to the manager
      */
@@ -27,7 +29,6 @@ public class MangerStore implements Serializable {
      *  the actual user that appointed to be manager
      */
     @OneToOne(cascade = CascadeType.ALL)
-    @Id
     private UserSystem appointedManager;
 
     public MangerStore(UserSystem appointedManager) {
