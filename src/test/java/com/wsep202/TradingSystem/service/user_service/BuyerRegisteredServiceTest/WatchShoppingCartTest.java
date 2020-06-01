@@ -66,7 +66,7 @@ public class WatchShoppingCartTest {
      * add a valid product in a registered user's shopping bag
      */
     @Test
-    void addValidProductRegisteredUser() {
+    void viewShoppingCartValidProductRegisteredUser() {
         Pair<StoreDto, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAndAddProduct();
         this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
                 1, returnedValue.getValue(), this.uuid);
@@ -97,11 +97,11 @@ public class WatchShoppingCartTest {
      */
     @Test
     void viewShoppingCartValidUserNotEmptyCart() {
-        Assertions.assertThrows(Exception.class, ()-> {
+//        Assertions.assertThrows(Exception.class, ()-> {
             this.helper.openStoreAndAddProduct(this.user, this.uuid);
-            this.buyerRegisteredService.watchShoppingCart(
-                    this.user.getUserName(), uuid);
-        });
+            Assertions.assertNotNull(this.buyerRegisteredService.watchShoppingCart(
+                    this.user.getUserName(), uuid));
+//        });
     }
 
 }

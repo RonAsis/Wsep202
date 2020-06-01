@@ -33,12 +33,14 @@ public class LoginTest {
     UserSystemDto user = new UserSystemDto("username","name","lname");
     String userPassword = "password";
     MultipartFile image = null;
+    int counter = 0;
 
     @BeforeEach
     void setUp() {
         if (this.helper == null || this.helper.getGuestService() == null ){
             this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService);
         }
+        this.user.setUserName(this.user.getUserName()+this.counter);
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
     }
