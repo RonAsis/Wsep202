@@ -2,11 +2,9 @@ package com.wsep202.TradingSystem.service;
 
 import com.wsep202.TradingSystem.dto.NotificationDto;
 import com.wsep202.TradingSystem.service.user_service.NotificationService;
-import lombok.NoArgsConstructor;
+import com.wsep202.TradingSystem.service.user_service.NotificationServiceImpl;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

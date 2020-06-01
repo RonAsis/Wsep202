@@ -18,13 +18,19 @@ export class OwnedStoreEditComponent implements OnInit {
   store: Store;
   loadedFeature: string;
   isOwner = false;
+  permissions: string [];
 
   ngOnInit(): void {
     this.store = this.shareService.storeSelected;
     this.loadedFeature = 'Edit-Product';
-    this.storeService.getIsOwner(this.store.storeId).subscribe(response =>{
+    this.storeService.getIsOwner(this.store.storeId).subscribe(response => {
       if (response){
         this.isOwner = true;
+      }
+    });
+    this.storeService.getMyPermissions(this.store.storeId).subscribe(response => {
+      if ( response !== undefined){
+        this.permissions = response;
       }
     });
   }
@@ -57,4 +63,15 @@ export class OwnedStoreEditComponent implements OnInit {
     this.onDiscounts();
   }
 
+  isManagerCanEditDiscount() {
+    return this.permissions.includes('edit product');
+  }
+
+  isManagerCanEditProduct() {
+    return this.permissions.includes('edit discount');
+  }
+
+  isManagerCanEditPurchasePolicy() {
+    return this.permissions.includes('edit purchase policy');
+  }
 }

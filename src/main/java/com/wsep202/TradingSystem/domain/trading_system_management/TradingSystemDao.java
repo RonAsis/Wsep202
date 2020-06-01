@@ -27,7 +27,7 @@ public interface TradingSystemDao {
 
     List<Product> searchProductByKeyWords(List<String> keyWords);
 
-    void addStore(Store newStore);
+    void addStore(Store newStore, UserSystem userSystem);
 
     Set<Store> getStores();
 

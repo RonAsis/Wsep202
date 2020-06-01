@@ -4,11 +4,14 @@ import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchas
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchaseType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
+import javax.persistence.OneToOne;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +24,14 @@ import java.util.Set;
 public class PurchasePolicyDto {
 
     protected int purchaseId;
+    /**
+     * types of discounts in the store
+     */
+    @OneToOne(cascade = CascadeType.ALL)
+    private PurchasePolicy purchasePolicy;
+
+    private PurchaseType purchaseType;
+
     /**
      * list of countries that the store have deliveries to
      */
@@ -47,14 +58,6 @@ public class PurchasePolicyDto {
      * children components of the composite Purchase policy
      * the operands of the composed Purchase policy
      */
-    private List<Purchase> composedPurchasePolicies;
-    /**
-     * the types of purchase exist in the store
-     */
-    private Map<String, PurchasePolicy> purchasePolicies;
-    /**
-     * tells if its purchase policy at the shopping bag level
-     */
-    private boolean isShoppingBagPurchaseLimit;
+    private List<PurchasePolicyDto> composedPurchasePolicies;
 
 }

@@ -21,7 +21,6 @@ import java.util.UUID;
 public class LogoutDefinition extends ActivityDefinition {
 
     private String userName;
-    private String password;
 
     public final static String type = "logout";
 

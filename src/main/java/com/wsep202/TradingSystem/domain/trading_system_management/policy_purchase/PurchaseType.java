@@ -1,4 +1,4 @@
-package com.wsep202.TradingSystem.domain.trading_system_management;
+package com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase;
 import com.wsep202.TradingSystem.domain.exception.*;
 
 import java.util.Arrays;
@@ -6,6 +6,7 @@ import java.util.Arrays;
 public enum PurchaseType {
 
     BUY_IMMEDIATELY("Buy immediately");
+
 
     public final String type;
 

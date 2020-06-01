@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.service.user_service.GuestServiceTest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
@@ -9,6 +10,8 @@ import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
 import com.wsep202.TradingSystem.service.user_service.ServiceTestsHelper;
+import externals.ChargeSystem;
+import externals.SupplySystem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TradingSystemConfiguration.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
@@ -33,7 +40,7 @@ public class PurchaseShoppingCartGuestTest {
     @Autowired
     SellerOwnerService sellerOwnerService;
     ServiceTestsHelper helper;
-    ObjectMapper objectMapper;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     UserSystemDto user = new UserSystemDto("username","name","lname");
     String userPassword = "password";
@@ -44,7 +51,11 @@ public class PurchaseShoppingCartGuestTest {
             "address", "city", "country", "1");
     PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto( "123456789", 798, "123456789");
     PaymentDetailsDto invalidPaymentDetailsDto = new PaymentDetailsDto( "123456789", 1, "123456789");
-    ShoppingCartDto shoppingCartDto;
+    ShoppingCartDto shoppingCartDto = new ShoppingCartDto();
+
+    //the external systems
+    private ChargeSystem chargeSystem;
+    private SupplySystem supplySystem;
 
     @BeforeEach
     void setUp() {
@@ -52,6 +63,8 @@ public class PurchaseShoppingCartGuestTest {
             this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService,
                     this.sellerOwnerService);
         }
+        chargeSystem = mock(ChargeSystem.class);
+        supplySystem = mock(SupplySystem.class);
     }
 
     /**
@@ -59,10 +72,14 @@ public class PurchaseShoppingCartGuestTest {
      */
     @Test
     void purchaseEmptyShoppingCart() {
-        this.shoppingCartDto = new ShoppingCartDto();
         PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, this.billingAddressDto);
-        //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
-        //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
+        try {
+            String purchaseDtoString = objectMapper.writeValueAsString(purchaseDto);
+//            when(chargeSystem.sendPaymentTransaction(any(), any(), any())).thenReturn(true);
+            when(supplySystem.deliver(any(), any())).thenReturn(true);
+            Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
+        } catch (Exception e) {
+        }
     }
 
     /**
@@ -70,11 +87,14 @@ public class PurchaseShoppingCartGuestTest {
      */
     @Test
     void purchaseShoppingCartNullPaymentDetails() {
-        this.shoppingCartDto = new ShoppingCartDto();
         PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, null, this.billingAddressDto);
-        //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
-        //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
-
+        try {
+            String purchaseDtoString = objectMapper.writeValueAsString(purchaseDto);
+//            when(chargeSystem.sendPaymentTransaction(any(), any(), any())).thenReturn(true);
+            when(supplySystem.deliver(any(), any())).thenReturn(true);
+            Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
+        } catch (Exception e) {
+        }
     }
 
     /**
@@ -82,22 +102,28 @@ public class PurchaseShoppingCartGuestTest {
      */
     @Test
     void purchaseShoppingCartNullBillingAddress() {
-        this.shoppingCartDto = new ShoppingCartDto();
         PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, null);
-        //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
-        //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
-
+        try {
+            String purchaseDtoString = objectMapper.writeValueAsString(purchaseDto);
+//            when(chargeSystem.sendPaymentTransaction(any(), any(), any())).thenReturn(true);
+            when(supplySystem.deliver(any(), any())).thenReturn(true);
+            Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
+        } catch (Exception e) {
+        }
     }
     /**
      * purchase shopping with invalid payment details
      */
     @Test
     void purchaseShoppingCartInvalidPaymentDetails() {
-        this.shoppingCartDto = new ShoppingCartDto();
         PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.invalidPaymentDetailsDto, this.billingAddressDto);
-        //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
-        //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
-
+        try {
+            String purchaseDtoString = objectMapper.writeValueAsString(purchaseDto);
+            //when(chargeSystem.sendPaymentTransaction(any(), any(), any())).thenReturn(true);
+            when(supplySystem.deliver(any(), any())).thenReturn(true);
+            Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
+        } catch (Exception e) {
+        }
     }
 
     /**
@@ -105,11 +131,14 @@ public class PurchaseShoppingCartGuestTest {
      */
     @Test
     void purchaseShoppingCartInvalidBillingAddress() {
-        this.shoppingCartDto = new ShoppingCartDto();
         PurchaseDto purchaseDto = new PurchaseDto(this.shoppingCartDto, this.paymentDetailsDto, this.invalidBillingAddressDto);
-        //String purchaseDtoString = objectMapper.readValue(purchaseDto, PurchaseDto.class);
-        //Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
-
+        try {
+            String purchaseDtoString = objectMapper.writeValueAsString(purchaseDto);
+//            when(chargeSystem.sendPaymentTransaction(any(), any(), any())).thenReturn(true);
+            when(supplySystem.deliver(any(), any())).thenReturn(true);
+            Assertions.assertNull(this.guestService.purchaseShoppingCartGuest(purchaseDtoString));
+        } catch (Exception e) {
+        }
     }
 
 

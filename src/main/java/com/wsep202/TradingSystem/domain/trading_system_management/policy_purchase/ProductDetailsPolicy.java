@@ -16,29 +16,45 @@ import java.util.Optional;
 @Builder
 public class ProductDetailsPolicy extends PurchasePolicy {
 
+    /**
+     * the valid range of amount of products to buy in a purchase
+     * in ShoppingBagDetails it is the amount of different items
+     * in ProductDetails it is the amount of items from a specific one product
+     */
+    private int min,max;
+    /**
+     * the SN of product which has limitations amounts
+     */
+    private int productId;
+
+    public ProductDetailsPolicy(int min, int max, int productId) {
+        this.min = min;
+        this.max = max;
+        this.productId = productId;
+    }
 
     @Override
     public boolean isApproved(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {
         Optional<Product> optionalProduct = products.keySet().stream().
-                filter(product -> product.getProductSn()==purchase.getProductId()).findFirst();
+                filter(product -> product.getProductSn()== productId).findFirst();
 
         if(optionalProduct.isPresent()){
             Product productInStore = optionalProduct.get();
             int amount = products.get(productInStore);
-            boolean isApproved = isStandsInTerms(amount,purchase.getMin(),purchase.getMax());
+            boolean isApproved = isStandsInTerms(amount,min,max);
             if(!isApproved){
                 log.info("bad amount of items for product: "+productInStore.getName()+" \npurchase " +
                         "policy failed");
                 throw new PurchasePolicyException("Sorry, your product details are incompatible with" +
                         "purchase policy: product '"+productInStore.getName()+"' has "
-                        +amount+" items but the policy minimum required is "+purchase.getMin()+ "and maximum is "+
-                        purchase.getMax());
+                        +amount+" items but the policy minimum required is "+ min+ "and maximum is "+
+                        max);
             }
         log.info("product: "+productInStore.getName()+" passed the product purchase policy with" +
                 "ID: "+ purchase.purchaseId);
         }
         //succeeded due to empty manner or product stands in terms
-        log.info("purchase policy of product details passed for: "+purchase.getProductId());
+        log.info("purchase policy of product details passed for: "+ productId);
         return true;
     }
 
@@ -48,7 +64,23 @@ public class ProductDetailsPolicy extends PurchasePolicy {
      * @return
      */
     private boolean isStandsInTerms(int amount,int min,int max) {
-        return amount >= min && amount <= max;
+        return amount >= min && amount <= max && min>=0 && max>0;
     }
 
+    /**
+     * edit min and max
+     * @param min - amount of product to buy
+     * @param max - amount of product to buy
+     * @return true if success, else false
+     */
+    public boolean edit(Purchase purchase, int min,int max, int productId){
+        if(min < 0 || max < 0 || min > max || this.productId != productId){
+            log.info("problem with updating product details in product purchase policy number " + purchase.purchaseId);
+            return false;
+        }
+        this.min = min;
+        this.max = max;
+        log.info("updated product details in product purchase policy number " + purchase.purchaseId);
+        return true;
+    }
 }

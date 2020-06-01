@@ -84,7 +84,7 @@ public class AddPermissionTest {
     @Test
     void addValidNotAddedPermission() {
         Assertions.assertTrue(this.sellerOwnerService.addPermission(this.user.getUserName(), this.storeId,
-                this.manager.getUserName(), "edit", this.uuid));
+                this.manager.getUserName(), "edit purchase policy", this.uuid));
     }
 
     /**

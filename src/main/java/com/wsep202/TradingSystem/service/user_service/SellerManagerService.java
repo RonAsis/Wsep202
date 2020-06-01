@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
 import com.wsep202.TradingSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class SellerManagerService {
     /**
      * UC 4.2 (inherited from owner) - adding/ editing the store's purchase's policies.
      */
-    public PurchaseDto addEditPurchasePolicy(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
+    public PurchasePolicyDto addEditPurchasePolicy(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
         return tradingSystemFacade.addEditPurchase(username, storeId, purchaseDto, uuid);
     }
 
