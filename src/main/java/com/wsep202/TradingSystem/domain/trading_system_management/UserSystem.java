@@ -10,6 +10,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.notification.O
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -22,7 +23,7 @@ import java.util.*;
 @Slf4j
 @Builder
 @Entity
-public class UserSystem implements Observer {
+public class UserSystem implements Observer, Serializable {
 
     /**
      * the user name
@@ -63,7 +64,7 @@ public class UserSystem implements Observer {
      * The user personal shopping cart
      */
     @Builder.Default
-    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private ShoppingCart shoppingCart = new ShoppingCart();
     /**
      * Show the stage of the user, logged-in or logged-out
@@ -74,7 +75,7 @@ public class UserSystem implements Observer {
      * The users personal receipts list
      */
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Receipt> receipts = new LinkedList<>();
 
     /**

@@ -5,6 +5,7 @@ import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -16,41 +17,32 @@ import java.util.Map;
 @Slf4j
 @Builder
 @AllArgsConstructor
-//@NoArgsConstructor
 @Getter
 @Setter
-@Entity
+@Entity(name = "shopping_cart")
 public class ShoppingCart {
 
-    /**
-     * saves the last shoppingCartSnAcc when a new product is created
-     */
-    private static int shoppingCartSnAcc = 1;
-
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Min(value = 1, message = "Must be greater than or equal zero")
+    @GeneratedValue
+    @Column(columnDefinition = "id")
     private int id;
     /**
      * list of stores and there shopping bags
      */
     @Builder.Default
-    @JoinTable()
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "hopping_cart_shopping_bag_mapping",
+            joinColumns = {@JoinColumn(name = "shopping_cart_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "shopping_bag_id", referencedColumnName = "id")})
+    @MapKeyJoinColumn(name = "store_store_id")
     private Map<Store, ShoppingBag> shoppingBagsList;
 
     public ShoppingCart(Map<Store,ShoppingBag> shoppingBagsList){
-        id = generateShoppingCartSn();
         this.shoppingBagsList=shoppingBagsList;
     }
 
     public ShoppingCart(){
-        id = generateShoppingCartSn();
         this.shoppingBagsList = new HashMap<>();
-    }
-
-    private int generateShoppingCartSn(){
-        return shoppingCartSnAcc++;
     }
 
     /**

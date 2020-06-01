@@ -84,40 +84,7 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
     }
 
     @Override
-    public List<Product> searchProductByName(String productName) {
-        return new ArrayList<>(stores.stream()
-                .map(store -> store.searchProductByName(productName))
-                .reduce((products, products2) -> {
-                    products.addAll(products2);
-                    return products;
-                })
-                .orElse(new HashSet<>()));
-    }
-
-    @Override
-    public List<Product> searchProductByCategory(ProductCategory productCategory) {
-        return new ArrayList<>(stores.stream()
-                .map(store -> store.searchProductByCategory(productCategory))
-                .reduce((products, products2) -> {
-                    products.addAll(products2);
-                    return products;
-                })
-                .orElse(new HashSet<>()));
-    }
-
-    @Override
-    public List<Product> searchProductByKeyWords(List<String> keyWords) {
-        return new ArrayList<>(stores.stream()
-                .map(store -> store.searchProductByKeyWords(keyWords))
-                .reduce((products, products2) -> {
-                    products.addAll(products2);
-                    return products;
-                })
-                .orElse(new HashSet<>()));
-    }
-
-    @Override
-    public void addStore(Store newStore, UserSystem userSystem) {
+    public void addStore(Store newStore) {
         this.stores.add(newStore);
     }
 

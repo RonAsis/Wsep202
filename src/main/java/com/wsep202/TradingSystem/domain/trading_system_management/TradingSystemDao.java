@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface TradingSystemDao {
+
     void registerAdmin(UserSystem admin);
 
     boolean isRegistered(UserSystem userSystem);
@@ -21,13 +22,7 @@ public interface TradingSystemDao {
 
     Optional<Store> getStore(int storeId);
 
-    List<Product> searchProductByName(String productName);
-
-    List<Product> searchProductByCategory(ProductCategory productCategory);
-
-    List<Product> searchProductByKeyWords(List<String> keyWords);
-
-    void addStore(Store newStore, UserSystem userSystem);
+    void addStore(Store newStore);
 
     Set<Store> getStores();
 

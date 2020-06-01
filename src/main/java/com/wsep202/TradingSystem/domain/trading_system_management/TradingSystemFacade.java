@@ -159,7 +159,7 @@ public class TradingSystemFacade {
             }
             Product product = new Product(productName, productCategory, amount, cost, storeId);
             if(ownerStore.addNewProduct(user, product)) {
-                tradingSystem.getTradingSystemDao().addStore(ownerStore, user);
+                tradingSystem.getTradingSystemDao().addStore(ownerStore);
                 return modelMapper.map(product, ProductDto.class);
             }
             else return null;
@@ -189,7 +189,7 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
         Boolean ans = store.removeDiscount(user, discountId);
-        tradingSystem.getTradingSystemDao().addStore(store,user);
+        tradingSystem.getTradingSystemDao().addStore(store);
         return ans;
     }
 
@@ -206,7 +206,7 @@ public class TradingSystemFacade {
         Store store = user.getOwnerOrManagerStore(storeId);
         Discount discount = modelMapper.map(discountDto, Discount.class);
         DiscountDto ans = modelMapper.map(store.addEditDiscount(user, discount), DiscountDto.class);
-        tradingSystem.getTradingSystemDao().addStore(store, user);
+        tradingSystem.getTradingSystemDao().addStore(store);
         return ans;
     }
 
@@ -226,7 +226,7 @@ public class TradingSystemFacade {
                 purchaseDto.getStoreWorkDays(),purchaseDto.getMin(),purchaseDto.getMax(),
                 purchaseDto.getProductId(),purchaseDto.getCompositeOperator(),
                 convert(purchaseDto.getComposedPurchasePolicies())), PurchasePolicyDto.class);
-        tradingSystem.getTradingSystemDao().addStore(store, user);
+        tradingSystem.getTradingSystemDao().addStore(store);
         return ans;
     }
 
@@ -256,7 +256,7 @@ public class TradingSystemFacade {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get the registered user
             Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he is owner of the store
             Boolean ans = ownerStore.removeProductFromStore(user, productSn);
-            tradingSystem.getTradingSystemDao().addStore(ownerStore, user);
+            tradingSystem.getTradingSystemDao().addStore(ownerStore);
             return ans;
         } catch (TradingSystemException e) {
             log.error("deleteProduct from store failed", e);
@@ -287,7 +287,7 @@ public class TradingSystemFacade {
                 return false;
             }
             Boolean ans = ownerStore.editProduct(user, productSn, productName, category, amount, cost);
-            tradingSystem.getTradingSystemDao().addStore(ownerStore, user);
+            tradingSystem.getTradingSystemDao().addStore(ownerStore);
             return ans;
         } catch (TradingSystemException e) {
             log.error("editProduct failed", e);
@@ -310,7 +310,7 @@ public class TradingSystemFacade {
             Store ownerStore = ownerUser.getOwnerStore(storeId);
             //return tradingSystem.createNewAppointingAgreement(ownerStore, ownerUser, newOwnerUsername);
             Boolean ans = tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
-            tradingSystem.getTradingSystemDao().addStore(ownerStore, ownerUser);
+            tradingSystem.getTradingSystemDao().addStore(ownerStore);
             return ans;
         } catch (TradingSystemException e) {
             log.error("Add owner failed", e);
@@ -332,7 +332,7 @@ public class TradingSystemFacade {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
             Store ownedStore = ownerUser.getOwnerStore(storeId);
             MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUsername);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore, ownerUser);
+            tradingSystem.getTradingSystemDao().addStore(ownedStore);
             return Objects.nonNull(mangerStore) ? modelMapper.map(mangerStore, ManagerDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("Add manager failed", e);
@@ -357,7 +357,7 @@ public class TradingSystemFacade {
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             StorePermission storePermission = StorePermission.getStorePermission(permission);
             Boolean ans = ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore, ownerUser);
+            tradingSystem.getTradingSystemDao().addStore(ownedStore);
             return ans;
         } catch (TradingSystemException e) {
             log.error("Add permission failed", e);
@@ -382,7 +382,7 @@ public class TradingSystemFacade {
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             StorePermission storePermission = StorePermission.getStorePermission(permission);
             Boolean ans = ownedStore.removePermission(ownerUser, managerStore, storePermission);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore, ownerUser);
+            tradingSystem.getTradingSystemDao().addStore(ownedStore);
             return ans;
         } catch (TradingSystemException e) {
             log.error("Add permission failed", e);
@@ -426,7 +426,7 @@ public class TradingSystemFacade {
             Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             Boolean ans = tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore, ownerUser);
+            tradingSystem.getTradingSystemDao().addStore(ownedStore);
             return ans;
         } catch (TradingSystemException e) {
             log.error("remove manager failed", e);
@@ -449,7 +449,7 @@ public class TradingSystemFacade {
             Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
             UserSystem removeOwner = ownedStore.getAppointedOwner(ownerUser, ownerToRemove);
             Boolean ans = tradingSystem.removeOwner(ownedStore, ownerUser, removeOwner);
-            tradingSystem.getTradingSystemDao().addStore(ownedStore, ownerUser);
+            tradingSystem.getTradingSystemDao().addStore(ownedStore);
             return ans;
         } catch (TradingSystemException e) {
             log.error("remove owner failed", e);

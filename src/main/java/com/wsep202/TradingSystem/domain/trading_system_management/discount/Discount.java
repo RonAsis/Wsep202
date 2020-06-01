@@ -24,15 +24,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Entity
 public class Discount {
 
-
     /**
      * saves the last discountSnAcc when a new product is created
      */
     private static int discountSnAcc = 1;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Min(value = 1, message = "Must be greater than or equal zero")
+    @GeneratedValue
     protected int discountId;
 
     /**
@@ -66,17 +64,12 @@ public class Discount {
                     String description,
                     DiscountPolicy discountPolicy,
                     DiscountType discountType) {
-        discountId = generateDiscountSn();
         this.discountPercentage = discountPercentage;
         this.endTime = endTime;
         this.description = description;
         this.isApplied = false;
         this.discountPolicy = discountPolicy;
         this.discountType = discountType;
-    }
-
-    private int generateDiscountSn(){
-        return discountSnAcc++;
     }
 
     /**

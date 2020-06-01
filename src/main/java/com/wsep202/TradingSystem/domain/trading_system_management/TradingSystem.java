@@ -207,8 +207,8 @@ public class TradingSystem {
      * @return - a list that contains all suitable products.
      */
     public List<Product> searchProductByName(String productName) {
-        return tradingSystemDao.searchProductByName(productName);
-
+        //return tradingSystemDao.searchProductByName(productName);
+            return null;
     }
 
     /**
@@ -219,7 +219,8 @@ public class TradingSystem {
      * @return - a list that contains all suitable products.
      */
     public List<Product> searchProductByCategory(ProductCategory productCategory) {
-        return tradingSystemDao.searchProductByCategory(productCategory);
+//        return tradingSystemDao.searchProductByCategory(productCategory);
+        return null;
     }
 
     /**
@@ -230,7 +231,8 @@ public class TradingSystem {
      * @return - a list that contains all suitable products.
      */
     public List<Product> searchProductByKeyWords(List<String> keyWords) {
-        return tradingSystemDao.searchProductByKeyWords(keyWords);
+      //  return tradingSystemDao.searchProductByKeyWords(keyWords);
+        return null;
     }
 
     /**
@@ -383,7 +385,7 @@ public class TradingSystem {
             && tradingSystemDao.isRegistered(user)) {
             Store newStore = new Store(user, storeName, description);
             user.addNewOwnedStore(newStore);
-            tradingSystemDao.addStore(newStore, user);
+            tradingSystemDao.addStore(newStore);
             log.info(String.format("A new store '%s' was opened in the system, %s is the owner", storeName, user.getUserName()));
             return newStore;
         }

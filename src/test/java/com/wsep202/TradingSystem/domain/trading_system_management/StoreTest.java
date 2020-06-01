@@ -340,7 +340,7 @@ class StoreTest {
             //setup : adding alex as manager to the store
             addManagerSetup();
             //success: the manager alex is returned as expected
-            Assertions.assertEquals("Alex", storeUT.getManagerObject(owner, "Alex").getAppointedManagerName());
+            Assertions.assertEquals("Alex", storeUT.getManagerObject(owner, "Alex").getAppointedManager());
         }
 
         /**
@@ -1123,7 +1123,7 @@ class StoreTest {
             //setup : adding alex as manager to the store
             addManagerSetup();
             //success: the manager alex is returned as expected
-            Assertions.assertEquals("Alex", storeUT.getManagerObject(ownerRealUser, "Alex").getAppointedManagerName());
+            Assertions.assertEquals("Alex", storeUT.getManagerObject(ownerRealUser, "Alex").getAppointedManager());
         }
 
         /**

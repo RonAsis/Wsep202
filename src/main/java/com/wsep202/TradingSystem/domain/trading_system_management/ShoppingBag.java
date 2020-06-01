@@ -18,17 +18,12 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
+@Entity(name = "shopping_bag")
 public class ShoppingBag {
 
-    /**
-     * saves the last shoppingBagSnAcc when a new product is created
-     */
-    private static int shoppingBagSnAcc = 1;
-
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Min(value = 1, message = "Must be greater than or equal zero")
+    @GeneratedValue
+    @Column(columnDefinition = "shopping_bag_id")
     private int id;
 
     /**
@@ -45,14 +40,8 @@ public class ShoppingBag {
 
 
     public ShoppingBag(Store storeOfProduct){
-        id = generateShoppingBagSn();
         this.storeOfProduct = storeOfProduct;
         productListFromStore = new HashMap<>();
-    }
-
-
-    private int generateShoppingBagSn(){
-        return shoppingBagSnAcc++;
     }
 
     /**
@@ -184,5 +173,16 @@ public class ShoppingBag {
 
     public int getNumOfProducts() {
         return productListFromStore.values().size();
+    }
+
+    @ManyToOne(optional = false)
+    private ShoppingCart shoppingCarts;
+
+    public ShoppingCart getShoppingCarts() {
+        return shoppingCarts;
+    }
+
+    public void setShoppingCarts(ShoppingCart shoppingCarts) {
+        this.shoppingCarts = shoppingCarts;
     }
 }

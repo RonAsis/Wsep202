@@ -23,6 +23,7 @@ public class GuestService { //notice: most of the UCs related to the guest cart 
     private final TradingSystemFacade tradingSystemFacade;
 
     private final ObjectMapper objectMapper;
+
     /**
      * Guest registration - UC 2.2
      */
@@ -30,7 +31,7 @@ public class GuestService { //notice: most of the UCs related to the guest cart 
                                 String password,
                                 String firstName,
                                 String lastName,
-                                MultipartFile image){
+                                MultipartFile image) {
         return tradingSystemFacade.registerUser(username, password, firstName, lastName, image);
     }
 
@@ -38,19 +39,19 @@ public class GuestService { //notice: most of the UCs related to the guest cart 
      * Guest login - UC 2.3
      */
     public Pair<UUID, Boolean> login(String username,
-                                     String password){
+                                     String password) {
         return tradingSystemFacade.login(username, password);
     }
 
     /**
      * Guest purchase products - UC 2.8
      */
-    public List<ReceiptDto> purchaseShoppingCartGuest(String purchaseJsonNode){
+    public List<ReceiptDto> purchaseShoppingCartGuest(String purchaseJsonNode) {
         PurchaseDto purchaseDto = createPurchaseDto(purchaseJsonNode);
         return tradingSystemFacade.purchaseShoppingCart(purchaseDto.getShoppingCartDto(),
                 purchaseDto.getPaymentDetailsDto(), purchaseDto.getBillingAddressDto());
     }
-    //UC 2.4
+
     /**
      * Guest watch on stores - UC 2.4.1
      */
@@ -73,7 +74,8 @@ public class GuestService { //notice: most of the UCs related to the guest cart 
         return tradingSystemFacade.getTotalPriceOfShoppingCart(createShoppingCartDto(shoppingCart));
     }
 
-    private ShoppingCartDto createShoppingCartDto(String shoppingCart){
+    //////////////////////////////////////////////general//////////////////////////////////
+    private ShoppingCartDto createShoppingCartDto(String shoppingCart) {
         try {
             return objectMapper.readValue(shoppingCart, ShoppingCartDto.class);
         } catch (IOException e) {
@@ -82,7 +84,7 @@ public class GuestService { //notice: most of the UCs related to the guest cart 
         }
     }
 
-    private PurchaseDto createPurchaseDto(String purchaseDto){
+    private PurchaseDto createPurchaseDto(String purchaseDto) {
         try {
             return objectMapper.readValue(purchaseDto, PurchaseDto.class);
         } catch (IOException e) {

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface NotificationService {
 
-     void sendNotification(List<NotificationDto> notificationDtos);
+    void sendNotification(List<NotificationDto> notificationDtos);
 
     void addUser(String username, UUID uuid, String principal);
 }

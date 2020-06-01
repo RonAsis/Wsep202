@@ -81,7 +81,6 @@ public class Product {
     private int storeId;
 
     public Product(String name, ProductCategory category, int amount, double cost, int storeId){
-        this.productSn = generateProductSn();
         this.name = name;
         this.category = category;
         this.amount = amount;
@@ -89,14 +88,6 @@ public class Product {
         this.originalCost = cost;
         this.rank = 5;
         this.storeId = storeId;
-    }
-
-    /**
-     * Generates a new productSn (to ensure productSn is unique).
-     * @return - the new produceSn.
-     */
-    private int generateProductSn(){
-        return productSnAcc++;
     }
 
     /**

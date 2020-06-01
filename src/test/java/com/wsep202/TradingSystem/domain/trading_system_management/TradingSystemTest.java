@@ -910,7 +910,7 @@ class TradingSystemTest {
             Set<UserSystem> owners = new HashSet<>();
             owners.add(userSystem1);
             when(store.getOwners()).thenReturn(owners);
-            doNothing().when(tradingSystemDao).addStore(store,userSystem1);
+            doNothing().when(tradingSystemDao).addStore(store);
             when(store.getStoreName()).thenReturn("castro");
             when(userSystem.addNewOwnedStore(any())).thenReturn(true);
         }

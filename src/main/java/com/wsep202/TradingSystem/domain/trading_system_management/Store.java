@@ -8,6 +8,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchas
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Setter
 @Getter
-@Entity
+@Entity(name = "store")
 public class Store {
     @Transient
     private final Object stockLock = new Object();
@@ -31,8 +32,8 @@ public class Store {
     private static int storeSnAcc = 1;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Min(value = 1, message = "Must be greater than or equal zero")
+    @GeneratedValue
+    @Column(columnDefinition = "store_id")
     private int storeId;        //unique identifier for the store
 
     private String storeName;
@@ -86,8 +87,32 @@ public class Store {
         initStore(owner, storeName);
     }
 
+    public Store(String storeName, List<OwnersAppointee> appointedOwners,
+                 List<ManagersAppointee> appointedManagers,
+                 Set<Product> products,
+                 List<Purchase> purchasePolicies,
+                 List<Discount> discounts,
+                 Set<UserSystem> owners,
+                 Set<MangerStore> managers,
+                 List<Receipt> receipts,
+                 int rank, String description,
+                 List<AppointingAgreement> appointingAgreements) {
+        this.storeName = storeName;
+        this.appointedOwners = appointedOwners;
+        this.appointedManagers = appointedManagers;
+        this.products = products;
+        this.purchasePolicies = purchasePolicies;
+        this.discounts = discounts;
+        this.owners = owners;
+        this.managers = managers;
+        this.receipts = receipts;
+        this.rank = rank;
+        this.description = description;
+        this.appointingAgreements = appointingAgreements;
+    }
+
     private void initStore(UserSystem owner, String storeName) {
-        storeId = generateStoreSn();
+        //storeId = generateStoreSn();
         this.purchasePolicies = new ArrayList<>();
         this.discounts = new ArrayList<>();
         receipts = new LinkedList<>();
@@ -103,7 +128,7 @@ public class Store {
     }
 
     public Store(UserSystem owner, String storeName, String description) {
-        storeId = generateStoreSn();
+       // storeId = generateStoreSn();
         initStore(owner, storeName);
         this.description = description;
     }

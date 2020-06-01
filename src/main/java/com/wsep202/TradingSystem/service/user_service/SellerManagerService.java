@@ -19,12 +19,12 @@ public class SellerManagerService {
 
     /**
      * UC 5.1.1 - viewing the store's purchase history.
-     *
+     * <p>
      * View store purchase history
      */
     public List<ReceiptDto> viewPurchaseHistoryOfManager(String userName,
                                                          int storeId,
-                                                         UUID uuid){
+                                                         UUID uuid) {
         return tradingSystemFacade.viewPurchaseHistoryOfManager(userName, storeId, uuid);
     }
 

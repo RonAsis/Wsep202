@@ -11,7 +11,6 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
-//@NoArgsConstructor
 @Builder
 @Slf4j
 @Entity
@@ -30,6 +29,9 @@ public class AppointingAgreement {
         @ElementCollection
         @JoinTable()
         Map<String, Boolean> ownersAndApproval;
+
+        public AppointingAgreement() {
+        }
 
         public AppointingAgreement(String newOwner, String appointee, Set<UserSystem> owners) {
                 this.newOwner = newOwner;

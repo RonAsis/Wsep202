@@ -18,45 +18,45 @@ public class SellerOwnerService {
 
     /**
      * UC 4.10 - viewing store's history purchase.
-     *
+     * <p>
      * View store purchase history
      */
     public List<ReceiptDto> viewPurchaseHistoryOfStoreOwner(String ownerUsername,
                                                             int storeId,
-                                                            UUID uuid){
-        return tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername,storeId, uuid);
+                                                            UUID uuid) {
+        return tradingSystemFacade.viewPurchaseHistoryOfOwner(ownerUsername, storeId, uuid);
     }
 
     /**
      * UC 4.1.1 - adding products to store.
-     *
+     * <p>
      * add product
      */
     public ProductDto addProduct(String ownerUsername,
-                              int storeId,
-                              String productName,
-                              String category,
-                              int amount,
-                              double cost,
-                              UUID uuid){
+                                 int storeId,
+                                 String productName,
+                                 String category,
+                                 int amount,
+                                 double cost,
+                                 UUID uuid) {
         return tradingSystemFacade.addProduct(ownerUsername, storeId, productName, category, amount, cost, uuid);
     }
 
     /**
      * UC 4.1.2 - removing a product.
-     *
+     * <p>
      * remove product
      */
     public boolean deleteProductFromStore(String ownerUsername,
                                           int storeId,
                                           int productSn,
-                                          UUID uuid){
+                                          UUID uuid) {
         return tradingSystemFacade.deleteProductFromStore(ownerUsername, storeId, productSn, uuid);
     }
 
     /**
      * UC 4.1.3 - editing a product’s detail.
-     *
+     * <p>
      * edit product
      */
     public boolean editProduct(String ownerUsername,
@@ -66,19 +66,19 @@ public class SellerOwnerService {
                                String category,
                                int amount,
                                double cost,
-                               UUID uuid){
+                               UUID uuid) {
         return tradingSystemFacade.editProduct(ownerUsername, storeId, productSn, productName, category, amount, cost, uuid);
     }
 
     /**
      * UC 4.3 - appointing a new store owner.
-     *
+     * <p>
      * add owner
      */
     public boolean addOwner(String ownerUsername,
                             int storeId,
                             String newOwnerUsername,
-                            UUID uuid){
+                            UUID uuid) {
         return tradingSystemFacade.addOwner(ownerUsername, storeId, newOwnerUsername, uuid);
     }
 
@@ -88,7 +88,7 @@ public class SellerOwnerService {
     public boolean removeManager(String ownerUsername,
                                  int storeId,
                                  String newManagerUsername,
-                                 UUID uuid){
+                                 UUID uuid) {
         return tradingSystemFacade.removeManager(ownerUsername, storeId, newManagerUsername, uuid);
     }
 
@@ -96,34 +96,34 @@ public class SellerOwnerService {
      * UC 4.4 - removing a store owner.
      */
     public boolean removeOwner(String ownerUsername,
-                                 int storeId,
-                                 String ownerToRemove,
-                                 UUID uuid){
+                               int storeId,
+                               String ownerToRemove,
+                               UUID uuid) {
         return tradingSystemFacade.removeOwner(ownerUsername, storeId, ownerToRemove, uuid);
     }
 
     /**
      * UC 4.6 - adding a permission to a manager.
-     *
+     * <p>
      * add permission
      */
     public boolean addPermission(String ownerUsername,
                                  int storeId,
                                  String newManagerUsername,
                                  String permission,
-                                 UUID uuid){
+                                 UUID uuid) {
         return tradingSystemFacade.addPermission(ownerUsername, storeId, newManagerUsername, permission, uuid);
     }
 
     /**
      * UC 4.5 - appointing a new store manager.
-     *
+     * <p>
      * add manager
      */
     public ManagerDto addManager(String ownerUsername,
-                              int storeId,
-                              String newManagerUsername,
-                              UUID uuid){
+                                 int storeId,
+                                 String newManagerUsername,
+                                 UUID uuid) {
         return tradingSystemFacade.addManager(ownerUsername, storeId, newManagerUsername, uuid);
     }
 
@@ -145,7 +145,7 @@ public class SellerOwnerService {
 
     public List<String> getAllUsernameNotOwnerNotManger(String ownerUsername,
                                                         int storeId,
-                                                        UUID uuid){
+                                                        UUID uuid) {
         return tradingSystemFacade.getAllUsernameNotOwnerNotManger(ownerUsername, storeId, uuid);
     }
 

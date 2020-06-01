@@ -3,6 +3,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Slf4j
 @Entity
-public class MangerStore {
+public class MangerStore implements Serializable {
 
     /**
      *  the permissions that were given to the manager
@@ -26,15 +27,12 @@ public class MangerStore {
      *  the actual user that appointed to be manager
      */
     @OneToOne(cascade = CascadeType.ALL)
-    private UserSystem appointedManager;
-
     @Id
-    private String appointedManagerName;
+    private UserSystem appointedManager;
 
     public MangerStore(UserSystem appointedManager) {
         this.storePermissions = new HashSet<>(Arrays.asList(StorePermission.VIEW));
         this.appointedManager = appointedManager;
-        this.appointedManagerName = appointedManager.getUserName();
     }
 
     /**

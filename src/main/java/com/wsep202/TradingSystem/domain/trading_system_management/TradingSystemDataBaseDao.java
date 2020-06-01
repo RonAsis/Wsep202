@@ -2,16 +2,16 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
-import com.wsep202.TradingSystem.domain.trading_system_management.Repositories.StoreRepository;
-import com.wsep202.TradingSystem.domain.trading_system_management.Repositories.UserRepository;
+import com.wsep202.TradingSystem.data_access_layer.StoreRepository;
+import com.wsep202.TradingSystem.data_access_layer.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,109 +22,71 @@ public class TradingSystemDataBaseDao implements TradingSystemDao{
     private final StoreRepository storeRepository;
 
     @Override
+    @Transactional
     public void registerAdmin(UserSystem admin) {
         userRepository.save(admin);
     }
 
-    private boolean isNull(Object object){
-        if(object == null)
-            return false;
-        return true;
-    }
-
     @Override
+    @Transactional
     public boolean isRegistered(UserSystem userSystem) {
-        // if NULL returned then the user isn't register
-        return isNull(userRepository.findByUserName(userSystem.getUserName()));
+        return userRepository.existsById(userSystem.getUserName());
     }
 
     @Override
     @Transactional
     public void addUserSystem(UserSystem userToRegister, MultipartFile image) {
-        String urlImage = null;
         if (Objects.nonNull(image)) {
-            urlImage = ImageUtil.saveImage(ImagePath.ROOT_IMAGE_DIC + ImagePath.USER_IMAGE_DIC + image.getOriginalFilename(), image);
+            String urlImage = ImageUtil.saveImage(ImagePath.ROOT_IMAGE_DIC + ImagePath.USER_IMAGE_DIC + image.getOriginalFilename(), image);
             userToRegister.setImageUrl(urlImage);
         }
         userRepository.save(userToRegister);
     }
 
     @Override
+    @Transactional
     public Optional<UserSystem> getUserSystem(String username) {
-        /*UserSystem userSystem = userRepository.findByUserName(username);
-        if(userSystem != null){
-            Set<Store> ownedStores = userRepository.queryUserSystemByOwnedStores(userSystem.getUserName()).stream().collect(Collectors.toSet());
-            userSystem.setOwnedStores(ownedStores);
-        }
-        return Optional.ofNullable(userSystem);*/
-        return Optional.ofNullable(userRepository.findByUserName(username));
+        return userRepository.findById(username);
     }
 
     @Override
+    @Transactional
     public boolean isAdmin(String username) {
-        return userRepository.findByUserName(username).isAdmin();
+        return userRepository.exists(Example.of(UserSystem.builder()
+                .userName(username)
+                .isAdmin(true)
+                .build()));
     }
 
     @Override
+    @Transactional
     public Optional<UserSystem> getAdministratorUser(String username) {
-        Optional<UserSystem> userSystemOptional = Optional.ofNullable(userRepository.findByUserName(username));
-        if(userSystemOptional != null)
-            if(userSystemOptional.get().isAdmin())
-                return userSystemOptional;
-        return Optional.empty();
+        return userRepository.findOne(Example.of(UserSystem.builder()
+                .userName(username)
+                .isAdmin(true)
+                .build()));
     }
 
     @Override
+    @Transactional
     public Optional<Store> getStore(int storeId) {
-        return Optional.ofNullable(storeRepository.findByStoreId(storeId));
+        return storeRepository.findById(storeId);
     }
 
     @Override
-    public List<Product> searchProductByName(String productName) {
-        return new ArrayList<>(storeRepository.findAll().stream()
-                .map(store -> store.searchProductByName(productName))
-                .reduce((products, products2) -> {
-                    products.addAll(products2);
-                    return products;
-                })
-                .orElse(new HashSet<>()));
-    }
-
-    @Override
-    public List<Product> searchProductByCategory(ProductCategory productCategory) {
-        return new ArrayList<>(storeRepository.findAll().stream()
-                .map(store -> store.searchProductByCategory(productCategory))
-                .reduce((products, products2) -> {
-                    products.addAll(products2);
-                    return products;
-                })
-                .orElse(new HashSet<>()));
-    }
-
-    @Override
-    public List<Product> searchProductByKeyWords(List<String> keyWords) {
-        return new ArrayList<>(storeRepository.findAll().stream()
-                .map(store -> store.searchProductByKeyWords(keyWords))
-                .reduce((products, products2) -> {
-                    products.addAll(products2);
-                    return products;
-                })
-                .orElse(new HashSet<>()));
-    }
-
-    @Override
-    public void addStore(Store newStore, UserSystem userSystem) {
+    @Transactional
+    public void addStore(Store newStore) {
         storeRepository.save(newStore);
-        userRepository.save(userSystem);
     }
 
     @Override
+    @Transactional
     public Set<Store> getStores() {
-        List<Store> res = storeRepository.findAll();
-        return res.stream().collect(Collectors.toSet());
+        return new HashSet<>(storeRepository.findAll());
     }
 
     @Override
+    @Transactional
     public Set<Product> getProducts() {
         return storeRepository.findAll().stream()
                 .map(Store::getProducts)
@@ -135,8 +97,8 @@ public class TradingSystemDataBaseDao implements TradingSystemDao{
     }
 
     @Override
+    @Transactional
     public Set<UserSystem> getUsers() {
-        List<UserSystem> res = userRepository.findAll();
-        return res.stream().collect(Collectors.toSet());
+        return new HashSet<>(userRepository.findAll());
     }
 }
