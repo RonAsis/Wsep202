@@ -1,5 +1,5 @@
 #idea folder
-/.idea/
+/.idea/**
 /.idea/libraries/lib2.xml
 #log file
 *.log
@@ -11,3 +11,4 @@
 .idea_modules
 
 /target/
+/TradingSystem.iml
