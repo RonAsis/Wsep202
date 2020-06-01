@@ -368,14 +368,14 @@ public class Store {
             owners.remove(ownerToDelete);
             appointedManagers.remove(ownerToDelete);
             ownerToDelete.removeOwnedStore(this);
-            ownerToDelete.newNotification(Notification.builder().content("you are fired").build());
+           // ownerToDelete.newNotification(Notification.builder().content("you are fired").build());
 
         }
         for (MangerStore manager: managerToRemove) {
             managers.remove(manager);
             manager.removeManagedStore(this);
-            manager.getAppointedManager()
-                    .newNotification(Notification.builder().content("you are fired").build());
+          //  manager.getAppointedManager()
+              //      .newNotification(Notification.builder().content("you are fired").build());
         }
     }
 
