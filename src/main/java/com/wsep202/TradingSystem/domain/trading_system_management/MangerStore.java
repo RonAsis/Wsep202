@@ -75,9 +75,9 @@ public class MangerStore implements Serializable {
         return storePermissions.removeIf(permission1 -> permission1 == permission);
     }
 
-    public boolean canEdit() {
+    public boolean canEditManagers() {
         return storePermissions.stream()
-                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_PRODUCT));
+                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_Managers));
     }
 
     public boolean canEditProduct() {

@@ -410,7 +410,8 @@ public class TradingSystem {
             if(Objects.nonNull(mangerStore)) {
                 log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.get().getUserName(), ownedStore.getStoreId()));
                 if(newManagerUser.get().addNewManageStore(ownedStore)){
-                    tradingSystemDao.updateStoreAndUserSystem(ownedStore, newManagerUser.get());
+                    tradingSystemDao.updateStore(ownedStore);
+                    log.info(String.format("user %s was saved as manager in store '%d'", newManagerUser.get().getUserName(), ownedStore.getStoreId()));
                     return mangerStore;
                 }
             }

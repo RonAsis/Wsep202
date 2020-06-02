@@ -20,7 +20,7 @@ public class ManagersAppointee {
 
     private String appointeeUser;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<MangerStore> appointedManagers;
 
     public ManagersAppointee(String appointeeUser,  Set<MangerStore> appointedManagers) {

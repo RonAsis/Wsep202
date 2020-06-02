@@ -10,10 +10,6 @@ import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchas
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.*;
@@ -61,7 +57,7 @@ public class Store {
     private List<Discount> discounts;
 
     //owners of the store
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH, orphanRemoval = true)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     private Set<UserSystem> owners;
 
     //managers in the store
@@ -291,7 +287,7 @@ public class Store {
      * @return true for success otherwise false
      */
     public MangerStore addManager(UserSystem ownerStore, UserSystem newManagerUser) {
-        if (isOwner(ownerStore)) {    //check if the user appointing is an owner so can appoint
+        if (isOwner(ownerStore) || managerCanEditManagers(ownerStore.getUserName())) {    //check if the user appointing is an owner so can appoint
             MangerStore newManager = new MangerStore(newManagerUser);
             boolean isAppointedToManager = appointAdditionManager(ownerStore, newManager);
             if (isAppointedToManager) {       //the manager appointed to manage the store successfully
@@ -996,10 +992,9 @@ public class Store {
         }
     }
 
-    public boolean managerCanEdit(String userName) {
+    public boolean managerCanEditManagers(String userName) {
         return managers.stream()
-                .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.canEdit());
-
+                .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.canEditManagers());
     }
 
     public boolean managerCanEditProduct(String userName) {

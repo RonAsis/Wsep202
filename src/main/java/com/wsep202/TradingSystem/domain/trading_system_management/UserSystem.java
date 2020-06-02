@@ -52,14 +52,15 @@ public class UserSystem implements Observer, Serializable {
      * The stores that the user manages
      */
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @Column(unique = true)
+//    @CollectionTable
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+//    @Column(unique = true, nullable = false)
     private Set<Store> managedStores = new HashSet<>();
     /**
      * The stores that the user own
      */
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<Store> ownedStores = new HashSet<>();
     /**
      * The user personal shopping cart
@@ -253,7 +254,7 @@ public class UserSystem implements Observer, Serializable {
                 .findFirst();
         return ownerStore.isPresent() ? ownerStore.get() :
                 managedStores.stream()
-                        .filter(store -> store.getStoreId() == storeId && store.managerCanEdit(userName))
+                        .filter(store -> store.getStoreId() == storeId && store.managerCanEditManagers(userName))
                         .findFirst().orElseThrow(() -> new TradingSystemException(
                         String.format("The user %s is not manager with edit permission or owner of store %d",userName, storeId)));
     }
@@ -377,4 +378,15 @@ public class UserSystem implements Observer, Serializable {
         shoppingCart.applyDiscountPolicies();
         return shoppingCart;
     }
+
+    public Store getOwnerStoreOrManagerCanEditManagers(int storeId) {
+        Optional<Store> ownerStore = ownedStores.stream()
+                .filter(store -> store.getStoreId() == storeId)
+                .findFirst();
+        return ownerStore.orElseGet(() -> managedStores.stream()
+                .filter(store -> store.getStoreId() == storeId && store.managerCanEditManagers(userName))
+                .findFirst().orElseThrow(() -> new TradingSystemException(
+                        String.format("The user %s is not manager with edit permission or owner of store %d", userName, storeId))));
+    }
+
 }

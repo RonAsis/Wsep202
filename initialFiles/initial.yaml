@@ -46,7 +46,7 @@ activities:
     ownerUserName: u2
     storeId: 0
     managerUsername: u3
-    permission: edit product
+    permission: edit managers
   - type: login
     userName: u3
     password: u3
@@ -54,6 +54,11 @@ activities:
     ownerUserName: u3
     storeId: 0
     newManagerUsername: u5
+  - type: addPermission
+    ownerUserName: u3
+    storeId: 0
+    managerUsername: u5
+    permission: edit managers
   - type: login
     userName: u5
     password: u5

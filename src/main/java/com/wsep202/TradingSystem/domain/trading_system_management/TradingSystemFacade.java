@@ -319,7 +319,7 @@ public class TradingSystemFacade {
     public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            Store ownedStore = ownerUser.getOwnerStoreOrManagerCanEditManagers(storeId);
             MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUsername);
             return Objects.nonNull(mangerStore) ? modelMapper.map(mangerStore, ManagerDto.class) : null;
         } catch (TradingSystemException e) {
@@ -341,7 +341,7 @@ public class TradingSystemFacade {
     public boolean addPermission(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUsername, @NotBlank String permission, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            Store ownedStore = ownerUser.getOwnerStoreOrManagerCanEditManagers(storeId);
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             StorePermission storePermission = StorePermission.getStorePermission(permission);
             return tradingSystemDao.addPermissionToManager(ownedStore, ownerUser, managerStore, storePermission);

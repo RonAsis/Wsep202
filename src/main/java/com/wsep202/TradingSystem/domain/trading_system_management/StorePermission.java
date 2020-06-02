@@ -15,7 +15,8 @@ public enum StorePermission {
     VIEW("view"),
     EDIT_PRODUCT("edit product"),
     EDIT_DISCOUNT("edit discount"),
-    EDIT_PURCHASE_POLICY("edit purchase policy");
+    EDIT_PURCHASE_POLICY("edit purchase policy"),
+    EDIT_Managers("edit managers");
 
     public final String function;
 
