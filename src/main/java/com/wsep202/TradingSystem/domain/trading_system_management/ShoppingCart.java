@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Builder
@@ -103,16 +104,14 @@ public class ShoppingCart {
      * @return true if the removal was successful, else false
      */
     public boolean removeProductInCart(Store storeOfProduct, Product productToRemove) {
+        boolean response = false;
        if(checkParameters(storeOfProduct,productToRemove)) {
-           shoppingBagsList.get(storeOfProduct).removeProductFromBag(productToRemove);
-           if (shoppingBagsList.get(storeOfProduct).getNumOfProducts() == 0) {
-               shoppingBagsList.remove(storeOfProduct);
-               log.info("delete an empty shopping bag from store '" + storeOfProduct.getStoreName() + "'");
+           if(Objects.nonNull(shoppingBagsList.get(storeOfProduct))){
+               shoppingBagsList.get(storeOfProduct).removeProductFromBag(productToRemove);
+               response = true;
            }
-           log.info("product '" + productToRemove.getName() + "' was removed from cart");
-           return true;
        }
-       return false;
+       return response;
     }
 
     /**
@@ -123,12 +122,18 @@ public class ShoppingCart {
      * @return true if the addition was successful
      */
     public boolean addProductToCart(Store storeOfProduct, Product productToAdd, int amountOfProduct){
+        boolean response = false;
         if(checkParameters(storeOfProduct,productToAdd)) {
-            shoppingBagsList.get(storeOfProduct).addProductToBag(productToAdd,amountOfProduct);
-            log.info("the product '"+productToAdd.getName()+"' to cart");
-            return true;
+            if(Objects.isNull(shoppingBagsList.get(storeOfProduct))){
+                ShoppingBag storeShoppingBag = new ShoppingBag(storeOfProduct);
+                response =  storeShoppingBag.addProductToBag(productToAdd, amountOfProduct) && addBagToCart(storeOfProduct, storeShoppingBag);
+            }else{
+                shoppingBagsList.get(storeOfProduct).addProductToBag(productToAdd,amountOfProduct);
+                response  = true;
+            }
         }
-        return false;
+        log.info(String.format("the product %s  %s to cart", productToAdd.getName(), response? "added" : "not added"));
+        return response;
     }
 
     private boolean checkParameters(Store store, Object object2){

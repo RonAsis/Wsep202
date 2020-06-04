@@ -52,15 +52,13 @@ public class UserSystem implements Observer, Serializable {
      * The stores that the user manages
      */
     @Builder.Default
-//    @CollectionTable
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-//    @Column(unique = true, nullable = false)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Store> managedStores = new HashSet<>();
     /**
      * The stores that the user own
      */
     @Builder.Default
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Store> ownedStores = new HashSet<>();
     /**
      * The user personal shopping cart
@@ -99,7 +97,10 @@ public class UserSystem implements Observer, Serializable {
 
     private String imageUrl;
 
-    public UserSystem(String userName, String firstName,boolean isLogin, String lastName, String password, boolean isAdmin) {
+    /**
+     * use for DB
+     */
+    public UserSystem(String userName, String firstName, boolean isLogin, String lastName, String password, boolean isAdmin) {
         this.userName = userName;
         this.firstName = firstName;
         this.isLogin = isLogin;
@@ -112,6 +113,9 @@ public class UserSystem implements Observer, Serializable {
         managedStores = new HashSet<>();
     }
 
+    /**
+     * use for new user
+     */
     public UserSystem(String userName, String firstName, String lastName, String password) {
         this.userName = userName;
         this.firstName = firstName;
@@ -126,117 +130,6 @@ public class UserSystem implements Observer, Serializable {
     }
 
     /**
-     * UC 4.3
-     * This method is used to add a new owned store to the user
-     *
-     * @param store - the store that needs to be added
-     * @return the answer that addNewOwnedOrManageStore method returns
-     */
-    public boolean addNewOwnedStore(Store store) {
-        return addNewOwnedOrManageStore(store, ownedStores);
-    }
-
-    /**
-     * UC 4.5
-     * This method is used to add a new managed store to the user
-     *
-     * @param store - the store that needs to be added
-     * @return the answer that addNewOwnedOrManageStore method returns
-     */
-    public boolean addNewManageStore(Store store) {
-        return addNewOwnedOrManageStore(store, managedStores);
-    }
-
-    /**
-     * UC 4.5, 4.4
-     * This method is used to add a store to the relevant list (owned OR managed)
-     *
-     * @param storeToAdd   - the store that needs to be added
-     * @param listOfStores - the list that store is going to be added
-     * @return true if the addition was successful, false if the store is null or the store is already in the list
-     */
-    private boolean addNewOwnedOrManageStore(Store storeToAdd, Set<Store> listOfStores) {
-        if (storeToAdd == null) {
-            log.error("can't add a null store to user");
-            return false;
-        }
-        if (!listOfStores.contains(storeToAdd)) {
-            log.info("added a new owned OR managed store '" + storeToAdd.getStoreName() + "' to the user '" + userName + "'");
-            listOfStores.add(storeToAdd);
-            return true;
-        }
-        log.error("can't add an existing store '" + storeToAdd.getStoreName() + "'");
-        return false;
-    }
-
-    /**
-     * UC 4.7
-     * This method is used to remove a store that is under a users management
-     *
-     * @param storeToRemove - the store that needs to be removed
-     * @return true if the store exists in managedStores, false if not or null
-     */
-    public boolean removeManagedStore(Store storeToRemove) {
-        if (storeToRemove == null) {
-            log.error("can't remove a null store");
-            return false;
-        }
-        if (!managedStores.contains(storeToRemove)) {
-            log.error("store '" + storeToRemove.getStoreName() + "' is not managed by this user '" + userName + "'");
-            return false;
-        }
-        managedStores.remove(storeToRemove);
-        log.info("store '" + storeToRemove.getStoreName() + "' was removed from managed store list");
-        return true;
-    }
-
-    /**
-     * UC 4.4
-     * This method is used to remove a store that is under a users ownership
-     *
-     * @param storeToRemove - the store that needs to be removed
-     * @return true if the store exists in ownedStores, false if not or null
-     */
-    public boolean removeOwnedStore(Store storeToRemove) {
-        if (storeToRemove == null) {
-            log.error("can't remove a null store");
-            return false;
-        }
-        if (!ownedStores.contains(storeToRemove)) {
-            log.error("store '" + storeToRemove.getStoreName() + "' is not owned by this user '" + userName + "'");
-            return false;
-        }
-        ownedStores.remove(storeToRemove);
-        log.info("store '" + storeToRemove.getStoreName() + "' was removed from owned store list");
-        return true;
-    }
-
-    /**
-     * UC 2.3
-     * This method is used to change the stage of the user to logged-in
-     */
-    public void login() {
-        if(!notifications.isEmpty()){
-            subject.update(this);
-        }
-        isLogin = true;
-    }
-
-    /**
-     * UC 3.1
-     * This method is used to change the stage of the user to logged-out
-     *
-     * @return always true, because the user is now logged-out
-     */
-    public boolean logout() {
-        if(Objects.nonNull(subject)) {
-            subject.unregister(this);
-        }
-        isLogin = false;
-        return true;
-    }
-
-    /**
      * This method is used to find if this user is a owner of a certain store.
      *
      * @param storeId - the id of the store
@@ -247,21 +140,112 @@ public class UserSystem implements Observer, Serializable {
                 .filter(store -> store.getStoreId() == storeId)
                 .findFirst().orElseThrow(() -> new NoOwnerInStoreException(userName, storeId));
     }
+    /**
+     * This method is used to add a new owned store to the user
+     * @param store - the store that needs to be added
+     * @return the answer that addNewOwnedOrManageStore method returns
+     */
+    public boolean addNewOwnedStore(Store store) {
+        return addNewOwnedOrManageStore(store, ownedStores);
+    }
 
-    public Store getOwnerOrManagerStore(int storeId) {
-        Optional<Store> ownerStore = ownedStores.stream()
+    /**
+     * This method is used to add a new managed store to the user
+     * @param store - the store that needs to be added
+     * @return the answer that addNewOwnedOrManageStore method returns
+     */
+    public boolean addNewManageStore(Store store) {
+        return addNewOwnedOrManageStore(store, managedStores);
+    }
+
+    /**
+     * This method is used to add a store to the relevant list (owned OR managed)
+     * @param storeToAdd   - the store that needs to be added
+     * @param listOfStores - the list that store is going to be added
+     * @return true if the addition was successful, false if the store is null or the store is already in the list
+     */
+    private boolean addNewOwnedOrManageStore(Store storeToAdd, Set<Store> listOfStores) {
+        boolean response = false;
+        if (Objects.nonNull(storeToAdd) && !listOfStores.contains(storeToAdd)) {
+            log.info("added a new owned OR managed store '" + storeToAdd.getStoreName() + "' to the user '" + userName + "'");
+            listOfStores.add(storeToAdd);
+            response = true;
+        }
+        return response;
+    }
+
+    /**
+     * This method is used to remove a store that is under a users management
+     * @param storeToRemove - the store that needs to be removed
+     * @return true if the store exists in managedStores, false if not or null
+     */
+    public boolean removeManagedStore(Store storeToRemove) {
+        boolean response = false;
+        if (Objects.nonNull(storeToRemove) && !managedStores.contains(storeToRemove)) {
+            managedStores.remove(storeToRemove);
+            log.info("store '" + storeToRemove.getStoreName() + "' was removed from managed store list");
+            response = true;
+        }
+        return response;
+    }
+
+    /**
+     * This method is used to remove a store that is under a users ownership
+     * @param storeToRemove - the store that needs to be removed
+     * @return true if the store exists in ownedStores, false if not or null
+     */
+    public boolean removeOwnedStore(Store storeToRemove) {
+        boolean response = false;
+        if (Objects.nonNull(storeToRemove) && !ownedStores.contains(storeToRemove)) {
+            ownedStores.remove(storeToRemove);
+            log.info("store '" + storeToRemove.getStoreName() + "' was removed from owned store list");
+            response = true;
+        }
+        return response;
+    }
+
+    /**
+     * This method is used to change the stage of the user to logged-in
+     */
+    public void login() {
+        if (!notifications.isEmpty()) {
+            subject.update(this);
+        }
+        isLogin = true;
+    }
+
+    /**
+     * This method is used to change the stage of the user to logged-out
+     * @return always true, because the user is now logged-out
+     */
+    public boolean logout() {
+        if (Objects.nonNull(subject)) {
+            subject.unregister(this);
+        }
+        isLogin = false;
+        return true;
+    }
+
+    public Store getOwnerOrManagerWithPermission(int storeId, StorePermission permission) {
+        Optional<Store> ownerStore = getStoreOfOwner(storeId);
+        return ownerStore.orElseGet(() -> getStoreOfManagerWithPermission(storeId, permission));
+    }
+
+    private Store getStoreOfManagerWithPermission(int storeId, StorePermission permission) {
+        return managedStores.stream()
+                .filter(store -> store.getStoreId() == storeId && store.managerHavePermission(userName, permission))
+                .findFirst().orElseThrow(() -> new TradingSystemException(
+                        String.format("The user %s is not manager with %s permission or owner of store %d", userName, permission.function, storeId)));
+    }
+
+    private Optional<Store> getStoreOfOwner(int storeId) {
+        return ownedStores.stream()
                 .filter(store -> store.getStoreId() == storeId)
                 .findFirst();
-        return ownerStore.isPresent() ? ownerStore.get() :
-                managedStores.stream()
-                        .filter(store -> store.getStoreId() == storeId && store.managerCanEditManagers(userName))
-                        .findFirst().orElseThrow(() -> new TradingSystemException(
-                        String.format("The user %s is not manager with edit permission or owner of store %d",userName, storeId)));
     }
 
     /**
      * This method is used to find if this user is a manager of a certain store.
-     *
      * @param storeId - the id of the store
      * @return the store if the user is a manager, exception if he's not
      */
@@ -272,49 +256,26 @@ public class UserSystem implements Observer, Serializable {
     }
 
     /**
-     * UC 2.7
      * This method is used to add a product to the users cart.
      * The method use the methods getShoppingBag & addBagToCart in ShoppingCart and addProductToBag in ShoppingBag.
-     *
      * @param storeOfProduct  - the store of the product that needs to be added
      * @param productToAdd    - the product that needs to be added
      * @param amountOfProduct - the amount of the product
      * @return true if the addition was successful, false if there were a problem to add it
      */
     public boolean saveProductInShoppingBag(Store storeOfProduct, Product productToAdd, int amountOfProduct) {
-        if (shoppingCart.getShoppingBag(storeOfProduct) == null) {
-            ShoppingBag storeShoppingBag = new ShoppingBag(storeOfProduct);
-            boolean isAdded = storeShoppingBag.addProductToBag(productToAdd, amountOfProduct);
-            log.info("add the product '" + productToAdd.getName() + "' to a new shopping bug");
-            if (isAdded)
-                return shoppingCart.addBagToCart(storeOfProduct, storeShoppingBag);
-            return false;
-        }
-        log.info("add the product '" + productToAdd.getName() + "' to an existing shopping bug");
-        return shoppingCart.getShoppingBag(storeOfProduct).addProductToBag(productToAdd, amountOfProduct);
+        return shoppingCart.addProductToCart(storeOfProduct, productToAdd, amountOfProduct);
     }
 
     /**
-     * UC 2.7
      * This method is used to remove a product from the cart.
      * The method use the methods getShoppingBag in ShoppingCart and removeProductFromBag in ShoppingBag
-     *
      * @param storeOfProduct  - the store of the product that needs to be removed
      * @param productToRemove - the product that needs to be removed
      * @return true if the removal was successful, false if there were a problem to remove it.
      */
     public boolean removeProductInShoppingBag(Store storeOfProduct, Product productToRemove) {
-        if (shoppingCart.getShoppingBag(storeOfProduct) == null) {
-            log.error("the product '" + productToRemove.getName() + "' is not in cart");
-            return false;
-        }
-        boolean isProductRemoved = shoppingCart.removeProductInCart(storeOfProduct, productToRemove);
-        if (isProductRemoved) {
-            log.info("product '" + productToRemove.getName() + "' was removed");
-            return true;
-        }
-        log.error("product '" + productToRemove.getName() + "' was not removed");
-        return false;
+        return shoppingCart.removeProductInCart(storeOfProduct, productToRemove);
     }
 
     public boolean isValidUser() {
@@ -334,7 +295,7 @@ public class UserSystem implements Observer, Serializable {
     public void connectNotificationSystem(Subject subject, String principal) {
         setSubject(subject);
         subject.register(this);
-        if(!notifications.isEmpty()){
+        if (!notifications.isEmpty()) {
             subject.update(this);
         }
     }
@@ -350,14 +311,12 @@ public class UserSystem implements Observer, Serializable {
     public boolean isOwner(int storeId) {
         return ownedStores.stream()
                 .anyMatch(store -> store.getStoreId() == storeId);
-
     }
 
     /**
-     * UC 2.7
      * change the amount of product in the bag
      */
-    public boolean changeProductAmountInShoppingBag(int storeId,int amount, int productSn) {
+    public boolean changeProductAmountInShoppingBag(int storeId, int amount, int productSn) {
         return shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
     }
 
@@ -365,28 +324,15 @@ public class UserSystem implements Observer, Serializable {
      * This Method is used to add the receipts to the users receipt list
      * @param receipts - new receipt for new purchase
      */
-    public void addReceipts(List<Receipt> receipts){
-        if (receipts != null) {
-            for (Receipt rep : receipts) {
-                if (!this.receipts.contains(rep) && rep != null)
-                    this.receipts.add(rep);
-            }
+    public void addReceipts(List<Receipt> receipts) {
+        if (Objects.nonNull(receipts)) {
+            this.receipts.addAll(receipts);
         }
     }
 
-    public ShoppingCart getShoppingCart(){
+    public ShoppingCart getShoppingCart() {
         shoppingCart.applyDiscountPolicies();
         return shoppingCart;
-    }
-
-    public Store getOwnerStoreOrManagerCanEditManagers(int storeId) {
-        Optional<Store> ownerStore = ownedStores.stream()
-                .filter(store -> store.getStoreId() == storeId)
-                .findFirst();
-        return ownerStore.orElseGet(() -> managedStores.stream()
-                .filter(store -> store.getStoreId() == storeId && store.managerCanEditManagers(userName))
-                .findFirst().orElseThrow(() -> new TradingSystemException(
-                        String.format("The user %s is not manager with edit permission or owner of store %d", userName, storeId))));
     }
 
 }

@@ -2,7 +2,7 @@
   <button *ngIf="isOwner || isManagerCanEditDiscount()" class="btn btn-primary" type="submit" (click)="onAddDiscount()">Add Discount</button>
   <button *ngIf="isOwner || isManagerCanEditDiscount()" class="btn btn-primary" type="submit" (click)="onDiscounts()">Discounts</button>
   <button *ngIf="isOwner || isManagerCanEditProduct()" class="btn btn-primary" type="submit" (click)="onEditProduct()">Edit Product</button>
-  <button *ngIf="isOwner" class="btn btn-primary" type="submit" (click)="onManagers()">Managers</button>
+  <button *ngIf="isOwner || isManagerCanEditManager()" class="btn btn-primary" type="submit" (click)="onManagers()">Managers</button>
   <button *ngIf="isOwner" class="btn btn-primary" type="submit" (click)="onOwners()">Owners</button>
   <button *ngIf="isOwner || isManagerCanEditPurchasePolicy()" class="btn btn-primary" type="submit" (click)="onPolicy()">Policy</button>
 

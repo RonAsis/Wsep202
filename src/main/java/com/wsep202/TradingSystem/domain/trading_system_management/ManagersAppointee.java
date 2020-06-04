@@ -28,4 +28,8 @@ public class ManagersAppointee {
         this.appointedManagers = appointedManagers;
 
     }
+
+    public boolean removeManager(UserSystem user) {
+        return appointedManagers.removeIf(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(user.getUserName()));
+    }
 }

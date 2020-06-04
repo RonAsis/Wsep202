@@ -122,7 +122,7 @@ public class SetUpObjects {
 
         return Store.builder()
                 .storeId(storeId)
-                .owners(owners)
+//                .owners(owners)
                 .storeName(storeName)
 //                .discountPolicy(discountPolicy)
                 .products(products)

@@ -15,47 +15,47 @@ import java.util.Set;
 @Slf4j
 @Entity
 public class AppointingAgreement {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private int appointingAgreementNumber;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int appointingAgreementNumber;
 
-        @Builder.Default
-        private String newOwner;
+    @Builder.Default
+    private String newOwner;
 
-        @Builder.Default
-        private String appointee;
+    @Builder.Default
+    private String appointee;
 
-        @Builder.Default
-        @ElementCollection
-        @MapKeyColumn(name = "owner_name")
-        private Map<String, Boolean> ownersAndApproval;
+    @Builder.Default
+    @ElementCollection
+    @MapKeyColumn(name = "owner_name")
+    private Map<String, Boolean> ownersAndApproval;
 
-        public AppointingAgreement() {
+    public AppointingAgreement() {
+    }
+
+    public AppointingAgreement(String newOwner, String appointee, Set<String> owners) {
+        this.newOwner = newOwner;
+        this.appointee = appointee;
+        owners.forEach(owner -> {
+            if (owner.equals(appointee)) {
+                this.ownersAndApproval.put(owner, true);
+            } else {
+                this.ownersAndApproval.put(owner, null);
+            }
+        });
+    }
+
+    public void changeApproval(String owner, Boolean approval) {
+        this.ownersAndApproval.replace(owner, approval);
+    }
+
+    public boolean checkIfApproved() {
+        for (String owner : ownersAndApproval.keySet()) {
+            if (!ownersAndApproval.get(owner)) {
+                return false;
+            }
         }
-
-        public AppointingAgreement(String newOwner, String appointee, Set<UserSystem> owners) {
-                this.newOwner = newOwner;
-                this.appointee = appointee;
-                for (UserSystem userSystem : owners) {
-                        if (userSystem.getUserName().equals(appointee)) {
-                                this.ownersAndApproval.put(userSystem.getUserName(), true);
-                        } else {
-                                this.ownersAndApproval.put(userSystem.getUserName(), null);
-                        }
-                }
-        }
-
-        public void changeApproval(String owner, Boolean approval) {
-                this.ownersAndApproval.replace(owner, approval);
-        }
-
-        public boolean checkIfApproved (){
-                for (String owner: ownersAndApproval.keySet()){
-                        if (!ownersAndApproval.get(owner)){
-                                return false;
-                        }
-                }
-                return true; //tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
-        }
+        return true; //tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
+    }
 
 }

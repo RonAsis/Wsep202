@@ -572,9 +572,8 @@ public class TradingSystem {
     }
 
     public List<String> getAllUsernameNotOwnerNotManger(Store store) {
-        List<String> usernameOwners = store.getOwners().stream()
-                .map(UserSystem::getUserName).collect(Collectors.toList());
-        List<String> usernameMangers = store.getManagers().stream()
+        Set<String> usernameOwners = store.getOwnersUsername();
+        List<String> usernameMangers = store.getManagersStore().stream()
                 .map(userSystem -> userSystem.getAppointedManager().getUserName())
                 .collect(Collectors.toList());
         return tradingSystemDao.getUsers().stream()

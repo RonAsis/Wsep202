@@ -34,15 +34,16 @@ export class EditProductComponent implements OnInit {
     this.storeService.deleteProductFromStore(productData.productSn, productData.storeId)
       .subscribe(response => {
         if (response){
+          console.log(response);
+          console.log(productData);
           this.productItems = this.productItems.filter(product => product.productSn !== productData.productSn);
           this.store.products = this.productItems;
+          console.log(this.productItems);
         }
       });
   }
 
   onProductItemChanged(productData: { productSn: number, storeId: number }) {
-    this.productItems = this.productItems.filter(product => product.productSn !== productData.productSn);
-    this.store.products = this.productItems;
     this.productItemChanged.emit({
       productSn: productData.productSn,
       storeId: productData.storeId

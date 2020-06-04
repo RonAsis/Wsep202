@@ -43,9 +43,9 @@ public class AppStartupRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         createDirForImages();
-        if(thereIsInitialFiles()){
+        if (thereIsInitialFiles()) {
             initialAccordingByFiles();
-        }else {
+        } else {
             initialTheSystem();
         }
     }
@@ -208,14 +208,16 @@ public class AppStartupRunner implements ApplicationRunner {
 
     private void initialProductsForStores(Set<Store> stores) {
         stores.forEach(store -> {
-            UserSystem userSystem = store.getOwners().stream().findFirst().get();
-            Arrays.stream(new Product[NUM_OF_OBJECTS]).forEach( product -> {
+            String username = store.getOwnersUsername().stream().findFirst().get();
+            Arrays.stream(new Product[NUM_OF_OBJECTS]).forEach(product -> {
                 Faker faker = new Faker();
                 Product newProduct = new Product(faker.book().title(),
                         ProductCategory.values()[createRandomNumber(0, ProductCategory.values().length - 1)],
                         createRandomNumber(0, 100),
                         createRandomNumber(0, 10000), store.getStoreId());
-                store.addNewProduct(userSystem, newProduct);
+                store.addNewProduct(UserSystem.builder()
+                        .userName(username)
+                        .build(), newProduct);
             });
         });
     }

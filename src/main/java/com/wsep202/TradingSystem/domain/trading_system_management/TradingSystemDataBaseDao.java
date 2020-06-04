@@ -11,7 +11,9 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sun.security.util.ArrayUtil;
 
+import java.lang.reflect.Array;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,12 +110,18 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
 
     @Override
     public Product addProductToStore(Store store, UserSystem owner, Product product) {
-        Product res = null;
         if (store.addNewProduct(owner, product)) {
             storeRepository.save(store);
-            res = product;
+            product.setProductSn(store.getProducts().stream()
+                    .map(Product::getProductSn)
+                    .reduce(0, (acc, cur)-> {
+                        if(cur> acc){
+                            acc = cur;
+                        }
+                        return acc;
+                    } ));
         }
-        return res;
+        return product;
     }
 
     @Override
@@ -140,6 +148,7 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
         boolean ans = ownerStore.removeProductFromStore(user, productSn);
         if (ans) {
             storeRepository.save(ownerStore);
+            log.info(String.format("Delete productSn %d from store %d", productSn, ownerStore.getStoreId()));
         }
         return ans;
     }

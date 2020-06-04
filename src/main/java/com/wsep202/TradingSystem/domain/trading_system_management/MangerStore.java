@@ -75,26 +75,11 @@ public class MangerStore implements Serializable {
         return storePermissions.removeIf(permission1 -> permission1 == permission);
     }
 
-    public boolean canEditManagers() {
-        return storePermissions.stream()
-                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_Managers));
-    }
-
-    public boolean canEditProduct() {
-        return storePermissions.stream()
-                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_PRODUCT));
-    }
-
-    public boolean canEditDiscount() {
-        return storePermissions.stream()
-                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_DISCOUNT));
-    }
-
-    public boolean canEditPurchasePolicy() {
-        return storePermissions.stream()
-                .anyMatch(storePermission -> storePermission==(StorePermission.EDIT_PURCHASE_POLICY));
-    }
     public boolean removeManagedStore(Store storeToRemove){
       return appointedManager.removeOwnedStore(storeToRemove);
+    }
+
+    public boolean managerHavePermission(StorePermission permission) {
+        return storePermissions.contains(permission);
     }
 }

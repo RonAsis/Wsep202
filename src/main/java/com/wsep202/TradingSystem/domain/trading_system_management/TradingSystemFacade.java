@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 
-import com.github.javafaker.Bool;
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
@@ -32,7 +31,6 @@ public class TradingSystemFacade {
      * inorder talk with the system
      */
     private final TradingSystem tradingSystem;
-
 
     /**
      * inorder to convert dto to object
@@ -153,7 +151,7 @@ public class TradingSystemFacade {
                               int amount, double cost, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get registered user with ownerUsername
-            Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
+            Store ownerStore = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PRODUCT); //verify he owns store with storeId
             //convert to a category we can add to the product
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             Product product = factoryObjects.createProduct(productName, productCategory, amount, cost, storeId);
@@ -167,7 +165,7 @@ public class TradingSystemFacade {
 
     public List<DiscountDto> getStoreDiscounts(String username, int storeId, UUID uuid) {
             UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
-            Store store = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
+            Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT); //verify he owns store with storeId
             List<Discount> storeDiscounts = store.getStoreDiscounts(user);
             return convertDiscountList(storeDiscounts);
     }
@@ -183,7 +181,7 @@ public class TradingSystemFacade {
      */
     public boolean removeDiscount(String username, int storeId, int discountId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
-        Store store = user.getOwnerOrManagerStore(storeId); //verify he owns store with storeId
+        Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT); //verify he owns store with storeId
         return tradingSystemDao.removeDiscount(store, user, discountId);
     }
 
@@ -197,7 +195,7 @@ public class TradingSystemFacade {
      */
     public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
-        Store store = user.getOwnerOrManagerStore(storeId);
+        Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT);
         Discount discount = modelMapper.map(discountDto, Discount.class);
         Discount discountRes = tradingSystemDao.addEditDiscount(store, user, discount);
         return Objects.nonNull(discountRes)? modelMapper.map(discountRes, DiscountDto.class) : null;
@@ -215,7 +213,7 @@ public class TradingSystemFacade {
         // TODO need organize : PurchasePolicyDto not define good -domain ==> need do like discount
         //                      need convert PurchasePolicyDto to PurchasePolicy and not send the vaule inside
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
-        Store store = user.getOwnerOrManagerStore(storeId);
+        Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PURCHASE_POLICY);
         Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);
         PurchasePolicyDto ans =  modelMapper.map(store.addEditPurchase(user, purchase, purchaseDto.getCountriesPermitted(),
                 purchaseDto.getStoreWorkDays(),purchaseDto.getMin(),purchaseDto.getMax(),
@@ -249,7 +247,7 @@ public class TradingSystemFacade {
     public boolean deleteProductFromStore(@NotBlank String ownerUsername, int storeId, int productSn, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get the registered user
-            Store ownerStore = user.getOwnerOrManagerStore(storeId); //verify he is owner of the store
+            Store ownerStore = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PRODUCT); //verify he is owner of the store
             return tradingSystemDao.deleteProductFromStore(ownerStore, user, productSn);
         } catch (TradingSystemException e) {
             log.error("deleteProduct from store failed", e);
@@ -274,7 +272,7 @@ public class TradingSystemFacade {
                                @NotBlank String category, int amount, double cost, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownerStore = user.getOwnerOrManagerStore(storeId);
+            Store ownerStore = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PRODUCT);
             if (amount<0 || cost<0){
                 log.error("editProduct failed- amount/cost must be greater than 0");
                 return false;
@@ -319,7 +317,7 @@ public class TradingSystemFacade {
     public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownedStore = ownerUser.getOwnerStoreOrManagerCanEditManagers(storeId);
+            Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
             MangerStore mangerStore = tradingSystem.addMangerToStore(ownedStore, ownerUser, newManagerUsername);
             return Objects.nonNull(mangerStore) ? modelMapper.map(mangerStore, ManagerDto.class) : null;
         } catch (TradingSystemException e) {
@@ -341,7 +339,7 @@ public class TradingSystemFacade {
     public boolean addPermission(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUsername, @NotBlank String permission, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownedStore = ownerUser.getOwnerStoreOrManagerCanEditManagers(storeId);
+            Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             StorePermission storePermission = StorePermission.getStorePermission(permission);
             return tradingSystemDao.addPermissionToManager(ownedStore, ownerUser, managerStore, storePermission);
@@ -407,7 +405,7 @@ public class TradingSystemFacade {
     public boolean removeManager(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid); //get registered user
-            Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
+            Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId,  StorePermission.EDIT_Managers);    //verify the remover is owner
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             return tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
         } catch (TradingSystemException e) {

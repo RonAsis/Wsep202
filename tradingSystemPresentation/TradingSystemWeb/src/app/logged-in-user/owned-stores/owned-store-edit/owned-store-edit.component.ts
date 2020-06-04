@@ -26,11 +26,13 @@ export class OwnedStoreEditComponent implements OnInit {
     this.storeService.getIsOwner(this.store.storeId).subscribe(response => {
       if (response){
         this.isOwner = true;
-      }
-    });
-    this.storeService.getMyPermissions(this.store.storeId).subscribe(response => {
-      if ( response !== undefined){
-        this.permissions = response;
+      }else{
+        this.storeService.getMyPermissions(this.store.storeId).subscribe(response => {
+          if ( response !== undefined){
+            this.permissions = response;
+            console.log(this.permissions);
+          }
+        });
       }
     });
   }
@@ -64,14 +66,18 @@ export class OwnedStoreEditComponent implements OnInit {
   }
 
   isManagerCanEditDiscount() {
-    return this.permissions.includes('edit product');
+    return this.permissions !== undefined && this.permissions.includes('edit discount');
   }
 
   isManagerCanEditProduct() {
-    return this.permissions.includes('edit discount');
+    return this.permissions !== undefined && this.permissions.includes('edit product');
   }
 
   isManagerCanEditPurchasePolicy() {
-    return this.permissions.includes('edit purchase policy');
+    return this.permissions !== undefined && this.permissions.includes('edit purchase policy');
+  }
+
+  isManagerCanEditManager() {
+    return this.permissions !== undefined && this.permissions.includes('edit managers');
   }
 }
