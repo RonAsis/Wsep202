@@ -1,12 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.compiste_id_db.OwnersAppointeeId;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,19 +19,18 @@ import java.util.Set;
 public class OwnersAppointee implements Serializable {
 
     @Id
-    private String appointeeUser;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    long id;
 
-    @Id
-    private int storeId;
+    private String appointeeUser;
 
     @OneToMany(cascade = CascadeType.ALL)
     @Builder.Default
     private Set<UserSystem> appointedUsers = new HashSet<>();
 
-    public OwnersAppointee(String appointeeUser, int storeId){
+    public OwnersAppointee(String appointeeUser){
         this.appointeeUser = appointeeUser;
         this.appointedUsers = new HashSet<>();
-        this.storeId = storeId;
     }
 
     public boolean addSubOwner(UserSystem newOwner){

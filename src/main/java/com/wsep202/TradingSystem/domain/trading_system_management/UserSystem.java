@@ -75,8 +75,8 @@ public class UserSystem implements Observer, Serializable {
      * The users personal receipts list
      */
     @Builder.Default
-    @OneToMany(orphanRemoval = true)
-    private List<Receipt> receipts = new LinkedList<>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Receipt> receipts = new HashSet<>();
 
     /**
      * for notification
@@ -181,12 +181,23 @@ public class UserSystem implements Observer, Serializable {
      */
     public boolean removeManagedStore(Store storeToRemove) {
         boolean response = false;
-        if (Objects.nonNull(storeToRemove) && !managedStores.contains(storeToRemove)) {
+        if (Objects.nonNull(storeToRemove) && managedStores.contains(storeToRemove)) {
             managedStores.remove(storeToRemove);
             log.info("store '" + storeToRemove.getStoreName() + "' was removed from managed store list");
             response = true;
         }
         return response;
+    }
+
+    /**
+     * This method is used to remove a store that is under a users management
+     * @return true if the store exists in managedStores, false if not or null
+     */
+    public boolean removeManagedStore(int storeId) {
+        managedStores.stream()
+                .filter(managedStore -> managedStore.getStoreId() == storeId)
+                .map(managedStore -> managedStores.remove(managedStore));
+        return true;
     }
 
     /**

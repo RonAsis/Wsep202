@@ -30,7 +30,7 @@ public class ShoppingCart {
      */
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL)
-    @MapKeyJoinColumn(name = "store_store_id")
+    @MapKeyJoinColumn(name = "shopping_bag_id")
     private Map<Store, ShoppingBag> shoppingBagsList;
 
     public ShoppingCart(Map<Store,ShoppingBag> shoppingBagsList){
@@ -141,10 +141,6 @@ public class ShoppingCart {
             log.info("store or product or shopping bag can't be null");
             return false;
         }
-        if (!shoppingBagsList.containsKey(store)){
-            log.info("No items from store '" +store.getStoreName()+ "' in cart");
-            return false;
-        }
         return true;
     }
 
@@ -201,7 +197,7 @@ public class ShoppingCart {
 
     public void applyDiscountPolicies() {
         for (Store store: shoppingBagsList.keySet()){
-            store.applyDiscountPolicies((HashMap<Product, Integer>) shoppingBagsList
+            store.applyDiscountPolicies(shoppingBagsList
                     .get(store).getProductListFromStore());
         }
     }
@@ -227,12 +223,11 @@ public class ShoppingCart {
         return shoppingBagsList.values().stream()
                 .map(ShoppingBag::getNumOfProducts)
                 .reduce( 0, Integer::sum);
-
     }
 
-    public boolean ApprovePurchasePolicy(BillingAddress billingAddress) throws PurchasePolicyException {
+    public boolean approvePurchasePolicy(BillingAddress billingAddress) throws PurchasePolicyException {
         for (Store store: this.getShoppingBagsList().keySet()){
-            store.isApprovedPurchasePolicies((HashMap<Product, Integer>) shoppingBagsList
+            store.isApprovedPurchasePolicies(shoppingBagsList
                     .get(store).getProductListFromStore(),billingAddress);
         }
         return true;

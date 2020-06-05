@@ -8,6 +8,7 @@ import {of} from 'rxjs';
 import {PaymentDetails} from '../shared/paymentDetails.model';
 import {BillingAddress} from '../shared/billingAddress.model';
 import {ShareService} from './share.service';
+import {Store} from '../shared/store.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,8 +28,6 @@ export class UserService {
   logoutNoEvent = new EventEmitter<boolean>();
 
   userSelectedEvent = new EventEmitter<UserSystem>();
-
-  private usernameWantSeeHistory = null;
 
   constructor(private httpService: HttpService, private  shareService: ShareService) {
     this.shoppingCart = new ShoppingCart(new Map<number, ShoppingBag>());
@@ -51,7 +50,6 @@ export class UserService {
   }
 
   login(username: string, password: string) {
-    this.usernameWantSeeHistory = null; // need to remove from here
     this.httpService.login(username, password).subscribe(
       response => {
         if (response !== null && response.key !== null) {
@@ -87,16 +85,20 @@ export class UserService {
   }
 
   viewPurchaseHistory() {
-    return this.httpService.viewPurchaseHistory(this.username, this.uuid);
+    console.log(this.shareService.userSelected);
+    if (this.shareService.userSelected !== null && this.shareService.userSelected !== undefined){
+      console.log(this.shareService.userSelected);
+      return this.httpService.viewPurchaseHistoryUserByAdmin(this.username, this.shareService.userSelected, this.uuid);
+    }
+    else{
+      return this.httpService.viewPurchaseHistory(this.username, this.uuid);
+    }
   }
 
   getUsers() {
      return this.httpService.getUsers(this.username, this.uuid);
   }
 
-  wantViewPurchaseHistory(user: UserSystem) {
-    this.usernameWantSeeHistory = user.username;
-  }
 
   public getUsername() {
     return this.username;

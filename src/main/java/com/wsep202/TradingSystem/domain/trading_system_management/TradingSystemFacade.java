@@ -55,7 +55,7 @@ public class TradingSystemFacade {
     public List<ReceiptDto> viewPurchaseHistory(@NotBlank String userName, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(userName, uuid);   //get registered user by his username
-            List<Receipt> receipts = user.getReceipts(); //get user receipts
+            List<Receipt> receipts = new LinkedList<>(user.getReceipts()); //get user receipts
             return convertReceiptList(receipts);
         } catch (TradingSystemException e) {
             log.error("Tried to view his purchase history and failed", e);
@@ -92,7 +92,7 @@ public class TradingSystemFacade {
     public List<ReceiptDto> viewPurchaseHistory(@NotBlank String administratorUsername, @NotBlank String userName, UUID uuid) {
         try {
             UserSystem userByAdmin = tradingSystem.getUserByAdmin(administratorUsername, userName, uuid);
-            return convertReceiptList(userByAdmin.getReceipts());
+            return convertReceiptList(new LinkedList<>(userByAdmin.getReceipts()));
         } catch (TradingSystemException e) {
             log.error("Tried to view purchase history of user and failed", e);
             return null;
@@ -755,7 +755,7 @@ public class TradingSystemFacade {
 
     public List<String> getAllUsernameNotOwnerNotManger(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-        Store store = user.getOwnerStore(storeId);
+        Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
         return tradingSystem.getAllUsernameNotOwnerNotManger(store);
     }
 
@@ -765,10 +765,9 @@ public class TradingSystemFacade {
         return store.getMySubOwners(ownerUsername);
     }
 
-
     public List<ManagerDto> getMySubMangers(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
-        Store store = user.getOwnerStore(storeId);
+        Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
         Type listType = new TypeToken<List<ManagerDto>>() {}.getType();
         return modelMapper.map(store.getMySubMangers(ownerUsername), listType);
     }
@@ -776,7 +775,7 @@ public class TradingSystemFacade {
     public List<String> getPermissionCantDo(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
-            Store ownedStore = ownerUser.getOwnerStore(storeId);
+            Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             Set<StorePermission> permissionOfManager = ownedStore.getPermissionCantDo(ownerUser, managerStore);
             return StorePermission.getStringPermissions(permissionOfManager);

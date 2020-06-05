@@ -58,10 +58,8 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
     @Override
     @Transactional
     public boolean isAdmin(String username) {
-        return userRepository.exists(Example.of(UserSystem.builder()
-                .userName(username)
-                .isAdmin(true)
-                .build()));
+        Optional<UserSystem> user = userRepository.findById(username);
+        return user.isPresent() && user.get().isAdmin();
     }
 
     @Override
@@ -188,7 +186,8 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
 
     @Override
     public boolean saveProductInShoppingBag(UserSystem user, Store store, Product product, int amount) {
-        boolean ans = user.saveProductInShoppingBag(store, product.cloneProduct(), amount);
+        Product productInShoppingBag = store.getProduct(product.getProductSn());
+        boolean ans = user.saveProductInShoppingBag(store, productInShoppingBag, amount);
         if (ans) {
             userRepository.save(user);
         }

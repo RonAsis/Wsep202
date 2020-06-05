@@ -82,4 +82,5 @@ public class MangerStore implements Serializable {
     public boolean managerHavePermission(StorePermission permission) {
         return storePermissions.contains(permission);
     }
+
 }

@@ -44,6 +44,7 @@ public class TradingSystem {
     }
 
     private void initAdmin(UserSystem admin) {
+        admin.setAdmin(true);
         encryptPassword(admin);
         tradingSystemDao.registerAdmin(admin);
     }
@@ -343,7 +344,7 @@ public class TradingSystem {
         if (validationOfPurchaseArgs(paymentDetails, shoppingCart, billingAddress)) return null;
         shoppingCart.isAllBagsInStock();    //ask the cart to check all products in stock
         log.info("all products in stock");
-        shoppingCart.ApprovePurchasePolicy(billingAddress);
+        shoppingCart.approvePurchasePolicy(billingAddress);
         log.info("applied stores purchase policies on shopping cart");
         shoppingCart.applyDiscountPolicies();
         log.info("applied stores discount policies on shopping cart");
@@ -406,7 +407,7 @@ public class TradingSystem {
         Optional<UserSystem> newManagerUser = tradingSystemDao.getUserSystem(newManagerUsername);
         if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser) &&
                 newManagerUser.isPresent()) {
-            MangerStore mangerStore = ownedStore.addManager(ownerUser, newManagerUser.get());
+            MangerStore mangerStore = ownedStore.appointAdditionManager(ownerUser, newManagerUser.get());
             if(Objects.nonNull(mangerStore)) {
                 log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.get().getUserName(), ownedStore.getStoreId()));
                 if(newManagerUser.get().addNewManageStore(ownedStore)){
@@ -528,7 +529,7 @@ public class TradingSystem {
         //update the products in the bags with their discounts
         Map<Store, ShoppingBag> bagsToCalculate = cartToCalculate.getShoppingBagsList();
         for (Store store : bagsToCalculate.keySet()) {  //apply the discounts on the bags in the cart (update the products prices)
-            store.applyDiscountPolicies((HashMap<Product, Integer>) bagsToCalculate.get(store).getProductListFromStore());
+            store.applyDiscountPolicies(bagsToCalculate.get(store).getProductListFromStore());
         }
         sumBeforeDiscounts = getOriginalTotalPrice(bagsToCalculate);
         sumAfterDiscounts = getCurrentTotalPrice(bagsToCalculate);

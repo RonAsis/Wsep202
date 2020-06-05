@@ -46,7 +46,6 @@ public class Publisher implements Subject {
     @Synchronized("publisherSync")
     @Scheduled(fixedRateString = "6000", initialDelayString = "0")
     public void notifyObservers() {
-       log.info("notifyObservers");
         List<Notification> notifications = new LinkedList<>();
         observersWithNotification.forEach(observer -> {
             List<Notification> notificationsObserver = observer.getNotifications();

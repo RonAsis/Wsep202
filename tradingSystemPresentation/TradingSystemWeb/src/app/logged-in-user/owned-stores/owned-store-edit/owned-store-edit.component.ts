@@ -22,15 +22,16 @@ export class OwnedStoreEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.store = this.shareService.storeSelected;
-    this.loadedFeature = 'Edit-Product';
+    this.loadedFeature = '';
     this.storeService.getIsOwner(this.store.storeId).subscribe(response => {
       if (response){
         this.isOwner = true;
+        this.loadedFeature = 'Edit-Product';
       }else{
         this.storeService.getMyPermissions(this.store.storeId).subscribe(response => {
           if ( response !== undefined){
             this.permissions = response;
-            console.log(this.permissions);
+            this.loadedFeature = this.permissions.includes('Edit-Product') ? 'Edit-Product' : this.permissions[0];
           }
         });
       }

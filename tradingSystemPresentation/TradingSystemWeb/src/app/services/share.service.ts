@@ -13,6 +13,7 @@ export class ShareService {
   featureSelected = new EventEmitter<string>();
   receipts: Receipt[];
   storeSelected: Store;
+  userSelected: string;
   constructor() {
     this.receipts = [];
   }

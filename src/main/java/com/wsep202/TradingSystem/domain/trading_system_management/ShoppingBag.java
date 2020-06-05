@@ -30,12 +30,18 @@ public class ShoppingBag {
      */
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Store storeOfProduct;
+
     /**
      * list of all of the products and the amount of each product
      */
     @ElementCollection
     @MapKeyColumn(name = "products")
     private Map<Product, Integer> productListFromStore;
+
+    public ShoppingBag(Store storeOfProduct, Map<Product, Integer> productListFromStore){
+        this.storeOfProduct = storeOfProduct;
+        this.productListFromStore = productListFromStore;
+    }
 
     public ShoppingBag(Store storeOfProduct){
         this.storeOfProduct = storeOfProduct;
@@ -127,17 +133,6 @@ public class ShoppingBag {
         return productListFromStore.get(isInBag);
     }
 
-/*
-    public boolean changeProductAmountInShoppingBag(int amount, int productSn) {
-        return productListFromStore.entrySet().stream()
-                .filter(productIntegerEntry -> productIntegerEntry.getKey().getProductSn() == productSn)
-                .findFirst().map(productIntegerEntry -> {
-                    productIntegerEntry.setValue(amount);
-                    return true;
-                }).orElse(false);
-    }
-*/
-
     /**
      * check if the product exists in bag
      * @param serialNum - the products serial number
@@ -173,14 +168,4 @@ public class ShoppingBag {
         return productListFromStore.values().size();
     }
 
-    @ManyToOne(optional = false)
-    private ShoppingCart shoppingCarts;
-
-    public ShoppingCart getShoppingCarts() {
-        return shoppingCarts;
-    }
-
-    public void setShoppingCarts(ShoppingCart shoppingCarts) {
-        this.shoppingCarts = shoppingCarts;
-    }
 }

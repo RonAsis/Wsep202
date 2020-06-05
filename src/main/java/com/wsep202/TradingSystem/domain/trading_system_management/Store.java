@@ -128,10 +128,7 @@ public class Store {
         appointedManagers = new HashSet<>();
         products = new LinkedHashSet<>();
         this.storeName = storeName;
-        appointedOwners.add(OwnersAppointee.builder()
-                .appointeeUser(owner.getUserName())
-                .storeId(storeId)
-                .build());
+        appointedOwners.add(new OwnersAppointee(owner.getUserName()));
         this.rank = 5;
     }
 
@@ -412,42 +409,29 @@ public class Store {
     /**
      * add new manager to the appointed owners of the store
      * @param owner
-     * @param mangerStore
      * @return true for successful addition
      */
-    private MangerStore appointAdditionManager(UserSystem owner, MangerStore mangerStore) {
-        boolean appointed = false;
-        //manager is not owner or manager in this store
-        if (!isManager(mangerStore.getAppointedManager()) || isOwner(owner)) {
-            appointedManagers.add(new ManagersAppointee(owner.getUserName(), new HashSet<>()));
-            int ownerIndex = getAppointeeManagersIndex(owner.getUserName());
-            if (ownerIndex != -1)
-                new LinkedList<>(appointedManagers).get(ownerIndex).getAppointedManagers().add(mangerStore);
-            appointed = true;
-            log.info("The user: " + mangerStore.getAppointedManager().getUserName() + " added as appointed manager by the owner: " + owner.getUserName() + "" +
-                    " for the store:" + this.storeName);
+    public MangerStore appointAdditionManager(UserSystem owner, UserSystem newManagerStore) {
+        MangerStore newManager = null;
+        if(isOwner(owner) || isManagerWithPermission(owner.getUserName(), StorePermission.EDIT_Managers)){
+            newManager = new MangerStore(newManagerStore);
+            ManagersAppointee managersAppointee = findManagersAppointee(owner.getUserName());
+            managersAppointee.addManger(newManager);
         }
-        if (!appointed) {
-            log.info("The user: " + mangerStore.getAppointedManager().getUserName() + " couldn't be appointed as manager" +
-                    " by: " + owner.getUserName() + " " +
-                    "for the store: " + this.storeName);
-        }
-        return mangerStore;
+        log.info(String.format("The user %s %s new manger %s to the store %d",
+                owner.getUserName(),Objects.nonNull(newManager) ? "appointed" : "not appointed" ,newManagerStore.getUserName(), storeId));
+        return newManager;
     }
 
-    /**
-     * add a manager to be manager of this store
-     * @param ownerStore
-     * @param newManagerUser
-     * @return true for success otherwise false
-     */
-    public MangerStore addManager(UserSystem ownerStore, UserSystem newManagerUser) {
-        MangerStore newManager = null;
-        if (isOwner(ownerStore) || isManagerWithPermission(ownerStore.getUserName(), StorePermission.EDIT_Managers)) {    //check if the user appointing is an owner so can appoint
-            newManager = new MangerStore(newManagerUser);
-            newManager = appointAdditionManager(ownerStore, newManager);
-        }
-        return newManager;
+    private ManagersAppointee findManagersAppointee(String appointedManagerUsername){
+        return appointedManagers.stream()
+                .filter(appointedManager-> appointedManager.getAppointeeUser().equals(appointedManagerUsername))
+                .findFirst()
+                .orElseGet(()-> {
+                    ManagersAppointee managersAppointee = new ManagersAppointee(appointedManagerUsername);
+                    appointedManagers.add(managersAppointee);
+                    return managersAppointee;
+                });
     }
 
     /**
@@ -458,12 +442,30 @@ public class Store {
      */
     public boolean removeManager(UserSystem ownerStore, UserSystem user) {
         boolean response = false;
-        if (isOwner(ownerStore)) {  //the user is able to remove his appointments
-            response =  appointedManagers.stream()
+        if ((isOwner(ownerStore) || isManagerWithPermission(ownerStore.getUserName(), StorePermission.EDIT_Managers))
+        && removeManagerRecursive(ownerStore, user)) {  //the user is able to remove his appointments
+            response = appointedManagers.stream()
                     .filter(appointedManager-> appointedManager.getAppointeeUser().equals(ownerStore.getUserName()))
                     .findFirst()
-                    .map(appointedManager -> appointedManager.removeManager(user))
+                    .map(appointedManager -> appointedManager.removeManager(user, storeId))
                     .orElse(false);
+        }
+        return response;
+    }
+
+    public boolean removeManagerRecursive(UserSystem ownerStore, UserSystem user) {
+        boolean response = false;
+        if (isOwner(ownerStore) || isManagerWithPermission(ownerStore.getUserName(), StorePermission.EDIT_Managers)) {  //the user is able to remove his appointments
+            response =  appointedManagers.stream()
+                    .filter(appointedManager-> appointedManager.getAppointeeUser().equals(user.getUserName()))
+                    .findFirst()
+                    .map(appointedManager -> {
+                        appointedManager.getAppointedManagers()
+                                .forEach(subManager -> removeManagerRecursive(user, subManager.getAppointedManager()));
+                        user.removeManagedStore(this);
+                        return appointedManagers.remove(appointedManager);
+                    })
+                    .orElseGet(()->user.removeManagedStore(this));
         }
         return response;
     }
@@ -477,43 +479,28 @@ public class Store {
      * otherwise false
      */
     public boolean addPermissionToManager(UserSystem ownerStore, UserSystem user, StorePermission storePermission) {
-        if (!isOwner(ownerStore) && isManagerWithPermission(user.getUserName(), StorePermission.EDIT_Managers)) {    //verify the editor is owner in the store
-            log.error("couldn't add permission:" + storePermission.function + " " +
-                    "to: " + user.getUserName() + " by " + ownerStore.getUserName());
-            return false;
+        boolean permissionAdded = false;
+        if(isOwner(ownerStore) || isManagerWithPermission(ownerStore.getUserName(), StorePermission.EDIT_Managers)){
+            MangerStore mangerStore = getMangerStore(ownerStore, user);
+            permissionAdded = mangerStore.addStorePermission(storePermission);
         }
-        //holds the manager appointed by the received owner to be manager in this store
-        MangerStore manager = getManagerObject(ownerStore, user.getUserName());
-        boolean added = manager.addStorePermission(storePermission);    //add the permission
-        if (!added) {
-            log.info("couldn't add permission:" + storePermission.function + " " +
-                    "to: " + user.getUserName() + " by " + ownerStore.getUserName());
-            return false;
-        }
-        log.info("Permission:" + storePermission.function + " added" +
-                "to: " + user.getUserName() + " by " + ownerStore.getUserName());
-        return true;
+        log.info(String.format("The permission %s %s by %s to %s in %d",
+                storePermission.function, permissionAdded? "added" : "not added", ownerStore.getUserName(), user.getUserName(), storeId));
+        return permissionAdded;
     }
 
-
-    /**
-     * get the manager object of the manager managerUserName appointed by ownerUser
-     * @param ownerUser       - the appointing owner
-     * @param managerUserName - the appointed manager
-     * @return the manager object which wraps the manager with manager username
-     */
-    public MangerStore getManagerObject(UserSystem ownerUser, String managerUserName) {
-        int ownerUserIndex = getAppointeeManagersIndex(ownerUser.getUserName());
-        if (ownerUserIndex != -1) {
-            if (new LinkedList<>(appointedManagers).get(ownerUserIndex).getAppointedManagers() == null)
-                return null;
-            else {
-                return new LinkedList<>(appointedManagers).get(ownerUserIndex).getAppointedManagers().stream().
-                        filter(mangerStore -> mangerStore.isTheUser(managerUserName))
-                        .findFirst().orElseThrow(() -> new NoManagerInStoreException(managerUserName, storeId));
-            }
-        } else return null;
+    private MangerStore getMangerStore(UserSystem ownerStore, UserSystem user) {
+        return appointedManagers.stream()
+                .filter(appointedManager -> appointedManager.getAppointeeUser().equals(ownerStore.getUserName()))
+                .findFirst()
+                .orElseThrow(() -> new TradingSystemException(String.format("The username %s is not manger and not owner in store %d",
+                        ownerStore.getUserName(), storeId)))
+                .getAppointedManagers().stream()
+                .filter(storeManager -> storeManager.getAppointedManager().getUserName().equals(user.getUserName()))
+                .findFirst()
+                .orElseThrow(() -> new NoManagerInStoreException(user.getUserName(), storeId));
     }
+
     /**
      * get the actual user of the manager appointeed by the ownerUser with managerUserName
      *
@@ -610,7 +597,7 @@ public class Store {
     }
 
     public Set<StorePermission> getPermissionCantDo(UserSystem ownerStore, UserSystem user) {
-        if (!isOwner(ownerStore)) {    //verify the editor is owner in the store
+        if (!isOwner(ownerStore) && !isManagerWithPermission(ownerStore.getUserName(), StorePermission.EDIT_Managers)) {    //verify the editor is owner in the store
             log.error(String.format("couldn't get permissions of %s by %S ", user.getUserName(), ownerStore.getUserName()));
             return null;
         } else {
@@ -751,7 +738,7 @@ public class Store {
         //TODO BIG BLAGN
         if (isOwner(owner) && !isOwner(willBeOwner)) {
             if (!checkIfAppointeeExists(owner.getUserName())) {
-                appointedOwners.add(new OwnersAppointee(owner.getUserName(), storeId));
+                appointedOwners.add(new OwnersAppointee(owner.getUserName()));
             }
 
             int ownerIndex = getAppointeeOwnersIndex(owner.getUserName());
@@ -872,6 +859,5 @@ public class Store {
                 newOwner.getUserName() ,owner.getUserName(), storeName));
         return response;
     }
-
 
 }
