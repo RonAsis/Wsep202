@@ -34,7 +34,7 @@ public class StoreRepositoryTests {
 
     @Test
     void addStoreANDgetStorePositive() {
-        UserSystem userSystemOwner = new UserSystem("usernamePos", "name", false, "lname", "password", false);
+        UserSystem userSystemOwner = new UserSystem("usernamePos", "name", "lname", "password", false);
         Store store = new Store(userSystemOwner,"storeName");
         tradingSystemDataBaseDao.addStore(store);
         assertEquals(tradingSystemDataBaseDao.getStore(store.getStoreId()).get(),store);
@@ -42,7 +42,7 @@ public class StoreRepositoryTests {
 
     @Test
     void getStoresPositive() {
-        UserSystem userSystemOwner = new UserSystem("usernamePos", "name", false, "lname", "password", false);
+        UserSystem userSystemOwner = new UserSystem("usernamePos", "name", "lname", "password", false);
         Store store0 = new Store(userSystemOwner,"storeName0");
         Store store1 = new Store(userSystemOwner,"storeName1");
         Store store2 = new Store(userSystemOwner,"storeName2");
@@ -57,7 +57,7 @@ public class StoreRepositoryTests {
 
     @Test
     void getProductsPositive(){
-        UserSystem userSystemOwner = new UserSystem("usernamePos", "name", false, "lname", "password", false);
+        UserSystem userSystemOwner = new UserSystem("usernamePos", "name", "lname", "password", false);
         Product product0 = new Product("coockie0", ProductCategory.HEALTH,10,10,1);
         Product product1 = new Product("coockie1", ProductCategory.HEALTH,10,10,1);
         Product product2 = new Product("coockie2", ProductCategory.HEALTH,10,10,1);

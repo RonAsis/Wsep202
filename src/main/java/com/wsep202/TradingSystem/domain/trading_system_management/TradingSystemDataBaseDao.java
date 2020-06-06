@@ -2,8 +2,10 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.data_access_layer.StoreRepository;
 import com.wsep202.TradingSystem.data_access_layer.UserRepository;
+import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
+import com.wsep202.TradingSystem.domain.trading_system_management.cashing.TradingSystemCashing;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,21 +13,17 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import sun.security.util.ArrayUtil;
 
-import java.lang.reflect.Array;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TradingSystemDataBaseDao implements TradingSystemDao {
+public class TradingSystemDataBaseDao extends TradingSystemDao {
 
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
+    private final TradingSystemCashing tradingSystemCashing;
 
     @Override
     @Transactional
@@ -92,12 +90,16 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
     @Override
     @Transactional
     public Set<Product> getProducts() {
-        return storeRepository.findAll().stream()
-                .map(Store::getProducts)
-                .reduce(new HashSet<>(), (productsAcc, products) -> {
-                    productsAcc.addAll(products);
-                    return productsAcc;
-                });
+        if (tradingSystemCashing.getProducts().isEmpty()) {
+            Set<Product> productSet = storeRepository.findAll().stream()
+                    .map(Store::getProducts)
+                    .reduce(new HashSet<>(), (productsAcc, products) -> {
+                        productsAcc.addAll(products);
+                        return productsAcc;
+                    });
+            tradingSystemCashing.addProducts(productSet);
+        }
+        return tradingSystemCashing.getProducts();
     }
 
     @Override
@@ -112,12 +114,13 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
             storeRepository.save(store);
             product.setProductSn(store.getProducts().stream()
                     .map(Product::getProductSn)
-                    .reduce(0, (acc, cur)-> {
-                        if(cur> acc){
+                    .reduce(0, (acc, cur) -> {
+                        if (cur > acc) {
                             acc = cur;
                         }
                         return acc;
-                    } ));
+                    }) + 1);
+            tradingSystemCashing.addProduct(product);
         }
         return product;
     }
@@ -137,6 +140,8 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
         Discount res = store.addEditDiscount(user, discount);
         if (Objects.nonNull(res)) {
             storeRepository.save(store);
+            List<Discount> discounts = storeRepository.findById(store.getStoreId()).get().getDiscounts();
+            res.setDiscountId(discounts.get(discounts.size() - 1).getDiscountId());
         }
         return res;
     }
@@ -147,6 +152,7 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
         if (ans) {
             storeRepository.save(ownerStore);
             log.info(String.format("Delete productSn %d from store %d", productSn, ownerStore.getStoreId()));
+            tradingSystemCashing.removeProduct(productSn);
         }
         return ans;
     }
@@ -156,6 +162,7 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
         boolean ans = ownerStore.editProduct(user, productSn, productName, category, amount, cost);
         if (ans) {
             storeRepository.save(ownerStore);
+            tradingSystemCashing.editProduct(ownerStore.getProduct(productSn));
         }
         return ans;
     }
@@ -185,20 +192,16 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
     }
 
     @Override
-    public boolean saveProductInShoppingBag(UserSystem user, Store store, Product product, int amount) {
+    public boolean saveProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product, int amount) {
         Product productInShoppingBag = store.getProduct(product.getProductSn());
-        boolean ans = user.saveProductInShoppingBag(store, productInShoppingBag, amount);
-        if (ans) {
-            userRepository.save(user);
-        }
-        return ans;
+        return shoppingCart.addProductToCart(store, productInShoppingBag, amount);
     }
 
     @Override
-    public boolean removeProductInShoppingBag(UserSystem user, Store store, Product product) {
-        boolean ans = user.removeProductInShoppingBag(store, product);
+    public boolean removeProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product) {
+        boolean ans = shoppingCart.removeProductInCart(store, product);
         if (ans) {
-            userRepository.save(user);
+            tradingSystemCashing.editShoppingCart(username, shoppingCart);
         }
         return ans;
     }
@@ -206,19 +209,47 @@ public class TradingSystemDataBaseDao implements TradingSystemDao {
     @Override
     public void updateUser(UserSystem user) {
         userRepository.save(user);
+        tradingSystemCashing.editShoppingCart(user.getUserName(), user.getShoppingCart());
     }
 
     @Override
-    public boolean changeProductAmountInShoppingBag(UserSystem user, int storeId, int amount, int productSn) {
-        boolean ans = user.changeProductAmountInShoppingBag(storeId, amount, productSn);
-        if(ans){
-            updateUser(user);
+    public boolean changeProductAmountInShoppingBag(String username, ShoppingCart shoppingCart, int storeId, int amount, int productSn) {
+        boolean ans = shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
+        if (ans) {
+            tradingSystemCashing.editShoppingCart(username, shoppingCart);
         }
         return ans;
     }
 
     @Override
-    public void updateStore(Store ownedStore){
+    public void updateStore(Store ownedStore) {
         storeRepository.save(ownedStore);
+    }
+
+    @Override
+    public void login(String username, ShoppingCart shoppingCart) {
+        tradingSystemCashing.addShoppingCart(username, shoppingCart);
+    }
+
+    @Override
+    public void saveShoppingCart(String username) {
+        ShoppingCart shoppingCart = tradingSystemCashing.removeShoppingCart(username);
+        getUserSystem(username).ifPresent(userSystem -> {
+            userSystem.setShoppingCart(shoppingCart);
+            userRepository.save(userSystem);
+        });
+    }
+
+    @Override
+    public ShoppingCart getShoppingCart(String username, UUID uuid) {
+        if (isValidUuid(username, uuid)) {
+            return tradingSystemCashing.getShoppingCart(username);
+        }
+        throw new UserDontExistInTheSystemException(username);
+    }
+
+    @Override
+    public void loadShoppingCart(UserSystem user) {
+        user.setShoppingCart(tradingSystemCashing.getShoppingCart(user.getUserName()));
     }
 }

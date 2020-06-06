@@ -5,6 +5,7 @@ import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -29,7 +30,7 @@ public class ShoppingCart {
      * list of stores and there shopping bags
      */
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @MapKeyJoinColumn(name = "shopping_bag_id")
     private Map<Store, ShoppingBag> shoppingBagsList;
 

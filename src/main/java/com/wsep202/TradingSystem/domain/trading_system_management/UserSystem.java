@@ -66,11 +66,7 @@ public class UserSystem implements Observer, Serializable {
     @Builder.Default
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private ShoppingCart shoppingCart = new ShoppingCart();
-    /**
-     * Show the stage of the user, logged-in or logged-out
-     */
-    @Builder.Default
-    private boolean isLogin = false;
+
     /**
      * The users personal receipts list
      */
@@ -100,10 +96,9 @@ public class UserSystem implements Observer, Serializable {
     /**
      * use for DB
      */
-    public UserSystem(String userName, String firstName, boolean isLogin, String lastName, String password, boolean isAdmin) {
+    public UserSystem(String userName, String firstName, String lastName, String password, boolean isAdmin) {
         this.userName = userName;
         this.firstName = firstName;
-        this.isLogin = isLogin;
         this.lastName = lastName;
         this.password = password;
         this.isAdmin = isAdmin;
@@ -122,7 +117,6 @@ public class UserSystem implements Observer, Serializable {
         this.lastName = lastName;
         this.password = password;
         this.isAdmin = false;
-        this.isLogin = false;
         this.notifications = new LinkedList<>();
         this.shoppingCart = new ShoppingCart();
         this.ownedStores = new HashSet<>();
@@ -222,7 +216,6 @@ public class UserSystem implements Observer, Serializable {
         if (!notifications.isEmpty()) {
             subject.update(this);
         }
-        isLogin = true;
     }
 
     /**
@@ -233,7 +226,6 @@ public class UserSystem implements Observer, Serializable {
         if (Objects.nonNull(subject)) {
             subject.unregister(this);
         }
-        isLogin = false;
         return true;
     }
 

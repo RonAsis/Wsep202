@@ -8,27 +8,35 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+import javax.persistence.*;
 import java.util.Map;
 
 @Data
-@AllArgsConstructor
 @Slf4j
 @Builder
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class VisibleDiscount extends DiscountPolicy {
 
     /**
      * amount of product from to apply discount
      */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "amountOfProductsForApplyDiscounts" )
+    @Cascade(value = { CascadeType.ALL })
     private Map<Product, Integer> amountOfProductsForApplyDiscounts;
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
         if (!isExpired(discount)) {
-            if(discount.getDiscountPercentage()<0){
-                throw new IllegalPercentageException(discount.getDiscountId(),discount.getDiscountPercentage());
-            }
             products.keySet().forEach(product -> {
                 if (isProductHaveDiscount(amountOfProductsForApplyDiscounts, product)) {
                     double discountCost = (discount.getDiscountPercentage() / 100) * product.getOriginalCost();
@@ -54,6 +62,11 @@ public class VisibleDiscount extends DiscountPolicy {
                 product.setCost(product.getCost() + discountCost);    //update the price by discount
             }
         });
+    }
+
+    @Override
+    public void removeProductFromDiscount(int productSn) {
+        removeProductFromCollection(amountOfProductsForApplyDiscounts, productSn);
     }
 
 }

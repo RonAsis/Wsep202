@@ -57,19 +57,19 @@ public class Store {
     /**
      * The set purchase policy for the store
      */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER )
     private List<Purchase> purchasePolicies;
 
     /**
      * The set purchase policy for the store
      */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Discount> discounts;
 
     /**
      * list of purchases made in the store
      */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Receipt> receipts;
 
     /**
@@ -156,7 +156,7 @@ public class Store {
             duplicate.stream()
                     .filter(product -> product.getProductSn() == productSn)
                     .forEach(products::remove);
-
+            removeProductFromDiscount(productSn);
             //is present
             return duplicate.size() > products.size();
         }
@@ -165,6 +165,7 @@ public class Store {
                 "not owner");
         return false;
     }
+
 
     /**
      * owner adds a new product to the store
@@ -522,16 +523,7 @@ public class Store {
             }
         else return null;
     }
-    /**
-     * checks if the user is manager in the store
-     * @param user
-     * @return
-     */
-    private boolean isManager(UserSystem user) {
-        return appointedManagers.stream()
-                .anyMatch(entry -> entry.getAppointedManagers().stream()
-                        .anyMatch(mangerStore -> mangerStore.isTheUser(user)));
-    }
+
 
     /**
      * get the permissions of a manager
@@ -627,6 +619,10 @@ public class Store {
     }
 
     /////////////////////////////////////////////////////////discounts ///////////////////////////////////////
+
+    private void removeProductFromDiscount(int productSn) {
+        discounts.forEach(discount -> discount.removeProductFromDiscount(productSn));
+    }
 
     /**
      * apply discounts on a shopping bag

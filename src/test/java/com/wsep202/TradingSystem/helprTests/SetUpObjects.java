@@ -86,7 +86,6 @@ public class SetUpObjects {
                     .password("password" + counter)
                     .firstName("firstName" + counter)
                     .lastName("lastName" + counter)
-                    .isLogin(false)
                     .build());
         }
         return userSystems;

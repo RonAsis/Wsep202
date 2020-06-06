@@ -1,6 +1,5 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.compiste_id_db.OwnersAppointeeId;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 

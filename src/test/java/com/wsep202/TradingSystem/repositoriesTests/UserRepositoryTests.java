@@ -40,27 +40,27 @@ public class UserRepositoryTests {
 
     @Test
     void registerAdminPositive(){
-        UserSystem  userSystemAdmin = new UserSystem("usernameAdmin","name",false,"lname","password", true);
+        UserSystem  userSystemAdmin = new UserSystem("usernameAdmin","name","lname","password", true);
         tradingSystemDataBaseDao.registerAdmin(userSystemAdmin);
         assertTrue(tradingSystemDataBaseDao.isRegistered(userSystemAdmin));
     }
 
     @Test
     void isRegisteredPositive() {
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", false);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", false);
         tradingSystemDataBaseDao.addUserSystem(userSystem,image);
         assertTrue(tradingSystemDataBaseDao.isRegistered(userSystem));
     }
 
     @Test
     void isRegisteredNegative() {
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", false);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", false);
         assertFalse(tradingSystemDataBaseDao.isRegistered(userSystem));
     }
 
     @Test
     void addUserSystemPositive(){
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", false);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", false);
         Path path = Paths.get("/path/to/the/file.txt");
         String name = "file.txt";
         String originalFileName = "file.txt";
@@ -77,12 +77,11 @@ public class UserRepositoryTests {
 
     @Test
     void getUserSystemPositive(){
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", false);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", false);
         tradingSystemDataBaseDao.addUserSystem(userSystem,image);
         assertTrue(tradingSystemDataBaseDao.getUserSystem(userSystem.getUserName()).isPresent());
         Assertions.assertEquals(userSystem.getUserName(),tradingSystemDataBaseDao.getUserSystem(userSystem.getUserName()).get().getUserName());
         Assertions.assertEquals(userSystem.getFirstName(),tradingSystemDataBaseDao.getUserSystem(userSystem.getUserName()).get().getFirstName());
-        Assertions.assertEquals(userSystem.isLogin(),tradingSystemDataBaseDao.getUserSystem(userSystem.getUserName()).get().isLogin());
         Assertions.assertEquals(userSystem.getLastName(),tradingSystemDataBaseDao.getUserSystem(userSystem.getUserName()).get().getLastName());
         Assertions.assertEquals(userSystem.getPassword(),tradingSystemDataBaseDao.getUserSystem(userSystem.getUserName()).get().getPassword());
         Assertions.assertEquals(userSystem.getImageUrl(),tradingSystemDataBaseDao.getUserSystem(userSystem.getUserName()).get().getImageUrl());
@@ -90,32 +89,31 @@ public class UserRepositoryTests {
 
     @Test
     void getUserSystemNegative(){
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", false);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", false);
         assertFalse(tradingSystemDataBaseDao.getUserSystem(userSystem.getUserName()).isPresent());
     }
 
     @Test
     void isAdminPositive(){
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", true);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", true);
         tradingSystemDataBaseDao.addUserSystem(userSystem,image);
         assertTrue(tradingSystemDataBaseDao.isAdmin(userSystem.getUserName()));
     }
 
     @Test
     void isAdminNegative(){
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", false);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", false);
         tradingSystemDataBaseDao.addUserSystem(userSystem,image);
         assertFalse(tradingSystemDataBaseDao.isAdmin(userSystem.getUserName()));
     }
 
     @Test
     void getAdministratorUserPositive(){
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", true);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", true);
         tradingSystemDataBaseDao.addUserSystem(userSystem,image);
         assertTrue(tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).isPresent());
         Assertions.assertEquals(userSystem.getUserName(),tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).get().getUserName());
         Assertions.assertEquals(userSystem.getFirstName(),tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).get().getFirstName());
-        Assertions.assertEquals(userSystem.isLogin(),tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).get().isLogin());
         Assertions.assertEquals(userSystem.getLastName(),tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).get().getLastName());
         Assertions.assertEquals(userSystem.getPassword(),tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).get().getPassword());
         Assertions.assertEquals(userSystem.isAdmin(),tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).get().isAdmin());
@@ -124,17 +122,17 @@ public class UserRepositoryTests {
 
     @Test
     void getAdministratorUserNegative(){
-        UserSystem  userSystem = new UserSystem("usernamePos","name",false,"lname","password", false);
+        UserSystem  userSystem = new UserSystem("usernamePos","name","lname","password", false);
         tradingSystemDataBaseDao.addUserSystem(userSystem,image);
         assertFalse(tradingSystemDataBaseDao.getAdministratorUser(userSystem.getUserName()).isPresent());
     }
 
     @Test
     void getUsersPositive(){
-        UserSystem  userSystem1 = new UserSystem("usernamePos1","name",false,"lname","password", false);
-        UserSystem  userSystem2 = new UserSystem("usernamePos2","name",false,"lname","password", false);
-        UserSystem  userSystem3 = new UserSystem("usernamePos3","name",false,"lname","password", false);
-        UserSystem  userSystem4 = new UserSystem("usernamePos4","name",false,"lname","password", false);
+        UserSystem  userSystem1 = new UserSystem("usernamePos1","name","lname","password", false);
+        UserSystem  userSystem2 = new UserSystem("usernamePos2","name","lname","password", false);
+        UserSystem  userSystem3 = new UserSystem("usernamePos3","name","lname","password", false);
+        UserSystem  userSystem4 = new UserSystem("usernamePos4","name","lname","password", false);
         tradingSystemDataBaseDao.addUserSystem(userSystem1,image);
         tradingSystemDataBaseDao.addUserSystem(userSystem2,image);
         tradingSystemDataBaseDao.addUserSystem(userSystem3,image);

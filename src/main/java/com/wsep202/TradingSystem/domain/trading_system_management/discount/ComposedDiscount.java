@@ -4,7 +4,9 @@ import com.wsep202.TradingSystem.domain.exception.CompositeOperatorNullException
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Cascade;
 
+import javax.persistence.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,31 +18,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@Entity
 public class ComposedDiscount extends DiscountPolicy {
 
     /**
      * amount of product from to apply discount
      */
+    @MapKeyColumn(name = "amountOfProductsForApplyDiscounts")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Map<Product, Integer> amountOfProductsForApplyDiscounts;
 
     /**
      * products that has the specified discount
      */
+    @ElementCollection
+    @MapKeyColumn(name = "productsUnderThisDiscount")
     private Map<Product, Integer> productsUnderThisDiscount;
 
     /**
      * children components of the composite conditional discount
      */
+    @OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST,CascadeType.REMOVE}, orphanRemoval = true)
     private List<Discount> composedDiscounts;
 
     /**
      * the operation between the conditionals discounts
      */
+    @Enumerated(EnumType.STRING)
     private CompositeOperator compositeOperator;
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
-        verifyValidity(discount);
         if (amountOfProductsForApplyDiscounts!=null&&!amountOfProductsForApplyDiscounts.isEmpty() && isApprovedProducts(discount, products)) {
             //composed discount terms are met so apply the discount as set in its properties.
             createConditionalDiscount().applyDiscount(discount, products);
@@ -79,11 +88,6 @@ public class ComposedDiscount extends DiscountPolicy {
         }
     }
 
-    private void verifyValidity(Discount discount) {
-        if(compositeOperator==null){
-            throw new CompositeOperatorNullException(discount.getDiscountId());
-        }
-    }
 
     private ConditionalProductDiscount createConditionalDiscount(){
         return ConditionalProductDiscount.builder()
@@ -93,7 +97,6 @@ public class ComposedDiscount extends DiscountPolicy {
     }
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
-        verifyValidity(discount);
         boolean isApproved = !isExpired(discount);
         switch (compositeOperator) {
             case AND:
@@ -114,6 +117,12 @@ public class ComposedDiscount extends DiscountPolicy {
     @Override   //the undo will be done for each of the simple discounts in store anyway
     public void undoDiscount(Discount discount, Map<Product, Integer> products) {
 
+    }
+
+    @Override
+    public void removeProductFromDiscount(int productSn) {
+        removeProductFromCollection(amountOfProductsForApplyDiscounts, productSn);
+        removeProductFromCollection(productsUnderThisDiscount, productSn);
     }
 
     private int getNumOfPolicyApproved(Discount discount, Map<Product, Integer> products) {

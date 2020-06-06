@@ -531,10 +531,10 @@ public class TradingSystemFacade {
     public boolean saveProductInShoppingBag(@NotBlank String username, int storeId, int productSn, int amount, UUID uuid) {
         try {
             log.info("save product " + productSn + "in bag of store " + storeId);
-            UserSystem user = tradingSystem.getUser(username, uuid);
             Store store = tradingSystem.getStore(storeId);
             Product product = store.getProduct(productSn);
-            return tradingSystemDao.saveProductInShoppingBag(user, store, product, amount);
+            ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
+            return tradingSystemDao.saveProductInShoppingBag(username, shoppingCart, store, product, amount);
         } catch (TradingSystemException e) {
             log.error("saveInBag", e);
             return false;
@@ -549,8 +549,7 @@ public class TradingSystemFacade {
      */
     public ShoppingCartDto watchShoppingCart(@NotBlank String username, UUID uuid) {
         try {
-            UserSystem user = tradingSystem.getUser(username, uuid);
-            ShoppingCart shoppingCart = user.getShoppingCart();
+            ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
             return Objects.nonNull(shoppingCart) ?modelMapper.map(shoppingCart, ShoppingCartDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("view products in shopping bag", e);
@@ -569,10 +568,10 @@ public class TradingSystemFacade {
      */
     public boolean removeProductInShoppingBag(@NotBlank String username, int storeId, int productSn, UUID uuid) {
         try {
-            UserSystem user = tradingSystem.getUser(username, uuid);
             Store store = tradingSystem.getStore(storeId);
             Product product = store.getProduct(productSn);
-            return tradingSystemDao.removeProductInShoppingBag(user, store, product);
+            ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
+            return tradingSystemDao.removeProductInShoppingBag(username, shoppingCart, store, product);
         } catch (TradingSystemException e) {
             log.error("Remove product in shopping bag failed", e);
             return false;
@@ -611,6 +610,7 @@ public class TradingSystemFacade {
             PaymentDetails paymentDetails = Objects.nonNull(paymentDetailsDto) ? modelMapper.map(paymentDetailsDto, PaymentDetails.class) : null;
             BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
             List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, user);
+            // Todo
             return Objects.nonNull(receipts) ? convertReceiptList(receipts) : null;
     }
 
@@ -674,21 +674,21 @@ public class TradingSystemFacade {
      * @return true if added, else false
      */
     public boolean addProductToShoppingCart(String username, int amount, ProductDto productDto, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(username,uuid);
         Product product = modelMapper.map(productDto, Product.class);
         Store store = tradingSystem.getStore(product.getStoreId());
-        return tradingSystemDao.saveProductInShoppingBag(user, store, product, amount);
+        ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
+        return tradingSystemDao.saveProductInShoppingBag(username, shoppingCart, store, product, amount);
     }
 
     public  List<ProductShoppingCartDto> getShoppingCart(String username, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(username,uuid);
+        ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
         Type listType = new TypeToken<List<ProductShoppingCartDto>>() {}.getType();
-        return modelMapper.map(user.getShoppingCart(), listType);
+        return modelMapper.map(shoppingCart, listType);
     }
 
     public Pair<Double, Double> getTotalPriceOfShoppingCart(String username, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(username,uuid);
-        return tradingSystem.getTotalPrices(user.getShoppingCart());
+        ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
+        return tradingSystem.getTotalPrices(shoppingCart);
     }
 
 
@@ -796,8 +796,8 @@ public class TradingSystemFacade {
      * @return true if changed
      */
     public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(username, uuid);
-        return tradingSystemDao.changeProductAmountInShoppingBag(user, storeId, amount, productSn);
+        ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
+        return tradingSystemDao.changeProductAmountInShoppingBag(username, shoppingCart, storeId, amount, productSn);
     }
 
     /**

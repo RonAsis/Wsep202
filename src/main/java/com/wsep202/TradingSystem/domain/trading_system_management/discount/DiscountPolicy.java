@@ -15,15 +15,15 @@ import java.util.Map;
  * The discount policy defines the discount interface
  */
 @Data
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class DiscountPolicy {
 
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private long id;
 
     /**
      * apply discounts according to the type of the executing discount
@@ -55,9 +55,6 @@ public abstract class DiscountPolicy {
     public void setCostAfterDiscount(Discount discount, Product product, double discountCost) {
         product.setCost(product.getCost() - discountCost);
         discount.setApplied(true);
-        if (product.getCost() < 0) {
-            throw new IllegalProductPriceException(discount.getDiscountId());
-        }
     }
 
     /**
@@ -85,5 +82,14 @@ public abstract class DiscountPolicy {
     public boolean isProductHaveDiscount(Map<Product, Integer> amountOfProductsForApplyDiscounts, Product product) {
         return amountOfProductsForApplyDiscounts.keySet().stream()
                 .anyMatch(integer -> product.getProductSn() == integer.getProductSn());
+    }
+
+    public abstract void removeProductFromDiscount(int productSn);
+
+    public void removeProductFromCollection(Map<Product, Integer> collection ,int productSn){
+        collection.entrySet().stream()
+                .filter(entry -> entry.getKey().getProductSn() == productSn)
+                .findFirst()
+                .map(entry -> collection.remove(entry.getKey()));
     }
 }

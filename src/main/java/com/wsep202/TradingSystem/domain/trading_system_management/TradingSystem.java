@@ -25,8 +25,6 @@ public class TradingSystem {
 
     private ExternalServiceManagement externalServiceManagement;
 
-    private Map<String, UUID> usersLogin;
-
     private TradingSystemDao tradingSystemDao;
 
     @Setter
@@ -38,7 +36,6 @@ public class TradingSystem {
         this.externalServiceManagement = externalServiceManagement;// must be first
         this.externalServiceManagement.connect();    //connect to the externals
         this.tradingSystemDao = tradingSystemDao;
-        this.usersLogin = new HashMap<>();
         initAdmin(admin);
         externalServiceManagement.connect();
     }
@@ -97,11 +94,10 @@ public class TradingSystem {
         if (userSystem.isPresent() &&
                 tradingSystemDao.isRegistered(userSystem.get()) &&
                 externalServiceManagement.isAuthenticatedUserPassword(password, userSystem.get()) &&
-                Objects.isNull(usersLogin.get(userName))) {
+                !tradingSystemDao.isLogin(userName)) {
             userSystem.get().login();
-            tradingSystemDao.addUserSystem(userSystem.get(),null);
             UUID uuid = UUID.randomUUID();
-            usersLogin.put(userName, uuid);
+            tradingSystemDao.login(userName, uuid);
             boolean isAdmin = tradingSystemDao.isAdmin(userName);
             log.info(String.format("user: %s logged in successfully, is admin: %b", userName, isAdmin));
             return new Pair<>(uuid, isAdmin);
@@ -119,9 +115,9 @@ public class TradingSystem {
     public boolean logout(@NotNull UserSystem user) {
 
         if (Objects.nonNull(user) &&
-                Objects.nonNull(usersLogin.get(user.getUserName()))) {
+                tradingSystemDao.isLogin(user.getUserName())) {
             user.logout();
-            usersLogin.remove(user.getUserName());
+            tradingSystemDao.logout(user.getUserName());
             log.info(String.format("user: %s logout successfully", (user.getUserName())));
             return true;
         }
@@ -144,8 +140,8 @@ public class TradingSystem {
 
     private boolean uuidIsValid(String administratorUsername, UUID uuid) {
         return Objects.nonNull(administratorUsername) &&
-                Objects.nonNull(usersLogin.get(administratorUsername)) &&
-                usersLogin.get(administratorUsername).equals(uuid);
+               tradingSystemDao.isLogin(administratorUsername) &&
+                tradingSystemDao.isValidUuid(administratorUsername, uuid);
     }
 
     /**
@@ -320,6 +316,7 @@ public class TradingSystem {
             log.error("user can't be null");
             return null;
         }
+        tradingSystemDao.loadShoppingCart(user);
         List<Receipt> receipts = purchaseAndDeliver(paymentDetails, user.getShoppingCart(), billingAddress, user.getUserName());
         user.addReceipts(receipts);
         tradingSystemDao.updateUser(user);
@@ -582,5 +579,9 @@ public class TradingSystem {
                         usernameMangers.stream().noneMatch(user -> user.equals(userSystem.getUserName())))
                 .map(UserSystem::getUserName)
                 .collect(Collectors.toList());
+    }
+
+    public ShoppingCart getShoppingCart(String username, UUID uuid) {
+        return tradingSystemDao.getShoppingCart(username, uuid);
     }
 }

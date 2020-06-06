@@ -3,56 +3,87 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-public interface TradingSystemDao {
+public abstract class TradingSystemDao {
 
-    void registerAdmin(UserSystem admin);
+    private Map<String, UUID> usersLogin;
 
-    boolean isRegistered(UserSystem userSystem);
+    public TradingSystemDao(){
+        usersLogin = new HashMap<>();
+    }
+    abstract void registerAdmin(UserSystem admin);
 
-    void addUserSystem(UserSystem userToRegister, MultipartFile image);
+    abstract boolean isRegistered(UserSystem userSystem);
 
-    Optional<UserSystem> getUserSystem(String username);
+    abstract void addUserSystem(UserSystem userToRegister, MultipartFile image);
 
-    boolean isAdmin(String username);
+    abstract Optional<UserSystem> getUserSystem(String username);
 
-    Optional<UserSystem> getAdministratorUser(String username);
+    abstract boolean isAdmin(String username);
 
-    Optional<Store> getStore(int storeId);
+    abstract Optional<UserSystem> getAdministratorUser(String username);
 
-    void addStore(Store newStore);
+    abstract Optional<Store> getStore(int storeId);
 
-    Set<Store> getStores();
+    abstract void addStore(Store newStore);
 
-    Set<Product> getProducts();
+    abstract Set<Store> getStores();
 
-    Set<UserSystem> getUsers();
+    abstract Set<Product> getProducts();
 
-    Product addProductToStore(Store store, UserSystem owner, Product product);
+    abstract Set<UserSystem> getUsers();
 
-    boolean removeDiscount(Store store, UserSystem user, int discountId);
+    abstract Product addProductToStore(Store store, UserSystem owner, Product product);
 
-    Discount addEditDiscount(Store store, UserSystem user, Discount discount);
+    abstract boolean removeDiscount(Store store, UserSystem user, int discountId);
 
-    boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn);
+    abstract Discount addEditDiscount(Store store, UserSystem user, Discount discount);
 
-    boolean editProduct(Store ownerStore, UserSystem user, int productSn, String productName, String category, int amount, double cost);
+    abstract boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn);
 
-    default void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem){}
+    abstract boolean editProduct(Store ownerStore, UserSystem user, int productSn, String productName, String category, int amount, double cost);
 
-    boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
+    public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem){}
 
-    boolean removePermission(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
+    abstract boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
 
-    boolean saveProductInShoppingBag(UserSystem user, Store store, Product product, int amount);
+    abstract boolean removePermission(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
 
-    boolean removeProductInShoppingBag(UserSystem user, Store store, Product product);
+    abstract boolean saveProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product, int amount);
 
-    default void updateUser(UserSystem user){}
+    abstract boolean removeProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product);
 
-    boolean changeProductAmountInShoppingBag(UserSystem user, int storeId, int amount, int productSn);
+    protected void updateUser(UserSystem user){}
 
-    default void updateStore(Store ownedStore){}
+    abstract boolean changeProductAmountInShoppingBag(String username, ShoppingCart shoppingCart, int storeId, int amount, int productSn);
+
+    protected void updateStore(Store ownedStore){}
+
+    public  boolean isLogin(String userName){
+        return Objects.nonNull(usersLogin.get(userName));
+    }
+
+    public void login(String userName, UUID uuid){
+        usersLogin.put(userName, uuid);
+        getUserSystem(userName)
+                .ifPresent(userSystem -> login(userSystem.getUserName(), userSystem.getShoppingCart()));
+    }
+
+    public abstract void login(String username, ShoppingCart shoppingCart);
+
+    public void logout(String userName){
+        usersLogin.remove(userName);
+        saveShoppingCart(userName);
+    }
+
+    public abstract void saveShoppingCart(String username);
+
+    public boolean isValidUuid(String username, UUID uuid){
+        return usersLogin.get(username).equals(uuid);
+    }
+
+    public abstract ShoppingCart getShoppingCart(String username, UUID uuid);
+
+    public abstract void loadShoppingCart(UserSystem user);
 }

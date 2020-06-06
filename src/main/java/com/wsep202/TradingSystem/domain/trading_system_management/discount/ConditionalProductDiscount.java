@@ -11,7 +11,12 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Cascade;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.MapKeyColumn;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -19,16 +24,25 @@ import java.util.Map;
 @Getter
 @Slf4j
 @Builder
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class ConditionalProductDiscount extends DiscountPolicy {
 
     /**
      * products that has the specified discount
      */
+    @MapKeyColumn(name = "productsUnderThisDiscount")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Map<Product, Integer> productsUnderThisDiscount;
 
     /**
      * amount of product from to apply discount
      */
+    @MapKeyColumn(name = "amountOfProductsForApplyDiscounts")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Map<Product, Integer> amountOfProductsForApplyDiscounts;
 
     @Override
@@ -43,9 +57,6 @@ public class ConditionalProductDiscount extends DiscountPolicy {
                         double discountCost = calculateDiscount(discount.getDiscountPercentage(), amountProductInAmountOfProductsForApplyDiscounts,
                                 amount, product.getOriginalCost());
                         product.setCost(product.getCost() - discountCost);    //update the price by discountCost
-                        if (product.getCost() < 0) {
-                            throw new IllegalProductPriceException(discount.getDiscountId()); //if the inserted percentage is not reasonable
-                        }
                     }
                 });
             }
@@ -78,6 +89,12 @@ public class ConditionalProductDiscount extends DiscountPolicy {
         });
     }
 
+    @Override
+    public void removeProductFromDiscount(int productSn) {
+        removeProductFromCollection(productsUnderThisDiscount, productSn);
+        removeProductFromCollection(amountOfProductsForApplyDiscounts, productSn);
+    }
+
     private int getAmountProductInAmountOfProductsForApplyDiscounts(Discount discount, Product product) {
         return amountOfProductsForApplyDiscounts.entrySet().stream()
                 .filter(productInDisCount -> productInDisCount.getKey().getProductSn() == product.getProductSn())
@@ -104,9 +121,6 @@ public class ConditionalProductDiscount extends DiscountPolicy {
     }
 
     private void verifyValidity(Discount discount) {
-        if(discount.getDiscountPercentage()<0){
-            throw new IllegalPercentageException(discount.getDiscountId(),discount.getDiscountPercentage());
-        }
         if(this.productsUnderThisDiscount==null){
             throw new ConditionalProductException("There are no products as condition. check discountId: "+discount.getDiscountId());
         }

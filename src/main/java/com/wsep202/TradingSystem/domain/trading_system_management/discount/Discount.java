@@ -24,14 +24,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Entity
 public class Discount {
 
-    /**
-     * saves the last discountSnAcc when a new product is created
-     */
-    private static int discountSnAcc = 1;
-
     @Id
     @GeneratedValue
-    protected int discountId;
+    protected long discountId;
 
     /**
      * how much discount should to apply on product
@@ -41,6 +36,8 @@ public class Discount {
     /**
      * the product validation date
      */
+    @Basic
+    @Temporal(TemporalType.DATE)
     private Calendar endTime;
 
     /**
@@ -99,10 +96,15 @@ public class Discount {
         return true;
     }
 
+    public void removeProductFromDiscount(int productSn) {
+        discountPolicy.removeProductFromDiscount(productSn);
+    }
+
     ////////////////////////////////////// general /////////////////////////////////////////
 
     public boolean isExpired() {
         return getEndTime().compareTo(Calendar.getInstance()) < 0;
     }
+
 
 }

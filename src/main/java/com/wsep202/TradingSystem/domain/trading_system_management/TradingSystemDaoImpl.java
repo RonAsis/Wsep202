@@ -1,18 +1,16 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
-public class TradingSystemDaoImpl implements TradingSystemDao {
+public class TradingSystemDaoImpl extends TradingSystemDao {
 
     private static int idAcc = 0;
     private Set<Store> stores;
@@ -20,6 +18,7 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
     private Set<UserSystem> administrators;
 
     public TradingSystemDaoImpl() {
+        super();
         this.stores = new HashSet<>();
         this.users = new HashSet<>();
         this.administrators = new HashSet<>();
@@ -149,18 +148,45 @@ public class TradingSystemDaoImpl implements TradingSystemDao {
     }
 
     @Override
-    public boolean saveProductInShoppingBag(UserSystem user, Store store, Product product, int amount) {
-        return user.saveProductInShoppingBag(store, product.cloneProduct(), amount);
+    public boolean saveProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product, int amount) {
+        return shoppingCart.addProductToCart(store, product.cloneProduct(), amount);
     }
 
     @Override
-    public boolean removeProductInShoppingBag(UserSystem user, Store store, Product product) {
-        return user.removeProductInShoppingBag(store, product);
+    public boolean removeProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product) {
+        return shoppingCart.removeProductInCart(store, product);
     }
 
     @Override
-    public boolean changeProductAmountInShoppingBag(UserSystem user, int storeId, int amount, int productSn) {
-        return user.changeProductAmountInShoppingBag(storeId, amount, productSn);
+    public boolean changeProductAmountInShoppingBag(String username, ShoppingCart shoppingCart, int storeId, int amount, int productSn) {
+        return shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
+    }
+
+    @Override
+    public void login(String username, ShoppingCart shoppingCart) {
+        // Its need to be empty
+    }
+
+    @Override
+    public void saveShoppingCart(String username) {
+        // Its need to be empty
+    }
+
+    @Override
+    public ShoppingCart getShoppingCart(String username, UUID uuid) {
+        if(isValidUuid(username, uuid)){
+            return users.stream()
+                    .filter(userSystem -> userSystem.getUserName().equals(username))
+                    .findFirst()
+                    .map(UserSystem::getShoppingCart)
+                    .orElseThrow(()-> new UserDontExistInTheSystemException(username));
+        }
+        throw new UserDontExistInTheSystemException(username);
+    }
+
+    @Override
+    public void loadShoppingCart(UserSystem user) {
+        // Its need to be empty
     }
 
 

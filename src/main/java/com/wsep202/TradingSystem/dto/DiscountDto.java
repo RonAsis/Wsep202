@@ -20,7 +20,7 @@ import java.util.Map;
 @Slf4j
 public class DiscountDto {
 
-    private int discountId;
+    private long discountId;
     /**
      * how much discount should to apply on product
      */
