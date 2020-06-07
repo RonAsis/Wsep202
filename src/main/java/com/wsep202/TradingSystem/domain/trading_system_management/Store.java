@@ -5,6 +5,8 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.Compo
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountType;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Day;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
@@ -52,25 +54,27 @@ public class Store {
      */
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("productSn DESC")
     private Set<Product> products = new LinkedHashSet<>();
 
     /**
      * The set purchase policy for the store
      */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER )
-    private List<Purchase> purchasePolicies;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Purchase> purchasePolicies;
 
     /**
      * The set purchase policy for the store
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Discount> discounts;
+    @OrderBy("discountId DESC")
+    private Set<Discount> discounts;
 
     /**
      * list of purchases made in the store
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Receipt> receipts;
+    private Set<Receipt> receipts;
 
     /**
      * the store rank
@@ -85,7 +89,7 @@ public class Store {
     /**
      * list of appointing agreements of owners in the store
      */
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<AppointingAgreement> appointingAgreements;
 
     /**
@@ -101,9 +105,9 @@ public class Store {
     public Store(String storeName, Set<OwnersAppointee> appointedOwners,
                  Set<ManagersAppointee> appointedManagers,
                  Set<Product> products,
-                 List<Purchase> purchasePolicies,
-                 List<Discount> discounts,
-                 List<Receipt> receipts,
+                 Set<Purchase> purchasePolicies,
+                 Set<Discount> discounts,
+                 Set<Receipt> receipts,
                  int rank, String description,
                  List<AppointingAgreement> appointingAgreements) {
         this.storeName = storeName;
@@ -120,15 +124,15 @@ public class Store {
 
     private void initStore(UserSystem owner, String storeName) {
         //storeId = generateStoreSn();
-        purchasePolicies = new ArrayList<>();
-        discounts = new ArrayList<>();
-        receipts = new LinkedList<>();
+        purchasePolicies = new HashSet<>();
+        discounts = new HashSet<>();
+        receipts = new HashSet<>();
         appointingAgreements = new LinkedList<>();
         appointedOwners = new HashSet<>();
         appointedManagers = new HashSet<>();
         products = new LinkedHashSet<>();
         this.storeName = storeName;
-        appointedOwners.add(new OwnersAppointee(owner.getUserName()));
+        appointedOwners.add(new OwnersAppointee(owner));
         this.rank = 5;
     }
 
@@ -138,9 +142,11 @@ public class Store {
         this.description = description;
     }
 
-   /////////////////////////////////////////products////////////////////////////////////////////////
+    /////////////////////////////////////////products////////////////////////////////////////////////
+
     /**
      * return a product with the SN reveived
+     *
      * @param productId - SN of product to get
      * @return the fit product if exist in the store
      * otherwise exception is thrown
@@ -151,7 +157,7 @@ public class Store {
     }
 
     public boolean removeProductFromStore(UserSystem user, int productSn) {
-        if (isOwner(user) || isManagerWithPermission(user.getUserName(), StorePermission.EDIT_PRODUCT)) {  //only owner can remove products from its store
+        if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {  //only owner can remove products from its store
             Set<Product> duplicate = new HashSet<>(products);
             duplicate.stream()
                     .filter(product -> product.getProductSn() == productSn)
@@ -166,6 +172,17 @@ public class Store {
         return false;
     }
 
+    public boolean validateCanEditProdcuts(UserSystem userSystem, int productSn) {
+        return validatePermission(userSystem, StorePermission.EDIT_PRODUCT) &&
+                products.stream()
+                        .filter(product -> product.getProductSn() == productSn)
+                        .findFirst().isPresent();
+    }
+
+    private boolean validatePermission(UserSystem user, StorePermission storePermission) {
+        return isOwner(user) || isManagerWithPermission(user.getUserName(), storePermission);
+    }
+
 
     /**
      * owner adds a new product to the store
@@ -175,7 +192,7 @@ public class Store {
      * @return true for success
      */
     public boolean addNewProduct(UserSystem user, Product product) {
-        if (isOwner(user) || isManagerWithPermission(user.getUserName(), StorePermission.EDIT_PRODUCT)) {  //verify the user is owner of the store
+        if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {  //verify the user is owner of the store
             products.add(product);
             log.info("The product: " + product.getName() + " added to the store: " + this.storeName);
             return true;
@@ -198,7 +215,7 @@ public class Store {
      */
     public boolean editProduct(UserSystem user, int productSn, String productName, String category,
                                int amount, double cost) {
-        if (isOwner(user) || isManagerWithPermission(user.getUserName(), StorePermission.EDIT_PRODUCT)) {   //the user is owner
+        if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {   //the user is owner
 
             Optional<Product> optionalProduct = products.stream().
                     filter(product -> product.getProductSn() == productSn).findFirst();
@@ -220,8 +237,10 @@ public class Store {
     }
 
     ////////////////////////////////////////receipts ///////////////////////////////////////////////////////
+
     /**
      * The store creates receipt for the products purchased in the bag.
+     *
      * @param bag
      * @param buyerName
      * @return
@@ -232,8 +251,10 @@ public class Store {
     }
 
     //////////////////////////////////////////////shopping cart /////////////////////////////////////////////
+
     /**
      * update amount of product in the stock
+     *
      * @param productSn
      * @param amount
      * @return true if operation succeeded
@@ -287,6 +308,19 @@ public class Store {
     /////////////////////////////////////////////////owner /////////////////////////////////////////////
 
     /**
+     * This method is used to check if owner2 was appointed by owner1
+     *
+     * @return true if owner2 was appointed by owner1, else false
+     */
+    private boolean isAppointedBy(UserSystem owner1, UserSystem owner2) {
+        int owner1Index = getAppointeeOwnersIndex(owner1.getUserName());
+        if (owner1Index != -1)
+            if (new LinkedList<>(appointedOwners).get(owner1Index).getAppointedUsers().size() > 0 && new LinkedList<>(appointedOwners).get(owner1Index).getAppointedUsers().contains(owner2))
+                return true;
+        return false;
+    }
+
+    /**
      * This method is used to remove an owner from the store
      *
      * @param owner         - the appointing owner
@@ -301,10 +335,63 @@ public class Store {
         return false;
     }
 
-    public Set<String> getOwnersUsername(){
+    public Set<String> getOwnersUsername() {
         return this.appointedOwners.stream()
-                .map(OwnersAppointee::getAppointeeUser)
+                .map(ownersAppointee -> ownersAppointee.getAppointeeUser().getUserName())
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * creating a new appointing agreement for the given new owner
+     *
+     * @param owner    - the user that wants to appoint new owner as an owner
+     * @param newOwner - the user that owner wants to appoint as an owner
+     * @return true if an appointing agreement was created successfully
+     */
+    public boolean createNewAppointingAgreement(UserSystem owner, UserSystem newOwner) {
+        boolean response = false;
+        if (isOwner(owner) && !isOwner(newOwner) && !checkIfNewOwnerHasAppointingAgreement(newOwner.getUserName())) {
+            appointingAgreements.add(new AppointingAgreement(newOwner,
+                    owner.getUserName(), getOwnersUsername()));
+            log.info(String.format("A new appointing agreement was created for the user: %s by the owner: %s for the store: %s",
+                    newOwner.getUserName(), owner.getUserName(), storeName));
+            response = true;
+        }
+        log.info(String.format("Can't create a new appointing agreement for the user: %s  by the owner: %s  for the store: %s",
+                newOwner.getUserName(), owner.getUserName(), storeName));
+        return response;
+    }
+
+    public void approveOwner(UserSystem ownerUser, Store ownedStore, String ownerToApprove, boolean status) {
+        appointingAgreements.stream()
+                .filter(appointingAgreement -> appointingAgreement.getNewOwner().getUserName().equals(ownerToApprove))
+                .findFirst()
+                .map(appointingAgreement -> {
+                    appointingAgreement.changeApproval(ownerUser.getUserName(), status ? StatusOwner.APPROVE : StatusOwner.NOT_APPROVE);
+                    return isApproveOwner(appointingAgreement.getNewOwner());
+                });
+    }
+
+    public StatusOwner isApproveOwner(UserSystem userSystemApproveOwner) {
+        Optional<AppointingAgreement> agreement = appointingAgreements.stream()
+                .filter(appointingAgreement -> appointingAgreement.getAppointee().equals(userSystemApproveOwner.getUserName()))
+                .findFirst();
+        StatusOwner statusOwner = agreement
+                .map(AppointingAgreement::checkIfApproved)
+                .orElse(StatusOwner.WAITING);
+        if (statusOwner == StatusOwner.APPROVE) {
+            agreement.map(appointingAgreement -> {
+                return appointedOwners.stream()
+                        .filter(appointedOwner -> appointedOwner.getAppointeeUser().getUserName().equals(appointingAgreement.getAppointee()))
+                        .findFirst()
+                        .map(appointedOwner -> appointedOwner.addSubOwner(userSystemApproveOwner));
+            });
+        } else if (statusOwner == StatusOwner.NOT_APPROVE && agreement.isPresent()) {
+            appointingAgreements.remove(agreement.get());
+            appointedOwners.forEach(appointedOwner ->
+                    appointedOwner.getAppointeeUser().removeAgreement(getStoreId(), userSystemApproveOwner.getUserName()));
+        }
+        return statusOwner;
     }
 
     /**
@@ -320,7 +407,7 @@ public class Store {
         ownersToRemove.add(ownerToRemove);
         managerToRemove.addAll(findManagersToRemove(ownersToRemove, managerToRemove));
         for (UserSystem ownerToDelete : ownersToRemove) {
-            appointedOwners.removeIf(appointedOwners-> appointedOwners.getAppointeeUser().equals(ownerToDelete.getUserName()));
+            appointedOwners.removeIf(appointedOwners -> appointedOwners.getAppointeeUser().equals(ownerToDelete.getUserName()));
             ownerToDelete.removeOwnedStore(this);
             ownerToDelete.newNotification(Notification.builder().content("you are fired").build());
 
@@ -365,6 +452,7 @@ public class Store {
         }
         return managerToRemove;
     }
+
     /**
      * get the actual user of the manager appointed by the ownerUser with managerUserName
      *
@@ -398,6 +486,7 @@ public class Store {
 
     /**
      * checks if the given user is owner in this store
+     *
      * @param user
      * @return
      */
@@ -405,30 +494,36 @@ public class Store {
         return (getOwnersUsername().stream().anyMatch(curUser -> curUser.equals(user.getUserName())));
     }
 
+    private boolean checkIfExistsAgreement(String userName) {
+        return appointingAgreements.stream()
+                .anyMatch(appointingAgreement -> appointingAgreement.getNewOwner().equals(userName));
+    }
+
     /////////////////////////////////////// manager //////////////////////////////////////////////////
 
     /**
      * add new manager to the appointed owners of the store
+     *
      * @param owner
      * @return true for successful addition
      */
     public MangerStore appointAdditionManager(UserSystem owner, UserSystem newManagerStore) {
         MangerStore newManager = null;
-        if(isOwner(owner) || isManagerWithPermission(owner.getUserName(), StorePermission.EDIT_Managers)){
+        if (validatePermission(owner, StorePermission.EDIT_Managers)) {
             newManager = new MangerStore(newManagerStore);
             ManagersAppointee managersAppointee = findManagersAppointee(owner.getUserName());
             managersAppointee.addManger(newManager);
         }
         log.info(String.format("The user %s %s new manger %s to the store %d",
-                owner.getUserName(),Objects.nonNull(newManager) ? "appointed" : "not appointed" ,newManagerStore.getUserName(), storeId));
+                owner.getUserName(), Objects.nonNull(newManager) ? "appointed" : "not appointed", newManagerStore.getUserName(), storeId));
         return newManager;
     }
 
-    private ManagersAppointee findManagersAppointee(String appointedManagerUsername){
+    private ManagersAppointee findManagersAppointee(String appointedManagerUsername) {
         return appointedManagers.stream()
-                .filter(appointedManager-> appointedManager.getAppointeeUser().equals(appointedManagerUsername))
+                .filter(appointedManager -> appointedManager.getAppointeeUser().equals(appointedManagerUsername))
                 .findFirst()
-                .orElseGet(()-> {
+                .orElseGet(() -> {
                     ManagersAppointee managersAppointee = new ManagersAppointee(appointedManagerUsername);
                     appointedManagers.add(managersAppointee);
                     return managersAppointee;
@@ -437,16 +532,17 @@ public class Store {
 
     /**
      * remove user from the store's managers
+     *
      * @param ownerStore the removing owner
      * @param user       the removed manager
      * @return true for successful operation
      */
     public boolean removeManager(UserSystem ownerStore, UserSystem user) {
         boolean response = false;
-        if ((isOwner(ownerStore) || isManagerWithPermission(ownerStore.getUserName(), StorePermission.EDIT_Managers))
-        && removeManagerRecursive(ownerStore, user)) {  //the user is able to remove his appointments
+        if ((validatePermission(ownerStore, StorePermission.EDIT_Managers))
+                && removeManagerRecursive(ownerStore, user)) {  //the user is able to remove his appointments
             response = appointedManagers.stream()
-                    .filter(appointedManager-> appointedManager.getAppointeeUser().equals(ownerStore.getUserName()))
+                    .filter(appointedManager -> appointedManager.getAppointeeUser().equals(ownerStore.getUserName()))
                     .findFirst()
                     .map(appointedManager -> appointedManager.removeManager(user, storeId))
                     .orElse(false);
@@ -456,9 +552,9 @@ public class Store {
 
     public boolean removeManagerRecursive(UserSystem ownerStore, UserSystem user) {
         boolean response = false;
-        if (isOwner(ownerStore) || isManagerWithPermission(ownerStore.getUserName(), StorePermission.EDIT_Managers)) {  //the user is able to remove his appointments
-            response =  appointedManagers.stream()
-                    .filter(appointedManager-> appointedManager.getAppointeeUser().equals(user.getUserName()))
+        if (validatePermission(ownerStore, StorePermission.EDIT_Managers)) {  //the user is able to remove his appointments
+            response = appointedManagers.stream()
+                    .filter(appointedManager -> appointedManager.getAppointeeUser().equals(user.getUserName()))
                     .findFirst()
                     .map(appointedManager -> {
                         appointedManager.getAppointedManagers()
@@ -466,13 +562,14 @@ public class Store {
                         user.removeManagedStore(this);
                         return appointedManagers.remove(appointedManager);
                     })
-                    .orElseGet(()->user.removeManagedStore(this));
+                    .orElseGet(() -> user.removeManagedStore(this));
         }
         return response;
     }
 
     /**
      * add management options for a manager by an store owner
+     *
      * @param ownerStore      - owner of this store
      * @param user            - the manager we wish to edit and add his permissions
      * @param storePermission
@@ -481,12 +578,12 @@ public class Store {
      */
     public boolean addPermissionToManager(UserSystem ownerStore, UserSystem user, StorePermission storePermission) {
         boolean permissionAdded = false;
-        if(isOwner(ownerStore) || isManagerWithPermission(ownerStore.getUserName(), StorePermission.EDIT_Managers)){
+        if (validatePermission(ownerStore, StorePermission.EDIT_Managers)) {
             MangerStore mangerStore = getMangerStore(ownerStore, user);
             permissionAdded = mangerStore.addStorePermission(storePermission);
         }
         log.info(String.format("The permission %s %s by %s to %s in %d",
-                storePermission.function, permissionAdded? "added" : "not added", ownerStore.getUserName(), user.getUserName(), storeId));
+                storePermission.function, permissionAdded ? "added" : "not added", ownerStore.getUserName(), user.getUserName(), storeId));
         return permissionAdded;
     }
 
@@ -524,6 +621,17 @@ public class Store {
         else return null;
     }
 
+    private int getAppointeeManagersIndex(String userName) {
+        int i = 0;
+        for (ManagersAppointee managersAppointee : appointedManagers) {
+            if (managersAppointee.getAppointeeUser().equals(userName)) {
+                return i;
+            } else {
+                i++;
+            }
+        }
+        return -1; // userName doesn't exist in appointedOwners
+    }
 
     /**
      * get the permissions of a manager
@@ -569,13 +677,13 @@ public class Store {
         }
     }
 
-    private boolean isManagerWithPermission(String username, StorePermission permission){
+    private boolean isManagerWithPermission(String username, StorePermission permission) {
         return getManagersStore().stream()
                 .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(username) &&
                         mangerStore.getStorePermissions().contains(permission));
     }
 
-    public Set<MangerStore> getManagersStore(){
+    public Set<MangerStore> getManagersStore() {
         return appointedManagers.stream()
                 .map(ManagersAppointee::getAppointedManagers)
                 .reduce(new HashSet<>(), (acc, cur) -> {
@@ -583,6 +691,7 @@ public class Store {
                     return acc;
                 });
     }
+
     public boolean managerHavePermission(String userName, StorePermission permission) {
         return getManagersStore().stream()
                 .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(userName) && mangerStore.managerHavePermission(permission));
@@ -603,14 +712,16 @@ public class Store {
     }
 
     /////////////////////////////////////////////// purchase policy //////////////////////////////////////
+
     /**
      * add purchase policy to store
+     *
      * @param user
      * @param purchase
      * @return
      */
     public Purchase addPurchasePolicy(UserSystem user, Purchase purchase) {
-        if (isOwner(user) || isManagerWithPermission(user.getUserName(), StorePermission.EDIT_PURCHASE_POLICY)) {  //verify the user is owner of the store
+        if (validatePermission(user, StorePermission.EDIT_PURCHASE_POLICY)) {  //verify the user is owner of the store
             //purchase.setNewId();  //generate new ID for the new discount
             purchasePolicies.add(purchase);
             return purchase;
@@ -645,7 +756,7 @@ public class Store {
     }
 
     public boolean removeDiscount(UserSystem userSystem, int discountId) {
-        if (isOwner(userSystem) || isManagerWithPermission(userSystem.getUserName(), StorePermission.EDIT_DISCOUNT)) {
+        if (validatePermission(userSystem, StorePermission.EDIT_DISCOUNT)) {
             Discount discount = discounts.stream()
                     .filter(discountPolicy -> discountPolicy.getDiscountId() == discountId)
                     .findFirst().orElseThrow(() -> new TradingSystemException(String.format("the discount %d don't exist on store %d", discountId, storeId)));
@@ -653,26 +764,29 @@ public class Store {
         }
         throw new NoOwnerInStoreException(userSystem.getUserName(), this.getStoreId());
     }
+
     /**
      * get the discounts in store
+     *
      * @param user
      * @return
      */
     public List<Discount> getStoreDiscounts(UserSystem user) {
-        if (isOwner(user) || isManagerWithPermission(user.getUserName(), StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
-            return discounts;
+        if (validatePermission(user, StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
+            return new LinkedList<>(discounts);
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
     /**
      * add new discount to store
+     *
      * @param user     adder
      * @param discount to add
      * @return
      */
     public Discount addDiscount(UserSystem user, Discount discount) {
-        if (isOwner(user) || isManagerWithPermission(user.getUserName(), StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
+        if (validatePermission(user, StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
             //discount.setNewId();  //generate new ID for the new discount
             discounts.add(discount);
             return discount;
@@ -689,7 +803,7 @@ public class Store {
     }
 
     private Discount editDiscount(UserSystem user, Discount discount) {
-        if (isOwner(user) || isManagerWithPermission(user.getUserName(), StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
+        if (validatePermission(user, StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
             Optional<Boolean> isEdit = discounts.stream()
                     .filter(discountCur -> discountCur.getDiscountId() == discount.getDiscountId())
                     .findFirst().map(discountCur -> discountCur.editDiscount(discount.getDiscountPercentage(),
@@ -710,73 +824,28 @@ public class Store {
 
     //////////////////////////////////////////////////TODO need to fix all what in down  ////////////////////
 
-    /**
-     * This method is used to check if owner2 was appointed by owner1
-     *
-     * @return true if owner2 was appointed by owner1, else false
-     */
-    private boolean isAppointedBy(UserSystem owner1, UserSystem owner2) {
-        int owner1Index = getAppointeeOwnersIndex(owner1.getUserName());
-        if (owner1Index != -1)
-            if (new LinkedList<>(appointedOwners).get(owner1Index).getAppointedUsers().size() > 0 && new LinkedList<>(appointedOwners).get(owner1Index).getAppointedUsers().contains(owner2))
-                return true;
-        return false;
-    }
 
     /**
      * add new owner to the appointed owners of the store
+     *
      * @param owner
      * @param willBeOwner
      * @return true if owner added successfully
      */
     public boolean addOwner(UserSystem owner, UserSystem willBeOwner) {
-        boolean appointed = false;
-        //TODO BIG BLAGN
-        if (isOwner(owner) && !isOwner(willBeOwner)) {
-            if (!checkIfAppointeeExists(owner.getUserName())) {
-                appointedOwners.add(new OwnersAppointee(owner.getUserName()));
-            }
-
-            int ownerIndex = getAppointeeOwnersIndex(owner.getUserName());
-            if (ownerIndex != -1) {
-                new LinkedList<>(appointedOwners).get(ownerIndex).getAppointedUsers().add(willBeOwner);
-            }
-            appointed = true;
-            log.info("The user: " + willBeOwner.getUserName() + " added as appointed owner by the owner: " + owner.getUserName() + "" +
-                    " for the store:" + this.storeName);
-        }
-        if (!appointed) {
-            log.info("The user: " + willBeOwner.getUserName() + " couldn't be appointed as owner by: " + owner.getUserName() + " " +
-                    "for the store: " + this.storeName);
-        }
-        return appointed;
-    }
-
-    private boolean checkIfAppointeeExists(String userName) {
-        for (OwnersAppointee ownersAppointee : appointedOwners) {
-            if (ownersAppointee.getAppointeeUser().equals(userName)) {
-                return true;
-            }
+        if (isOwner(owner) && !isOwner(willBeOwner) && !checkIfExistsAgreement(owner.getUserName())) {
+            appointingAgreements.add(new AppointingAgreement( willBeOwner, owner.getUserName(), getOwnersUsername()));
+            appointedOwners.forEach(appointedOwner -> appointedOwner.getAppointeeUser().addOwnerToApprove(storeId, storeName, willBeOwner.getUserName()));
+            return true;
         }
         return false;
     }
+
 
     private int getAppointeeOwnersIndex(String userName) {
         int i = 0;
         for (OwnersAppointee ownersAppointee : appointedOwners) {
             if (ownersAppointee.getAppointeeUser().equals(userName)) {
-                return i;
-            } else {
-                i++;
-            }
-        }
-        return -1; // userName doesn't exist in appointedOwners
-    }
-
-    private int getAppointeeManagersIndex(String userName) {
-        int i = 0;
-        for (ManagersAppointee managersAppointee : appointedManagers) {
-            if (managersAppointee.getAppointeeUser().equals(userName)) {
                 return i;
             } else {
                 i++;
@@ -835,25 +904,5 @@ public class Store {
         }
     }
 
-    /**
-     * creating a new appointing agreement for the given new owner
-     *
-     * @param owner    - the user that wants to appoint new owner as an owner
-     * @param newOwner - the user that owner wants to appoint as an owner
-     * @return true if an appointing agreement was created successfully
-     */
-    public boolean createNewAppointingAgreement(UserSystem owner, UserSystem newOwner) {
-        boolean response = false;
-        if (isOwner(owner) && !isOwner(newOwner) && !checkIfNewOwnerHasAppointingAgreement(newOwner.getUserName())) {
-            appointingAgreements.add(new AppointingAgreement(newOwner.getUserName(),
-                    owner.getUserName(), getOwnersUsername()));
-            log.info(String.format("A new appointing agreement was created for the user: %s by the owner: %s for the store: %s",
-                    newOwner.getUserName(), owner.getUserName(), storeName));
-            response = true;
-        }
-        log.info(String.format("Can't create a new appointing agreement for the user: %s  by the owner: %s  for the store: %s",
-                newOwner.getUserName() ,owner.getUserName(), storeName));
-        return response;
-    }
 
 }

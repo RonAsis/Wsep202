@@ -6,6 +6,8 @@ import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
@@ -49,6 +51,7 @@ public class TradingSystemFacade {
     /**
      * UC 3.7
      * view purchase history of user logged in
+     *
      * @param userName - must be logged in
      * @return all the receipt of the user
      */
@@ -66,6 +69,7 @@ public class TradingSystemFacade {
     /**
      * UC 6.4.1
      * administrator view purchase history of store
+     *
      * @param administratorUsername the user name of the admin
      * @param storeId               - the store id of the store that want view purchase history
      * @return all the receipt of the store
@@ -74,7 +78,7 @@ public class TradingSystemFacade {
         try {
             //get the store if the user has admin permissions (it is admin)
             Store store = tradingSystem.getStoreByAdmin(administratorUsername, storeId, uuid);
-            List<Receipt> receipts = store.getReceipts();
+            List<Receipt> receipts = new LinkedList<>(store.getReceipts());
             return convertReceiptList(receipts);
         } catch (TradingSystemException e) {
             log.error("Tried to view purchase history of store failed", e);
@@ -85,6 +89,7 @@ public class TradingSystemFacade {
     /**
      * UC 6.4.2
      * administrator view purchase history of user
+     *
      * @param administratorUsername the user name of the admin
      * @param userName              - the userName that want view purchase history
      * @return all the receipt of the user
@@ -102,6 +107,7 @@ public class TradingSystemFacade {
     /**
      * UC 5.1
      * Manager view purchase history of store
+     *
      * @param managerUsername - the manager Username of the store manger that want view purchase history
      * @param storeId         - the store that want view the purchase history
      * @param uuid
@@ -111,7 +117,7 @@ public class TradingSystemFacade {
         try {
             //get the registered user with username
             UserSystem mangerStore = tradingSystem.getUser(managerUsername, uuid);
-            return convertReceiptList(mangerStore.getManagerStore(storeId).getReceipts());
+            return convertReceiptList(new LinkedList<>(mangerStore.getManagerStore(storeId).getReceipts()));
         } catch (TradingSystemException e) {
             log.error("The user is not a manager of the store ,so cant see purchase history of store", e);
             return null;
@@ -121,6 +127,7 @@ public class TradingSystemFacade {
     /**
      * UC 4.10
      * Owner view purchase history of store
+     *
      * @param ownerUserName the owner Username of the store manger that want view purchase history
      * @param storeId       - the store that want view the purchase history
      * @return all the receipt of the store
@@ -128,7 +135,7 @@ public class TradingSystemFacade {
     public List<ReceiptDto> viewPurchaseHistoryOfOwner(@NotBlank String ownerUserName, int storeId, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUserName, uuid);
-            return convertReceiptList(user.getOwnerStore(storeId).getReceipts());
+            return convertReceiptList(new LinkedList<>(user.getOwnerStore(storeId).getReceipts()));
         } catch (TradingSystemException e) {
             log.error("Can't see history of the store", e);
             return null;
@@ -138,6 +145,7 @@ public class TradingSystemFacade {
     /**
      * UC 4.1
      * add product to store
+     *
      * @param ownerUsername the username of the owner store
      * @param storeId       - of the store that want add product
      * @param productName   - the name of the new product
@@ -147,8 +155,8 @@ public class TradingSystemFacade {
      * @return true if succeed
      */
     public ProductDto addProduct(@NotBlank String ownerUsername, int storeId,
-                              @NotBlank String productName, @NotBlank String category,
-                              int amount, double cost, UUID uuid) {
+                                 @NotBlank String productName, @NotBlank String category,
+                                 int amount, double cost, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get registered user with ownerUsername
             Store ownerStore = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PRODUCT); //verify he owns store with storeId
@@ -156,7 +164,7 @@ public class TradingSystemFacade {
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             Product product = factoryObjects.createProduct(productName, productCategory, amount, cost, storeId);
             Product productRes = tradingSystemDao.addProductToStore(ownerStore, user, product);
-            return Objects.nonNull(productRes)? modelMapper.map(product, ProductDto.class) : null;
+            return Objects.nonNull(productRes) ? modelMapper.map(product, ProductDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("add product failed", e);
             return null;
@@ -164,19 +172,20 @@ public class TradingSystemFacade {
     }
 
     public List<DiscountDto> getStoreDiscounts(String username, int storeId, UUID uuid) {
-            UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
-            Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT); //verify he owns store with storeId
-            List<Discount> storeDiscounts = store.getStoreDiscounts(user);
-            return convertDiscountList(storeDiscounts);
+        UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
+        Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT); //verify he owns store with storeId
+        List<Discount> storeDiscounts = store.getStoreDiscounts(user);
+        return convertDiscountList(storeDiscounts);
     }
 
     /**
      * UC 4.2
      * owner wants remove a discount policy from store
-     * @param username - name of owner
-     * @param storeId - the id of the store
+     *
+     * @param username   - name of owner
+     * @param storeId    - the id of the store
      * @param discountId - id of discount to remove
-     * @param uuid - users UUID
+     * @param uuid       - users UUID
      * @return true if success, else false
      */
     public boolean removeDiscount(String username, int storeId, int discountId, UUID uuid) {
@@ -188,9 +197,10 @@ public class TradingSystemFacade {
     /**
      * UC 4.2
      * owner wants add a new policy ir edit an existing one a discount policy from store
+     *
      * @param username - name of owner
-     * @param storeId - the id of the store
-     * @param uuid - users UUID
+     * @param storeId  - the id of the store
+     * @param uuid     - users UUID
      * @return true if success, else false
      */
     public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
@@ -198,15 +208,16 @@ public class TradingSystemFacade {
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT);
         Discount discount = modelMapper.map(discountDto, Discount.class);
         Discount discountRes = tradingSystemDao.addEditDiscount(store, user, discount);
-        return Objects.nonNull(discountRes)? modelMapper.map(discountRes, DiscountDto.class) : null;
+        return Objects.nonNull(discountRes) ? modelMapper.map(discountRes, DiscountDto.class) : null;
     }
 
     /**
      * UC 4.2
      * owner wants add a new policy ir edit an existing one a discount policy from store
+     *
      * @param username - name of owner
-     * @param storeId - the id of the store
-     * @param uuid - users UUID
+     * @param storeId  - the id of the store
+     * @param uuid     - users UUID
      * @return true if success, else false
      */
     public PurchasePolicyDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
@@ -215,9 +226,9 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PURCHASE_POLICY);
         Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);
-        PurchasePolicyDto ans =  modelMapper.map(store.addEditPurchase(user, purchase, purchaseDto.getCountriesPermitted(),
-                purchaseDto.getStoreWorkDays(),purchaseDto.getMin(),purchaseDto.getMax(),
-                purchaseDto.getProductId(),purchaseDto.getCompositeOperator(),
+        PurchasePolicyDto ans = modelMapper.map(store.addEditPurchase(user, purchase, purchaseDto.getCountriesPermitted(),
+                purchaseDto.getStoreWorkDays(), purchaseDto.getMin(), purchaseDto.getMax(),
+                purchaseDto.getProductId(), purchaseDto.getCompositeOperator(),
                 convert(purchaseDto.getComposedPurchasePolicies())), PurchasePolicyDto.class);
         return ans;
     }
@@ -236,9 +247,11 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username, uuid);
         return CompositeOperator.getStringCompositeOperators();
     }
+
     /**
      * UC 4.1
      * delete product form store
+     *
      * @param ownerUsername the username of the owner store
      * @param storeId       - of the store that want delete product
      * @param productSn     - the sn of the product
@@ -258,6 +271,7 @@ public class TradingSystemFacade {
     /**
      * UC 4.1
      * edit product
+     *
      * @param ownerUsername the username of the owner store
      * @param storeId       - of the store that want edit product
      * @param productSn     - the sn of the product
@@ -273,7 +287,7 @@ public class TradingSystemFacade {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
             Store ownerStore = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PRODUCT);
-            if (amount<0 || cost<0){
+            if (amount < 0 || cost < 0) {
                 log.error("editProduct failed- amount/cost must be greater than 0");
                 return false;
             }
@@ -287,6 +301,7 @@ public class TradingSystemFacade {
     /**
      * UC 4.3
      * add new owner to store
+     *
      * @param ownerUsername    the username of the owner store
      * @param storeId          - of the store that want add new owner
      * @param newOwnerUsername - the new owner
@@ -297,7 +312,6 @@ public class TradingSystemFacade {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
             Store ownerStore = ownerUser.getOwnerStore(storeId);
-//            return tradingSystem.createNewAppointingAgreement(ownerStore, ownerUser, newOwnerUsername);
             return tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
         } catch (TradingSystemException e) {
             log.error("Add owner failed", e);
@@ -308,6 +322,7 @@ public class TradingSystemFacade {
     /**
      * UC 4.5
      * add manger to the store with the default permission
+     *
      * @param ownerUsername      the username of the owner store
      * @param storeId            - of the store that want add new owner
      * @param newManagerUsername - the new manger
@@ -329,6 +344,7 @@ public class TradingSystemFacade {
     /**
      * UC 4.6
      * add permission the manger in the store
+     *
      * @param ownerUsername   the username of the owner store
      * @param storeId         - of the store that want add permission the manger
      * @param managerUsername - the user name of the manger
@@ -352,11 +368,12 @@ public class TradingSystemFacade {
     /**
      * UC 4.6
      * remove permissions from manager
-     * @param ownerUsername - owner of the store
-     * @param storeId - id of store
+     *
+     * @param ownerUsername   - owner of the store
+     * @param storeId         - id of store
      * @param managerUsername - manager of store
-     * @param permission - permission to remove
-     * @param uuid - UUID of owner
+     * @param permission      - permission to remove
+     * @param uuid            - UUID of owner
      * @return true if success, else false
      */
     public boolean removePermission(String ownerUsername, int storeId, String managerUsername, String permission, UUID uuid) {
@@ -374,10 +391,11 @@ public class TradingSystemFacade {
 
     /**
      * see managers permissions
-     * @param ownerUsername - owner of store
-     * @param storeId - store id
+     *
+     * @param ownerUsername   - owner of store
+     * @param storeId         - store id
      * @param managerUsername - manager of store
-     * @param uuid - UUID of owner
+     * @param uuid            - UUID of owner
      * @return
      */
     public List<String> getPermissionOfManager(String ownerUsername, int storeId, String managerUsername, UUID uuid) {
@@ -396,6 +414,7 @@ public class TradingSystemFacade {
     /**
      * UC 4.7
      * remove manger from the store by the owner that appointed him
+     *
      * @param ownerUsername   owner that appointed the manger
      * @param storeId         - the id that of the store that want remove the manger
      * @param managerUsername - the manger that want remove
@@ -405,7 +424,7 @@ public class TradingSystemFacade {
     public boolean removeManager(@NotBlank String ownerUsername, int storeId, @NotBlank String managerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid); //get registered user
-            Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId,  StorePermission.EDIT_Managers);    //verify the remover is owner
+            Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);    //verify the remover is owner
             UserSystem managerStore = ownedStore.getManager(ownerUser, managerUsername);
             return tradingSystem.removeManager(ownedStore, ownerUser, managerStore);
         } catch (TradingSystemException e) {
@@ -417,8 +436,9 @@ public class TradingSystemFacade {
     /**
      * UC 4.4
      * remove owner from the store by the owner that appointed him
-     * @param ownerUsername   owner that appointed the manger
-     * @param storeId         - the id that of the store that want remove the owner
+     *
+     * @param ownerUsername owner that appointed the manger
+     * @param storeId       - the id that of the store that want remove the owner
      * @param ownerToRemove - the owner that needs to be removed
      * @param uuid
      * @return true if succeed
@@ -438,6 +458,7 @@ public class TradingSystemFacade {
     /**
      * UC 3.1
      * the user name logout from the system
+     *
      * @param username - the username that want logout
      * @return true if succeed
      */
@@ -454,6 +475,7 @@ public class TradingSystemFacade {
     /**
      * UC 3.2
      * open new store
+     *
      * @param usernameOwner - the user that open the store
      * @param storeName     - the name of the new store
      * @return true if succeed
@@ -472,6 +494,7 @@ public class TradingSystemFacade {
     /**
      * UC 2.2
      * register new user to the system
+     *
      * @param userName  - the new username
      * @param password  - the password of the user
      * @param firstName - the first name of the new user
@@ -489,6 +512,7 @@ public class TradingSystemFacade {
     /**
      * UC 2.3
      * user login to the system
+     *
      * @param userName - the username need to be register to the system for suc
      * @param password - the password must be the correct password of the user
      * @return true if succeed
@@ -503,25 +527,8 @@ public class TradingSystemFacade {
     }
 
     /**
-     * UC 2.4
-     * view product of specific store
-     * @param storeId   - the store id that include the product
-     * @param productId - the product id that want view the product details
-     * @return the product details
-     */
-    public ProductDto viewProduct(int storeId, int productId) {
-        try {
-            Store store = tradingSystem.getStore(storeId);
-            Product product = store.getProduct(productId);
-            return Objects.nonNull(product) ? modelMapper.map(product, ProductDto.class) : null;
-        } catch (TradingSystemException e) {
-            log.error("view product failed", e);
-            return null;
-        }
-    }
-
-    /**
      * UC 2.6
+     *
      * @param username  the username that want save ShoppingBag
      * @param storeId   the storeId that the product belong to
      * @param productSn - the sn of the prodcut
@@ -544,13 +551,14 @@ public class TradingSystemFacade {
     /**
      * UC 2.7
      * view products in shopping cart
+     *
      * @param username the username that want view the ShoppingBag
      * @return shopping bag
      */
     public ShoppingCartDto watchShoppingCart(@NotBlank String username, UUID uuid) {
         try {
             ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
-            return Objects.nonNull(shoppingCart) ?modelMapper.map(shoppingCart, ShoppingCartDto.class) : null;
+            return Objects.nonNull(shoppingCart) ? modelMapper.map(shoppingCart, ShoppingCartDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("view products in shopping bag", e);
             return null;
@@ -606,12 +614,11 @@ public class TradingSystemFacade {
                                                  @NotNull PaymentDetailsDto paymentDetailsDto,
                                                  @NotNull BillingAddressDto billingAddressDto,
                                                  UUID uuid) {
-            UserSystem user = tradingSystem.getUser(username, uuid);
-            PaymentDetails paymentDetails = Objects.nonNull(paymentDetailsDto) ? modelMapper.map(paymentDetailsDto, PaymentDetails.class) : null;
-            BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
-            List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, user);
-            // Todo
-            return Objects.nonNull(receipts) ? convertReceiptList(receipts) : null;
+        UserSystem user = tradingSystem.getUser(username, uuid);
+        PaymentDetails paymentDetails = Objects.nonNull(paymentDetailsDto) ? modelMapper.map(paymentDetailsDto, PaymentDetails.class) : null;
+        BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
+        List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, user);
+        return Objects.nonNull(receipts) ? convertReceiptList(receipts) : null;
     }
 
     public List<StoreDto> getOwnerStores(String ownerUsername, UUID uuid) {
@@ -667,10 +674,11 @@ public class TradingSystemFacade {
     /**
      * UC 2.7
      * add a new product to cart
-     * @param username - name of the user
-     * @param amount - amount of the product
+     *
+     * @param username   - name of the user
+     * @param amount     - amount of the product
      * @param productDto - the product details
-     * @param uuid - users UUID
+     * @param uuid       - users UUID
      * @return true if added, else false
      */
     public boolean addProductToShoppingCart(String username, int amount, ProductDto productDto, UUID uuid) {
@@ -680,9 +688,10 @@ public class TradingSystemFacade {
         return tradingSystemDao.saveProductInShoppingBag(username, shoppingCart, store, product, amount);
     }
 
-    public  List<ProductShoppingCartDto> getShoppingCart(String username, UUID uuid) {
+    public List<ProductShoppingCartDto> getShoppingCart(String username, UUID uuid) {
         ShoppingCart shoppingCart = tradingSystem.getShoppingCart(username, uuid);
-        Type listType = new TypeToken<List<ProductShoppingCartDto>>() {}.getType();
+        Type listType = new TypeToken<List<ProductShoppingCartDto>>() {
+        }.getType();
         return modelMapper.map(shoppingCart, listType);
     }
 
@@ -693,11 +702,10 @@ public class TradingSystemFacade {
 
 
     public Set<UserSystemDto> getUsers(String administratorUsername, UUID uuid) {
-        UserSystem user = tradingSystem.getUser(administratorUsername,uuid);
+        UserSystem user = tradingSystem.getUser(administratorUsername, uuid);
         Set<UserSystem> users = tradingSystem.getUsers(user);
         return convertSetUsersToSetUserDto(users);
     }
-
 
 
     //////////////////////////////// converters ///////////////////////////
@@ -715,8 +723,7 @@ public class TradingSystemFacade {
                                     shoppingBagMap.put(product, value);
                                 });
                         shoppingCartMap.put(store, ShoppingBag.builder()
-                                .productListFromStore(shoppingBagMap)
-                                .storeOfProduct(store).build());
+                                .productListFromStore(shoppingBagMap).build());
                     });
         }
         return ShoppingCart.builder()
@@ -728,7 +735,7 @@ public class TradingSystemFacade {
      * get all discounts of store with id received
      *
      * @param ownerUsername
-     * @param storeId id of the store to get its discounts
+     * @param storeId       id of the store to get its discounts
      * @param uuid
      * @return
      */
@@ -742,14 +749,14 @@ public class TradingSystemFacade {
     public List<DiscountDto> getAlltDiscounts(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
         Store store = user.getOwnerStore(storeId);
-        List<Discount> allDiscounts = store.getDiscounts();
+        List<Discount> allDiscounts = new LinkedList<>(store.getDiscounts());
         return convertDiscountList(allDiscounts);
     }
 
     public List<PurchaseDto> getAllStorePurchases(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
         Store store = user.getOwnerStore(storeId);
-        List<Purchase> allPurchases = store.getPurchasePolicies();
+        List<Purchase> allPurchases = new LinkedList<>(store.getPurchasePolicies());
         return convertPurchaseList(allPurchases);
     }
 
@@ -768,7 +775,8 @@ public class TradingSystemFacade {
     public List<ManagerDto> getMySubMangers(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
-        Type listType = new TypeToken<List<ManagerDto>>() {}.getType();
+        Type listType = new TypeToken<List<ManagerDto>>() {
+        }.getType();
         return modelMapper.map(store.getMySubMangers(ownerUsername), listType);
     }
 
@@ -793,6 +801,7 @@ public class TradingSystemFacade {
     /**
      * UC 2.7
      * edit products in cart
+     *
      * @return true if changed
      */
     public boolean changeProductAmountInShoppingBag(String username, int storeId, int amount, int productSn, UUID uuid) {
@@ -807,7 +816,8 @@ public class TradingSystemFacade {
      * @return list of ReceiptDto
      */
     private List<ReceiptDto> convertReceiptList(@NotNull List<@NotNull Receipt> receipts) {
-        Type listType = new TypeToken<List<ReceiptDto>>() {}.getType();
+        Type listType = new TypeToken<List<ReceiptDto>>() {
+        }.getType();
         return modelMapper.map(receipts, listType);
     }
 
@@ -818,7 +828,8 @@ public class TradingSystemFacade {
      * @return list of ReceiptDto
      */
     private List<StoreDto> convertStoreList(@NotNull List<@NotNull Store> stores) {
-        Type listType = new TypeToken<List<StoreDto>>() {}.getType();
+        Type listType = new TypeToken<List<StoreDto>>() {
+        }.getType();
         return modelMapper.map(stores, listType);
     }
 
@@ -829,28 +840,49 @@ public class TradingSystemFacade {
      * @return list of ProductDto
      */
     private List<ProductDto> convertProductDtoList(@NotNull List<@NotNull Product> products) {
-        Type listType = new TypeToken<List<ProductDto>>() {}.getType();
+        Type listType = new TypeToken<List<ProductDto>>() {
+        }.getType();
         return modelMapper.map(products, listType);
     }
 
     private List<NotificationDto> convertNotificationList(@NotNull List<@NotNull Notification> notifications) {
-        Type listType = new TypeToken<List<NotificationDto>>() {}.getType();
+        Type listType = new TypeToken<List<NotificationDto>>() {
+        }.getType();
         return modelMapper.map(notifications, listType);
     }
 
     private List<DiscountDto> convertDiscountList(@NotNull List<@NotNull Discount> discounts) {
-        Type listType = new TypeToken<List<DiscountDto>>() {}.getType();
+        Type listType = new TypeToken<List<DiscountDto>>() {
+        }.getType();
         return modelMapper.map(discounts, listType);
     }
 
     private List<PurchaseDto> convertPurchaseList(@NotNull List<@NotNull Purchase> purchases) {
-        Type listType = new TypeToken<List<Purchase>>() {}.getType();
+        Type listType = new TypeToken<List<Purchase>>() {
+        }.getType();
         return modelMapper.map(purchases, listType);
     }
 
     private Set<UserSystemDto> convertSetUsersToSetUserDto(Set<UserSystem> users) {
-        Type listType = new TypeToken<Set<UserSystemDto>>() {}.getType();
+        Type listType = new TypeToken<Set<UserSystemDto>>() {
+        }.getType();
         return modelMapper.map(users, listType);
     }
 
+    public List<OwnerToApproveDto> getMyOwnerToApprove(String ownerUsername, UUID uuid) {
+        return convertSetOwnerToApproveToSetOwnerToApproveDto(tradingSystemDao.getMyOwnerToApprove(ownerUsername, uuid));
+    }
+
+    private List<OwnerToApproveDto> convertSetOwnerToApproveToSetOwnerToApproveDto(Set<OwnerToApprove> ownerToApproves) {
+        Type listType = new TypeToken<List<OwnerToApproveDto>>() {
+        }.getType();
+        return modelMapper.map(ownerToApproves, listType);
+    }
+
+    public boolean approveOwner(String ownerUsername, int storeId, String ownerToApprove, boolean status, UUID uuid) {
+        UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
+        Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
+        ownedStore.approveOwner(ownerUser, ownedStore, ownerToApprove, status);
+        return true;
+    }
 }

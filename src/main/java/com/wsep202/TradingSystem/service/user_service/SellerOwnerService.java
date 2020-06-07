@@ -168,4 +168,12 @@ public class SellerOwnerService {
     public boolean isOwner(String username, int storeId, UUID uuid) {
         return tradingSystemFacade.isOwner(username, storeId, uuid);
     }
+
+    public List<OwnerToApproveDto> getMyOwnerToApprove(String ownerUsername, UUID uuid) {
+        return tradingSystemFacade.getMyOwnerToApprove(ownerUsername, uuid);
+    }
+
+    public boolean approveOwner(String ownerUsername, int storeId, String ownerToApprove, boolean status, UUID uuid) {
+        return tradingSystemFacade.approveOwner(ownerUsername, storeId, ownerToApprove, status, uuid);
+    }
 }

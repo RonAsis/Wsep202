@@ -1,9 +1,6 @@
 package com.wsep202.TradingSystem.web.controllers;
 
-import com.wsep202.TradingSystem.dto.ManagerDto;
-import com.wsep202.TradingSystem.dto.ProductDto;
-import com.wsep202.TradingSystem.dto.ReceiptDto;
-import com.wsep202.TradingSystem.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
@@ -238,6 +235,29 @@ public class SellerOwnerController {
                                  @PathVariable String ownerToRemove,
                                  @PathVariable UUID uuid) {
         return sellerOwnerService.removeOwner(ownerUsername, storeId, ownerToRemove, uuid);
+    }
+
+    /**
+     * get my owner to approve
+     */
+    @ApiOperation(value = "get my owners to approve")
+    @GetMapping("get-my-owner-to-approve/{ownerUsername}/{uuid}")
+    public List<OwnerToApproveDto> getMyOwnerToApprove(@PathVariable String ownerUsername,
+                                                       @PathVariable UUID uuid) {
+        return sellerOwnerService.getMyOwnerToApprove(ownerUsername,uuid);
+    }
+
+    /**
+     * approve owner
+     */
+    @ApiOperation(value = "approve owner")
+    @PostMapping("approve-owner/{ownerUsername}/{storeId}/{ownerToApprove}/{status}/{uuid}")
+    public boolean approveOwner(@PathVariable String ownerUsername,
+                               @PathVariable int storeId,
+                               @PathVariable String ownerToApprove,
+                               @PathVariable boolean status,
+                               @PathVariable UUID uuid) {
+        return sellerOwnerService.approveOwner(ownerUsername, storeId, ownerToApprove, status, uuid);
     }
 
 }

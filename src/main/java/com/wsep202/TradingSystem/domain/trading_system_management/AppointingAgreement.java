@@ -1,10 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +20,8 @@ public class AppointingAgreement {
     private int appointingAgreementNumber;
 
     @Builder.Default
-    private String newOwner;
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private UserSystem newOwner;
 
     @Builder.Default
     private String appointee;
@@ -28,34 +29,35 @@ public class AppointingAgreement {
     @Builder.Default
     @ElementCollection
     @MapKeyColumn(name = "owner_name")
-    private Map<String, Boolean> ownersAndApproval;
+    private Map<String, StatusOwner> ownersAndApproval;
 
     public AppointingAgreement() {
     }
 
-    public AppointingAgreement(String newOwner, String appointee, Set<String> owners) {
+    public AppointingAgreement(UserSystem newOwner, String appointee, Set<String> owners) {
         this.newOwner = newOwner;
         this.appointee = appointee;
         owners.forEach(owner -> {
             if (owner.equals(appointee)) {
-                this.ownersAndApproval.put(owner, true);
+                this.ownersAndApproval.put(owner, StatusOwner.APPROVE);
             } else {
-                this.ownersAndApproval.put(owner, null);
+                this.ownersAndApproval.put(owner, StatusOwner.WAITING);
             }
         });
     }
 
-    public void changeApproval(String owner, Boolean approval) {
-        this.ownersAndApproval.replace(owner, approval);
+    public StatusOwner changeApproval(String owner, StatusOwner statusOwner) {
+        this.ownersAndApproval.replace(owner, statusOwner);
+        return statusOwner;
     }
 
-    public boolean checkIfApproved() {
-        for (String owner : ownersAndApproval.keySet()) {
-            if (!ownersAndApproval.get(owner)) {
-                return false;
-            }
-        }
-        return true; //tradingSystem.addOwnerToStore(ownerStore, ownerUser, newOwnerUsername);
+    public StatusOwner checkIfApproved() {
+        return ownersAndApproval.values().stream()
+                .filter(status -> status == StatusOwner.NOT_APPROVE)
+                .findFirst()
+                .orElse(ownersAndApproval.values().stream()
+                .filter(statusOwner -> statusOwner == StatusOwner.WAITING)
+                .findFirst().orElse(StatusOwner.APPROVE));
     }
 
 }

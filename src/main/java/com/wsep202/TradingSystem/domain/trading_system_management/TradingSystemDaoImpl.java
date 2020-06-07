@@ -4,12 +4,14 @@ import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemExcept
 import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
-
+@Slf4j
 public class TradingSystemDaoImpl extends TradingSystemDao {
 
     private static int idAcc = 0;
@@ -129,6 +131,11 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn) {
+        boolean ans = ownerStore.validateCanEditProdcuts(user, productSn);
+        if (ans) {
+            updateShoppingCart(user, new LinkedList<>(users), ownerStore, ownerStore.getProduct(productSn));
+            log.info(String.format("Delete productSn %d from store %d", productSn, ownerStore.getStoreId()));
+        }
         return ownerStore.removeProductFromStore(user, productSn);
     }
 
@@ -189,6 +196,17 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
         // Its need to be empty
     }
 
+    @Override
+    public Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid) {
+        if(isValidUuid(ownerUsername, uuid)){
+            return users.stream()
+            .filter(userSystem -> userSystem.getUserName().equals(ownerUsername))
+                    .findFirst()
+                    .map(UserSystem::getOwnerToApproves)
+                    .orElse(new HashSet<>());
+        }
+        return new HashSet<>();
+    }
 
     private int getNewId(){
         return idAcc++;

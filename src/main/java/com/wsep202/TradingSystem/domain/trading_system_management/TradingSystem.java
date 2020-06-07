@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import javafx.util.Pair;
@@ -427,38 +428,24 @@ public class TradingSystem {
      * @return true if the addition was successful, false if there were a problem
      */
     public boolean addOwnerToStore(Store ownedStore, UserSystem ownerUser, String newOwnerUser) {
-        boolean res= false;
         UserSystem userSystem = tradingSystemDao.getUserSystem(newOwnerUser).orElse(null);
         if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(userSystem)
                 && ownedStore.addOwner(ownerUser, userSystem)) {
-            log.info(String.format("user %s was added as manager in store '%d'", newOwnerUser, ownedStore.getStoreId()));
-            res = userSystem.addNewOwnedStore(ownedStore);
-        }
-        if(res){
+            log.info(String.format("user %s waiting for be approve in store '%d'", newOwnerUser, ownedStore.getStoreId()));
+            approveOwner(ownerUser, userSystem, ownedStore);
             tradingSystemDao.updateStoreAndUserSystem(ownedStore, userSystem);
-        }
-        log.info("failed add user as owner in store");
-        return res;
-    }
-
-    /**
-     * UC 4.3
-     * This method is used to create a new appointing agreement to a new owner
-     * @param ownedStore   - The store to which you want to add a manager
-     * @param ownerUser    - owner of the store
-     * @param newOwnerUser - the user that needs to be added as an owner
-     * @return true if the creation of the appointing agreement was successful, false if there were a problem
-     */
-    public boolean createNewAppointingAgreement(Store ownedStore, UserSystem ownerUser, String newOwnerUser) {
-        UserSystem userSystem = tradingSystemDao.getUserSystem(newOwnerUser).orElse(null);
-        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(userSystem)
-                && ownedStore.createNewAppointingAgreement(ownerUser, userSystem)) {
-            log.info(String.format("A new appointing agreement was created for user %s in store %d", newOwnerUser, ownedStore.getStoreId()));
             return true;
         }
-        log.info("failed add user as owner in store");
+        log.info(String.format("user %s failed for add agreement owner in store '%d'", newOwnerUser, ownedStore.getStoreId()));
         return false;
     }
+
+    private void approveOwner(UserSystem ownerUser, UserSystem newOwnerUser, Store store){
+        if(store.isApproveOwner(newOwnerUser) == StatusOwner.APPROVE){
+            newOwnerUser.addNewOwnedStore(store);
+        }
+    }
+
 
     /**
      * UC 4.7

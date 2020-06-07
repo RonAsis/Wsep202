@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,13 +22,14 @@ public class OwnersAppointee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
-    private String appointeeUser;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private UserSystem appointeeUser;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     private Set<UserSystem> appointedUsers = new HashSet<>();
 
-    public OwnersAppointee(String appointeeUser){
+    public OwnersAppointee(UserSystem appointeeUser){
         this.appointeeUser = appointeeUser;
         this.appointedUsers = new HashSet<>();
     }

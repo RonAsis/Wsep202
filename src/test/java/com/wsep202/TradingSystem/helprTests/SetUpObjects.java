@@ -125,7 +125,7 @@ public class SetUpObjects {
                 .storeName(storeName)
 //                .discountPolicy(discountPolicy)
                 .products(products)
-                .receipts(receipts)
+                .receipts(new HashSet<>(receipts))
                 .rank(rank)
 //                .purchasePolicy(purchasePolicy)
                 .build();

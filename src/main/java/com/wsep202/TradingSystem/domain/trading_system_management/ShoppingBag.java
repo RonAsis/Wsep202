@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -26,25 +28,18 @@ public class ShoppingBag {
     private int id;
 
     /**
-     * the store of the products
-     */
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Store storeOfProduct;
-
-    /**
      * list of all of the products and the amount of each product
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
     @MapKeyColumn(name = "products")
     private Map<Product, Integer> productListFromStore;
 
-    public ShoppingBag(Store storeOfProduct, Map<Product, Integer> productListFromStore){
-        this.storeOfProduct = storeOfProduct;
+    public ShoppingBag( Map<Product, Integer> productListFromStore){
         this.productListFromStore = productListFromStore;
     }
 
     public ShoppingBag(Store storeOfProduct){
-        this.storeOfProduct = storeOfProduct;
         productListFromStore = new HashMap<>();
     }
 
@@ -59,12 +54,8 @@ public class ShoppingBag {
             log.info("A null product was trying to be added to the bag or a in correct amount");
             return false;
         }
-        if(productToAdd.getStoreId() != storeOfProduct.getStoreId()){
-            log.info("Store '"+ storeOfProduct.getStoreId() +"' id and product '"+ productToAdd.getName() +"' store id "+ productToAdd.getStoreId() +" does not mach");
-            return false;
-        }
         if (productToAdd.getAmount() < amountOfProduct){
-            log.info("there is not enough '" + productToAdd.getName() + "' in store '" + storeOfProduct.getStoreName() + "'");
+            log.info("there is not enough '" + productToAdd.getName());
             return false;
         }
         Product isInBag = containProduct(productToAdd.getProductSn());
@@ -85,10 +76,6 @@ public class ShoppingBag {
     public boolean removeProductFromBag(Product productToRemove){
         if (productToRemove == null){
             log.info("Can't remove a null product");
-            return false;
-        }
-        if(productToRemove.getStoreId() != storeOfProduct.getStoreId()){
-            log.info("Store id "+ storeOfProduct.getStoreId() +" and product store id "+ productToRemove.getStoreId() +" does not mach");
             return false;
         }
         Product isInBag = containProduct(productToRemove.getProductSn());

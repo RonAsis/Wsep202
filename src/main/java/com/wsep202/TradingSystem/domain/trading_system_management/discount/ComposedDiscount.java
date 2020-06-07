@@ -91,7 +91,7 @@ public class ComposedDiscount extends DiscountPolicy {
 
     private ConditionalProductDiscount createConditionalDiscount(){
         return ConditionalProductDiscount.builder()
-                .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                .productsApplyDiscounts(amountOfProductsForApplyDiscounts)
                 .productsUnderThisDiscount(productsUnderThisDiscount)
                 .build();
     }

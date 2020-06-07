@@ -7,6 +7,8 @@ import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.cashing.TradingSystemCashing;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.dto.ManagerDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -111,15 +113,9 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     @Override
     public Product addProductToStore(Store store, UserSystem owner, Product product) {
         if (store.addNewProduct(owner, product)) {
-            storeRepository.save(store);
-            product.setProductSn(store.getProducts().stream()
-                    .map(Product::getProductSn)
-                    .reduce(0, (acc, cur) -> {
-                        if (cur > acc) {
-                            acc = cur;
-                        }
-                        return acc;
-                    }) + 1);
+            Store storeSaved = storeRepository.save(store);
+            int productSn = new LinkedList<>(storeSaved.getProducts()).getLast().getProductSn();
+            product.setProductSn(productSn);
             tradingSystemCashing.addProduct(product);
         }
         return product;
@@ -140,7 +136,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
         Discount res = store.addEditDiscount(user, discount);
         if (Objects.nonNull(res)) {
             storeRepository.save(store);
-            List<Discount> discounts = storeRepository.findById(store.getStoreId()).get().getDiscounts();
+            List<Discount> discounts = new LinkedList<>(storeRepository.findById(store.getStoreId()).get().getDiscounts());
             res.setDiscountId(discounts.get(discounts.size() - 1).getDiscountId());
         }
         return res;
@@ -148,13 +144,23 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
 
     @Override
     public boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn) {
-        boolean ans = ownerStore.removeProductFromStore(user, productSn);
+        boolean ans = ownerStore.validateCanEditProdcuts(user, productSn);
         if (ans) {
+            updateDbWithCashing();
+            updateShoppingCart(user, userRepository.findAll(), ownerStore, ownerStore.getProduct(productSn));
             storeRepository.save(ownerStore);
             log.info(String.format("Delete productSn %d from store %d", productSn, ownerStore.getStoreId()));
             tradingSystemCashing.removeProduct(productSn);
         }
         return ans;
+    }
+
+    private void updateDbWithCashing() {
+        tradingSystemCashing.getShoppingCartMap().forEach((key, value) -> userRepository.findById(key)
+                .ifPresent(userSystem -> {
+                    userSystem.setShoppingCart(value);
+                    userRepository.save(userSystem);
+                }));
     }
 
     @Override
@@ -235,6 +241,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     public void saveShoppingCart(String username) {
         ShoppingCart shoppingCart = tradingSystemCashing.removeShoppingCart(username);
         getUserSystem(username).ifPresent(userSystem -> {
+            List<Store> stores = storeRepository.findAll();
             userSystem.setShoppingCart(shoppingCart);
             userRepository.save(userSystem);
         });
@@ -242,7 +249,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
 
     @Override
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
-        if (isValidUuid(username, uuid)) {
+        if (isValidUuid(username, uuid) ) {
             return tradingSystemCashing.getShoppingCart(username);
         }
         throw new UserDontExistInTheSystemException(username);
@@ -251,5 +258,15 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     @Override
     public void loadShoppingCart(UserSystem user) {
         user.setShoppingCart(tradingSystemCashing.getShoppingCart(user.getUserName()));
+    }
+
+    @Override
+    public Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid) {
+        if(isValidUuid(ownerUsername, uuid)){
+            return userRepository.findById(ownerUsername)
+                    .map(userSystem -> userSystem.getOwnerToApproves())
+                    .orElse(new HashSet<>());
+        }
+        return new HashSet<>();
     }
 }

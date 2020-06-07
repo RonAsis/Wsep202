@@ -766,7 +766,7 @@ class ConditionalProductDiscountTest {
         private void setProductDiscount(Map<Product, Integer> productsUnderThisDiscount, Map<Product, Integer> amountOfProductsForApplyDiscounts) {
             productDiscountUT = ConditionalProductDiscount.builder()
                     .productsUnderThisDiscount(productsUnderThisDiscount)
-                    .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                    .productsApplyDiscounts(amountOfProductsForApplyDiscounts)
                     .build();
         }
 

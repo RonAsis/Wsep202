@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {Product} from '../../../shared/product.model';
 import {ProductService} from '../../../services/product.service';
 import {LabelType, Options} from 'ng5-slider';
@@ -9,11 +9,12 @@ import {Store} from '../../../shared/store.model';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, OnChanges {
   @Output() productWasSelected = new EventEmitter<Product>();
   products: Product[];
   @Input() store: Store;
   searchText;
+
 
   // for filter by product range
   productRank = 1;
@@ -82,4 +83,10 @@ export class ProductListComponent implements OnInit {
   onSelectCategory(category: string) {
     this.selectedCategory = category;
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.ngOnInit();
+    console.log('iniital');
+  }
+
 }

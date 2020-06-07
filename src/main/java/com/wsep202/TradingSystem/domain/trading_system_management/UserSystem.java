@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
@@ -80,6 +81,9 @@ public class UserSystem implements Observer, Serializable {
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new LinkedList<>();
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<OwnerToApprove> ownerToApproves;
 
     //need ignore in Db;
     @Transient
@@ -338,4 +342,20 @@ public class UserSystem implements Observer, Serializable {
         return shoppingCart;
     }
 
+    public void addOwnerToApprove(int storeId, String storeName, String userName) {
+        OwnerToApprove ownerToApprove = new OwnerToApprove(storeId, storeName, userName);
+        ownerToApproves.add(ownerToApprove);
+        newNotification(Notification
+        .builder()
+        .content(String.format("You have a new Owner to approve in storeId %s", storeId))
+        .build());
+    }
+
+    public void removeAgreement(int storeId, String userName) {
+        ownerToApproves.stream()
+                .filter(ownerToApprove -> ownerToApprove.getStoreId() == storeId && ownerToApprove.getUsernameToApprove().equals(userName))
+                .findFirst()
+                .map(ownerToApprove -> ownerToApproves.remove(ownerToApprove));
+    }
 }
+

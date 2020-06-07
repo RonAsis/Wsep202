@@ -168,7 +168,7 @@ public class TradingSystemMapper {
                     case CONDITIONAL_PRODUCT:
                         discountPolicy = ConditionalProductDiscount.builder()
                                 .productsUnderThisDiscount(productsUnderThisDiscount)
-                                .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                                .productsApplyDiscounts(amountOfProductsForApplyDiscounts)
                                 .build();
                         break;
                     case CONDITIONAL_STORE:
@@ -212,7 +212,7 @@ public class TradingSystemMapper {
                             case CONDITIONAL_PRODUCT:
                                 discountPolicy = ConditionalProductDiscount.builder()
                                         .productsUnderThisDiscount(productsUnderThisDiscount)
-                                        .amountOfProductsForApplyDiscounts(amountOfProductsForApplyDiscounts)
+                                        .productsApplyDiscounts(amountOfProductsForApplyDiscounts)
                                         .build();
                                 break;
                             case CONDITIONAL_STORE:
@@ -283,7 +283,7 @@ public class TradingSystemMapper {
                         break;
                     case CONDITIONAL_PRODUCT:
                         ConditionalProductDiscount conditionalProductDiscount = (ConditionalProductDiscount) context.getSource().getDiscountPolicy();
-                        context.getDestination().setAmountOfProductsForApplyDiscounts(convertProductsToMap(conditionalProductDiscount.getAmountOfProductsForApplyDiscounts()));
+                        context.getDestination().setAmountOfProductsForApplyDiscounts(convertProductsToMap(conditionalProductDiscount.getProductsApplyDiscounts()));
                         context.getDestination().setProductsUnderThisDiscount(convertProductsToMap(conditionalProductDiscount.getProductsUnderThisDiscount()));
                         break;
                     case CONDITIONAL_STORE:
@@ -315,7 +315,7 @@ public class TradingSystemMapper {
                                 break;
                             case CONDITIONAL_PRODUCT:
                                 ConditionalProductDiscount conditionalProductDiscount = (ConditionalProductDiscount) discount.getDiscountPolicy();
-                                discountDto.setAmountOfProductsForApplyDiscounts(convertProductsToMap(conditionalProductDiscount.getAmountOfProductsForApplyDiscounts()));
+                                discountDto.setAmountOfProductsForApplyDiscounts(convertProductsToMap(conditionalProductDiscount.getProductsApplyDiscounts()));
                                 discountDto.setProductsUnderThisDiscount(convertProductsToMap(conditionalProductDiscount.getProductsUnderThisDiscount()));
                                 break;
                             case CONDITIONAL_STORE:

@@ -1,6 +1,8 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.dto.ManagerDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -86,4 +88,15 @@ public abstract class TradingSystemDao {
     public abstract ShoppingCart getShoppingCart(String username, UUID uuid);
 
     public abstract void loadShoppingCart(UserSystem user);
+    
+    protected void updateShoppingCart(UserSystem owner, List<UserSystem> userSystems, Store store, Product product){
+        userSystems.forEach(userSystem -> {
+            if(userSystem.removeProductInShoppingBag(store, product)){
+                updateUser(userSystem);
+            }
+        });
+        store.removeProductFromStore(owner, product.getProductSn());
+    }
+
+    public abstract Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid);
 }

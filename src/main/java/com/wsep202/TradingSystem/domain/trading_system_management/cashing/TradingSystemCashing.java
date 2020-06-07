@@ -2,6 +2,8 @@ package com.wsep202.TradingSystem.domain.trading_system_management.cashing;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart;
+import com.wsep202.TradingSystem.domain.trading_system_management.Store;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
+@Data
 public class TradingSystemCashing {
 
     private Map<String, ShoppingCart> shoppingCartMap;
@@ -65,4 +68,5 @@ public class TradingSystemCashing {
     public void addProducts(Set<Product> productSet) {
         products = productSet;
     }
+
 }

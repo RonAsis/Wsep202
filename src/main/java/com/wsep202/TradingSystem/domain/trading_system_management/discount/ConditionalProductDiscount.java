@@ -4,12 +4,8 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.exception.ConditionalProductException;
-import com.wsep202.TradingSystem.domain.exception.IllegalPercentageException;
-import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
-import com.wsep202.TradingSystem.domain.exception.NotValidEndTime;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Cascade;
 
@@ -17,7 +13,6 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.MapKeyColumn;
-import java.util.Calendar;
 import java.util.Map;
 
 @Setter
@@ -40,10 +35,10 @@ public class ConditionalProductDiscount extends DiscountPolicy {
     /**
      * amount of product from to apply discount
      */
-    @MapKeyColumn(name = "amountOfProductsForApplyDiscounts")
+    @MapKeyColumn(name = "productsApplyDiscounts")
     @ElementCollection(fetch = FetchType.EAGER)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    private Map<Product, Integer> amountOfProductsForApplyDiscounts;
+    private Map<Product, Integer> productsApplyDiscounts;
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
@@ -92,11 +87,11 @@ public class ConditionalProductDiscount extends DiscountPolicy {
     @Override
     public void removeProductFromDiscount(int productSn) {
         removeProductFromCollection(productsUnderThisDiscount, productSn);
-        removeProductFromCollection(amountOfProductsForApplyDiscounts, productSn);
+        removeProductFromCollection(productsApplyDiscounts, productSn);
     }
 
     private int getAmountProductInAmountOfProductsForApplyDiscounts(Discount discount, Product product) {
-        return amountOfProductsForApplyDiscounts.entrySet().stream()
+        return productsApplyDiscounts.entrySet().stream()
                 .filter(productInDisCount -> productInDisCount.getKey().getProductSn() == product.getProductSn())
                 .map(Map.Entry::getValue)
                 .findFirst().orElse(-1);
@@ -124,8 +119,8 @@ public class ConditionalProductDiscount extends DiscountPolicy {
         if(this.productsUnderThisDiscount==null){
             throw new ConditionalProductException("There are no products as condition. check discountId: "+discount.getDiscountId());
         }
-        if(this.amountOfProductsForApplyDiscounts==null||
-                amountOfProductsForApplyDiscounts.isEmpty()){
+        if(this.productsApplyDiscounts ==null||
+                productsApplyDiscounts.isEmpty()){
             throw new ConditionalProductException("There are no products amounts to apply discount. check discountId: "+discount.getDiscountId());
         }
     }

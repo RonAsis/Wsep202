@@ -50,10 +50,7 @@ class ShoppingCartTest {
             when(testShoppingBag2.getTotalCostOfBag()).thenReturn(99.1);
             when(testShoppingBag3.getNumOfProducts()).thenReturn(1);
             when(testShoppingBag3.getTotalCostOfBag()).thenReturn(50.0);
-            when(testShoppingBag3.getStoreOfProduct()).thenReturn(testStore3);
             when(testShoppingBag3.getProductAmount(testProduct.getProductSn())).thenReturn(1);
-            when(testShoppingBag2.getStoreOfProduct()).thenReturn(testStore3);
-            when(testShoppingBag1.getStoreOfProduct()).thenReturn(testStore3);
             when(testStore1.getStoreId()).thenReturn(1);
             when(testStore2.getStoreId()).thenReturn(2);
             when(testStore3.getStoreId()).thenReturn(3);

@@ -30,7 +30,7 @@ public class ShoppingCart {
      * list of stores and there shopping bags
      */
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
     @MapKeyJoinColumn(name = "shopping_bag_id")
     private Map<Store, ShoppingBag> shoppingBagsList;
 
@@ -106,7 +106,7 @@ public class ShoppingCart {
      */
     public boolean removeProductInCart(Store storeOfProduct, Product productToRemove) {
         boolean response = false;
-       if(checkParameters(storeOfProduct,productToRemove)) {
+       if(checkParameters(storeOfProduct,productToRemove) && isProductInStore(storeOfProduct, productToRemove)) {
            if(Objects.nonNull(shoppingBagsList.get(storeOfProduct))){
                shoppingBagsList.get(storeOfProduct).removeProductFromBag(productToRemove);
                response = true;
@@ -124,17 +124,25 @@ public class ShoppingCart {
      */
     public boolean addProductToCart(Store storeOfProduct, Product productToAdd, int amountOfProduct){
         boolean response = false;
-        if(checkParameters(storeOfProduct,productToAdd)) {
-            if(Objects.isNull(shoppingBagsList.get(storeOfProduct))){
+        if(checkParameters(storeOfProduct,productToAdd) && isProductInStore(storeOfProduct, productToAdd)) {
+            if(shoppingBagsList.keySet().stream()
+            .noneMatch(store -> store.getStoreId() == storeOfProduct.getStoreId())){
                 ShoppingBag storeShoppingBag = new ShoppingBag(storeOfProduct);
                 response =  storeShoppingBag.addProductToBag(productToAdd, amountOfProduct) && addBagToCart(storeOfProduct, storeShoppingBag);
             }else{
-                shoppingBagsList.get(storeOfProduct).addProductToBag(productToAdd,amountOfProduct);
+                Store storeInShoppingBag = shoppingBagsList.keySet().stream()
+                        .filter(store -> store.getStoreId() == storeOfProduct.getStoreId())
+                        .findFirst().get();
+                shoppingBagsList.get(storeInShoppingBag).addProductToBag(productToAdd,amountOfProduct);
                 response  = true;
             }
         }
         log.info(String.format("the product %s  %s to cart", productToAdd.getName(), response? "added" : "not added"));
         return response;
+    }
+
+    private boolean isProductInStore(Store storeOfProduct, Product productToAdd) {
+        return Objects.nonNull(storeOfProduct.getProduct(productToAdd.getProductSn()));
     }
 
     private boolean checkParameters(Store store, Object object2){
