@@ -1,0 +1,14 @@
+#idea folder
+/.idea/**
+/.idea/libraries/lib2.xml
+#log file
+*.log
+#compiled classes
+*.class
+#intellij outputs
+**/out/
+
+.idea_modules
+
+/target/
+/TradingSystem.iml

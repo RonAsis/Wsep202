@@ -1,0 +1,17 @@
+<div class="col-xs-12">
+  <button *ngIf="isOwner || isManagerCanEditDiscount()" class="btn btn-primary" type="submit" (click)="onAddDiscount()">Add Discount</button>
+  <button *ngIf="isOwner || isManagerCanEditDiscount()" class="btn btn-primary" type="submit" (click)="onDiscounts()">Discounts</button>
+  <button *ngIf="isOwner || isManagerCanEditProduct()" class="btn btn-primary" type="submit" (click)="onEditProduct()">Edit Product</button>
+  <button *ngIf="isOwner || isManagerCanEditManager()" class="btn btn-primary" type="submit" (click)="onManagers()">Managers</button>
+  <button *ngIf="isOwner" class="btn btn-primary" type="submit" (click)="onOwners()">Owners</button>
+  <button *ngIf="isOwner || isManagerCanEditPurchasePolicy()" class="btn btn-primary" type="submit" (click)="onPolicy()">Policy</button>
+
+  <app-add-discount *ngIf="loadedFeature === 'Add Discount'" [store]="store" (discountItemAdded)="discountAdded($event)"
+                    ></app-add-discount>
+  <app-discount *ngIf="loadedFeature === 'Discounts'" [store]="store"></app-discount>
+  <app-edit-product *ngIf="loadedFeature === 'Edit-Product'" ></app-edit-product>
+  <app-visible-discount-store *ngIf="loadedFeature === 'Managers'" [store]="store"></app-visible-discount-store>
+  <app-owners *ngIf="loadedFeature === 'Owners'" [store]="store"></app-owners>
+  <app-policy *ngIf="loadedFeature === 'Policy'"></app-policy>
+
+</div>

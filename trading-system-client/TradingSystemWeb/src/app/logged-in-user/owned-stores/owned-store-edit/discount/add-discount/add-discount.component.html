@@ -1,0 +1,131 @@
+<div class="row">
+
+  <div>
+    <div class="col-sm-5 from-group">
+      <label for="discountPercentage">Discount Percentage
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="number" [min]="1" [max]="100" id="discountPercentage" class="form-control"
+             [value]="this.discount !== undefined  && this.discount.discountPercentage!== undefined? this.discount.discountPercentage : 1"
+             #discountPercentage/>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label for="endTime">End Time
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="date" [value]="today"
+             [min]="today"
+             id="endTime" class="form-control"
+             #endTime/>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label for="description">description
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="text" id="description" class="form-control"
+             [value]="this.discount !== undefined ? this.discount.description : ''"
+             #description/>
+    </div>
+
+    <div class="col-sm-5 from-group">
+      <label></label>
+    </div>
+    <div class="col-sm-5 from-group">
+      <label></label>
+    </div>
+
+    <div class="col-xs-12">
+      <button class="btn btn-danger" type="submit" (click)="onVisibleDiscount()">Visible Discount</button>
+      <button class="btn btn-danger" type="submit" (click)="onConditionalStoreDiscount()">Conditional Store Discount
+      </button>
+      <button class="btn btn-danger" type="submit" (click)="onConditionalProductDiscount()">Conditional Product
+        Discount
+      </button>
+      <button class="btn btn-danger" type="submit" (click)="onComposeDiscount()">Compse Discount</button>
+
+    </div>
+    <div *ngIf="discountType === 'conditional product' || discountType === 'compose'" class="row justify-content-start">
+      <div class="col-sm-4 from-group">
+
+        <label>Products Conditions:</label>
+        <div class="md-form">
+          <ng-multiselect-dropdown
+            [placeholder]="'Select Products'"
+            [settings]="productUnderDiscountSettings"
+            [data]="optionsProductUnderDiscount"
+            [(ngModel)]="selectedProductUnderDiscount"
+            (onSelect)="onSelectProductUnderDiscount($event)"
+          >
+          </ng-multiselect-dropdown>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="discountType === 'conditional store'" class="row justify-content-start">
+      <div class="col-sm-4 from-group">
+        <label for="minPrice">Min Price</label>
+        <input type="number" [min]="1" id="minPrice" class="form-control"
+               [value]="this.discount !== undefined ? this.discount.minPrice : null"
+               #minPrice/>
+      </div>
+    </div>
+
+    <div *ngIf="discountType === 'compose'" class="row justify-content-start">
+      <div class="col-sm-4 from-group">
+        <label>composedDiscounts:</label>
+        <div class="md-form">
+          <ng-multiselect-dropdown
+            [placeholder]="'Select Discounts'"
+            [settings]="composedDiscountsSettings"
+            [data]="optionsComposedDiscounts"
+            [(ngModel)]="selectedComposedDiscounts"
+          >
+          </ng-multiselect-dropdown>
+        </div>
+        <div class="col-sm-5 from-group">
+          <select [value]="this.discount !== undefined ? this.discount.compositeOperator : null"
+                  [ngModel]="selectedComposite" (ngModelChange)="onSelectedCompositeOperator($event)">
+            <option *ngFor="let compositeOperator of compositeOperators" value={{compositeOperator}}>
+              {{compositeOperator}}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="discountType !== 'visible' && discountType !== 'conditional store'" class="row justify-content-end">
+      <div class="col-sm-4 from-group">
+        <label> ====>
+        </label>
+      </div>
+    </div>
+
+    <div *ngIf="discountType !== 'conditional store'" class="col-sm-4 from-group">
+      <label>Applied Products:
+        <span class="required-asterisk">*</span>
+      </label>
+      <div class="md-form">
+        <ng-multiselect-dropdown
+          [placeholder]="'Select Products'"
+          [settings]="productsForApplyDiscountSettings"
+          [data]="optionsProductsForApplyDiscounts"
+          [(ngModel)]="selectedProductsForApplyDiscounts"
+          (onSelect)="onSelectProductsForApplyDiscount($event)"
+        >
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+
+  </div>
+
+  <hr/>
+  <div class="col-xs-12">
+    <button class="btn btn-success" type="submit" (click)="onAddDiscount()">Add/Edit Discount</button>
+  </div>
+  <div class="col-sm-5 from-group" [style.color]="messageColor">
+    <p>{{message}}</p>
+  </div>
+</div>
+

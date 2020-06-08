@@ -1,0 +1,14 @@
+body, html {
+  height: 100%;
+}
+.bg {
+  /* The image used */
+  background: url("https://mdbootstrap.com/img/Photos/Others/img%20(42).jpg");
+  /* Half height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}

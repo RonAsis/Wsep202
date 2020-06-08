@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.wsep202.TradingSystem.domain.trading_system_management</OriginalElement>
+  <nodes>
+    <node x="586.2131254755611" y="112.0">com.wsep202.TradingSystem.domain.trading_system_management.StorePermission</node>
+    <node x="753.852564102564" y="842.0">com.wsep202.TradingSystem.domain.trading_system_management.PasswordSaltPair</node>
+    <node x="194.33333333333326" y="254.0">com.wsep202.TradingSystem.domain.trading_system_management.Receipt</node>
+    <node x="633.6717501841858" y="954.0">com.wsep202.TradingSystem.domain.trading_system_management.ExternalServiceManagement</node>
+    <node x="611.0050835175191" y="426.0">com.wsep202.TradingSystem.domain.trading_system_management.Store</node>
+    <node x="743.6717501841858" y="1126.0">com.wsep202.TradingSystem.domain.trading_system_management.TradingSystem</node>
+    <node x="1496.9217501841858" y="1278.0">com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade</node>
+    <node x="225.86549029554135" y="112.0">com.wsep202.TradingSystem.domain.trading_system_management.Product</node>
+    <node x="534.7358527482883" y="842.0">com.wsep202.TradingSystem.domain.trading_system_management.UserSystem</node>
+    <node x="619.5884168508524" y="254.0">com.wsep202.TradingSystem.domain.trading_system_management.MangerStore</node>
+    <node x="100.5" y="700.0">com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart</node>
+    <node x="483.3333333333333" y="578.0">com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag</node>
+    <node x="530.5154902955412" y="0.0">com.wsep202.TradingSystem.domain.trading_system_management.ProductCategory</node>
+  </nodes>
+  <notes />
+  <edges />
+  <settings layout="Hierarchic Group" zoom="0.31333333333333335" x="898.5" y="665.0" />
+  <SelectedNodes>
+    <node>com.wsep202.TradingSystem.domain.trading_system_management.StorePermission</node>
+  </SelectedNodes>
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
