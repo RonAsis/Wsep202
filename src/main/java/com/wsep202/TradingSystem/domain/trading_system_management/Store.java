@@ -89,8 +89,8 @@ public class Store {
     /**
      * list of appointing agreements of owners in the store
      */
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<AppointingAgreement> appointingAgreements;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<AppointingAgreement> appointingAgreements;
 
     /**
      * for new store
@@ -109,7 +109,7 @@ public class Store {
                  Set<Discount> discounts,
                  Set<Receipt> receipts,
                  int rank, String description,
-                 List<AppointingAgreement> appointingAgreements) {
+                 Set<AppointingAgreement> appointingAgreements) {
         this.storeName = storeName;
         this.appointedOwners = appointedOwners;
         this.appointedManagers = appointedManagers;
@@ -127,7 +127,7 @@ public class Store {
         purchasePolicies = new HashSet<>();
         discounts = new HashSet<>();
         receipts = new HashSet<>();
-        appointingAgreements = new LinkedList<>();
+        appointingAgreements = new HashSet<>();
         appointedOwners = new HashSet<>();
         appointedManagers = new HashSet<>();
         products = new LinkedHashSet<>();
@@ -374,7 +374,7 @@ public class Store {
 
     public StatusOwner isApproveOwner(UserSystem userSystemApproveOwner) {
         Optional<AppointingAgreement> agreement = appointingAgreements.stream()
-                .filter(appointingAgreement -> appointingAgreement.getAppointee().equals(userSystemApproveOwner.getUserName()))
+                .filter(appointingAgreement -> appointingAgreement.getNewOwner().getUserName().equals(userSystemApproveOwner.getUserName()))
                 .findFirst();
         StatusOwner statusOwner = agreement
                 .map(AppointingAgreement::checkIfApproved)
@@ -384,7 +384,11 @@ public class Store {
                 return appointedOwners.stream()
                         .filter(appointedOwner -> appointedOwner.getAppointeeUser().getUserName().equals(appointingAgreement.getAppointee()))
                         .findFirst()
-                        .map(appointedOwner -> appointedOwner.addSubOwner(userSystemApproveOwner));
+                        .map(appointedOwner -> {
+                            appointedOwner.addSubOwner(userSystemApproveOwner);
+                            appointingAgreements.remove(appointingAgreement);
+                            return appointedOwners.add(new OwnersAppointee(userSystemApproveOwner));
+                        });
             });
         } else if (statusOwner == StatusOwner.NOT_APPROVE && agreement.isPresent()) {
             appointingAgreements.remove(agreement.get());
@@ -476,10 +480,11 @@ public class Store {
 
     public List<String> getMySubOwners(String ownerUsername) {
         return appointedOwners.stream()
-                .filter(userSystemSetEntry -> userSystemSetEntry.getAppointeeUser().equals(ownerUsername))
+                .filter(userSystemSetEntry -> userSystemSetEntry.getAppointeeUser().getUserName().equals(ownerUsername))
                 .findFirst()
                 .map(OwnersAppointee::getAppointedUsers)
-                .orElse(new HashSet<>()).stream()
+                .orElse(new HashSet<>())
+                .stream()
                 .map(UserSystem::getUserName)
                 .collect(Collectors.toList());
     }
@@ -497,6 +502,25 @@ public class Store {
     private boolean checkIfExistsAgreement(String userName) {
         return appointingAgreements.stream()
                 .anyMatch(appointingAgreement -> appointingAgreement.getNewOwner().equals(userName));
+    }
+
+
+    /**
+     * add new owner to the appointed owners of the store
+     *
+     * @param owner
+     * @param willBeOwner
+     * @return true if owner added successfully
+     */
+    public boolean addOwner(UserSystem owner, UserSystem willBeOwner) {
+        if (isOwner(owner) && !isOwner(willBeOwner) && !checkIfExistsAgreement(owner.getUserName())) {
+            appointingAgreements.add(new AppointingAgreement( willBeOwner, owner.getUserName(), getOwnersUsername()));
+            appointedOwners.stream()
+                    .filter(appointedOwner -> !appointedOwner.getAppointeeUser().getUserName().equals(owner.getUserName()))
+                    .forEach(appointedOwner -> appointedOwner.getAppointeeUser().addOwnerToApprove(storeId, storeName, willBeOwner.getUserName()));
+            return true;
+        }
+        return false;
     }
 
     /////////////////////////////////////// manager //////////////////////////////////////////////////
@@ -824,24 +848,6 @@ public class Store {
 
     //////////////////////////////////////////////////TODO need to fix all what in down  ////////////////////
 
-
-    /**
-     * add new owner to the appointed owners of the store
-     *
-     * @param owner
-     * @param willBeOwner
-     * @return true if owner added successfully
-     */
-    public boolean addOwner(UserSystem owner, UserSystem willBeOwner) {
-        if (isOwner(owner) && !isOwner(willBeOwner) && !checkIfExistsAgreement(owner.getUserName())) {
-            appointingAgreements.add(new AppointingAgreement( willBeOwner, owner.getUserName(), getOwnersUsername()));
-            appointedOwners.forEach(appointedOwner -> appointedOwner.getAppointeeUser().addOwnerToApprove(storeId, storeName, willBeOwner.getUserName()));
-            return true;
-        }
-        return false;
-    }
-
-
     private int getAppointeeOwnersIndex(String userName) {
         int i = 0;
         for (OwnersAppointee ownersAppointee : appointedOwners) {
@@ -903,6 +909,5 @@ public class Store {
             purchase.isApproved(productsBag, userAddress);
         }
     }
-
 
 }

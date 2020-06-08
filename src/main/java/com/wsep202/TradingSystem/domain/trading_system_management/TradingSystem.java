@@ -28,8 +28,7 @@ public class TradingSystem {
 
     private TradingSystemDao tradingSystemDao;
 
-    @Setter
-    private Subject subject;
+    private static Subject subject;
 
     public TradingSystem(@NotNull ExternalServiceManagement externalServiceManagement,
                          @NotNull UserSystem admin,
@@ -45,6 +44,16 @@ public class TradingSystem {
         admin.setAdmin(true);
         encryptPassword(admin);
         tradingSystemDao.registerAdmin(admin);
+    }
+
+    public static Subject getSubject(){
+        return subject;
+    }
+
+    public static void setSubject(Subject subject){
+        if(Objects.isNull(TradingSystem.subject)){
+            TradingSystem.subject = subject;
+        }
     }
 
     /**
@@ -489,7 +498,7 @@ public class TradingSystem {
      * connect to Notification System
      */
     public void connectNotificationSystem(Observer observer, String principal) {
-        observer.connectNotificationSystem(subject, principal);
+        observer.connectNotificationSystem( principal);
     }
 
     public Set<Store> getStores() {
@@ -556,15 +565,21 @@ public class TradingSystem {
         throw new NotAdministratorException(user.getUserName());
     }
 
-    public List<String> getAllUsernameNotOwnerNotManger(Store store) {
+    public List<String> getAllUsernameNotOwnerNotMangerNotWaiting(Store store) {
         Set<String> usernameOwners = store.getOwnersUsername();
         List<String> usernameMangers = store.getManagersStore().stream()
                 .map(userSystem -> userSystem.getAppointedManager().getUserName())
                 .collect(Collectors.toList());
-        return tradingSystemDao.getUsers().stream()
+        List<String> withOutOwnerManager = tradingSystemDao.getUsers().stream()
                 .filter(userSystem -> usernameOwners.stream().noneMatch(user -> user.equals(userSystem.getUserName())) &&
                         usernameMangers.stream().noneMatch(user -> user.equals(userSystem.getUserName())))
                 .map(UserSystem::getUserName)
+                .collect(Collectors.toList());
+        List<String> newUserOwners = store.getAppointingAgreements().stream()
+                .map(appointingAgreement -> appointingAgreement.getNewOwner().getUserName())
+                .collect(Collectors.toList());
+        return withOutOwnerManager.stream()
+                .filter(userName -> !newUserOwners.contains(userName))
                 .collect(Collectors.toList());
     }
 

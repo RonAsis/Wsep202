@@ -7,7 +7,6 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
-import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
@@ -763,7 +762,7 @@ public class TradingSystemFacade {
     public List<String> getAllUsernameNotOwnerNotManger(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
-        return tradingSystem.getAllUsernameNotOwnerNotManger(store);
+        return tradingSystem.getAllUsernameNotOwnerNotMangerNotWaiting(store);
     }
 
     public List<String> getMySubOwners(String ownerUsername, int storeId, UUID uuid) {

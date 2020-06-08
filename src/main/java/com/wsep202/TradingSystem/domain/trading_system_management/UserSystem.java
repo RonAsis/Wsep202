@@ -14,6 +14,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
+import static javax.persistence.CascadeType.DETACH;
+
 /**
  * define user in the system
  */
@@ -65,7 +67,11 @@ public class UserSystem implements Observer, Serializable {
      * The user personal shopping cart
      */
     @Builder.Default
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE,
+                    CascadeType.REMOVE,
+                    CascadeType.REFRESH,
+                    DETACH}, orphanRemoval = true)
     private ShoppingCart shoppingCart = new ShoppingCart();
 
     /**
@@ -80,17 +86,11 @@ public class UserSystem implements Observer, Serializable {
      */
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Notification> notifications = new LinkedList<>();
+    private Set<Notification> notifications = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<OwnerToApprove> ownerToApproves;
 
-    //need ignore in Db;
-    @Transient
-    private Subject subject;
-
-    //need ignore in Db;
-    @Transient
     private String principal;
 
     private boolean isAdmin;
@@ -106,7 +106,7 @@ public class UserSystem implements Observer, Serializable {
         this.lastName = lastName;
         this.password = password;
         this.isAdmin = isAdmin;
-        this.notifications = new LinkedList<>();
+        this.notifications = new HashSet<>();
         this.shoppingCart = new ShoppingCart();
         this.ownedStores = new HashSet<>();
         managedStores = new HashSet<>();
@@ -121,7 +121,7 @@ public class UserSystem implements Observer, Serializable {
         this.lastName = lastName;
         this.password = password;
         this.isAdmin = false;
-        this.notifications = new LinkedList<>();
+        this.notifications = new HashSet<>();
         this.shoppingCart = new ShoppingCart();
         this.ownedStores = new HashSet<>();
         managedStores = new HashSet<>();
@@ -138,8 +138,10 @@ public class UserSystem implements Observer, Serializable {
                 .filter(store -> store.getStoreId() == storeId)
                 .findFirst().orElseThrow(() -> new NoOwnerInStoreException(userName, storeId));
     }
+
     /**
      * This method is used to add a new owned store to the user
+     *
      * @param store - the store that needs to be added
      * @return the answer that addNewOwnedOrManageStore method returns
      */
@@ -149,6 +151,7 @@ public class UserSystem implements Observer, Serializable {
 
     /**
      * This method is used to add a new managed store to the user
+     *
      * @param store - the store that needs to be added
      * @return the answer that addNewOwnedOrManageStore method returns
      */
@@ -158,6 +161,7 @@ public class UserSystem implements Observer, Serializable {
 
     /**
      * This method is used to add a store to the relevant list (owned OR managed)
+     *
      * @param storeToAdd   - the store that needs to be added
      * @param listOfStores - the list that store is going to be added
      * @return true if the addition was successful, false if the store is null or the store is already in the list
@@ -174,6 +178,7 @@ public class UserSystem implements Observer, Serializable {
 
     /**
      * This method is used to remove a store that is under a users management
+     *
      * @param storeToRemove - the store that needs to be removed
      * @return true if the store exists in managedStores, false if not or null
      */
@@ -189,6 +194,7 @@ public class UserSystem implements Observer, Serializable {
 
     /**
      * This method is used to remove a store that is under a users management
+     *
      * @return true if the store exists in managedStores, false if not or null
      */
     public boolean removeManagedStore(int storeId) {
@@ -200,6 +206,7 @@ public class UserSystem implements Observer, Serializable {
 
     /**
      * This method is used to remove a store that is under a users ownership
+     *
      * @param storeToRemove - the store that needs to be removed
      * @return true if the store exists in ownedStores, false if not or null
      */
@@ -218,18 +225,17 @@ public class UserSystem implements Observer, Serializable {
      */
     public void login() {
         if (!notifications.isEmpty()) {
-            subject.update(this);
+            TradingSystem.getSubject().update(this);
         }
     }
 
     /**
      * This method is used to change the stage of the user to logged-out
+     *
      * @return always true, because the user is now logged-out
      */
     public boolean logout() {
-        if (Objects.nonNull(subject)) {
-            subject.unregister(this);
-        }
+        TradingSystem.getSubject().unregister(this);
         return true;
     }
 
@@ -253,6 +259,7 @@ public class UserSystem implements Observer, Serializable {
 
     /**
      * This method is used to find if this user is a manager of a certain store.
+     *
      * @param storeId - the id of the store
      * @return the store if the user is a manager, exception if he's not
      */
@@ -265,6 +272,7 @@ public class UserSystem implements Observer, Serializable {
     /**
      * This method is used to add a product to the users cart.
      * The method use the methods getShoppingBag & addBagToCart in ShoppingCart and addProductToBag in ShoppingBag.
+     *
      * @param storeOfProduct  - the store of the product that needs to be added
      * @param productToAdd    - the product that needs to be added
      * @param amountOfProduct - the amount of the product
@@ -277,6 +285,7 @@ public class UserSystem implements Observer, Serializable {
     /**
      * This method is used to remove a product from the cart.
      * The method use the methods getShoppingBag in ShoppingCart and removeProductFromBag in ShoppingBag
+     *
      * @param storeOfProduct  - the store of the product that needs to be removed
      * @param productToRemove - the product that needs to be removed
      * @return true if the removal was successful, false if there were a problem to remove it.
@@ -294,25 +303,24 @@ public class UserSystem implements Observer, Serializable {
 
     @Override
     public void newNotification(Notification notification) {
+        notification.setPrincipal(principal);
         this.notifications.add(notification);
-        subject.update(this);
+        TradingSystem.getSubject().update(this);
     }
 
     @Override
-    public void connectNotificationSystem(Subject subject, String principal) {
-        setSubject(subject);
-        subject.register(this);
+    public void connectNotificationSystem( String principal) {
+        TradingSystem.getSubject().register(this);
+        this.principal = principal;
         if (!notifications.isEmpty()) {
-            subject.update(this);
+            TradingSystem.getSubject().update(this);
         }
     }
 
     @Override
     public List<Notification> getNotifications() {
-        List<Notification> notifications = this.notifications;
-        this.notifications = new LinkedList<>();
         notifications.forEach(notification -> notification.setPrincipal(principal));
-        return notifications;
+        return new LinkedList<>(notifications);
     }
 
     public boolean isOwner(int storeId) {
@@ -329,6 +337,7 @@ public class UserSystem implements Observer, Serializable {
 
     /**
      * This Method is used to add the receipts to the users receipt list
+     *
      * @param receipts - new receipt for new purchase
      */
     public void addReceipts(List<Receipt> receipts) {
@@ -346,9 +355,9 @@ public class UserSystem implements Observer, Serializable {
         OwnerToApprove ownerToApprove = new OwnerToApprove(storeId, storeName, userName);
         ownerToApproves.add(ownerToApprove);
         newNotification(Notification
-        .builder()
-        .content(String.format("You have a new Owner to approve in storeId %s", storeId))
-        .build());
+                .builder()
+                .content(String.format("You have a new Owner to approve in storeId %s", storeId))
+                .build());
     }
 
     public void removeAgreement(int storeId, String userName) {

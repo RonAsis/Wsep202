@@ -54,7 +54,7 @@ public class TradingSystemConfiguration {
     @Bean
     public Subject subject(TradingSystemFacade tradingSystemFacade, TradingSystem tradingSystem){
         Subject subject = new Publisher(tradingSystemFacade);
-        tradingSystem.setSubject(subject);
+        TradingSystem.setSubject(subject);
         return subject;
     }
 

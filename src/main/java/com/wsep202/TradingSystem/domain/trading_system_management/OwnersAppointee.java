@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,10 +23,10 @@ public class OwnersAppointee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     private UserSystem appointeeUser;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @Builder.Default
     private Set<UserSystem> appointedUsers = new HashSet<>();
 

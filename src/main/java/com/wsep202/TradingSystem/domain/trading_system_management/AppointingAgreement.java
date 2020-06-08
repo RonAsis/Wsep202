@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +38,11 @@ public class AppointingAgreement {
     public AppointingAgreement(UserSystem newOwner, String appointee, Set<String> owners) {
         this.newOwner = newOwner;
         this.appointee = appointee;
+        initOwnersAndApproval(appointee, owners);
+    }
+
+    private void initOwnersAndApproval(String appointee, Set<String> owners) {
+        ownersAndApproval = new HashMap<>();
         owners.forEach(owner -> {
             if (owner.equals(appointee)) {
                 this.ownersAndApproval.put(owner, StatusOwner.APPROVE);

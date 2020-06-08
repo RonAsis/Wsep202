@@ -8,5 +8,5 @@ public interface Observer {
 
     void newNotification(Notification notification);
 
-    void connectNotificationSystem(Subject subject, String principal);
+    void connectNotificationSystem(String principal);
 }
