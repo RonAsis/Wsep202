@@ -27,6 +27,7 @@ export class LoggedInUserComponent implements OnInit {
   }
 
   onNavigate(feature: string) {
+    console.log(feature);
     this.loadedFeature = feature;
   }
 

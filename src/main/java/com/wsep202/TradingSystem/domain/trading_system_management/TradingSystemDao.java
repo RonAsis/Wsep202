@@ -1,7 +1,10 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.sun.org.apache.bcel.internal.generic.SWITCH;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -68,7 +71,10 @@ public abstract class TradingSystemDao {
     public void login(String userName, UUID uuid){
         usersLogin.put(userName, uuid);
         getUserSystem(userName)
-                .ifPresent(userSystem -> login(userSystem.getUserName(), userSystem.getShoppingCart()));
+                .ifPresent(userSystem -> {
+                    login(userSystem.getUserName(), userSystem.getShoppingCart());
+                    userSystem.updateDaily(this);
+                });
     }
 
     public abstract void login(String username, ShoppingCart shoppingCart);
@@ -100,4 +106,8 @@ public abstract class TradingSystemDao {
     public abstract Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid);
 
     public abstract boolean approveOwner(Store ownedStore, UserSystem ownedStore1, String ownerToApprove, boolean status);
+
+    public abstract void updateDailyVisitors(DailyVisitorsField dailyVisitorsField);
+
+    public abstract Set<DailyVisitor> getDailyVisitors(String username, Date start, Date end, UUID uuid);
 }

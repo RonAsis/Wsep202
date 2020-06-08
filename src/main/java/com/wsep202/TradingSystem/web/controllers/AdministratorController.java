@@ -1,7 +1,9 @@
 package com.wsep202.TradingSystem.web.controllers;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
+import com.wsep202.TradingSystem.dto.DailyVisitorDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
+import com.wsep202.TradingSystem.dto.RequestGetDailyVisitorsDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.AdministratorService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -58,5 +61,16 @@ public class AdministratorController {
     public Set<UserSystemDto> getUsers(@PathVariable String administratorUsername,
                                        @PathVariable UUID uuid) {
         return administratorService.getUsers(administratorUsername, uuid);
+    }
+
+    /**
+     * View buyer purchase history
+     */
+    @ApiOperation(value = "get daily visitors")
+    @PostMapping("get-daily-visitors/{username}/{uuid}")
+    public List<DailyVisitorDto> getDailyVisitors(@PathVariable String username,
+                                         @RequestBody RequestGetDailyVisitorsDto requestGetDailyVisitorsDto,
+                                         @PathVariable UUID uuid) {
+        return administratorService.getDailyVisitors(username, requestGetDailyVisitorsDto, uuid);
     }
 }

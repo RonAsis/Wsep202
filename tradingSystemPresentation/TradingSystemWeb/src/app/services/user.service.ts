@@ -169,4 +169,8 @@ export class UserService {
   public approveOwner(storeId: number, ownerToApprove: string, status: boolean) {
     return this.httpService.approveOwner(this.username, storeId, ownerToApprove, status, this.uuid);
   }
+
+  public getDailyVisitors(startDate: Date, endDate: Date){
+    return this.httpService.getDailyVisitors(this.username, startDate, endDate, this.uuid)
+  }
 }

@@ -79,6 +79,7 @@ import { ApproveOwnerComponent } from './logged-in-user/approve-owner/approve-ow
 
 // MDB Angular Free
 import {WavesModule, TableModule, MDBBootstrapModule} from 'angular-bootstrap-md';
+import { VisitorDailyComponent } from './logged-in-user/admin/visitor-daily/visitor-daily.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -139,7 +140,8 @@ import {WavesModule, TableModule, MDBBootstrapModule} from 'angular-bootstrap-md
     DiscountsComponent,
     DiscontEditComponent,
     AddEditPolicyComponent,
-    ApproveOwnerComponent
+    ApproveOwnerComponent,
+    VisitorDailyComponent
   ],
   imports: [
     Ng2SearchPipeModule,

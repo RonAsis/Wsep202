@@ -1,7 +1,9 @@
 package com.wsep202.TradingSystem.config;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import com.wsep202.TradingSystem.web.controllers.shakeHandler.CustomHandshakeHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,7 +12,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+	private final TradingSystemFacade tradingSystemFacade;
 
 	/**
 	 * define whe app prefix and destination prefix
@@ -29,11 +34,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint(PublicApiPaths.STOMP_ENDPOINT)
 				.setAllowedOrigins("http://localhost:4200")
-				.setHandshakeHandler(new CustomHandshakeHandler());
+				.setHandshakeHandler(new CustomHandshakeHandler(tradingSystemFacade));
 
 		registry.addEndpoint(PublicApiPaths.STOMP_ENDPOINT)
 				.setAllowedOrigins("http://localhost:4200")
-				.setHandshakeHandler(new CustomHandshakeHandler())
+				.setHandshakeHandler(new CustomHandshakeHandler(tradingSystemFacade))
 				.withSockJS();
 	}
 }

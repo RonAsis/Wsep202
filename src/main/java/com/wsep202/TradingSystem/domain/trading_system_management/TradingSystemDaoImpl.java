@@ -1,15 +1,20 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.domain.exception.NotAdministratorException;
 import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class TradingSystemDaoImpl extends TradingSystemDao {
@@ -18,12 +23,14 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     private Set<Store> stores;
     private Set<UserSystem> users;
     private Set<UserSystem> administrators;
+    private Set<DailyVisitor> dailyVisitors;
 
     public TradingSystemDaoImpl() {
         super();
         this.stores = new HashSet<>();
         this.users = new HashSet<>();
         this.administrators = new HashSet<>();
+        dailyVisitors = new HashSet<>();
     }
 
     @Override
@@ -211,6 +218,30 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     @Override
     public boolean approveOwner(Store ownedStore, UserSystem ownerUser, String ownerToApprove, boolean status) {
         return ownedStore.approveOwner(ownerUser, ownerToApprove, status);
+    }
+
+    @Override
+    public void updateDailyVisitors(DailyVisitorsField dailyVisitorsField) {
+        Date toDay = new Date();
+        dailyVisitors.stream()
+                .filter(dailyVisitor -> DateUtils.isSameDay(dailyVisitor.getDate(), toDay))
+                .findFirst()
+                .map(dailyVisitor -> dailyVisitor.update(dailyVisitorsField))
+                .orElseGet(()->{
+                    DailyVisitor dailyVisitor = new DailyVisitor();
+                    dailyVisitors.add(dailyVisitor);
+                    return dailyVisitor.update(dailyVisitorsField);
+                });
+    }
+
+    @Override
+    public Set<DailyVisitor> getDailyVisitors(String username, Date start, Date end, UUID uuid) {
+        if (isValidUuid(username, uuid) && isAdmin(username)) {
+            return dailyVisitors.stream()
+                    .filter(dailyVisitor -> dailyVisitor.getDate().after(start) && dailyVisitor.getDate().before(end))
+                    .collect(Collectors.toSet());
+        }
+        throw  new NotAdministratorException(username);
     }
 
     private int getNewId(){

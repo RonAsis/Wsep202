@@ -1,0 +1,49 @@
+<div class="row">
+
+  <div>
+    <div class="col-sm-5 from-group">
+      <label for="startTime">Start Time
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="date" [value]="today"
+             id="startTime" class="form-control"
+             #startTime/>
+    </div>
+    <div class="col-sm-5 from-group">
+      <label for="endTime">End Time
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="date" [value]="today"
+             id="endTime" class="form-control"
+             #endTime/>
+    </div>
+  </div>
+
+  <table mdbTable>
+    <thead>
+    <tr>
+      <th *ngFor="let head of headElements" scope="col">{{head}} </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr mdbTableCol *ngFor="let el of dailyVistors">
+      <th scope="row" >{{el.date}}</th>
+      <td>{{el.guests}}</td>
+      <td>{{el.ownerStores}}</td>
+      <td>{{el.managerStores}}</td>
+      <td>{{el.simpleUser}}</td>
+      <td>{{el.admins}}</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <hr/>
+  <div class="col-xs-12">
+    <button class="btn btn-success" type="submit" (click)="onGetVistorDaily()">Get Vistor Daily</button>
+  </div>
+
+  <div class="col-sm-5 from-group" [style.color]="messageColor">
+    <p>{{message}}</p>
+  </div>
+
+</div>

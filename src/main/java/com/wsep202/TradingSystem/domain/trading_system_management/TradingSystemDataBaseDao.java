@@ -1,22 +1,27 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.wsep202.TradingSystem.data_access_layer.DailyVisitorsRepository;
 import com.wsep202.TradingSystem.data_access_layer.StoreRepository;
 import com.wsep202.TradingSystem.data_access_layer.UserRepository;
+import com.wsep202.TradingSystem.domain.exception.NotAdministratorException;
 import com.wsep202.TradingSystem.domain.exception.UserDontExistInTheSystemException;
 import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.cashing.TradingSystemCashing;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
-import com.wsep202.TradingSystem.dto.ManagerDto;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,6 +30,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
 
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
+    private final DailyVisitorsRepository dailyVisitorsRepository;
     private final TradingSystemCashing tradingSystemCashing;
 
     @Override
@@ -278,4 +284,28 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
         }
         return res;
     }
+
+    @Override
+    public void updateDailyVisitors(DailyVisitorsField dailyVisitorsField) {
+        Date toDay = new Date();
+        dailyVisitorsRepository.findById(toDay)
+                .map(dailyVisitor -> {
+                    dailyVisitor.update(dailyVisitorsField);
+                    return dailyVisitorsRepository.save(dailyVisitor);
+                })
+                .orElseGet(()->{
+                    DailyVisitor dailyVisitor = new DailyVisitor();
+                    dailyVisitor.update(dailyVisitorsField);
+                    return dailyVisitorsRepository.save(dailyVisitor);
+                });
+    }
+
+    @Override
+    public Set<DailyVisitor> getDailyVisitors(String username, Date start, Date end, UUID uuid) {
+        if (isValidUuid(username, uuid) && isAdmin(username)) {
+            return dailyVisitorsRepository.findByDateBetween(start, end);
+        }
+        throw  new NotAdministratorException(username);
+    }
+
 }

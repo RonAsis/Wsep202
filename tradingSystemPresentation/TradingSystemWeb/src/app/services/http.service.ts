@@ -12,6 +12,7 @@ import {Manager} from '../shared/manager.model';
 import {ProductShoppingCartDto} from '../shared/productShoppingCartDto.model';
 import {Discount} from '../shared/discount.model';
 import {OwnerToApprove} from '../shared/ownerToApprove.model';
+import {DailyVistorDto} from '../shared/dailyVistor.model';
 
 @Injectable({
   providedIn: 'root'
@@ -242,6 +243,14 @@ export class HttpService {
       `${uuid}`;
     return this.http.get<UserSystem[]>(
       url);
+  }
+
+  getDailyVisitors(administratorUsername: string, startDate: Date, endDate: Date, uuid: string) {
+    const url = `${this.adminUrl}/` + 'get-daily-visitors/' +
+      `${administratorUsername}/` +
+      `${uuid}`;
+    return this.http.post<DailyVistorDto[]>(
+      url, {start: startDate, end: endDate});
   }
   //////////////////////////// SellerManagerController ///////////////////////////
 

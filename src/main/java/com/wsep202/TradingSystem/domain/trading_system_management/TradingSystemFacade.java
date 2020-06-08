@@ -10,6 +10,8 @@ import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.Own
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.ServiceFacade;
 import javafx.util.Pair;
@@ -882,5 +884,18 @@ public class TradingSystemFacade {
         UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
         Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
         return tradingSystemDao.approveOwner(ownedStore, ownerUser, ownerToApprove, status);
+    }
+
+    public List<DailyVisitorDto> getDailyVisitors(String username, Date start, Date end, UUID uuid){
+        return convertSetDailyVisitorsToDailyVisitorsDtoSet(tradingSystemDao.getDailyVisitors(username, start, end, uuid));
+    }
+
+    public void updateDailyVisitor(String dailyVisitorsField){
+        tradingSystemDao.updateDailyVisitors(DailyVisitorsField.getDailyVisitorsField(dailyVisitorsField));
+    }
+    private List<DailyVisitorDto> convertSetDailyVisitorsToDailyVisitorsDtoSet(Set<DailyVisitor> dailyVisitors) {
+        Type listType = new TypeToken<List<DailyVisitorDto>>() {
+        }.getType();
+        return modelMapper.map(dailyVisitors, listType);
     }
 }

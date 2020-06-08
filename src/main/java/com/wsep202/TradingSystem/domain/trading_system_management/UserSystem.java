@@ -5,6 +5,7 @@ import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
@@ -365,6 +366,21 @@ public class UserSystem implements Observer, Serializable {
                 .filter(ownerToApprove -> ownerToApprove.getStoreId() == storeId && ownerToApprove.getUsernameToApprove().equals(userName))
                 .findFirst()
                 .map(ownerToApprove -> ownerToApproves.remove(ownerToApprove));
+    }
+
+    public void updateDaily(TradingSystemDao tradingSystemDao) {
+        if(isAdmin()){ // admin
+            tradingSystemDao.updateDailyVisitors(DailyVisitorsField.ADMIN);
+        }
+        if(ownedStores.isEmpty() && managedStores.isEmpty()){ // not owner not manger
+            tradingSystemDao.updateDailyVisitors(DailyVisitorsField.SIMPLE_USER);
+        }
+        if(!managedStores.isEmpty() && ownedStores.isEmpty()){ // manager and not owner
+            tradingSystemDao.updateDailyVisitors(DailyVisitorsField.MANAGER_STORES);
+        }
+        if(ownedStores.isEmpty()){ // owner
+            tradingSystemDao.updateDailyVisitors(DailyVisitorsField.OWNERS_STORES);
+        }
     }
 }
 

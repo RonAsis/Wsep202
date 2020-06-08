@@ -2,12 +2,15 @@ package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
+import com.wsep202.TradingSystem.dto.DailyVisitorDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
+import com.wsep202.TradingSystem.dto.RequestGetDailyVisitorsDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -39,5 +42,9 @@ public class AdministratorService {
 
     public Set<UserSystemDto> getUsers(String administratorUsername, UUID uuid) {
         return tradingSystemFacade.getUsers(administratorUsername, uuid);
+    }
+
+    public List<DailyVisitorDto> getDailyVisitors(String username, RequestGetDailyVisitorsDto requestGetDailyVisitorsDto, UUID uuid){
+        return tradingSystemFacade.getDailyVisitors(username, requestGetDailyVisitorsDto.getStart(), requestGetDailyVisitorsDto.getEnd(), uuid);
     }
 }
