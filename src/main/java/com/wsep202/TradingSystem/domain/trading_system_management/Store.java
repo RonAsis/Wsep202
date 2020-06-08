@@ -362,14 +362,16 @@ public class Store {
         return response;
     }
 
-    public void approveOwner(UserSystem ownerUser, Store ownedStore, String ownerToApprove, boolean status) {
-        appointingAgreements.stream()
+    public boolean approveOwner(UserSystem ownerUser, String ownerToApprove, boolean status) {
+        return appointingAgreements.stream()
                 .filter(appointingAgreement -> appointingAgreement.getNewOwner().getUserName().equals(ownerToApprove))
                 .findFirst()
                 .map(appointingAgreement -> {
                     appointingAgreement.changeApproval(ownerUser.getUserName(), status ? StatusOwner.APPROVE : StatusOwner.NOT_APPROVE);
-                    return isApproveOwner(appointingAgreement.getNewOwner());
-                });
+                    ownerUser.removeAgreement(storeId, ownerToApprove);
+                    isApproveOwner(appointingAgreement.getNewOwner());
+                    return true;
+                }).orElse(false);
     }
 
     public StatusOwner isApproveOwner(UserSystem userSystemApproveOwner) {

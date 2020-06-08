@@ -25,6 +25,7 @@
     "@ngx-formly/bootstrap": "^5.0.0",
     "@ngx-formly/core": "^5.0.0",
     "@ngx-formly/schematics": "^5.6.1",
+    "angular-bootstrap-md": "^9.3.1",
     "angular-ui-notification": "^0.3.6",
     "angular2-toaster": "^8.0.0",
     "bootstrap": "^3.4.1",

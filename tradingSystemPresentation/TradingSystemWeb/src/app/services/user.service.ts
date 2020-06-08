@@ -161,4 +161,12 @@ export class UserService {
   deleteShoppingCart() {
     this.shoppingCart = new ShoppingCart(new Map<number, ShoppingBag>());
   }
+
+  public getMyOwnerToApprove(){
+    return this.httpService.getMyOwnerToApprove(this.username, this.uuid);
+  }
+
+  public approveOwner(storeId: number, ownerToApprove: string, status: boolean) {
+    return this.httpService.approveOwner(this.username, storeId, ownerToApprove, status, this.uuid);
+  }
 }

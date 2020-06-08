@@ -11,6 +11,7 @@ import {UserSystem} from '../shared/userSystem.model';
 import {Manager} from '../shared/manager.model';
 import {ProductShoppingCartDto} from '../shared/productShoppingCartDto.model';
 import {Discount} from '../shared/discount.model';
+import {OwnerToApprove} from '../shared/ownerToApprove.model';
 
 @Injectable({
   providedIn: 'root'
@@ -500,7 +501,24 @@ export class HttpService {
       url, null);
   }
 
+  public approveOwner(ownerUsername: string, storeId: number, ownerToApprove: string, status: boolean, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'approve-owner/' +
+      `${ownerUsername}/` +
+      `${storeId}/` +
+      `${ownerToApprove}/` +
+      `${status}/` +
+      `${uuid}`;
+    return this.http.post<boolean>(
+      url, null);
+  }
 
+  public getMyOwnerToApprove(ownerUsername: string, uuid: string) {
+    const url = `${this.sellerOwnerUrl}/` + 'get-my-owner-to-approve/' +
+      `${ownerUsername}/` +
+      `${uuid}`;
+    return this.http.get<OwnerToApprove[]>(
+      url);
+  }
   //////////////////////////////////////// general /////////////////////////////
 
   private getImageHttpFormat(image: File){

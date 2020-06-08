@@ -38,7 +38,7 @@ export class AddOwnerComponent implements OnInit {
       this.storeService.addOwner(this.store.storeId, this.selectedNewOwner)
         .subscribe(response => {
           if (response) {
-            this.ownerItemAdded.emit(this.selectedNewOwner);
+            // this.ownerItemAdded.emit(this.selectedNewOwner);
             this.init();
             this.sucMessage();
           } else {
@@ -55,7 +55,7 @@ export class AddOwnerComponent implements OnInit {
   }
 
   sucMessage(){
-    this.message = 'the owner is added';
+    this.message = 'the owner is added and waiting for approve';
     this.messageColor = 'blue';
   }
 }

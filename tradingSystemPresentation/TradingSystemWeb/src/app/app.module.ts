@@ -75,7 +75,10 @@ import { DiscontEditComponent } from './logged-in-user/owned-stores/owned-store-
 import {DiscountItemComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/discounts/product-discount-item/discount-item.component';
 import { AddEditPolicyComponent } from './logged-in-user/owned-stores/owned-store-edit/policy/add-edit-policy/add-edit-policy.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { ApproveOwnerComponent } from './logged-in-user/approve-owner/approve-owner.component';
 
+// MDB Angular Free
+import {WavesModule, TableModule, MDBBootstrapModule} from 'angular-bootstrap-md';
 @NgModule({
   declarations: [
     AppComponent,
@@ -135,7 +138,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     AmountProductsComponent,
     DiscountsComponent,
     DiscontEditComponent,
-    AddEditPolicyComponent
+    AddEditPolicyComponent,
+    ApproveOwnerComponent
   ],
   imports: [
     Ng2SearchPipeModule,
@@ -160,7 +164,10 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     FormlyBootstrapModule,
     MatDialogModule,
     MatRadioModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MDBBootstrapModule.forRoot(),
+    WavesModule,
+    TableModule
   ],
   exports: [RouterModule],
   providers: [],

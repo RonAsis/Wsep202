@@ -208,6 +208,11 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
         return new HashSet<>();
     }
 
+    @Override
+    public boolean approveOwner(Store ownedStore, UserSystem ownerUser, String ownerToApprove, boolean status) {
+        return ownedStore.approveOwner(ownerUser, ownerToApprove, status);
+    }
+
     private int getNewId(){
         return idAcc++;
     }

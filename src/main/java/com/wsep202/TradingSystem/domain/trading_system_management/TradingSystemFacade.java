@@ -881,7 +881,6 @@ public class TradingSystemFacade {
     public boolean approveOwner(String ownerUsername, int storeId, String ownerToApprove, boolean status, UUID uuid) {
         UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
         Store ownedStore = ownerUser.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_Managers);
-        ownedStore.approveOwner(ownerUser, ownedStore, ownerToApprove, status);
-        return true;
+        return tradingSystemDao.approveOwner(ownedStore, ownerUser, ownerToApprove, status);
     }
 }

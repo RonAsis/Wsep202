@@ -2,7 +2,6 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
-import com.wsep202.TradingSystem.dto.ManagerDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -99,4 +98,6 @@ public abstract class TradingSystemDao {
     }
 
     public abstract Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid);
+
+    public abstract boolean approveOwner(Store ownedStore, UserSystem ownedStore1, String ownerToApprove, boolean status);
 }

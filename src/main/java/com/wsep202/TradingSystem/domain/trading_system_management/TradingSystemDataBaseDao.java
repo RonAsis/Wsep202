@@ -269,4 +269,13 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
         }
         return new HashSet<>();
     }
+
+    @Override
+    public boolean approveOwner(Store ownedStore, UserSystem ownerUser, String ownerToApprove, boolean status) {
+        boolean res = ownedStore.approveOwner(ownerUser, ownerToApprove, status);
+        if(res){
+            updateStoreAndUserSystem(ownedStore, ownerUser);
+        }
+        return res;
+    }
 }
