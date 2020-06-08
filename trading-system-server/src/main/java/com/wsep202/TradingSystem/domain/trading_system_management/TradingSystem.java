@@ -13,6 +13,7 @@ import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
@@ -30,18 +31,24 @@ public class TradingSystem {
 
     private static Subject subject;
 
+    private PasswordEncoder passwordEncoder;
+
     public TradingSystem(@NotNull ExternalServiceManagement externalServiceManagement,
                          @NotNull UserSystem admin,
-                         @NotNull TradingSystemDao tradingSystemDao) {
+                         @NotNull TradingSystemDao tradingSystemDao,
+                         PasswordEncoder passwordEncoder) {
         this.externalServiceManagement = externalServiceManagement;// must be first
         this.externalServiceManagement.connect();    //connect to the externals
         this.tradingSystemDao = tradingSystemDao;
+        this.passwordEncoder = passwordEncoder;
         initAdmin(admin);
         externalServiceManagement.connect();
     }
 
     private void initAdmin(UserSystem admin) {
         admin.setAdmin(true);
+        admin.getGrantedAuthorities().add(GrantedAuthorityImpl.USER);
+        admin.getGrantedAuthorities().add(GrantedAuthorityImpl.ADMIN);
         encryptPassword(admin);
         tradingSystemDao.registerAdmin(admin);
     }
@@ -62,11 +69,8 @@ public class TradingSystem {
      * @param userToRegister - the user we want to encrypt his password
      */
     private void encryptPassword(UserSystem userToRegister) {
-        PasswordSaltPair passwordSaltPair = externalServiceManagement
-                .getEncryptedPasswordAndSalt(userToRegister.getPassword());
-        //set the user password and its salt
-        userToRegister.setPassword(passwordSaltPair.getHashedPassword());
-        userToRegister.setSalt(passwordSaltPair.getSalt());
+        String encode = passwordEncoder.encode(userToRegister.getPassword());
+        userToRegister.setPassword(encode);
         log.info("The user " + userToRegister.getUserName() + " got encrypted password and salt");
     }
 
@@ -85,6 +89,7 @@ public class TradingSystem {
                 && !tradingSystemDao.isRegistered(userToRegister)
                 && userToRegister.isValidUser()) {
             encryptPassword(userToRegister); //encrypt user password to store it and its salt in the system
+            userToRegister.getGrantedAuthorities().add(GrantedAuthorityImpl.USER);
             log.info(String.format("The user %s registering", userToRegister.getUserName()));
             tradingSystemDao.addUserSystem(userToRegister, image);
             return true;
@@ -103,7 +108,7 @@ public class TradingSystem {
         Optional<UserSystem> userSystem = tradingSystemDao.getUserSystem(userName);
         if (userSystem.isPresent() &&
                 tradingSystemDao.isRegistered(userSystem.get()) &&
-                externalServiceManagement.isAuthenticatedUserPassword(password, userSystem.get()) &&
+                passwordEncoder.matches(password, userSystem.get().getPassword()) &&
                 !tradingSystemDao.isLogin(userName)) {
             userSystem.get().login();
             UUID uuid = UUID.randomUUID();

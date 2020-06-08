@@ -13,6 +13,7 @@ import {ProductShoppingCartDto} from '../shared/productShoppingCartDto.model';
 import {Discount} from '../shared/discount.model';
 import {OwnerToApprove} from '../shared/ownerToApprove.model';
 import {DailyVistorDto} from '../shared/dailyVistor.model';
+import {UserService} from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,15 @@ export class HttpService {
     this.adminUrl = this.serverUrl + '/admin';
     this.sellerManagerUrl = this.serverUrl + '/seller-manager';
     this.sellerOwnerUrl = this.serverUrl + '/seller-owner';
+  }
+
+  createBasicAuthenticationHttpHeader(username: string, password: string){
+    return 'Basic' + window.btoa(username + ':' + password);
+  }
+  createHeader(username: string, password: string){
+    return new HttpHeaders({
+      Authorization: this.createBasicAuthenticationHttpHeader(username, password)
+    });
   }
 
   //////////////////////////// GuestController ///////////////////////////

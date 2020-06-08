@@ -50,12 +50,15 @@ export class UserService {
   }
 
   login(username: string, password: string) {
+    const basicAuthenticationHttpHeader = this.createBasicAuthenticationHttpHeader(username, password);
     this.httpService.login(username, password).subscribe(
       response => {
         if (response !== null && response.key !== null) {
           this.uuid = response.key;
           this.isAdmin = response.value;
           this.username = username;
+          this.shareService.username = username;
+          this.shareService.basicAuthenticationHttpHeader = basicAuthenticationHttpHeader;
           this.userLoggingEvent.emit(true);
         } else {
           this.userLoggingEvent.emit(false);
@@ -69,6 +72,8 @@ export class UserService {
         if (response) {
           this.uuid = null;
           this.isAdmin = false;
+          this.shareService.username = undefined;
+          this.shareService.basicAuthenticationHttpHeader = undefined;
           this.userLogoutEvent.emit(true);
         } else {
           this.userLogoutEvent.emit(false);
@@ -171,6 +176,10 @@ export class UserService {
   }
 
   public getDailyVisitors(startDate: Date, endDate: Date){
-    return this.httpService.getDailyVisitors(this.username, startDate, endDate, this.uuid)
+    return this.httpService.getDailyVisitors(this.username, startDate, endDate, this.uuid);
+  }
+
+  private createBasicAuthenticationHttpHeader(username: string, password: string){
+    return 'Basic' + window.btoa(username + ':' + password);
   }
 }

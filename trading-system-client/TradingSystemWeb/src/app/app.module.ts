@@ -9,7 +9,7 @@ import {BuyerComponent} from './logged-in-user/buyer/buyer.component';
 import {SellerComponent} from './logged-in-user/seller/seller.component';
 import {RegisterComponent} from './guest/register/register.component';
 import {LoginComponent} from './guest/login/login.component';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {HeaderGuestComponent} from './guest/header-guest/header-guest.component';
 import {StoresComponent} from './guest/stores/stores.component';
 import {ProductsComponent} from './guest/products/products.component';
@@ -80,6 +80,8 @@ import { ApproveOwnerComponent } from './logged-in-user/approve-owner/approve-ow
 // MDB Angular Free
 import {WavesModule, TableModule, MDBBootstrapModule} from 'angular-bootstrap-md';
 import { VisitorDailyComponent } from './logged-in-user/admin/visitor-daily/visitor-daily.component';
+import {HttpIntercepterBasicAuthService} from "./services/http-intercepter-basic-auth.service";
+import {ShareService} from "./services/share.service";
 @NgModule({
   declarations: [
     AppComponent,
@@ -172,7 +174,9 @@ import { VisitorDailyComponent } from './logged-in-user/admin/visitor-daily/visi
     TableModule
   ],
   exports: [RouterModule],
-  providers: [],
+  providers: [
+    {provide: HTTP_INTERCEPTORS, useClass: HttpIntercepterBasicAuthService, multi: true}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
