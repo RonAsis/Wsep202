@@ -22,45 +22,45 @@ public abstract class TradingSystemDao {
 
     abstract void addUserSystem(UserSystem userToRegister, MultipartFile image);
 
-    abstract Optional<UserSystem> getUserSystem(String username);
+    public abstract Optional<UserSystem> getUserSystem(String username);
 
-    abstract boolean isAdmin(String username);
+    public abstract boolean isAdmin(String username);
 
-    abstract Optional<UserSystem> getAdministratorUser(String username);
+    public abstract Optional<UserSystem> getAdministratorUser(String username);
 
-    abstract Optional<Store> getStore(int storeId);
+    public abstract Optional<Store> getStore(int storeId);
 
-    abstract void addStore(Store newStore);
+    public abstract void addStore(Store newStore);
 
-    abstract Set<Store> getStores();
+    public abstract Set<Store> getStores();
 
-    abstract Set<Product> getProducts();
+    public abstract Set<Product> getProducts();
 
-    abstract Set<UserSystem> getUsers();
+    public abstract Set<UserSystem> getUsers();
 
-    abstract Product addProductToStore(Store store, UserSystem owner, Product product);
+    public abstract Product addProductToStore(Store store, UserSystem owner, Product product);
 
-    abstract boolean removeDiscount(Store store, UserSystem user, int discountId);
+    public abstract boolean removeDiscount(Store store, UserSystem user, int discountId);
 
-    abstract Discount addEditDiscount(Store store, UserSystem user, Discount discount);
+    public abstract Discount addEditDiscount(Store store, UserSystem user, Discount discount);
 
-    abstract boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn);
+    public abstract boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn);
 
-    abstract boolean editProduct(Store ownerStore, UserSystem user, int productSn, String productName, String category, int amount, double cost);
+    public abstract boolean editProduct(Store ownerStore, UserSystem user, int productSn, String productName, String category, int amount, double cost);
 
     public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem){}
 
-    abstract boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
+    public abstract boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
 
-    abstract boolean removePermission(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
+    public abstract boolean removePermission(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
 
-    abstract boolean saveProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product, int amount);
+    public abstract boolean saveProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product, int amount);
 
-    abstract boolean removeProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product);
+    public abstract boolean removeProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product);
 
     protected void updateUser(UserSystem user){}
 
-    abstract boolean changeProductAmountInShoppingBag(String username, ShoppingCart shoppingCart, int storeId, int amount, int productSn);
+    public abstract boolean changeProductAmountInShoppingBag(String username, ShoppingCart shoppingCart, int storeId, int amount, int productSn);
 
     protected void updateStore(Store ownedStore){}
 

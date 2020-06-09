@@ -10,6 +10,8 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 import org.hibernate.annotations.Type;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -99,6 +101,13 @@ public class UserSystem implements Observer, Serializable {
     private String imageUrl;
 
     /**
+     * for https
+     */
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = GrantedAuthorityImpl.class, fetch = FetchType.EAGER)
+    private Set<GrantedAuthority> grantedAuthorities;
+
+    /**
      * use for DB
      */
     public UserSystem(String userName, String firstName, String lastName, String password, boolean isAdmin) {
@@ -110,6 +119,7 @@ public class UserSystem implements Observer, Serializable {
         this.notifications = new HashSet<>();
         this.shoppingCart = new ShoppingCart();
         this.ownedStores = new HashSet<>();
+        this.grantedAuthorities = new HashSet<>();
         managedStores = new HashSet<>();
     }
 
@@ -125,6 +135,7 @@ public class UserSystem implements Observer, Serializable {
         this.notifications = new HashSet<>();
         this.shoppingCart = new ShoppingCart();
         this.ownedStores = new HashSet<>();
+        this.grantedAuthorities = new HashSet<>();
         managedStores = new HashSet<>();
     }
 

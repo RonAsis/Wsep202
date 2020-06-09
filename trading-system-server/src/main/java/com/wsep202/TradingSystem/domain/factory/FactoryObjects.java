@@ -12,11 +12,7 @@ public class FactoryObjects {
     create user in the system
      */
     public UserSystem createSystemUser(String userName, String firstName, String lastName, String password){
-        return UserSystem.builder()
-                .userName(userName)
-                .password(password)
-                .firstName(firstName)
-                .lastName(lastName).build();
+        return new UserSystem(userName, password, firstName, lastName, false);
     }
 
     public Product createProduct(String productName, ProductCategory productCategory, int amount, double cost, int storeId) {

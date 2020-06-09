@@ -10,6 +10,8 @@ import {Product} from '../shared/product.model';
   providedIn: 'root'
 })
 export class ShareService {
+  username: string;
+  basicAuthenticationHttpHeader: string;
   featureSelected = new EventEmitter<string>();
   receipts: Receipt[];
   storeSelected: Store;

@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class TradingSystemConfiguration {
@@ -34,11 +35,12 @@ public class TradingSystemConfiguration {
     public TradingSystem tradingSystem(FactoryObjects factoryObjects,
                                        ApplicationArguments applicationArguments,
                                        ExternalServiceManagement externalServiceManagement,
-                                       TradingSystemDao tradingSystemDao) {
+                                       TradingSystemDao tradingSystemDao,
+                                       PasswordEncoder passwordEncoder) {
         String usernameAdmin = applicationArguments.getSourceArgs()[0];
         String password = applicationArguments.getSourceArgs()[1];
         UserSystem admin = factoryObjects.createSystemUser(usernameAdmin, password, "admin", "admin");
-        return new TradingSystem(externalServiceManagement,admin, tradingSystemDao);
+        return new TradingSystem(externalServiceManagement,admin, tradingSystemDao, passwordEncoder);
     }
 
     @Bean
