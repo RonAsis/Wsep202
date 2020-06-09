@@ -11,7 +11,8 @@ export class HttpIntercepterBasicAuthService implements HttpInterceptor{
   intercept(req: HttpRequest<any>, next: HttpHandler){
     const username = this.shareService.username;
     const basicAuthenticationHttpHeader = this.shareService.basicAuthenticationHttpHeader;
-    if (username && basicAuthenticationHttpHeader){
+    console.log(basicAuthenticationHttpHeader);
+    if (username && basicAuthenticationHttpHeader && !req.url.includes('guest')){
       req = req.clone({
         setHeaders : {
           Authorization: basicAuthenticationHttpHeader

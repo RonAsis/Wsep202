@@ -180,6 +180,6 @@ export class UserService {
   }
 
   private createBasicAuthenticationHttpHeader(username: string, password: string){
-    return 'Basic' + window.btoa(username + ':' + password);
+    return 'Basic ' + window.btoa(username + ':' + password);
   }
 }
