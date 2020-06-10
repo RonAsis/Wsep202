@@ -307,59 +307,10 @@ public class Store {
 
     /////////////////////////////////////////////////owner /////////////////////////////////////////////
 
-    /**
-     * This method is used to check if owner2 was appointed by owner1
-     *
-     * @return true if owner2 was appointed by owner1, else false
-     */
-    private boolean isAppointedBy(UserSystem owner1, UserSystem owner2) {
-        int owner1Index = getAppointeeOwnersIndex(owner1.getUserName());
-        if (owner1Index != -1)
-            if (new LinkedList<>(appointedOwners).get(owner1Index).getAppointedUsers().size() > 0 && new LinkedList<>(appointedOwners).get(owner1Index).getAppointedUsers().contains(owner2))
-                return true;
-        return false;
-    }
-
-    /**
-     * This method is used to remove an owner from the store
-     *
-     * @param owner         - the appointing owner
-     * @param ownerToRemove - the appointed owner that needs to be removed
-     * @return true if succeeded, else false
-     */
-    public boolean removeOwner(UserSystem owner, UserSystem ownerToRemove) {
-        if (isOwner(owner) && isOwner(ownerToRemove)
-                && !owner.equals(ownerToRemove) && isAppointedBy(owner, ownerToRemove)) {
-            return removeAppointedOwners(ownerToRemove);
-        }
-        return false;
-    }
-
     public Set<String> getOwnersUsername() {
         return this.appointedOwners.stream()
                 .map(ownersAppointee -> ownersAppointee.getAppointeeUser().getUserName())
                 .collect(Collectors.toSet());
-    }
-
-    /**
-     * creating a new appointing agreement for the given new owner
-     *
-     * @param owner    - the user that wants to appoint new owner as an owner
-     * @param newOwner - the user that owner wants to appoint as an owner
-     * @return true if an appointing agreement was created successfully
-     */
-    public boolean createNewAppointingAgreement(UserSystem owner, UserSystem newOwner) {
-        boolean response = false;
-        if (isOwner(owner) && !isOwner(newOwner) && !checkIfNewOwnerHasAppointingAgreement(newOwner.getUserName())) {
-            appointingAgreements.add(new AppointingAgreement(newOwner,
-                    owner.getUserName(), getOwnersUsername()));
-            log.info(String.format("A new appointing agreement was created for the user: %s by the owner: %s for the store: %s",
-                    newOwner.getUserName(), owner.getUserName(), storeName));
-            response = true;
-        }
-        log.info(String.format("Can't create a new appointing agreement for the user: %s  by the owner: %s  for the store: %s",
-                newOwner.getUserName(), owner.getUserName(), storeName));
-        return response;
     }
 
     public boolean approveOwner(UserSystem ownerUser, String ownerToApprove, boolean status) {
@@ -401,30 +352,42 @@ public class Store {
     }
 
     /**
-     * This method is used to remove all the owners and managers that was
-     * appointed by ownerToRemove.
+     * remove ownerToRemove from the store's managers
      *
-     * @param ownerToRemove
+     * @param ownerStore the removing owner
+     * @param ownerToRemove       the removed manager
+     * @return true for successful operation
      */
-    private boolean removeAppointedOwners(UserSystem ownerToRemove) {
-        Set<UserSystem> ownersToRemove = new HashSet<>();
-        Set<MangerStore> managerToRemove = new HashSet<>();
-        ownersToRemove.addAll(findOwnersToRemove(ownerToRemove, ownersToRemove));
-        ownersToRemove.add(ownerToRemove);
-        managerToRemove.addAll(findManagersToRemove(ownersToRemove, managerToRemove));
-        for (UserSystem ownerToDelete : ownersToRemove) {
-            appointedOwners.removeIf(appointedOwners -> appointedOwners.getAppointeeUser().equals(ownerToDelete.getUserName()));
-            ownerToDelete.removeOwnedStore(this);
-            ownerToDelete.newNotification(Notification.builder().content("you are fired").build());
+    public boolean removeOwner(UserSystem ownerStore, UserSystem ownerToRemove) {
+        boolean response = false;
+        getMySubMangers(ownerToRemove.getUserName()).forEach(subManager -> {
+            removeManager(ownerToRemove, subManager.getAppointedManager());
+        });
+        if (isOwner(ownerStore) && removeOwnerRecursive(ownerStore, ownerToRemove)) {  //the ownerToRemove is able to remove his appointments
+            response = appointedOwners.stream()
+                    .filter(appointedOwner -> appointedOwner.getAppointeeUser().getUserName().equals(ownerStore.getUserName()))
+                    .findFirst()
+                    .map(appointedOwner -> appointedOwner.removeSubOwner(ownerToRemove.getUserName(), this))
+                    .orElse(false);
+        }
+        return response;
+    }
 
+    public boolean removeOwnerRecursive(UserSystem ownerStore, UserSystem user) {
+        boolean response = false;
+        if (isOwner(ownerStore)) {  //the user is able to remove his appointments
+            response = appointedOwners.stream()
+                    .filter(appointedOwner -> appointedOwner.getAppointeeUser().getUserName().equals(user.getUserName()))
+                    .findFirst()
+                    .map(appointedOwner -> {
+                        appointedOwner.getAppointedUsers()
+                                .forEach(subOwner -> removeOwnerRecursive(user, subOwner));
+                        user.removeOwnedStore(this);
+                        return appointedOwners.remove(appointedOwner);
+                    })
+                    .orElseGet(() -> user.removeManagedStore(this));
         }
-        for (MangerStore manager : managerToRemove) {
-            appointedManagers.removeIf(appointedManager -> appointedManager.getAppointeeUser().equals(manager.getAppointedManager().getUserName()));
-            manager.removeManagedStore(this);
-            manager.getAppointedManager()
-                    .newNotification(Notification.builder().content("you are fired").build());
-        }
-        return true;
+        return response;
     }
 
     /**
@@ -460,24 +423,19 @@ public class Store {
     }
 
     /**
-     * get the actual user of the manager appointed by the ownerUser with managerUserName
-     *
-     * @param ownerUser     - the appointing owner
-     * @param ownerUserName - the appointed manager
+     * get the actual user of the manager appointed by the ownerToRemove with managerUserName
+     * @param ownerToRemove     - the appointing owner
      * @return the user belongs to the manager username
      * or exception if not appointed by the owner
      * or null if the owner didn't appointed anyone
      */
-    public UserSystem getAppointedOwner(UserSystem ownerUser, String ownerUserName) {
-        int ownerUserIndex = getAppointeeOwnersIndex(ownerUser.getUserName());
-        if (ownerUserIndex != -1)
-            if (isOwner(ownerUser) && !new LinkedList<>(appointedOwners).get(ownerUserIndex).getAppointedUsers().isEmpty()) {
-                for (UserSystem user : new LinkedList<>(appointedOwners).get(ownerUserIndex).getAppointedUsers()) {
-                    if (user.getUserName().equals(ownerUserName))
-                        return user;
-                }
-            }
-        throw new NoOwnerInStoreException(ownerUserName, storeId);
+    public UserSystem getOwnerToRemove(UserSystem owner, String ownerToRemove) {
+        return appointedOwners.stream()
+                .filter(appointedOwner -> appointedOwner.getAppointeeUser().getUserName().equals(owner.getUserName()))
+                .map(appointedOwner -> appointedOwner.getAppointedUsers().stream()
+                                        .filter(subOwner -> subOwner.getUserName().equals(ownerToRemove))
+                                        .findFirst().orElseThrow(()-> new NoOwnerInStoreException(ownerToRemove, storeId)))
+                .findFirst().orElseThrow(()-> new NoOwnerInStoreException(owner.getUserName(), storeId));
     }
 
     public List<String> getMySubOwners(String ownerUsername) {
