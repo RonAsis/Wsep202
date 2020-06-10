@@ -448,7 +448,7 @@ public class TradingSystemFacade {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid); //get registered user
             Store ownedStore = ownerUser.getOwnerStore(storeId);    //verify the remover is owner
-            UserSystem removeOwner = ownedStore.getAppointedOwner(ownerUser, ownerToRemove);
+            UserSystem removeOwner = ownedStore.getOwnerToRemove(ownerUser, ownerToRemove);
             return tradingSystem.removeOwner(ownedStore, ownerUser, removeOwner);
         } catch (TradingSystemException e) {
             log.error("remove owner failed", e);
