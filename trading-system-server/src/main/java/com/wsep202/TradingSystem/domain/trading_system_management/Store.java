@@ -472,15 +472,23 @@ public class Store {
      * @param willBeOwner
      * @return true if owner added successfully
      */
-    public boolean addOwner(UserSystem owner, UserSystem willBeOwner) {
+    public Set<UserSystem> addOwner(UserSystem owner, UserSystem willBeOwner) {
         if (isOwner(owner) && !isOwner(willBeOwner) && !checkIfExistsAgreement(owner.getUserName())) {
             appointingAgreements.add(new AppointingAgreement( willBeOwner, owner.getUserName(), getOwnersUsername()));
             appointedOwners.stream()
                     .filter(appointedOwner -> !appointedOwner.getAppointeeUser().getUserName().equals(owner.getUserName()))
                     .forEach(appointedOwner -> appointedOwner.getAppointeeUser().addOwnerToApprove(storeId, storeName, willBeOwner.getUserName()));
-            return true;
+            return getAllOwnersNeedApprove(owner);
         }
-        return false;
+        return null;
+    }
+
+    private Set<UserSystem> getAllOwnersNeedApprove(UserSystem owner){
+        return  appointedOwners.stream()
+                .filter(appointedOwner -> !appointedOwner.getAppointeeUser().getUserName().equals(owner.getUserName()))
+                .map(OwnersAppointee::getAppointeeUser)
+                .collect(Collectors.toSet());
+
     }
 
     /////////////////////////////////////// manager //////////////////////////////////////////////////

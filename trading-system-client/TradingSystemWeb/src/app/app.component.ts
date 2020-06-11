@@ -62,9 +62,8 @@ export class AppComponent implements OnInit{
     }else{
       this.messages.push(message);
     }
-    console.log(message.style);
     const toast: Toast = {
-      type: message.style,
+       type: message.style,
       title: message.title,
       body: message.content,
       showCloseButton: true

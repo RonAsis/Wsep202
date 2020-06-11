@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.notification.Notification;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
@@ -212,102 +213,6 @@ public class TradingSystem {
     }
 
     /**
-     * UC 2.5
-     * searches all the products that there name is productName in all stores.
-     *
-     * @param productName - the name of product we want to search.
-     * @return - a list that contains all suitable products.
-     */
-    public List<Product> searchProductByName(String productName) {
-        //return tradingSystemDao.searchProductByName(productName);
-            return null;
-    }
-
-    /**
-     * UC 2.5
-     * searches all the products that there category is productCategory in all stores.
-     *
-     * @param productCategory - the category of product we want to search.
-     * @return - a list that contains all suitable products.
-     */
-    public List<Product> searchProductByCategory(ProductCategory productCategory) {
-//        return tradingSystemDao.searchProductByCategory(productCategory);
-        return null;
-    }
-
-    /**
-     * UC 2.5
-     * searches all the products that there name contains keyWords in all stores.
-     *
-     * @param keyWords - the key words that contained in product name.
-     * @return - a list that contains all suitable products.
-     */
-    public List<Product> searchProductByKeyWords(List<String> keyWords) {
-      //  return tradingSystemDao.searchProductByKeyWords(keyWords);
-        return null;
-    }
-
-    /**
-     * UC 2.5
-     * filter products by range price
-     *
-     * @param products - the list of products
-     * @param min      - min price
-     * @param max      - max price
-     * @return - products filtered by range price
-     */
-    public List<Product> filterByRangePrice(@NotNull List<@NonNull Product> products, double min, double max) {
-        return products.stream()
-                .filter(product -> min <= product.getCost() && product.getCost() <= max)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * UC 2.5
-     * filter products by product rank
-     *
-     * @param products - the list of products
-     * @param rank     - the minimum rank that want for product
-     * @return - list of products filtered product rank
-     */
-    public List<Product> filterByProductRank(@NotNull List<@NonNull Product> products, int rank) {
-        return products.stream()
-                .filter(product -> rank <= product.getRank())
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * UC 2.5
-     * filter products by store rank
-     *
-     * @param products - the list of products
-     * @param rank     - the store rank
-     * @return list of products filtered by store rank
-     */
-    public List<Product> filterByStoreRank(@NotNull List<@NonNull Product> products, int rank) {
-        return products.stream()
-                .filter(product -> {
-                    Store store = getStore(product.getStoreId());
-                    return rank <= store.getRank();
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * UC 2.5
-     * filter products by category
-     *
-     * @param products - the list of products
-     * @param category - the category that want get the products for
-     * @return list of products filtered by category
-     */
-    public List<Product> filterByStoreCategory(@NotNull List<@NonNull Product> products, @NotNull ProductCategory category) {
-        return products.stream()
-                .filter(product -> category == product.getCategory())
-                .collect(Collectors.toList());
-    }
-
-    /**
      * UC 2.8
      * This method is used to purchase all the products that the unregistered user added to his cart.
      * @param shoppingCart   - the users personal shopping cart
@@ -423,13 +328,16 @@ public class TradingSystem {
             if(Objects.nonNull(mangerStore)) {
                 log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.get().getUserName(), ownedStore.getStoreId()));
                 if(newManagerUser.get().addNewManageStore(ownedStore)){
+                    newManagerUser.get().newNotification(Notification.builder()
+                            .content(String.format("You are manger of store id %s", ownedStore.getStoreId()))
+                            .build());
                     tradingSystemDao.updateStore(ownedStore);
                     log.info(String.format("user %s was saved as manager in store '%d'", newManagerUser.get().getUserName(), ownedStore.getStoreId()));
                     return mangerStore;
                 }
             }
         }
-        log.info(String.format("failed add user as manager in store"));
+        log.info(String.format("failed add user as manager in store id %s", ownedStore.getStoreId()));
         return null;
     }
 
@@ -443,12 +351,16 @@ public class TradingSystem {
      */
     public boolean addOwnerToStore(Store ownedStore, UserSystem ownerUser, String newOwnerUser) {
         UserSystem userSystem = tradingSystemDao.getUserSystem(newOwnerUser).orElse(null);
-        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(userSystem)
-                && ownedStore.addOwner(ownerUser, userSystem)) {
-            log.info(String.format("user %s waiting for be approve in store '%d'", newOwnerUser, ownedStore.getStoreId()));
-            approveOwner(ownerUser, userSystem, ownedStore);
-            tradingSystemDao.updateStoreAndUserSystem(ownedStore, userSystem);
-            return true;
+        if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(userSystem)) {
+            Set<UserSystem> ownerNeedApprove = ownedStore.addOwner(ownerUser, userSystem);
+            if (Objects.nonNull(ownerNeedApprove)) {
+                log.info(String.format("user %s waiting for be approve in store '%d'", newOwnerUser, ownedStore.getStoreId()));
+                approveOwner(ownerUser, userSystem, ownedStore);
+                tradingSystemDao.updateUser(userSystem);
+                ownerNeedApprove.forEach(userSystemNeedApprove -> tradingSystemDao.updateUser(userSystemNeedApprove));
+                tradingSystemDao.updateStoreAndUserSystem(ownedStore, userSystem);
+                return true;
+            }
         }
         log.info(String.format("user %s failed for add agreement owner in store '%d'", newOwnerUser, ownedStore.getStoreId()));
         return false;
@@ -457,9 +369,11 @@ public class TradingSystem {
     private void approveOwner(UserSystem ownerUser, UserSystem newOwnerUser, Store store){
         if(store.isApproveOwner(newOwnerUser) == StatusOwner.APPROVE){
             newOwnerUser.addNewOwnedStore(store);
+            newOwnerUser.newNotification(Notification.builder()
+            .content(String.format("You are now owner of store %s on name %s", store.getStoreId(), store.getStoreName()))
+                    .build());
         }
     }
-
 
     /**
      * UC 4.7
@@ -472,6 +386,9 @@ public class TradingSystem {
     public boolean removeManager(Store ownedStSore, UserSystem ownerUser, UserSystem managerStore) {
         if (Objects.nonNull(ownedStSore) && Objects.nonNull(ownerUser) && Objects.nonNull(managerStore)
                 && ownedStSore.removeManager(ownerUser, managerStore)) {
+            managerStore.newNotification(Notification.builder()
+            .content(String.format("You are Not more manger of store id %s", ownedStSore.getStoreId()))
+            .build());
             tradingSystemDao.updateStoreAndUserSystem(ownedStSore, ownerUser);
             log.info(String.format("user %s was removed as manager from store '%d'", managerStore.getUserName(), ownedStSore.getStoreId()));
             return true;
@@ -491,11 +408,14 @@ public class TradingSystem {
     public boolean removeOwner(Store store, UserSystem ownerUser, UserSystem removeOwner) {
         if (Objects.nonNull(store) && Objects.nonNull(ownerUser) && Objects.nonNull(removeOwner)
                 && store.removeOwner(ownerUser, removeOwner)) {
+            removeOwner.newNotification(Notification.builder()
+                    .content(String.format("You are Not more owner of store id %s", store.getStoreId()))
+                    .build());
             tradingSystemDao.updateStoreAndUserSystem(store, ownerUser);
             log.info(String.format("user %s was removed as owner from store '%d'", removeOwner.getUserName(), store.getStoreId()));
             return true;
         }
-        log.info(String.format("failed remove user as owner from store"));
+        log.info(String.format("failed remove user as owner from store %s", store.getStoreId()));
         return false;
     }
 
@@ -550,7 +470,6 @@ public class TradingSystem {
 
     /**
      * get the shopping bag cost with original products prices
-     *
      * @param bagsToCalculate
      * @return
      */

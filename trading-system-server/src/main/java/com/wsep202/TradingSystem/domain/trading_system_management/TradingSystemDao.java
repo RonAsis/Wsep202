@@ -58,7 +58,7 @@ public abstract class TradingSystemDao {
 
     public abstract boolean removeProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product);
 
-    protected void updateUser(UserSystem user){}
+    public void updateUser(UserSystem user){}
 
     public abstract boolean changeProductAmountInShoppingBag(String username, ShoppingCart shoppingCart, int storeId, int amount, int productSn);
 
@@ -81,10 +81,14 @@ public abstract class TradingSystemDao {
 
     public void logout(String userName){
         usersLogin.remove(userName);
-        saveShoppingCart(userName);
+        Optional<UserSystem> userSystemOptional = getUserSystem(userName);
+        userSystemOptional.ifPresent(userSystem -> {
+            userSystem.setPrincipal(null);
+            saveShoppingCart(userSystem);
+        });
     }
 
-    public abstract void saveShoppingCart(String username);
+    public abstract void saveShoppingCart(UserSystem userSystem);
 
     public boolean isValidUuid(String username, UUID uuid){
         return usersLogin.get(username).equals(uuid);

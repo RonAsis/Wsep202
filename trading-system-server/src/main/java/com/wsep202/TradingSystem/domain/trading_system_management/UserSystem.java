@@ -317,11 +317,13 @@ public class UserSystem implements Observer, Serializable {
     public void newNotification(Notification notification) {
         notification.setPrincipal(principal);
         this.notifications.add(notification);
-        TradingSystem.getSubject().update(this);
+        if (Objects.nonNull(principal)) {
+            TradingSystem.getSubject().update(this);
+        }
     }
 
     @Override
-    public void connectNotificationSystem( String principal) {
+    public void connectNotificationSystem(String principal) {
         TradingSystem.getSubject().register(this);
         this.principal = principal;
         if (!notifications.isEmpty()) {
@@ -331,8 +333,13 @@ public class UserSystem implements Observer, Serializable {
 
     @Override
     public List<Notification> getNotifications() {
-        notifications.forEach(notification -> notification.setPrincipal(principal));
-        return new LinkedList<>(notifications);
+        if(Objects.nonNull(principal)) {
+            notifications.forEach(notification -> notification.setPrincipal(principal));
+            LinkedList<Notification> notifications = new LinkedList<>(this.notifications);
+            this.notifications = new HashSet<>();
+            return notifications;
+        }
+        return new LinkedList<>();
     }
 
     public boolean isOwner(int storeId) {
@@ -380,16 +387,16 @@ public class UserSystem implements Observer, Serializable {
     }
 
     public void updateDaily(TradingSystemDao tradingSystemDao) {
-        if(isAdmin()){ // admin
+        if (isAdmin()) { // admin
             tradingSystemDao.updateDailyVisitors(DailyVisitorsField.ADMIN);
         }
-        if(ownedStores.isEmpty() && managedStores.isEmpty()){ // not owner not manger
+        if (ownedStores.isEmpty() && managedStores.isEmpty()) { // not owner not manger
             tradingSystemDao.updateDailyVisitors(DailyVisitorsField.SIMPLE_USER);
         }
-        if(!managedStores.isEmpty() && ownedStores.isEmpty()){ // manager and not owner
+        if (!managedStores.isEmpty() && ownedStores.isEmpty()) { // manager and not owner
             tradingSystemDao.updateDailyVisitors(DailyVisitorsField.MANAGER_STORES);
         }
-        if(ownedStores.isEmpty()){ // owner
+        if (ownedStores.isEmpty()) { // owner
             tradingSystemDao.updateDailyVisitors(DailyVisitorsField.OWNERS_STORES);
         }
     }

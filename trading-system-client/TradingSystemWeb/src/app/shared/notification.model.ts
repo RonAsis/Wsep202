@@ -11,5 +11,8 @@ export class NotificationDto {
       this.style = style;
     }
     this.title = title;
+    if (this.title === undefined){
+     this.title = 'Notification';
+    }
   }
 }

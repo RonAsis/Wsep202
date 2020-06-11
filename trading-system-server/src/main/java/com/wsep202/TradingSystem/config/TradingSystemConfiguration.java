@@ -54,8 +54,8 @@ public class TradingSystemConfiguration {
     }
 
     @Bean
-    public Subject subject(TradingSystemFacade tradingSystemFacade, TradingSystem tradingSystem){
-        Subject subject = new Publisher(tradingSystemFacade);
+    public Subject subject(TradingSystemFacade tradingSystemFacade, TradingSystemDao tradingSystemDao){
+        Subject subject = new Publisher(tradingSystemDao, tradingSystemFacade);
         TradingSystem.setSubject(subject);
         return subject;
     }

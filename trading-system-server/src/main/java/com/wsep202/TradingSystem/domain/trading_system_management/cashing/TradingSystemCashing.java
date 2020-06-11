@@ -48,10 +48,6 @@ public class TradingSystemCashing {
         shoppingCartMap.put(username, shoppingCart);
     }
 
-    public void addShoppingCart(String username){
-        shoppingCartMap.remove(username);
-    }
-
     public void editShoppingCart(String username, ShoppingCart shoppingCart){
         removeShoppingCart(username);
         addShoppingCart(username, shoppingCart);

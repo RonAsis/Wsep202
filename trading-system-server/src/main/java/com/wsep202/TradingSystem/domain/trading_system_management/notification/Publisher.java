@@ -1,7 +1,9 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.notification;
 
 import com.wsep202.TradingSystem.domain.exception.RegisterObserverException;
+import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemDao;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +19,10 @@ public class Publisher implements Subject {
     private final List<Observer> observers = new LinkedList<>();
     private final Object publisherSync = new Object();// for sync
     private Set<Observer> observersWithNotification = new HashSet<>();
-
+    private final TradingSystemDao tradingSystemDao;
     private final TradingSystemFacade tradingSystemFacade;
 
-   @Override
+    @Override
     @Synchronized("publisherSync")
     public void register(Observer obj) {
         if (Objects.isNull(obj)) {
@@ -49,12 +51,13 @@ public class Publisher implements Subject {
         List<Notification> notifications = new LinkedList<>();
         observersWithNotification.forEach(observer -> {
             List<Notification> notificationsObserver = observer.getNotifications();
-            if(CollectionUtils.isEmpty(notificationsObserver)) {
-                notifications.addAll(notificationsObserver);
-            }
+            tradingSystemDao.updateUser((UserSystem) observer);
+            notifications.addAll(notificationsObserver);
         });
-        tradingSystemFacade.sendNotification(notifications);
-        observersWithNotification = new HashSet<>();
+        if (!CollectionUtils.isEmpty(notifications)) {
+            tradingSystemFacade.sendNotification(notifications);
+            observersWithNotification = new HashSet<>();
+        }
     }
 
     @Override

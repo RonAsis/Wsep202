@@ -31,8 +31,8 @@ public class NotificationController {
         log.info(String.format("The username : %s with principal name: %s,connect to notification system", connectionStart.getUsername(), principal.getName()));
         notificationService.addUser(connectionStart.getUsername(), connectionStart.getUuid(), principal.getName());
         return NotificationDto.builder()
-        .content("You are connecting to the notification system")
-       .principal(principal.getName())
-        .build();
+                .content("You are connecting to the notification system")
+                .principal(principal.getName())
+                .build();
     }
 }

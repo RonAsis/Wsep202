@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED;
+
 @Data
 @Slf4j
 @Service
@@ -22,9 +24,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendNotification(List<NotificationDto> notificationDtos) {
-        notificationDtos.forEach(notificationDto ->
-                simpMessagingTemplate.convertAndSendToUser(notificationDto.getPrincipal(), "/user" + PublicApiPaths.NOTIFICATION_PATH,
-                        notificationDto.getContent()));
+        notificationDtos.forEach(notificationDto -> {
+            simpMessagingTemplate.convertAndSendToUser(notificationDto.getPrincipal(), PublicApiPaths.CLIENT_DESTINATIONS_PREFIXED + PublicApiPaths.NOTIFICATION_PATH,
+                    notificationDto);
+            log.info(String.format("Send Notification to %s with content %s", notificationDto.getPrincipal(), notificationDto.getContent()));
+        });
     }
 
     @Override

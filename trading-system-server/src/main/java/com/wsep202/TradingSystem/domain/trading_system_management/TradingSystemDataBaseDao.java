@@ -221,7 +221,6 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     @Override
     public void updateUser(UserSystem user) {
         userRepository.save(user);
-        tradingSystemCashing.editShoppingCart(user.getUserName(), user.getShoppingCart());
     }
 
     @Override
@@ -244,18 +243,15 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    public void saveShoppingCart(String username) {
-        ShoppingCart shoppingCart = tradingSystemCashing.removeShoppingCart(username);
-        getUserSystem(username).ifPresent(userSystem -> {
-            List<Store> stores = storeRepository.findAll();
-            userSystem.setShoppingCart(shoppingCart);
-            userRepository.save(userSystem);
-        });
+    public void saveShoppingCart(UserSystem userSystem) {
+        ShoppingCart shoppingCart = tradingSystemCashing.removeShoppingCart(userSystem.getUserName());
+        userSystem.setShoppingCart(shoppingCart);
+        userRepository.save(userSystem);
     }
 
     @Override
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
-        if (isValidUuid(username, uuid) ) {
+        if (isValidUuid(username, uuid)) {
             return tradingSystemCashing.getShoppingCart(username);
         }
         throw new UserDontExistInTheSystemException(username);
@@ -268,7 +264,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
 
     @Override
     public Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid) {
-        if(isValidUuid(ownerUsername, uuid)){
+        if (isValidUuid(ownerUsername, uuid)) {
             return userRepository.findById(ownerUsername)
                     .map(userSystem -> userSystem.getOwnerToApproves())
                     .orElse(new HashSet<>());
@@ -279,7 +275,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     @Override
     public boolean approveOwner(Store ownedStore, UserSystem ownerUser, String ownerToApprove, boolean status) {
         boolean res = ownedStore.approveOwner(ownerUser, ownerToApprove, status);
-        if(res){
+        if (res) {
             updateStoreAndUserSystem(ownedStore, ownerUser);
         }
         return res;
@@ -293,7 +289,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
                     dailyVisitor.update(dailyVisitorsField);
                     return dailyVisitorsRepository.save(dailyVisitor);
                 })
-                .orElseGet(()->{
+                .orElseGet(() -> {
                     DailyVisitor dailyVisitor = new DailyVisitor();
                     dailyVisitor.update(dailyVisitorsField);
                     return dailyVisitorsRepository.save(dailyVisitor);
@@ -305,7 +301,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
         if (isValidUuid(username, uuid) && isAdmin(username)) {
             return dailyVisitorsRepository.findByDateBetween(start, end);
         }
-        throw  new NotAdministratorException(username);
+        throw new NotAdministratorException(username);
     }
 
 }

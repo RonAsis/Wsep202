@@ -22,7 +22,7 @@ export class WebSocketAPI {
     // tslint:disable-next-line:only-arrow-functions
     thisRef.stompClient.connect({},  (frame) => {
       thisRef.stompClient.subscribe(thisRef.topic, (sdkEvent) => {
-        console.log('get message');
+        console.log(sdkEvent.body);
         thisRef.onMessageReceived(JSON.parse(sdkEvent.body));
       });
     }, this.errorCallBack);

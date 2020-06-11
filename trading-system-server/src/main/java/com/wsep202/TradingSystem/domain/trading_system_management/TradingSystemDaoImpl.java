@@ -182,7 +182,7 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     }
 
     @Override
-    public void saveShoppingCart(String username) {
+    public void saveShoppingCart(UserSystem username) {
         // Its need to be empty
     }
 
