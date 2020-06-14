@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {UserService} from '../services/user.service';
 import {WebSocketService} from '../services/web-socket.service';
 import {ShareService} from '../services/share.service';
@@ -8,7 +8,7 @@ import {ShareService} from '../services/share.service';
   templateUrl: './logged-in-user.component.html',
   styleUrls: ['./logged-in-user.component.css']
 })
-export class LoggedInUserComponent implements OnInit {
+export class LoggedInUserComponent implements OnInit{
   loadedFeature: string;
 
   constructor(private userService: UserService, private webSocketService: WebSocketService,
@@ -30,5 +30,8 @@ export class LoggedInUserComponent implements OnInit {
     this.loadedFeature = feature;
   }
 
-
+  @HostListener('window:beforeunload', ['$event']) unloadHandler(event: Event){
+    this.userService.logout();
+    event.returnValue = false;
+  }
 }
