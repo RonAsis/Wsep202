@@ -5,6 +5,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.Disco
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -113,5 +114,5 @@ public abstract class TradingSystemDao {
 
     public abstract void updateDailyVisitors(DailyVisitorsField dailyVisitorsField);
 
-    public abstract Set<DailyVisitor> getDailyVisitors(String username, Date start, Date end, UUID uuid);
+    public abstract Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid);
 }

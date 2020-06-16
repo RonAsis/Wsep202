@@ -12,6 +12,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Billi
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.ServiceFacade;
 import javafx.util.Pair;
@@ -886,8 +887,9 @@ public class TradingSystemFacade {
         return tradingSystemDao.approveOwner(ownedStore, ownerUser, ownerToApprove, status);
     }
 
-    public List<DailyVisitorDto> getDailyVisitors(String username, Date start, Date end, UUID uuid){
-        return convertSetDailyVisitorsToDailyVisitorsDtoSet(tradingSystemDao.getDailyVisitors(username, start, end, uuid));
+    public List<DailyVisitorDto> getDailyVisitors(String username, RequestGetDailyVisitorsDto requestGetDailyVisitorsDto, UUID uuid){
+        RequestGetDailyVisitors requestGetDailyVisitors = modelMapper.map(requestGetDailyVisitorsDto, RequestGetDailyVisitors.class);
+        return convertSetDailyVisitorsToDailyVisitorsDtoSet(tradingSystem.getDailyVisitors(username, requestGetDailyVisitors, uuid));
     }
 
     public void updateDailyVisitor(String dailyVisitorsField){

@@ -12,10 +12,14 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.Disco
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -297,9 +301,10 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    public Set<DailyVisitor> getDailyVisitors(String username, Date start, Date end, UUID uuid) {
+    public Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid) {
         if (isValidUuid(username, uuid) && isAdmin(username)) {
-            return dailyVisitorsRepository.findByDateBetween(start, end);
+            Pageable pageable = PageRequest.of(requestGetDailyVisitors.getFirstIndex(), requestGetDailyVisitors.getLastIndex(), Sort.by("date").ascending());
+            return dailyVisitorsRepository.findByDateBetween(requestGetDailyVisitors.getStart(), requestGetDailyVisitors.getEnd(), pageable);
         }
         throw new NotAdministratorException(username);
     }

@@ -7,6 +7,8 @@ import com.wsep202.TradingSystem.domain.trading_system_management.notification.S
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
 import javafx.util.Pair;
 import lombok.Getter;
 import lombok.NonNull;
@@ -509,5 +511,11 @@ public class TradingSystem {
 
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
         return tradingSystemDao.getShoppingCart(username, uuid);
+    }
+
+    public Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid) {
+        Set<DailyVisitor> dailyVisitors = tradingSystemDao.getDailyVisitors(username, requestGetDailyVisitors, uuid);
+
+        return dailyVisitors;
     }
 }
