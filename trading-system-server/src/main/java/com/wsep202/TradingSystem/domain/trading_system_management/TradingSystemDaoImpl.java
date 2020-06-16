@@ -138,7 +138,7 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn) {
-        boolean ans = ownerStore.validateCanEditProdcuts(user, productSn);
+        boolean ans = ownerStore.validateCanEditProducts(user, productSn);
         if (ans) {
             updateShoppingCart(user, new LinkedList<>(users), ownerStore, ownerStore.getProduct(productSn));
             log.info(String.format("Delete productSn %d from store %d", productSn, ownerStore.getStoreId()));

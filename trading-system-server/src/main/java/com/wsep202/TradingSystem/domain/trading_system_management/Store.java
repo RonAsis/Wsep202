@@ -145,7 +145,7 @@ public class Store {
     /////////////////////////////////////////products////////////////////////////////////////////////
 
     /**
-     * return a product with the SN reveived
+     * return a product with the SN received
      *
      * @param productId - SN of product to get
      * @return the fit product if exist in the store
@@ -156,6 +156,12 @@ public class Store {
                 .orElseThrow(() -> new ProductDoesntExistException(productId, storeId));
     }
 
+    /**
+     * return true if the product with the given productSn was remove, else returns false
+     * @param user - the store owner name
+     * @param productSn - the productSn to remove
+     * @return - true id remove succeed, else returns false
+     */
     public boolean removeProductFromStore(UserSystem user, int productSn) {
         if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {  //only owner can remove products from its store
             Set<Product> duplicate = new HashSet<>(products);
@@ -172,21 +178,31 @@ public class Store {
         return false;
     }
 
-    public boolean validateCanEditProdcuts(UserSystem userSystem, int productSn) {
+    /**
+     * returns true of the given user has the permission to edit a product and checks that the product is in the store
+     * @param userSystem - the user to check on
+     * @param productSn - the given product
+     * @return - true if the owner and the products are valid, else returns false
+     */
+    public boolean validateCanEditProducts(UserSystem userSystem, int productSn) {
         return validatePermission(userSystem, StorePermission.EDIT_PRODUCT) &&
                 products.stream()
                         .filter(product -> product.getProductSn() == productSn)
                         .findFirst().isPresent();
     }
 
+    /**
+     * check is the given user has the given permission
+     * @param user - the user to check on
+     * @param storePermission - the permission to check on
+     * @return - true if the user has the given permission, else returns false
+     */
     private boolean validatePermission(UserSystem user, StorePermission storePermission) {
         return isOwner(user) || isManagerWithPermission(user.getUserName(), storePermission);
     }
 
-
     /**
      * owner adds a new product to the store
-     *
      * @param user    the user wish to add the product
      * @param product the product to add to store
      * @return true for success
@@ -203,10 +219,9 @@ public class Store {
 
     /**
      * edit of exist product parameters in the store
-     *
      * @param user        the user wish to add the product
      * @param productSn   the unique number of the product
-     *                    parameters of the product:
+     *       parameters of the product:
      * @param productName
      * @param category
      * @param amount
@@ -240,7 +255,6 @@ public class Store {
 
     /**
      * The store creates receipt for the products purchased in the bag.
-     *
      * @param bag
      * @param buyerName
      * @return
@@ -254,7 +268,6 @@ public class Store {
 
     /**
      * update amount of product in the stock
-     *
      * @param productSn
      * @param amount
      * @return true if operation succeeded
@@ -272,7 +285,6 @@ public class Store {
 
     /**
      * checks if all products in shopping bag are in stock of the store
-     *
      * @param bag the products list the user wish to purchase
      * @return true if all products in stock
      * otherwise exception
@@ -294,7 +306,6 @@ public class Store {
     /**
      * update amount of each bag product in the stock of store
      * after the purchase
-     *
      * @param bag shopping bag
      */
     public void updateStock(ShoppingBag bag) {
@@ -307,12 +318,22 @@ public class Store {
 
     /////////////////////////////////////////////////owner /////////////////////////////////////////////
 
+    /**
+     * returns all the usernames of all owners in the store
+     */
     public Set<String> getOwnersUsername() {
         return this.appointedOwners.stream()
                 .map(ownersAppointee -> ownersAppointee.getAppointeeUser().getUserName())
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * check if a user that wants to be approved is approved
+     * @param ownerUser
+     * @param ownerToApprove
+     * @param status
+     * @return - true if the user approved, else returns false
+     */
     public boolean approveOwner(UserSystem ownerUser, String ownerToApprove, boolean status) {
         return appointingAgreements.stream()
                 .filter(appointingAgreement -> appointingAgreement.getNewOwner().getUserName().equals(ownerToApprove))
@@ -325,6 +346,11 @@ public class Store {
                 }).orElse(false);
     }
 
+    /**
+     *
+     * @param userSystemApproveOwner
+     * @return
+     */
     public StatusOwner isApproveOwner(UserSystem userSystemApproveOwner) {
         Optional<AppointingAgreement> agreement = appointingAgreements.stream()
                 .filter(appointingAgreement -> appointingAgreement.getNewOwner().getUserName().equals(userSystemApproveOwner.getUserName()))
@@ -373,7 +399,7 @@ public class Store {
         return response;
     }
 
-    public boolean removeOwnerRecursive(UserSystem ownerStore, UserSystem user) {
+    private boolean removeOwnerRecursive(UserSystem ownerStore, UserSystem user) {
         boolean response = false;
         if (isOwner(ownerStore)) {  //the user is able to remove his appointments
             response = appointedOwners.stream()
@@ -477,7 +503,9 @@ public class Store {
             appointingAgreements.add(new AppointingAgreement( willBeOwner, owner.getUserName(), getOwnersUsername()));
             appointedOwners.stream()
                     .filter(appointedOwner -> !appointedOwner.getAppointeeUser().getUserName().equals(owner.getUserName()))
-                    .forEach(appointedOwner -> appointedOwner.getAppointeeUser().addOwnerToApprove(storeId, storeName, willBeOwner.getUserName()));
+                    .forEach(appointedOwner -> {
+                        appointedOwner.getAppointeeUser().addOwnerToApprove(storeId, storeName, willBeOwner.getUserName());
+                    });
             return getAllOwnersNeedApprove(owner);
         }
         return null;

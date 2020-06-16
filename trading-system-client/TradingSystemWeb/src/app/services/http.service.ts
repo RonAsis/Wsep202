@@ -14,6 +14,7 @@ import {Discount} from '../shared/discount.model';
 import {OwnerToApprove} from '../shared/ownerToApprove.model';
 import {DailyVistorDto} from '../shared/dailyVistor.model';
 import {UserService} from './user.service';
+import {Policy} from '../shared/policy.model';
 
 @Injectable({
   providedIn: 'root'
@@ -327,6 +328,15 @@ export class HttpService {
       url);
   }
 
+  getAllPurchasePolicies(username: string, storeId: number, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'get-all-purchase-policies/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<Policy[]>(
+      url);
+  }
+
   getSimpleDiscounts(username: string, storeId: number, uuid: string) {
     const url = `${this.sellerManagerUrl}/` + 'get-simple-discounts/' +
       `${username}/` +
@@ -343,6 +353,15 @@ export class HttpService {
       `${uuid}`;
     return this.http.post<Discount>(
       url, discount);
+  }
+
+  addPolicy(username: string, storeId: number, policy: Policy, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'add-policy/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.post<Discount>(
+      url, policy);
   }
   //////////////////////////// SellerOwnerController ///////////////////////////
 
@@ -548,6 +567,4 @@ export class HttpService {
     }
     return uploadImageData;
   }
-
-
 }

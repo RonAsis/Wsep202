@@ -1,6 +1,5 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.sun.org.apache.bcel.internal.generic.SWITCH;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;

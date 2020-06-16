@@ -138,5 +138,8 @@
       }
     }
   },
-  "defaultProject": "TradingSystemWeb"
+  "defaultProject": "TradingSystemWeb",
+  "cli": {
+    "analytics": "66dbbe81-23ff-44f7-8387-5cb3191de830"
+  }
 }

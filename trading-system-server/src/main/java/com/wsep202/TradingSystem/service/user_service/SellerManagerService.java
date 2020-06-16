@@ -1,7 +1,6 @@
 package com.wsep202.TradingSystem.service.user_service;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
-import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
 import com.wsep202.TradingSystem.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +72,7 @@ public class SellerManagerService {
         return tradingSystemFacade.getAlltDiscounts(username, storeId, uuid);
     }
 
-    public List<PurchaseDto> getPurchases(String username, int storeId, UUID uuid) {
+    public List<PurchaseDto> getAllStorePurchases(String username, int storeId, UUID uuid) {
         return tradingSystemFacade.getAllStorePurchases(username, storeId, uuid);
     }
 }

@@ -1,0 +1,133 @@
+<div class="row">
+  <br>
+  <hr>
+
+  <div class="col-xs-12">
+    <button class="btn btn-danger" type="submit" (click)="onAllStore()">All Store</button>&nbsp;
+    <button class="btn btn-danger" type="submit" (click)="onSpecificProduct()">Specific Product</button>&nbsp;
+    <button class="btn btn-danger" type="submit" (click)="onSystem()">On System</button>&nbsp;
+    <button class="btn btn-danger" type="submit" (click)="onUser()">On User</button>&nbsp;
+    <button class="btn btn-danger" type="submit" (click)="onComposePolicy()">Composite Policy</button>&nbsp;
+  </div>
+
+  <div *ngIf="policyType === 'specific product' || policyType === 'all store'" class="row justify-content-start">
+    <div class="col-sm-4 from-group">
+      <br>
+      <label for="description">Description
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="text" id="description" class="form-control"
+             [value]="this.policy !== undefined ? this.policy.description : ''"
+             #description/>
+
+      <div *ngIf="policyType !== 'all store'" class="row justify-content-start">
+        <br>
+        <label>Product:</label>
+        <div class="md-form">
+          <ng-multiselect-dropdown
+            [placeholder]="'Select Products'"
+            [settings]="productUnderPolicySettings"
+            [data]="optionsProductUnderPolicy"
+            [(ngModel)]="selectedProductUnderPolicy"
+            (onSelect)="onSelectProductUnderPolicy($event)">
+          </ng-multiselect-dropdown>
+        </div>
+      </div>
+      <div *ngIf="policyType === 'all store'" class="row justify-content-start">
+        <br>
+      </div>
+      <div class="col-lg-4 from-group">
+        <label for="min">Minimum</label>
+        <input type="number" [min]="1" id="min" class="form-control"
+               [value]="this.policy !== undefined ? this.policy.min : 1"
+               #min/> &nbsp;
+      </div>
+      <div class="col-lg-4 from-group">
+        <label for="max">Maximum</label>
+        <input type="number" [min]="1" id="max" class="form-control"
+               [value]="this.policy !== undefined ? this.policy.max : 1"
+               #max/>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="policyType === 'on system'" class="row justify-content-start">
+    <div class="col-sm-4 from-group">
+      <br>
+      <label for="description1">Description
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="text" id="description1" class="form-control"
+             [value]="this.policy !== undefined ? this.policy.description : ''"
+             #description/>
+
+      <br>
+      <label>Days:</label>
+      <div class="md-form">
+        <ng-multiselect-dropdown
+          [placeholder]="'Select Days'"
+          [settings]="storeWorkDaysSettings"
+          [data]="optionsStoreWorkDays"
+          [(ngModel)]="selectedStoreWorkDays"
+          (onSelect)="onSelectStoreWorkDays($event)">
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="policyType === 'on user'" class="row justify-content-start">
+    <div class="col-sm-4 from-group">
+      <br>
+      <label for="description2">Description
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="text" id="description2" class="form-control"
+             [value]="this.policy !== undefined ? this.policy.description : ''"
+             #description/>
+
+      <br>
+      <label>Countries:</label>
+      <div class="md-form">
+        <ng-multiselect-dropdown
+          [placeholder]="'Select Countries:'"
+          [settings]="countriesPermittedSettings"
+          [data]="optionsCountriesPermitted"
+          [(ngModel)]="selectedCountriesPermitted"
+          (onSelect)="onSelectCountriesPermitted($event)">
+        </ng-multiselect-dropdown>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="policyType === 'compose'" class="row justify-content-start">
+    <div class="col-sm-4 from-group">
+      <br>
+      <label>Composed Purchase Policies:</label>
+      <div class="md-form">
+        <ng-multiselect-dropdown
+          [placeholder]="'Select Policies'"
+          [settings]="composedPoliciesSettings"
+          [data]="optionsComposedPolicies"
+          [(ngModel)]="selectedComposedPolicies">
+        </ng-multiselect-dropdown>
+      </div>
+      <br>
+      <div class="col-sm-5 from-group">
+        <select [value]="this.policy !== undefined ? this.policy.compositeOperator : null"
+                [ngModel]="selectedComposite" (ngModelChange)="onSelectedCompositeOperator($event)">
+          <option *ngFor="let compositeOperator of compositeOperators" value={{compositeOperator}}>
+            {{compositeOperator}}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <br>
+  <div class="col-xs-12">
+    <button class="btn btn-success" type="submit" (click)="onAddDiscount()">Add/Edit Policy</button>
+  </div>
+  <div class="col-sm-5 from-group" [style.color]="messageColor">
+    <p>{{message}}</p>
+  </div>
+</div>

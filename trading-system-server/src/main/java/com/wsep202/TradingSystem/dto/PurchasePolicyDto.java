@@ -24,14 +24,15 @@ import java.util.Set;
 public class PurchasePolicyDto {
 
     protected int purchaseId;
+
+    private String purchaseType;
+
     /**
-     * types of discounts in the store
+     * one of the following : 'all store', 'specific product', 'on system', 'on user',  'compose'
      */
-    @OneToOne(cascade = CascadeType.ALL)
-    private PurchasePolicy purchasePolicy;
+    private String policyType;
 
-    private PurchaseType purchaseType;
-
+    private String description;
     /**
      * list of countries that the store have deliveries to
      */
@@ -39,7 +40,7 @@ public class PurchasePolicyDto {
     /**
      * the days in the week any user is permitted to perform a purchase
      */
-    private Set<Day> storeWorkDays;
+    private Set<Integer> storeWorkDays;
     /**
      * the valid range of amount of products to buy in a purchase
      * in ShoppingBagDetails it is the amount of different items
@@ -49,11 +50,11 @@ public class PurchasePolicyDto {
     /**
      * the SN of product which has limitations amounts
      */
-    private int productId;
+    private int productSn;
     /**
      * logical operator between policies
      */
-    private CompositeOperator compositeOperator;
+    private String compositeOperator;
     /**
      * children components of the composite Purchase policy
      * the operands of the composed Purchase policy

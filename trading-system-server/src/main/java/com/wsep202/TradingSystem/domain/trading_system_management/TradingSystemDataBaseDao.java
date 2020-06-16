@@ -14,14 +14,12 @@ import com.wsep202.TradingSystem.domain.trading_system_management.statistics.Dai
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -150,7 +148,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
 
     @Override
     public boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn) {
-        boolean ans = ownerStore.validateCanEditProdcuts(user, productSn);
+        boolean ans = ownerStore.validateCanEditProducts(user, productSn);
         if (ans) {
             updateDbWithCashing();
             updateShoppingCart(user, userRepository.findAll(), ownerStore, ownerStore.getProduct(productSn));

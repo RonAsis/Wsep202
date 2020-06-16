@@ -21,7 +21,7 @@ public enum  Day {
     /**
      * converts between day to Day enum if day is valid.
      * @param day2 - the day that needs to be converted.
-     * @return - the converted ProductCategory enum or CategoryDoestExistException if category doesn't exist.
+     * @return - the converted Day enum or IllegalDayException if day doesn't exist.
      */
     public static Day getDay(int day2) {
         return Arrays.stream(Day.values())

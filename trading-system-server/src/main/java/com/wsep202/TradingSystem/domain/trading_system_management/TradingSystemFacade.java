@@ -227,9 +227,14 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PURCHASE_POLICY);
         Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);
+        Set<Day> storeWorkDays = new HashSet<>();
+        purchaseDto.getStoreWorkDays().stream()
+                .forEach(s -> {
+                    storeWorkDays.add(Day.getDay(s));
+                });
         PurchasePolicyDto ans = modelMapper.map(store.addEditPurchase(user, purchase, purchaseDto.getCountriesPermitted(),
-                purchaseDto.getStoreWorkDays(), purchaseDto.getMin(), purchaseDto.getMax(),
-                purchaseDto.getProductId(), purchaseDto.getCompositeOperator(),
+                storeWorkDays, purchaseDto.getMin(), purchaseDto.getMax(),
+                purchaseDto.getProductSn(), CompositeOperator.getCompositeOperators(purchaseDto.getCompositeOperator()),
                 convert(purchaseDto.getComposedPurchasePolicies())), PurchasePolicyDto.class);
         return ans;
     }
@@ -237,10 +242,10 @@ public class TradingSystemFacade {
     private List<Purchase> convert(List<PurchasePolicyDto> list) {
         // TODO need remove from here the convert purchase need to be in the model mapper
         List<Purchase> purchases = new LinkedList<>();
-        for (PurchasePolicyDto ppd : list) {
+        /*for (PurchasePolicyDto ppd : list) {
             Purchase purchase = new Purchase(ppd.getPurchasePolicy(), ppd.getPurchaseType());
             purchases.add(purchase);
-        }
+        }*/
         return purchases;
     }
 
