@@ -1,13 +1,16 @@
 package externals;
 
+import com.wsep202.TradingSystem.domain.exception.DeliveryRequestException;
+import com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class SupplySystem {
+public class SupplySystem implements SupplyService{
 
-    public boolean deliver(BillingAddress addressInfo, List<ShoppingBag> bags){
+    public boolean isDelivered(BillingAddress addressInfo, List<ShoppingBag> bags){
         //check if the address is valid for example
         if(!isValidZip(addressInfo.getZipCode())){
             return false;
@@ -25,8 +28,36 @@ public class SupplySystem {
      * @param bags the products to cancel their shipping
      * @return true for successful cancellation.
      */
-    public boolean canceldelivery(BillingAddress addressInfo, List<ShoppingBag> bags) {
+    public int canceldeliveryOrig(BillingAddress addressInfo, List<ShoppingBag> bags) {
         //temporarily condition
-        return bags.size()>0;
+        return bags.size();
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public int deliver(BillingAddress addressInfo, ShoppingCart cart) {
+        boolean isDelivered;
+        List<ShoppingBag> bags = new ArrayList<>();
+        for(ShoppingBag bag : cart.getShoppingBagsList().values()){
+            bags.add(bag);
+        }
+        isDelivered = isDelivered(addressInfo,bags);
+        if(isDelivered){
+            return 11003;
+        }
+        throw new DeliveryRequestException("The Delivery request rejected.");
+    }
+
+    @Override
+    public int cancelDelivery(BillingAddress addressInfo, ShoppingCart cart,String suppTransId) {
+        List<ShoppingBag> bags = new ArrayList<>();
+        for(ShoppingBag bag : cart.getShoppingBagsList().values()){
+            bags.add(bag);
+        }
+        return canceldeliveryOrig(addressInfo,bags);
+    }
+
+    @Override
+    public boolean isConnected() {
+        return false;
     }
 }

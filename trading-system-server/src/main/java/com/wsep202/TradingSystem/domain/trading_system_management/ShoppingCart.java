@@ -195,10 +195,10 @@ public class ShoppingCart {
      * @param buyerName
      * @return list of receipts
      */
-    public ArrayList<Receipt> createReceipts(String buyerName){
+    public ArrayList<Receipt> createReceipts(String buyerName,int chargeTransId,int suppTransId){
         ArrayList<Receipt> purchaseReceipts = new ArrayList<>();
         for (Store store: shoppingBagsList.keySet()){
-            purchaseReceipts.add(store.createReceipt(shoppingBagsList.get(store),buyerName));
+            purchaseReceipts.add(store.createReceipt(shoppingBagsList.get(store),buyerName,chargeTransId,suppTransId));
         }
         shoppingBagsList = new HashMap<>();
         return purchaseReceipts;

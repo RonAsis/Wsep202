@@ -22,4 +22,13 @@ public class PaymentDetailsDto {
      * the id of the credit card holder
      */
     private String holderIDNumber;
+    /**
+     * valid thru details
+     */
+    private String month;
+    private String year;
+    /**
+     * name of the credit card holder
+     */
+    private String holderName;
 }

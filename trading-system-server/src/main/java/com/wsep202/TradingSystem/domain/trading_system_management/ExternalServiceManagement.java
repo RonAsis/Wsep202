@@ -1,33 +1,45 @@
+
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.ChargeException;
 import com.wsep202.TradingSystem.domain.exception.DeliveryRequestException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
-import externals.ChargeSystem;
-import externals.SecuritySystem;
-import externals.SupplySystem;
+import externals.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+@Getter
+@Setter
 @Slf4j
 public class ExternalServiceManagement {
-
+    /**
+     * factories
+     */
+    private ChargeSystemFactory chargeFactory;
+    private SupplySystemFactory supplyFactory;
+    /**
+     * Services
+     */
     private SecuritySystem securitySystem;
-    private ChargeSystem chargeSystem;
-    private SupplySystem supplySystem;
+    private ChargeService chargeSystem;
+    private SupplyService supplySystem;
 
     /**
      * default connect if we don't have any prefers for the external systems
      */
     public void connect() {
-        securitySystem = new SecuritySystem();
-        chargeSystem = new ChargeSystem();
-        supplySystem = new SupplySystem();
-        log.info("The system is now connected to the external systems");
+        chargeFactory = new ChargeSystemFactory();
+        supplyFactory = new SupplySystemFactory();
+
+        chargeSystem = chargeFactory.createChargeSystem("https://cs-bgu-wsep.herokuapp.com/");
+        supplySystem = supplyFactory.createSupplySystem("https://cs-bgu-wsep.herokuapp.com/");
+        log.info("The system is now initialized with external systems services");
+
 
     }
 
@@ -37,11 +49,11 @@ public class ExternalServiceManagement {
      * @param supSys   preferred supply system
      * @param chrgSys  preffered charge system
      */
-    public void connect(SecuritySystem secSys, SupplySystem supSys, ChargeSystem chrgSys){
+    public void connect(SecuritySystem secSys, SupplyService supSys, ChargeService chrgSys){
         this.securitySystem = secSys;
         this.supplySystem = supSys;
         this.chargeSystem = chrgSys;
-        log.info("The system is now connected to the external systems");
+        log.info("The system is now initialized with external systems services");
     }
 ////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////interface to security system/////////////////////////////
@@ -81,37 +93,18 @@ public class ExternalServiceManagement {
      * @param cart
      * @return storesFailedToChargeForBags list of failed stores to charge
      */
-    public boolean charge(PaymentDetails paymentDetails, ShoppingCart cart) throws ChargeException{
-        boolean isChargedForCurrentBag;     //flag tells if payment for current bag of store succeeded
-        boolean isCharged = true;           //isCharged = true iff all charge iterations succeeded
-        Map<Store, ShoppingBag> shoppingBags = cart.getShoppingBagsList();
-        //make the payment for each store in the cart
-        ShoppingCart chargedBags = new ShoppingCart();  //optional for cancelation deals in case of charge fail
-        for (Store store : shoppingBags.keySet()){
-            double calculatedPrice = calculateShoppingBagPrice(shoppingBags.get(store));
-            isChargedForCurrentBag = chargeSystem.sendPaymentTransaction(store.getStoreName(),calculatedPrice,paymentDetails);
-            isCharged = isCharged && isChargedForCurrentBag;    //all last charges succeeded ans current as well?
-            if(isChargedForCurrentBag){    //add store that its bag didn't charged by the user
-                log.info("Succeeded to charge bag in store: "+store.getStoreName());
-                chargedBags.addBagToCart(store,shoppingBags.get(store));
-            }else {
-                log.info("failed to charge bag in store: "+store.getStoreName());
-                cancelCharge(paymentDetails,chargedBags);   //cancel charge of already succeeded deals
-                throw new ChargeException("Charge refused for store: "+store.getStoreName());
-            }
+    public int charge(PaymentDetails paymentDetails, ShoppingCart cart) throws ChargeException{
+        int transId = chargeSystem.sendPaymentTransaction(paymentDetails,cart);
+        if(transId>=10000 && transId <= 100000){
+            log.info("charge succeeded for holder: "+paymentDetails.getHolderName());
         }
-        //all bags were charged
-        return true;
+        else{
+            log.info("charge failed for holder: "+paymentDetails.getHolderName());
+        }
+        return transId;
     }
 
-    /**
-     * calculate and returns the total price of the items in the shopping bag.
-     * @param shoppingBag - the shopping bag we wish to calculate its price.
-     * @return totalPrice as the price the customer needs to pay for the bag.
-     */
-    private double calculateShoppingBagPrice(ShoppingBag shoppingBag) {
-        return shoppingBag.getTotalCostOfBag();
-    }
+
 
     /**
      * The following request the chargeSystem to cancel charge of user belongs to the
@@ -120,20 +113,12 @@ public class ExternalServiceManagement {
      * @param cart
      * @return  true for successful cancellation for all payment.
      */
-    public boolean cancelCharge(PaymentDetails paymentDetails, ShoppingCart cart){
-        String logStatus = "failed";
-        boolean isRefund = true;           //isCharged = true iff all charge iterations succeeded
-        Map<Store, ShoppingBag> shoppingBags = cart.getShoppingBagsList();
-        //make the refund for each store in the cart
-        for (Store store : shoppingBags.keySet()){
-            double calculatedPrice = calculateShoppingBagPrice(shoppingBags.get(store));
-            isRefund = isRefund && chargeSystem.cancelCharge(store.getStoreName(),calculatedPrice,paymentDetails);
-            //all last charges succeeded ans current as well?
-        }
-        if(isRefund==true)
-            logStatus = "succeeded";
-        log.info("The user charging "+logStatus);
-        return isRefund;
+    public int cancelCharge(PaymentDetails paymentDetails, ShoppingCart cart,String transactionId){
+        int res = chargeSystem.cancelCharge(paymentDetails,transactionId,cart);
+        if(res>0){
+            log.info("card holder: "+paymentDetails.getHolderName()+" charged cancelled.");
+        }else log.info("cancellation failed for holder: "+paymentDetails.getHolderName());
+        return res;
     }
 
 
@@ -149,27 +134,26 @@ public class ExternalServiceManagement {
      * @return true if the request for delivery accepted
      * otherwise returns false
      */
-    public boolean deliver(BillingAddress addressInfo, ShoppingCart cart) throws DeliveryRequestException {
-        boolean isDelivered;
-        List<ShoppingBag> bags = new ArrayList<>();
-        for(ShoppingBag bag : cart.getShoppingBagsList().values()){
-            bags.add(bag);
-        }
-        isDelivered = supplySystem.deliver(addressInfo,bags);
-        if(isDelivered){
-            return true;
-        }
+    public int deliver(BillingAddress addressInfo, ShoppingCart cart) throws DeliveryRequestException {
 
-        //TODO: think how to return the specific reason for fail
-        throw new DeliveryRequestException("The Delivery request rejected.");
+        int transId = supplySystem.deliver(addressInfo,cart);
+        if(transId >= 10000 && transId<=100000){
+            log.info("supply accepted for: "+addressInfo.getCustomerFullName()+"by external system");
+        }else{
+            log.info("supply rejected for: "+addressInfo.getCustomerFullName()+" by external system");
+        }
+        return transId;
     }
 
-    public boolean cancelDelivery(BillingAddress addressInfo, ShoppingCart cart){
-        List<ShoppingBag> bags = new ArrayList<>();
-        for(ShoppingBag bag : cart.getShoppingBagsList().values()){
-            bags.add(bag);
+    public int cancelDelivery(BillingAddress addressInfo, ShoppingCart cart, String suppTransId){
+
+        int res = supplySystem.cancelDelivery(addressInfo,cart,suppTransId);
+        if(res>0){
+            log.info("supply cancelled successfully for: "+addressInfo.getCustomerFullName());
+        }else {
+            log.info("supply failed to cancel for: "+addressInfo.getCustomerFullName());
         }
-        return supplySystem.canceldelivery(addressInfo,bags);
+        return res;
     }
 }
 
