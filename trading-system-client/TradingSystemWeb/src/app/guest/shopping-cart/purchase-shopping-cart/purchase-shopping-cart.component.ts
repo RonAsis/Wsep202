@@ -21,15 +21,20 @@ export class PurchaseShoppingCartComponent implements OnInit {
   @ViewChild('creditCardNumberInput', {static: false}) creditCardNumberInputRef: ElementRef;
   @ViewChild('ccvInput', {static: false}) ccvInputRef: ElementRef;
   @ViewChild('idInput', {static: false}) idInputRef: ElementRef;
+  @ViewChild('expirationMonth', {static: false}) expirationMonth: ElementRef;
+  @ViewChild('expirationYear', {static: false}) expirationYear: ElementRef;
 
   @Input() cartTotal: number;
   @Input() cartTotalAfterDiscount: number;
+
+  @ViewChild('disabledPurchase', {static: false}) disabledPurchase: boolean;
 
   messageColor: string;
   message: string;
 
   constructor(private userService: UserService, private shareService: ShareService) {
     this.message = '';
+    this.disabledPurchase = false;
   }
 
   ngOnInit(): void {
@@ -44,11 +49,16 @@ export class PurchaseShoppingCartComponent implements OnInit {
   }
 
   OnPurchase() {
-    this.message = '';
+    this.disabledPurchase = true;
+    this.message = 'Waiting for details approval';
+    this.messageColor = 'blue';
     if (this.checkAllDetails()) {
       const paymentDetails = new PaymentDetails(this.creditCardNumberInputRef.nativeElement.value,
         this.ccvInputRef.nativeElement.value,
-        this.idInputRef.nativeElement.value);
+        this.idInputRef.nativeElement.value,
+        this.expirationMonth.nativeElement.value,
+        this.expirationYear.nativeElement.value,
+        this.fullNameInputRef.nativeElement.value);
       const billingAddress = new BillingAddress(this.fullNameInputRef.nativeElement.value,
         this.addressInputRef.nativeElement.value,
         this.cityInputRef.nativeElement.value,
@@ -56,10 +66,10 @@ export class PurchaseShoppingCartComponent implements OnInit {
         this.zipCodeInputRef.nativeElement.value);
       this.userService.purchaseShoppingCart(paymentDetails, billingAddress)
         .subscribe(response => {
+          this.disabledPurchase = false;
           if (response === undefined){
             this.errorMessage('There is no response from the server');
           }else{
-            console.log(response);
             this.shareService.setReceipts(response);
             this.userService.deleteShoppingCart();
             this.shareService.featureSelected.emit('History-purchase');
@@ -85,7 +95,6 @@ export class PurchaseShoppingCartComponent implements OnInit {
 
    checkAllDetails() {
     let theDetailsLegal = true;
-    console.log(theDetailsLegal);
     if (this.cityInputRef.nativeElement.value === undefined || this.cityInputRef.nativeElement.value.length === 0){
       this.errorMessage('You must write your city');
       theDetailsLegal = false;
@@ -104,15 +113,20 @@ export class PurchaseShoppingCartComponent implements OnInit {
     }else if (this.idInputRef.nativeElement.value === undefined || this.idInputRef.nativeElement.value.length !== 9){
       this.errorMessage('You must write you legal id on length 9');
       theDetailsLegal = false;
-    }else if (this.ccvInputRef.nativeElement.value === undefined || this.ccvInputRef.nativeElement.value.length !== 3){
+    }else if (this.ccvInputRef.nativeElement.value === undefined || this.ccvInputRef.nativeElement.value.length !== 3) {
       this.errorMessage('You must write you legal ccv on length 3');
+      theDetailsLegal = false;
+    } else if (this.expirationMonth.nativeElement.value === undefined){
+        this.errorMessage('You must write expiration Month');
+        theDetailsLegal = false;
+    } else if (this.expirationYear.nativeElement.value === undefined) {
+      this.errorMessage('You must write expiration Year');
       theDetailsLegal = false;
     }else if (this.creditCardNumberInputRef.nativeElement.value === undefined ||
       this.creditCardNumberInputRef.nativeElement.value.length !== 9){
       this.errorMessage('You must write your credit card number on length 9');
       theDetailsLegal = false;
     }
-    console.log(theDetailsLegal);
     return theDetailsLegal;
   }
 

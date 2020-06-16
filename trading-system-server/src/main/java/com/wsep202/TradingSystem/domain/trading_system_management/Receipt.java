@@ -46,6 +46,12 @@ public class Receipt {
     private double amountToPay;
 
     /**
+     * transactions with external systems identifiers
+     */
+    private String payTransId;
+    private String supplyTransId;
+
+    /**
      * a list of all the products that the user bought in this purchase.
      */
     @Builder.Default
@@ -60,11 +66,14 @@ public class Receipt {
      * @param amountToPay - the price that the user paid.
      * @param products - the products that the buyer bought.
      */
-    public Receipt(int storeId, String userName, double amountToPay, Map<Product, Integer> products){
+    public Receipt(int storeId, String userName, double amountToPay, Map<Product, Integer> products,
+                   String payId, String supplyId){
         purchaseDate = new Date(); // sets the current date
         this.storeId = storeId;
         this.userName = userName;
         this.amountToPay = amountToPay;
         this.productsBought = products;
+        this.payTransId = payId;
+        this.supplyTransId = supplyId;
     }
 }

@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TradingSystem {
 
+    private final Object purchaseLock = new Object();
+
+
     private ExternalServiceManagement externalServiceManagement;
 
     private TradingSystemDao tradingSystemDao;
@@ -231,6 +234,7 @@ public class TradingSystem {
      * @param user           - the user that made
      * @return list of receipts for stores where payment has been made
      */
+    @Synchronized("purchaseLock")
     public List<Receipt> purchaseShoppingCart(PaymentDetails paymentDetails, BillingAddress billingAddress, UserSystem user) {
         if (user == null) {
             log.error("user can't be null");
@@ -252,7 +256,7 @@ public class TradingSystem {
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
-    @Synchronized
+
     private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
                                              ShoppingCart shoppingCart, BillingAddress billingAddress,
                                              String customerName)
@@ -265,20 +269,28 @@ public class TradingSystem {
         log.info("applied stores purchase policies on shopping cart");
         shoppingCart.applyDiscountPolicies();
         log.info("applied stores discount policies on shopping cart");
-        externalServiceManagement.charge(paymentDetails, shoppingCart);
-        log.info("The user has been charged by his purchase.");
+        int chargeTransactionId = externalServiceManagement.charge(paymentDetails, shoppingCart);
+        if(chargeTransactionId<10000 || chargeTransactionId > 100000){
+            //charge failed
+            throw new ChargeException("failed to charge: "+paymentDetails.getHolderName()+" for purchase");
+        }
+        log.info("The card holder:"+paymentDetails.getHolderName()+" has been charged by his purchase.");
+        int supplyTransId;
         try {//request shipping for the purchase
-            externalServiceManagement.deliver(billingAddress, shoppingCart);
+            supplyTransId = externalServiceManagement.deliver(billingAddress, shoppingCart);
+            if(supplyTransId < 10000 || supplyTransId > 100000){
+                throw new DeliveryRequestException("supply rejected for: "+billingAddress.getCustomerFullName());
+            }
         } catch (DeliveryRequestException exception) {
             //in case delivery request rejected, cancel charged cart
-            externalServiceManagement.cancelCharge(paymentDetails, shoppingCart);
+            externalServiceManagement.cancelCharge(paymentDetails, shoppingCart,String.valueOf(chargeTransactionId));
             throw new DeliveryRequestException("The delivery request for: " + customerName + " " +
                     "has been rejected.");
         }
         log.info("delivery request accepted");
         shoppingCart.updateAllAmountsInStock();
         log.info("all amounts of products in stock of stores were updated");
-        return shoppingCart.createReceipts(customerName);
+        return shoppingCart.createReceipts(customerName,chargeTransactionId,supplyTransId);
     }
 
     private boolean validationOfPurchaseArgs(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress) {
