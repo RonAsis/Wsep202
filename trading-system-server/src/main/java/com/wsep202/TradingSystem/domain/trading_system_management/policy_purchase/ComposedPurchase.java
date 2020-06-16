@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management.policy_purcha
 
 import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
@@ -52,7 +53,7 @@ public class ComposedPurchase extends PurchasePolicy{
                 return true;
 
             } else if (compositeOperator == CompositeOperator.XOR) {                  //XOR case
-                int sumOfTrue = getSumOfTrue(purchase, products, userAddress);
+                int sumOfTrue = getSumOfTrue(products, userAddress);
                 if (sumOfTrue % 2 != 0) { //xor between odd amount of true = true
                     return true;
                 }
@@ -63,18 +64,13 @@ public class ComposedPurchase extends PurchasePolicy{
         return false;
     }
 
-    private int getSumOfTrue(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {
-        int sumOfTrue = 0;
-        for (Purchase policy : composedPurchasePolicies) {
-            try {
-                if (policy.getPurchasePolicy().isApproved(purchase,products, userAddress)) {
-                    sumOfTrue++;
-                }
-            }catch (TradingSystemException ex){
-                //do nothing
-            }
-        }
-        return sumOfTrue;
+
+
+
+    private int getSumOfTrue( Map<Product, Integer> products, BillingAddress userAddress) {
+        return composedPurchasePolicies.stream()
+                .filter(purchase1 -> purchase1.isApproved(products,userAddress))
+                .toArray().length;
     }
 
     private String getAllExceptionsMessages(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {

@@ -10,6 +10,7 @@ import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.cashing.TradingSystemCashing;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import lombok.RequiredArgsConstructor;
@@ -142,6 +143,17 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
             storeRepository.save(store);
             List<Discount> discounts = new LinkedList<>(storeRepository.findById(store.getStoreId()).get().getDiscounts());
             res.setDiscountId(discounts.get(discounts.size() - 1).getDiscountId());
+        }
+        return res;
+    }
+
+    @Override
+    public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
+        Purchase res = store.addEditPurchase(user, purchase);
+        if (Objects.nonNull(res)) {
+            storeRepository.save(store);
+            List<Purchase> purchaseList = new LinkedList<>(storeRepository.findById(store.getStoreId()).get().getPurchasePolicies());
+            res.setPurchasePolicyId(purchaseList.get(purchaseList.size() - 1).getPurchasePolicyId());
         }
         return res;
     }

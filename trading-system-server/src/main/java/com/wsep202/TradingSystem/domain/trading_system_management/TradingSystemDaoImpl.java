@@ -6,6 +6,7 @@ import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import lombok.extern.slf4j.Slf4j;
@@ -134,6 +135,12 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     public Discount addEditDiscount(Store store, UserSystem user, Discount discount) {
         discount.setDiscountId(getNewId());
         return store.addEditDiscount(user, discount);
+    }
+
+    @Override
+    public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
+        purchase.setPurchasePolicyId(getNewId());
+        return store.addEditPurchase(user, purchase);
     }
 
     @Override

@@ -51,7 +51,7 @@ public class ProductDetailsPolicy extends PurchasePolicy {
                         max);
             }
         log.info("product: "+productInStore.getName()+" passed the product purchase policy with" +
-                "ID: "+ purchase.purchaseId);
+                "ID: "+ purchase.getPurchasePolicyId());
         }
         //succeeded due to empty manner or product stands in terms
         log.info("purchase policy of product details passed for: "+ productId);
@@ -75,12 +75,12 @@ public class ProductDetailsPolicy extends PurchasePolicy {
      */
     public boolean edit(Purchase purchase, int min,int max, int productId){
         if(min < 0 || max < 0 || min > max || this.productId != productId){
-            log.info("problem with updating product details in product purchase policy number " + purchase.purchaseId);
+            log.info("problem with updating product details in product purchase policy number " + purchase.getPurchasePolicyId());
             return false;
         }
         this.min = min;
         this.max = max;
-        log.info("updated product details in product purchase policy number " + purchase.purchaseId);
+        log.info("updated product details in product purchase policy number " + purchase.getPurchasePolicyId());
         return true;
     }
 }

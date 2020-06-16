@@ -9,6 +9,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.Own
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Day;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchaseType;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -742,14 +743,91 @@ public class Store {
      */
     public Purchase addPurchasePolicy(UserSystem user, Purchase purchase) {
         if (validatePermission(user, StorePermission.EDIT_PURCHASE_POLICY)) {  //verify the user is owner of the store
-            //purchase.setNewId();  //generate new ID for the new discount
             purchasePolicies.add(purchase);
             return purchase;
         }
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
+    /**
+     * apply is approved on a shopping bag and user
+     * to check if user can buy by the purchase policy
+     */
+    public boolean isApprovedPurchasePolicies(Map<Product, Integer> productsBag,BillingAddress userAddress) throws
+            TradingSystemException{
+        return purchasePolicies.stream()
+                .filter(purchase1 -> !purchase1.isApproved(productsBag,userAddress))
+                .toArray().length==0;
+    }
+
+
+    /**
+     * remove specific purchase policy with purchaseId from store
+     */
+    public boolean removePurchase(UserSystem userSystem, int purchaseId) {
+        if (validatePermission(userSystem, StorePermission.EDIT_PURCHASE_POLICY)) {
+            Purchase purchase = purchasePolicies.stream()
+                    .filter(purchase1 -> purchase1.getPurchasePolicyId() == purchaseId)
+                    .findFirst().orElseThrow(() -> new TradingSystemException(String.format("the purchase %d doesn't exist in store %d", purchaseId, storeId)));
+            return purchasePolicies.remove(purchase);
+        }
+        throw new NoOwnerInStoreException(userSystem.getUserName(), this.getStoreId());
+    }
+
+    /**
+     * get the purchase policies in store
+     */
+    public List<Purchase> getStorePurchasePolicies(UserSystem user) {
+        if (validatePermission(user, StorePermission.EDIT_PURCHASE_POLICY)) {  //verify the user is owner of the store
+            return new LinkedList<>(purchasePolicies);
+        }
+        throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
+    }
+
+
+    /**
+     * split to the proper method add or edit
+     * @param user
+     * @param purchase
+     * @return
+     */
+    public Purchase addEditPurchase(UserSystem user, Purchase purchase) {
+        if (purchase.getPurchasePolicyId() < 0) {
+            return addPurchasePolicy(user, purchase);
+        } else {
+            return editPurchase(user, purchase);
+        }
+    }
+
+    private Purchase editPurchase(UserSystem user, Purchase purchase) {
+        if (validatePermission(user, StorePermission.EDIT_PURCHASE_POLICY)) {  //verify the user is owner of the store
+            Optional<Boolean> isEdit = purchasePolicies.stream()
+                    .filter(purchase1 -> purchase1.getPurchasePolicyId() == purchase.getPurchasePolicyId())
+                    .findFirst().map(purchase2 -> purchase2.editPurchase(purchase.getDescription(),purchase.getPurchasePolicy(),
+                            purchase.getPurchaseType()));
+            return isEdit.isPresent() ? purchase : null;
+        }
+        throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
+    }
+
+    public List<Purchase> getPurchasePoliciesSimple() {
+        return purchasePolicies.stream()
+                .filter(purchase -> purchase.getPurchaseType() != PurchaseType.COMPOSED_POLICY)
+                .collect(Collectors.toList());
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////discounts ///////////////////////////////////////
+
+    /**
+     * remove discounts that expired from store
+     */
+    private void updateExpiredDiscounts() {
+        List<Discount> discounts = this.getDiscounts().stream()
+                .filter(Discount::isExpired)
+                .collect(Collectors.toList());
+        this.discounts.removeAll(discounts);
+
+    }
 
     private void removeProductFromDiscount(int productSn) {
         discounts.forEach(discount -> discount.removeProductFromDiscount(productSn));
@@ -764,16 +842,7 @@ public class Store {
         discounts.forEach(discount -> discount.applyDiscount(productsBag));
     }
 
-    /**
-     * remove discounts that expired from store
-     */
-    private void updateExpiredDiscounts() {
-        List<Discount> discounts = this.getDiscounts().stream()
-                .filter(Discount::isExpired)
-                .collect(Collectors.toList());
-        this.discounts.removeAll(discounts);
 
-    }
 
     public boolean removeDiscount(UserSystem userSystem, int discountId) {
         if (validatePermission(userSystem, StorePermission.EDIT_DISCOUNT)) {
@@ -842,7 +911,6 @@ public class Store {
     /////////////////////////////////////////////////general //////////////////////////////////////////////////
 
 
-    //////////////////////////////////////////////////TODO need to fix all what in down  ////////////////////
 
     private int getAppointeeOwnersIndex(String userName) {
         int i = 0;
@@ -871,39 +939,6 @@ public class Store {
         return false;
     }
 
-    private Purchase editPurchase(UserSystem user, Purchase purchase, Set<String> countriesPermitted,
-                                  Set<Day> storeWorkDays, int min, int max, int productId,
-                                  CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies) {
-//        if (isOwner(user) || managerCanEditPurchasePolicy(user.getUserName())) {  //verify the user is owner of the store
-//            Optional<Boolean> isEdit = purchasePolicies.stream()
-//                    .filter(purchaseCur -> purchaseCur.getPurchaseId() == purchase.getPurchaseId())
-//                    .findFirst().map(purchaseCur -> purchaseCur.edit(countriesPermitted,storeWorkDays,
-//                            min,max,productId,compositeOperator, composedPurchasePolicies));
-//            return isEdit.isPresent() ? purchase : null;
-//        }
-        throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
-    }
 
-    public Purchase addEditPurchase(UserSystem user, Purchase purchase, Set<String> countriesPermitted,
-                                    Set<Day> storeWorkDays, int min, int max, int productId,
-                                    CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies) {
-        if (purchase.getPurchaseId() < 0) {
-            return addPurchasePolicy(user, purchase);
-        } else {
-            return editPurchase(user, purchase, countriesPermitted, storeWorkDays,
-                    min, max, productId, compositeOperator, composedPurchasePolicies);
-        }
-    }
-
-    /**
-     * apply purchase on a shopping bag
-     */
-    public void isApprovedPurchasePolicies(Map<Product, Integer> productsBag, BillingAddress userAddress)
-            throws PurchasePolicyException {
-        updateExpiredDiscounts();
-        for (Purchase purchase : this.getPurchasePolicies()) {  //apply discounts on shoppingBag
-            purchase.isApproved(productsBag, userAddress);
-        }
-    }
 
 }

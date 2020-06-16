@@ -8,20 +8,21 @@ package com.wsep202.TradingSystem.domain.trading_system_management.policy_purcha
 import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import java.util.Map;
 import java.util.Set;
 
-@Setter
-@Getter
+@Data
 @Slf4j
 @Builder
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDetailsPolicy extends PurchasePolicy {
 
     /**
@@ -35,13 +36,13 @@ public class UserDetailsPolicy extends PurchasePolicy {
         if(!countriesPermitted.contains(userAddress.getCountry())) {
             //the country of the user is not in the allowed countries for purchase in store
             log.info("The purchase policy failed because the country of the user " +
-                    "is not in the permitted countries of the store due to purchase policy with ID: "+ purchase.purchaseId);
+                    "is not in the permitted countries of the store due to purchase policy with ID: "+ purchase.getPurchasePolicyId());
             throw new PurchasePolicyException("Sorry, but your user details are incompatible with the store policy: " +
                     "store doesn't make deliveries to: "+userAddress.getCountry());
 
         }
         log.info("The purchase policy passed for user. " +
-                "his country is permitted. purchase policy with ID: "+ purchase.purchaseId);
+                "his country is permitted. purchase policy with ID: "+ purchase.getPurchasePolicyId());
         return true;
     }
 
@@ -53,10 +54,10 @@ public class UserDetailsPolicy extends PurchasePolicy {
     public boolean edit(Purchase purchase, Set<String> countriesPermitted){
         if (countriesPermitted != null && !countriesPermitted.isEmpty()){
             this.countriesPermitted = countriesPermitted;
-            log.info("counties updated in user purchase policy number " + purchase.purchaseId);
+            log.info("counties updated in user purchase policy number " + purchase.getPurchasePolicyId());
             return true;
         }
-        log.info("problem with updating counties in user purchase policy number " + purchase.purchaseId);
+        log.info("problem with updating counties in user purchase policy number " + purchase.getPurchasePolicyId());
         return false;
     }
 

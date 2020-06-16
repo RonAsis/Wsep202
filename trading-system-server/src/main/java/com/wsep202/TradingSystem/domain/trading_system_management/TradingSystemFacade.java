@@ -221,22 +221,13 @@ public class TradingSystemFacade {
      * @param uuid     - users UUID
      * @return true if success, else false
      */
-    public PurchasePolicyDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
-        // TODO need organize : PurchasePolicyDto not define good -domain ==> need do like discount
-        //                      need convert PurchasePolicyDto to PurchasePolicy and not send the vaule inside
+
+    public PurchasePolicyDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchasePolicyDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PURCHASE_POLICY);
-        Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);
-        Set<Day> storeWorkDays = new HashSet<>();
-        purchaseDto.getStoreWorkDays().stream()
-                .forEach(s -> {
-                    storeWorkDays.add(Day.getDay(s));
-                });
-        PurchasePolicyDto ans = modelMapper.map(store.addEditPurchase(user, purchase, purchaseDto.getCountriesPermitted(),
-                storeWorkDays, purchaseDto.getMin(), purchaseDto.getMax(),
-                purchaseDto.getProductSn(), CompositeOperator.getCompositeOperators(purchaseDto.getCompositeOperator()),
-                convert(purchaseDto.getComposedPurchasePolicies())), PurchasePolicyDto.class);
-        return ans;
+        Purchase purchase = modelMapper.map(purchasePolicyDto, Purchase.class);
+        Purchase purchaseRes = tradingSystemDao.addEditPurchase(store, user, purchase);
+        return Objects.nonNull(purchaseRes) ? modelMapper.map(purchaseRes, PurchasePolicyDto.class) : null;
     }
 
     private List<Purchase> convert(List<PurchasePolicyDto> list) {

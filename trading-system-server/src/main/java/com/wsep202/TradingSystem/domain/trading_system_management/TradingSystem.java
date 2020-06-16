@@ -263,7 +263,7 @@ public class TradingSystem {
         log.info("all products in stock");
         shoppingCart.approvePurchasePolicy(billingAddress);
         log.info("applied stores purchase policies on shopping cart");
-        shoppingCart.applyDiscountPolicies();
+        shoppingCart.applyDiscountPolicies(); //TODO: return the exceptions!!!!!! otherwise logic problem
         log.info("applied stores discount policies on shopping cart");
         externalServiceManagement.charge(paymentDetails, shoppingCart);
         log.info("The user has been charged by his purchase.");

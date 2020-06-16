@@ -25,12 +25,12 @@ public class PurchasePolicyDto {
 
     protected int purchaseId;
 
-    private String purchaseType;
-
     /**
      * one of the following : 'all store', 'specific product', 'on system', 'on user',  'compose'
      */
-    private String policyType;
+    private String purchaseType;
+
+
 
     private String description;
     /**
