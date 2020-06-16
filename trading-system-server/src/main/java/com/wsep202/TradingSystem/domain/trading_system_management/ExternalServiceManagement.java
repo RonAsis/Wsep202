@@ -39,8 +39,6 @@ public class ExternalServiceManagement {
         chargeSystem = chargeFactory.createChargeSystem("https://cs-bgu-wsep.herokuapp.com/");
         supplySystem = supplyFactory.createSupplySystem("https://cs-bgu-wsep.herokuapp.com/");
         log.info("The system is now initialized with external systems services");
-
-
     }
 
     /**

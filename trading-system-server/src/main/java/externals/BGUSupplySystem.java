@@ -3,6 +3,7 @@ package externals;
 import com.wsep202.TradingSystem.domain.exception.ExternalSystemException;
 import com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,6 +13,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 public class BGUSupplySystem implements SupplyService {
     //web address of the external system api
     private static final String url = "https://cs-bgu-wsep.herokuapp.com/";
@@ -41,10 +43,13 @@ public class BGUSupplySystem implements SupplyService {
             HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<MultiValueMap<String,String>>(postContent,headers);
             ResponseEntity<String> response = restTemplate.postForEntity(url,request,String.class);
             if(response.getBody()==null){
+                log.info("Get null body from external delivery system on deliver");
                 return -1;
             }
+            log.info(String.format("Get valid body [%s] from external delivery system on deliver", response.getBody()));
             return Integer.parseInt(response.getBody());
         }catch (ResourceAccessException e){
+            log.error("Can't connect to the charge system", e);
             throw new ExternalSystemException("failed to handshake the BGU charge system.");
         }
     }
@@ -60,10 +65,14 @@ public class BGUSupplySystem implements SupplyService {
             postContent.add("transaction_id",suppTrandId);
             HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<MultiValueMap<String,String>>(postContent,headers);
             ResponseEntity<String> response = restTemplate.postForEntity(url,request,String.class);
-            if(response.getBody()==null)
+            if(response.getBody()==null) {
+                log.info("Get null body from external delivery system on cancel Delivery");
                 return -1;
+            }
+            log.info(String.format("Get valid body [%s] from external delivery system on cancel Delivery", response.getBody()));
             return Integer.parseInt(response.getBody());
         }catch (ResourceAccessException e){
+            log.error("Can't connect to the charge system", e);
             throw new ExternalSystemException("failed to handshake the BGU charge system.");
         }
     }
@@ -77,6 +86,7 @@ public class BGUSupplySystem implements SupplyService {
             ResponseEntity<String> response = restTemplate.postForEntity(url,request,String.class);
             return response.getBody().equals("OK");
         }catch (ResourceAccessException e){
+            log.error("Can't connect to the charge system", e);
             throw new ExternalSystemException("failed to handshake the BGU charge system.");
         }
     }

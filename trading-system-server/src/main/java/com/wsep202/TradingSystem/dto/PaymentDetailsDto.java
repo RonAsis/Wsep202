@@ -17,7 +17,7 @@ public class PaymentDetailsDto {
     /**
      * ccv of the, the digits on the back of the card
      */
-    private int ccv;
+    private String ccv;
     /**
      * the id of the credit card holder
      */
@@ -31,4 +31,5 @@ public class PaymentDetailsDto {
      * name of the credit card holder
      */
     private String holderName;
+
 }
