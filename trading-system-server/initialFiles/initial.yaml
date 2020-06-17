@@ -54,6 +54,19 @@ activities:
     ownerUserName: u3
     storeId: 0
     newManagerUsername: u5
+    ################################################################
+
+      # the following must be when us is logged in and after u3 appoint u5 as owner in store 0
+  - type: approveOwner
+    ownerUsername: u2
+    ownerToApprove: u5
+    storeId: 0
+    status: true
+
+    ###################################################################
+
+
+
   - type: addPermission
     ownerUserName: u3
     storeId: 0
@@ -122,11 +135,6 @@ activities:
 
 
 
-# the following must be when us is logged in and after u3 appoint u5 as owner in store 0
-  #- type: approveOwner
-   # ownerUsername: u2
-    #ownerToApprove: u5
-    #storeId: 0
-    #status: true
+
 
 

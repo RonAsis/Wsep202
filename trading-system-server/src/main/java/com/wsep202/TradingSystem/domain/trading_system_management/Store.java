@@ -323,6 +323,8 @@ public class Store {
                     appointingAgreement.changeApproval(ownerUser.getUserName(), status ? StatusOwner.APPROVE : StatusOwner.NOT_APPROVE);
                     ownerUser.removeAgreement(storeId, ownerToApprove);
                     isApproveOwner(appointingAgreement.getNewOwner());
+                    log.info("The owner: "+ownerUser.getUserName()+" approved: "+ownerToApprove+"" +
+                            "with status: "+status);
                     return true;
                 }).orElse(false);
     }
