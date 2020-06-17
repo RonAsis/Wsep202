@@ -47,4 +47,8 @@ public class AdministratorService {
     public List<DailyVisitorDto> getDailyVisitors(String username, RequestGetDailyVisitorsDto requestGetDailyVisitorsDto, UUID uuid){
         return tradingSystemFacade.getDailyVisitors(username, requestGetDailyVisitorsDto, uuid);
     }
+
+    public void stopDailyVisitors(String username, UUID uuid) {
+        tradingSystemFacade.stopDailyVisitors(username, uuid);
+    }
 }

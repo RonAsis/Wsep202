@@ -3,12 +3,14 @@ import * as SockJS from 'sockjs-client';
 import {UserService} from '../../services/user.service';
 import {AppComponent} from '../../app.component';
 import {NotificationDto} from '../notification.model';
+import {UpdateDailyVisitor} from '../updateDailyVisitorDto.model';
 
 export class WebSocketAPI {
   private readonly webSocketTradingSystemsSubscribeEndpoint = '/user/trading-system-client/notification';
   private readonly webSocketTradingSystemSendEndpoint = '/trading-system-server/connect-notification-system';
   webSocketEndPoint = 'http://localhost:8080/trading-system-web-socket';
   topic = '/user/trading-system-client/notification';
+  dailyVisitor = '/user/trading-system-client/daily-visitor';
   stompClient: any;
   appComponent: AppComponent;
   constructor(appComponent: AppComponent, private userService: UserService){
@@ -22,6 +24,10 @@ export class WebSocketAPI {
     // tslint:disable-next-line:only-arrow-functions
     thisRef.stompClient.connect({},  (frame) => {
       thisRef.stompClient.subscribe(thisRef.topic, (sdkEvent) => {
+        console.log(sdkEvent.body);
+        thisRef.onMessageReceived(JSON.parse(sdkEvent.body));
+      });
+      thisRef.stompClient.subscribe(thisRef.dailyVisitor, (sdkEvent) => {
         console.log(sdkEvent.body);
         thisRef.onMessageReceived(JSON.parse(sdkEvent.body));
       });
@@ -46,14 +52,19 @@ export class WebSocketAPI {
   /**
    * Send message to sever via web socket
    */
-  _send() {
+  _send_connect() {
     console.log('calling connect');
     this.stompClient.send('/trading-system-server/connect-notification-system', {},
       JSON.stringify({username: this.userService.getUsername(), uuid: this.userService.getUuid()}));
   }
 
   onMessageReceived(notification: NotificationDto) {
-    console.log('Message Recieved from Server :: ' + notification.content);
+    console.log('Message Received from Server :: ' + notification.content);
     this.appComponent.handleMessage(notification);
+  }
+
+  OnDailyVisitorReceived(updateDailyVisitor: UpdateDailyVisitor){
+    console.log('update DailyVisitor Received from Server :: ' + updateDailyVisitor);
+    this.userService.dailyVisitorReceivedEvent.emit(updateDailyVisitor);
   }
 }

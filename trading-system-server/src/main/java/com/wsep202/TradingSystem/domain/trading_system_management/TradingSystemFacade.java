@@ -13,6 +13,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Payme
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.ServiceFacade;
 import javafx.util.Pair;
@@ -899,5 +900,13 @@ public class TradingSystemFacade {
         Type listType = new TypeToken<List<DailyVisitorDto>>() {
         }.getType();
         return modelMapper.map(dailyVisitors, listType);
+    }
+
+    public boolean sendDailyVisitor(UpdateDailyVisitor updateDailyVisitor) {
+        return serviceFacade.sendDailyVisitor(updateDailyVisitor);
+    }
+
+    public void stopDailyVisitors(String username, UUID uuid) {
+        tradingSystem.stopDailyVisitors(username, uuid);
     }
 }
