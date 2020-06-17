@@ -10,7 +10,7 @@
     <button class="btn btn-danger" type="submit" (click)="onComposePolicy()">Composite Policy</button>&nbsp;
   </div>
 
-  <div *ngIf="policyType === 'specific product' || policyType === 'all store'" class="row justify-content-start">
+  <div *ngIf="purchaseType === 'specific product' || purchaseType === 'all store'" class="row justify-content-start">
     <div class="col-sm-4 from-group">
       <br>
       <label for="description">Description
@@ -20,7 +20,7 @@
              [value]="this.policy !== undefined ? this.policy.description : ''"
              #description/>
 
-      <div *ngIf="policyType !== 'all store'" class="row justify-content-start">
+      <div *ngIf="purchaseType !== 'all store'" class="row justify-content-start">
         <br>
         <label>Product:</label>
         <div class="md-form">
@@ -33,25 +33,25 @@
           </ng-multiselect-dropdown>
         </div>
       </div>
-      <div *ngIf="policyType === 'all store'" class="row justify-content-start">
+      <div *ngIf="purchaseType === 'all store'" class="row justify-content-start">
         <br>
       </div>
       <div class="col-lg-4 from-group">
         <label for="min">Minimum</label>
-        <input type="number" [min]="1" id="min" class="form-control"
-               [value]="this.policy !== undefined ? this.policy.min : 1"
+        <input type="number" [min]="0" id="min" class="form-control"
+               [value]="this.policy !== undefined ? this.policy.min : 0"
                #min/> &nbsp;
       </div>
       <div class="col-lg-4 from-group">
         <label for="max">Maximum</label>
-        <input type="number" [min]="1" id="max" class="form-control"
-               [value]="this.policy !== undefined ? this.policy.max : 1"
+        <input type="number" [min]="0" id="max" class="form-control"
+               [value]="this.policy !== undefined ? this.policy.max : 100"
                #max/>
       </div>
     </div>
   </div>
 
-  <div *ngIf="policyType === 'on system'" class="row justify-content-start">
+  <div *ngIf="purchaseType === 'on system'" class="row justify-content-start">
     <div class="col-sm-4 from-group">
       <br>
       <label for="description1">Description
@@ -75,7 +75,7 @@
     </div>
   </div>
 
-  <div *ngIf="policyType === 'on user'" class="row justify-content-start">
+  <div *ngIf="purchaseType === 'on user'" class="row justify-content-start">
     <div class="col-sm-4 from-group">
       <br>
       <label for="description2">Description
@@ -99,7 +99,7 @@
     </div>
   </div>
 
-  <div *ngIf="policyType === 'compose'" class="row justify-content-start">
+  <div *ngIf="purchaseType === 'compose'" class="row justify-content-start">
     <div class="col-sm-4 from-group">
       <br>
       <label>Composed Purchase Policies:</label>
@@ -125,7 +125,7 @@
 
   <br>
   <div class="col-xs-12">
-    <button class="btn btn-success" type="submit" (click)="onAddDiscount()">Add/Edit Policy</button>
+    <button class="btn btn-success" type="submit" (click)="onAddPolicy()">Add/Edit Policy</button>
   </div>
   <div class="col-sm-5 from-group" [style.color]="messageColor">
     <p>{{message}}</p>

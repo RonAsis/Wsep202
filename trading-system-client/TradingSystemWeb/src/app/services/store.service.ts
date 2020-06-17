@@ -20,7 +20,7 @@ export class StoreService {
   discountSelected = new EventEmitter<Discount>();
   discountAdded = new EventEmitter<Discount>();
   policySelected = new EventEmitter<Policy>();
-  policyAdded = new EventEmitter<Discount>();
+  policyAdded = new EventEmitter<Policy>();
   constructor(private httpService: HttpService, private userService: UserService) {
   }
 

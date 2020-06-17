@@ -766,7 +766,7 @@ public class Store {
     public boolean removePurchase(UserSystem userSystem, int purchaseId) {
         if (validatePermission(userSystem, StorePermission.EDIT_PURCHASE_POLICY)) {
             Purchase purchase = purchasePolicies.stream()
-                    .filter(purchase1 -> purchase1.getPurchasePolicyId() == purchaseId)
+                    .filter(purchase1 -> purchase1.getPurchaseId() == purchaseId)
                     .findFirst().orElseThrow(() -> new TradingSystemException(String.format("the purchase %d doesn't exist in store %d", purchaseId, storeId)));
             return purchasePolicies.remove(purchase);
         }
@@ -791,7 +791,7 @@ public class Store {
      * @return
      */
     public Purchase addEditPurchase(UserSystem user, Purchase purchase) {
-        if (purchase.getPurchasePolicyId() < 0) {
+        if (purchase.getPurchaseId() < 0) {
             return addPurchasePolicy(user, purchase);
         } else {
             return editPurchase(user, purchase);
@@ -801,7 +801,7 @@ public class Store {
     private Purchase editPurchase(UserSystem user, Purchase purchase) {
         if (validatePermission(user, StorePermission.EDIT_PURCHASE_POLICY)) {  //verify the user is owner of the store
             Optional<Boolean> isEdit = purchasePolicies.stream()
-                    .filter(purchase1 -> purchase1.getPurchasePolicyId() == purchase.getPurchasePolicyId())
+                    .filter(purchase1 -> purchase1.getPurchaseId() == purchase.getPurchaseId())
                     .findFirst().map(purchase2 -> purchase2.editPurchase(purchase.getDescription(),purchase.getPurchasePolicy(),
                             purchase.getPurchaseType()));
             return isEdit.isPresent() ? purchase : null;

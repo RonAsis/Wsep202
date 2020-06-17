@@ -139,7 +139,7 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
-        purchase.setPurchasePolicyId(getNewId());
+        purchase.setPurchaseId(getNewId());
         return store.addEditPurchase(user, purchase);
     }
 

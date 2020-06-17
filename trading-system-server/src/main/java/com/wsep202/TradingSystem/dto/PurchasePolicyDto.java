@@ -23,14 +23,12 @@ import java.util.Set;
 @Builder
 public class PurchasePolicyDto {
 
-    protected int purchaseId;
+    protected long purchaseId;
 
     /**
      * one of the following : 'all store', 'specific product', 'on system', 'on user',  'compose'
      */
     private String purchaseType;
-
-
 
     private String description;
     /**

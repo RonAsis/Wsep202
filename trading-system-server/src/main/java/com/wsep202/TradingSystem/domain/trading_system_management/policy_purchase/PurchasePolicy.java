@@ -28,9 +28,7 @@ public abstract class PurchasePolicy {
      */
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private long id;;
-
-
+    private long id;
 
     /**
      * check if the purchase details stands in the purchase policy of the store

@@ -1,11 +1,13 @@
 <div class="row">
   <div class="col-md-5">
     <app-policies
-      [store]="store">
+      [store]="store"
+      (policyWasSelected)="selectedPolicy = $event">
     </app-policies>
   </div>
   <div *ngIf="selectedPolicy" class="col-md-7">
     <app-add-policy [policy]="selectedPolicy" [store]="store"
-                      (policyItemAdded)="policyItemChanged($event)"></app-add-policy>
+                    (policyItemAdded)="policyItemChanged($event)">
+    </app-add-policy>
   </div>
 </div>

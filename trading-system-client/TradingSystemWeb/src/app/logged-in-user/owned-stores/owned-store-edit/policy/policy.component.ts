@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Store} from '../../../../shared/store.model';
 import {StoreService} from '../../../../services/store.service';
-import {Discount} from '../../../../shared/discount.model';
 import {Policy} from '../../../../shared/policy.model';
 
 @Component({
@@ -19,7 +18,7 @@ export class PolicyComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  policyItemChanged($event: Discount) {
+  policyItemChanged($event: Policy) {
     this.storeService.policyAdded.emit($event);
   }
 }

@@ -360,7 +360,7 @@ export class HttpService {
       `${username}/` +
       `${storeId}/` +
       `${uuid}`;
-    return this.http.post<Discount>(
+    return this.http.post<Policy>(
       url, policy);
   }
   //////////////////////////// SellerOwnerController ///////////////////////////

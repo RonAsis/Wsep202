@@ -2,24 +2,25 @@ package com.wsep202.TradingSystem.domain.trading_system_management.policy_purcha
 import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.Entity;
 import java.util.Map;
 
 @Setter
 @Getter
 @Slf4j
 @Builder
+@Entity
+@AllArgsConstructor
 public class ShoppingBagDetailsPolicy extends PurchasePolicy {
 
     private int min,max;
 
-    public ShoppingBagDetailsPolicy(int min, int max) {
-        this.min = min;
-        this.max = max;
+    public ShoppingBagDetailsPolicy(){
+        this.min = 0;
+        this.max = 100;
     }
 
     @Override
@@ -28,7 +29,7 @@ public class ShoppingBagDetailsPolicy extends PurchasePolicy {
         if (!isStandsInTerms(amountOfProductsInBag,min,max)) {
             //is not approved policy terms
             log.info("bad amount of products in shopping bag: " + amountOfProductsInBag + " \npurchase " +
-                    "policy with id: " + purchase.getPurchasePolicyId() + " failed");
+                    "policy with id: " + purchase.getPurchaseId() + " failed");
             throw new PurchasePolicyException("Sorry, your shopping bag details are incompatible with" +
                     "purchase policy: your shopping bag has "
                     + amountOfProductsInBag + " products but the policy minimum required is " + min + "and maximum is " +
@@ -36,7 +37,7 @@ public class ShoppingBagDetailsPolicy extends PurchasePolicy {
         }
         //approved policy terms on amount of products in bag
         log.info("shopping bag passed the shopping bag purchase policy with" +
-                "ID: " + purchase.getPurchasePolicyId());
+                "ID: " + purchase.getPurchaseId());
         return true;
     }
     /**
@@ -56,12 +57,12 @@ public class ShoppingBagDetailsPolicy extends PurchasePolicy {
      */
     public boolean edit(Purchase purchase, int min,int max){
         if(min < 0 || max < 0 || min > max){
-            log.info("problem with updating policy in bag purchase policy number " + purchase.getPurchasePolicyId());
+            log.info("problem with updating policy in bag purchase policy number " + purchase.getPurchaseId());
             return false;
         }
         this.min = min;
         this.max = max;
-        log.info("updated min & max in bag purchase policy number " + purchase.getPurchasePolicyId());
+        log.info("updated min & max in bag purchase policy number " + purchase.getPurchaseId());
         return true;
     }
 }

@@ -3,11 +3,7 @@ import {Policy} from '../../../../../shared/policy.model';
 import {StoreService} from '../../../../../services/store.service';
 import {Product} from '../../../../../shared/product.model';
 import {IDropdownSettings, ListItem} from 'ng-multiselect-dropdown/multiselect.model';
-import {AmountProductsComponent} from '../../discount/add-discount/amount-products/amount-products.component';
-import {MatDialog} from '@angular/material/dialog';
 import {Store} from '../../../../../shared/store.model';
-import {Discount} from '../../../../../shared/discount.model';
-import {WeekDay} from '@angular/common';
 import {Countries} from '../../../../../shared/countries.model';
 
 @Component({
@@ -22,7 +18,7 @@ export class AddPolicyComponent implements OnInit {
   @Input() policy: Policy;
   @Input() store: Store;
 
-  @Output() policyItemAdded = new EventEmitter<Discount>();
+  @Output() policyItemAdded = new EventEmitter<Policy>();
 
   @ViewChild('min', {static: false}) min: ElementRef;
   @ViewChild('max', {static: false}) max: ElementRef;
@@ -44,7 +40,7 @@ export class AddPolicyComponent implements OnInit {
   selectedComposedPolicies: Policy[];
   composedPoliciesSettings: IDropdownSettings;
 
-  policyType: string;
+  purchaseType: string;
 
   compositeOperators: string[];
   selectedComposite: string;
@@ -61,7 +57,7 @@ export class AddPolicyComponent implements OnInit {
   }
 
   private initComp(): void {
-    this.policyType = 'all store';
+    this.purchaseType = 'all store';
     this.selectedCountriesPermitted = [];
     this.selectedStoreWorkDays = [];
     this.selectedComposedPolicies = [];
@@ -101,7 +97,7 @@ export class AddPolicyComponent implements OnInit {
         this.policy.composedPurchasePolicies !== undefined && this.policy.composedPurchasePolicies !== null ?
           this.policy.composedPurchasePolicies : [];
       this.selectedComposite = this.policy.compositeOperator;
-      this.policyType = this.policy.policyType;
+      this.purchaseType = this.policy.purchaseType;
     }
   }
 
@@ -154,7 +150,7 @@ export class AddPolicyComponent implements OnInit {
     if (this.description !== null && this.description !== undefined) {
       this.description.nativeElement.value = '';
     }
-    this.policyType = 'all store';
+    this.purchaseType = 'all store';
   }
 
   onSpecificProduct() {
@@ -162,7 +158,7 @@ export class AddPolicyComponent implements OnInit {
     if (this.description !== null && this.description !== undefined) {
       this.description.nativeElement.value = '';
     }
-    this.policyType = 'specific product';
+    this.purchaseType = 'specific product';
   }
 
   onSystem() {
@@ -170,7 +166,7 @@ export class AddPolicyComponent implements OnInit {
     if (this.description !== null && this.description !== undefined) {
       this.description.nativeElement.value = '';
     }
-    this.policyType = 'on system';
+    this.purchaseType = 'on system';
   }
 
   onUser() {
@@ -178,7 +174,7 @@ export class AddPolicyComponent implements OnInit {
     if (this.description !== null && this.description !== undefined) {
       this.description.nativeElement.value = '';
     }
-    this.policyType = 'on user';
+    this.purchaseType = 'on user';
   }
 
   onComposePolicy() {
@@ -186,7 +182,7 @@ export class AddPolicyComponent implements OnInit {
     if (this.description !== null && this.description !== undefined) {
       this.description.nativeElement.value = '';
     }
-    this.policyType = 'compose';
+    this.purchaseType = 'compose';
   }
 
   onSelectProductUnderPolicy(productItem: any) {
@@ -225,30 +221,34 @@ export class AddPolicyComponent implements OnInit {
     }
   }
 
-  onAddDiscount() {
+  onAddPolicy() {
     if (this.min !== null && this.min !== undefined && (this.min.nativeElement.value === null
       || this.min.nativeElement.value === undefined)) {
       this.errorMessage('You must type minimum value');
     } else if (this.max !== null && this.max !== undefined && (this.max.nativeElement.value === null
       || this.max.nativeElement.value === undefined)) {
       this.errorMessage('You must type maximum value');
+    } else if ((this.min !== null && this.min !== undefined && this.min.nativeElement.value !== null &&
+      this.min.nativeElement.value !== undefined) && (this.max !== null && this.max !== undefined &&
+      this.max.nativeElement.value !== null && this.max.nativeElement.value !== undefined) &&
+      this.min.nativeElement.value > this.max.nativeElement.value) {
+      this.errorMessage('You must type minimum value smaller or equals to maximum value');
     } else if (this.description.nativeElement.value === null || this.description.nativeElement.value === undefined ||
       this.description.nativeElement.value.length === 0) {
       this.errorMessage('You must type description');
-    } else if ((this.selectedProductUnderPolicy === null || this.selectedProductUnderPolicy === undefined) && this.policyType === 'specific product') {
+    } else if ((this.selectedProductUnderPolicy === null || this.selectedProductUnderPolicy === undefined) && this.purchaseType === 'specific product') {
       this.errorMessage('You must choose a product');
     } else if ((this.selectedCountriesPermitted === null || this.selectedCountriesPermitted === undefined ||
-      this.selectedCountriesPermitted.length === 0) && this.policyType === 'on user') {
+      this.selectedCountriesPermitted.length === 0) && this.purchaseType === 'on user') {
       this.errorMessage('You must choose at least one country');
     } else if ((this.selectedStoreWorkDays === null || this.selectedStoreWorkDays === undefined ||
-      this.selectedStoreWorkDays.length === 0) && this.policyType === 'on system') {
+      this.selectedStoreWorkDays.length === 0) && this.purchaseType === 'on system') {
       this.errorMessage('You must choose at least one day');
     } else {
       this.errorMessage('');
       const policy = new Policy(
         this.policy !== null && this.policy !== undefined ? this.policy.purchaseId : -1,
-        this.policy.purchaseType,
-        this.policyType,
+        this.purchaseType,
         this.description !== null && this.description !== undefined ? this.description.nativeElement.value : '',
         this.selectedCountriesPermitted,
         this.selectedStoreWorkDays.map(value => this.convertDayToInt(value)),
@@ -264,6 +264,7 @@ export class AddPolicyComponent implements OnInit {
             this.policyItemAdded.emit(response);
           }
         });
+      console.log(policy);
       this.sucMessage();
     }
   }

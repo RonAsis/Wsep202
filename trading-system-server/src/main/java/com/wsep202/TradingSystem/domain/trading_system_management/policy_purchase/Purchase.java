@@ -28,12 +28,12 @@ public class Purchase {
      */
     @Id
     @GeneratedValue
-    protected long purchasePolicyId;
+    protected long purchaseId;
 
     /**
      * the actual type of purchase policy
      */
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private PurchasePolicy purchasePolicy;
 
     /**
