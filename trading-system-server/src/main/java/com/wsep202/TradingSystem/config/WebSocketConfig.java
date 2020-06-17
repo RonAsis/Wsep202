@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.config;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
+import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import com.wsep202.TradingSystem.web.controllers.shakeHandler.CustomHandshakeHandler;
 import lombok.RequiredArgsConstructor;

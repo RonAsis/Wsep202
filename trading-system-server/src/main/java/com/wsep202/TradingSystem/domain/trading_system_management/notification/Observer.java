@@ -9,4 +9,8 @@ public interface Observer {
     void newNotification(Notification notification);
 
     void connectNotificationSystem(String principal);
+
+    String getPrincipal();
+
+    String getUserName();
 }

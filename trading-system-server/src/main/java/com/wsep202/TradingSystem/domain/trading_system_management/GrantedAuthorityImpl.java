@@ -13,7 +13,7 @@ public enum GrantedAuthorityImpl implements GrantedAuthority {
    ADMIN{
        @Override
        public String getAuthority() {
-           return "ROLE_USER";
+           return "ROLE_ADMIN";
        }
    };
 

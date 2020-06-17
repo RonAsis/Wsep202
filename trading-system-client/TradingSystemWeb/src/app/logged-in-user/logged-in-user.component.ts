@@ -14,7 +14,7 @@ export class LoggedInUserComponent implements OnInit{
   constructor(private userService: UserService, private webSocketService: WebSocketService,
               private shareService: ShareService) {
     this.tera();
-    this.webSocketService.getWebSocketAPI()._send();
+    this.webSocketService.getWebSocketAPI()._send_connect();
   }
 
   tera() {

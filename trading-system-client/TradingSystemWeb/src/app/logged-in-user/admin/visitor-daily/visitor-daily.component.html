@@ -42,6 +42,14 @@
     <button class="btn btn-success" type="submit" (click)="onGetVistorDaily()">Get Vistor Daily</button>
   </div>
 
+  <hr/>
+  <div class="col-xs-12">
+    <button class="btn bg-danger" [disabled]="!(firstIndex > 10)" type="submit" (click)="onPrev()">Prev</button>
+  </div>
+  <div class="col-xs-12">
+    <button class="btn bg-warning" [disabled]="!(dailyVistors.length == 10)" type="submit" (click)="onNext()">Next</button>
+  </div>
+
   <div class="col-sm-5 from-group" [style.color]="messageColor">
     <p>{{message}}</p>
   </div>

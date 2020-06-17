@@ -1,4 +1,4 @@
-package com.wsep202.TradingSystem.dto;
+package com.wsep202.TradingSystem.domain.trading_system_management.statistics;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class RequestGetDailyVisitorsDto {
+public class RequestGetDailyVisitors {
 
     private Date start;
 

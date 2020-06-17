@@ -1,6 +1,5 @@
 package com.wsep202.TradingSystem.web.controllers;
 
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
 import com.wsep202.TradingSystem.dto.DailyVisitorDto;
 import com.wsep202.TradingSystem.dto.ReceiptDto;
 import com.wsep202.TradingSystem.dto.RequestGetDailyVisitorsDto;
@@ -9,13 +8,10 @@ import com.wsep202.TradingSystem.service.user_service.AdministratorService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -41,6 +37,7 @@ public class AdministratorController {
             @PathVariable UUID uuid) {
         return administratorService.viewPurchaseHistory(administratorUsername, storeId, uuid);
     }
+
     /**
      * View buyer purchase history
      */
@@ -50,7 +47,7 @@ public class AdministratorController {
     public List<ReceiptDto> viewPurchaseHistory(@PathVariable String administratorUsername,
                                                 @PathVariable String username,
                                                 @PathVariable UUID uuid) {
-        return administratorService.viewPurchaseHistory(administratorUsername, username,uuid);
+        return administratorService.viewPurchaseHistory(administratorUsername, username, uuid);
     }
 
     /**
@@ -69,8 +66,19 @@ public class AdministratorController {
     @ApiOperation(value = "get daily visitors")
     @PostMapping("get-daily-visitors/{username}/{uuid}")
     public List<DailyVisitorDto> getDailyVisitors(@PathVariable String username,
-                                         @RequestBody RequestGetDailyVisitorsDto requestGetDailyVisitorsDto,
-                                         @PathVariable UUID uuid) {
+                                                  @RequestBody RequestGetDailyVisitorsDto requestGetDailyVisitorsDto,
+                                                  @PathVariable UUID uuid) {
         return administratorService.getDailyVisitors(username, requestGetDailyVisitorsDto, uuid);
     }
+
+    /**
+     * View buyer purchase history
+     */
+    @ApiOperation(value = "stop daily visitors")
+    @PostMapping("stop-daily-visitors/{username}/{uuid}")
+    public void stopDailyVisitors(@PathVariable String username,
+                                  @PathVariable UUID uuid) {
+        administratorService.stopDailyVisitors(username, uuid);
+    }
+
 }

@@ -4,6 +4,7 @@ import com.wsep202.TradingSystem.domain.exception.RegisterObserverException;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemDao;
 import com.wsep202.TradingSystem.domain.trading_system_management.TradingSystemFacade;
 import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class Publisher implements Subject {
     private Set<Observer> observersWithNotification = new HashSet<>();
     private final TradingSystemDao tradingSystemDao;
     private final TradingSystemFacade tradingSystemFacade;
+    private final Set<String> regToDailyVisitor = new HashSet<>();
 
     @Override
     @Synchronized("publisherSync")
@@ -28,7 +30,8 @@ public class Publisher implements Subject {
         if (Objects.isNull(obj)) {
             throw new RegisterObserverException("Null Observer");
         }
-        if (!observers.contains(obj)) {
+        if (observers.stream()
+        .noneMatch(observer -> observer.getUserName().equals(obj.getUserName()))) {
             observers.add(obj);
         }
     }
@@ -36,12 +39,15 @@ public class Publisher implements Subject {
     @Override
     @Synchronized("publisherSync")
     public void unregister(Observer obj) {
-        observers.remove(obj);
+        observers.stream().filter(observer -> observer.getUserName().equals(obj.getUserName())).findFirst()
+                .ifPresent(observers::remove);
     }
 
     @Override
     public void update(Observer obj) {
-        observersWithNotification.add(obj);
+        if(observers.stream().noneMatch(observer -> observer.getUserName().equals(obj.getUserName()))){
+            observersWithNotification.add(obj);
+        }
     }
 
     @Override
@@ -64,6 +70,27 @@ public class Publisher implements Subject {
     @Synchronized("publisherSync")
     public void Broadcast(Notification notification) {
         observers.forEach(observer -> observer.newNotification(notification));
+    }
+
+    @Override
+    public boolean regDailyVisitor(String username) {
+        return regToDailyVisitor.add(username);
+    }
+
+    @Override
+    public boolean unRegDailyVisitor(String username) {
+        return regToDailyVisitor.remove(username);
+    }
+
+    @Override
+    public void sendDailyVisitor(UpdateDailyVisitor updateDailyVisitor) {
+        regToDailyVisitor.forEach(username -> {
+                    Optional<Observer> optionalObserver = observers.stream().filter(oserver -> oserver.getUserName().equals(username)).findFirst();
+                    optionalObserver.map(observer -> {
+                        updateDailyVisitor.setPrincipal(observer.getPrincipal());
+                       return tradingSystemFacade.sendDailyVisitor(updateDailyVisitor);
+                    });
+                });
     }
 
 }

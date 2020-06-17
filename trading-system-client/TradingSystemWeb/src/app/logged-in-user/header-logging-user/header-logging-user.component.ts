@@ -12,6 +12,7 @@ import {ShareService} from '../../services/share.service';
 export class HeaderLoggedInUserComponent implements OnInit {
   @Output() featureSelectedLogging = new EventEmitter<string>();
   private isAdmin: boolean;
+  private prevFeature: string;
 
   constructor(private storeService: StoreService, private userService: UserService,
               private shareService: ShareService) {
@@ -19,6 +20,7 @@ export class HeaderLoggedInUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.prevFeature = 'Products';
     this.shareService.featureSelected.subscribe(feature => {
       this.teraAll();
       if (feature === 'Owned-stores'){
@@ -33,6 +35,10 @@ export class HeaderLoggedInUserComponent implements OnInit {
     this.teraAll();
     this.storeService.setOwnerStores(feature === 'Owned-stores');
     this.storeService.setManagerStores(feature === 'Managed-stores');
+    if (this.prevFeature === 'Visitor-Daily'){
+      this.userService.stopDailyVisitor().subscribe();
+    }
+    this.prevFeature = feature;
     this.featureSelectedLogging.emit(feature);
   }
 

@@ -7,12 +7,16 @@ import com.wsep202.TradingSystem.domain.trading_system_management.notification.S
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 import javafx.util.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -57,12 +62,12 @@ public class TradingSystem {
         tradingSystemDao.registerAdmin(admin);
     }
 
-    public static Subject getSubject(){
+    public static Subject getSubject() {
         return subject;
     }
 
-    public static void setSubject(Subject subject){
-        if(Objects.isNull(TradingSystem.subject)){
+    public static void setSubject(Subject subject) {
+        if (Objects.isNull(TradingSystem.subject)) {
             TradingSystem.subject = subject;
         }
     }
@@ -83,6 +88,7 @@ public class TradingSystem {
      * UC 2.2
      * register new user in the system
      * with its password
+     *
      * @param userToRegister the user we want to register
      * @param image
      * @return true if the registration succeeded
@@ -104,6 +110,7 @@ public class TradingSystem {
     /**
      * UC 2.3
      * This method is used to make a login for a the user
+     *
      * @param password - the users password
      * @return true if the user logged-in, false if nots
      */
@@ -116,7 +123,8 @@ public class TradingSystem {
                 !tradingSystemDao.isLogin(userName)) {
             userSystem.get().login();
             UUID uuid = UUID.randomUUID();
-            tradingSystemDao.login(userName, uuid);
+            Optional<UpdateDailyVisitor> updateDailyVisitorOpt = tradingSystemDao.login(userName, uuid);
+            updateDailyVisitorOpt.ifPresent(updateDailyVisitor -> subject.sendDailyVisitor(updateDailyVisitor));
             boolean isAdmin = tradingSystemDao.isAdmin(userName);
             log.info(String.format("user: %s logged in successfully, is admin: %b", userName, isAdmin));
             return new Pair<>(uuid, isAdmin);
@@ -128,6 +136,7 @@ public class TradingSystem {
     /**
      * UC 3.1
      * logout the user from the system
+     *
      * @param user - the user that asks to log out
      * @return true if logged out, otherwise false
      */
@@ -137,6 +146,7 @@ public class TradingSystem {
                 tradingSystemDao.isLogin(user.getUserName())) {
             user.logout();
             tradingSystemDao.logout(user.getUserName());
+            subject.unRegDailyVisitor(user.getUserName());
             log.info(String.format("user: %s logout successfully", (user.getUserName())));
             return true;
         }
@@ -159,7 +169,7 @@ public class TradingSystem {
 
     private boolean uuidIsValid(String administratorUsername, UUID uuid) {
         return Objects.nonNull(administratorUsername) &&
-               tradingSystemDao.isLogin(administratorUsername) &&
+                tradingSystemDao.isLogin(administratorUsername) &&
                 tradingSystemDao.isValidUuid(administratorUsername, uuid);
     }
 
@@ -218,6 +228,7 @@ public class TradingSystem {
     /**
      * UC 2.8
      * This method is used to purchase all the products that the unregistered user added to his cart.
+     *
      * @param shoppingCart   - the users personal shopping cart
      * @param paymentDetails - the user credit card number & expiration date
      * @return list of receipts for stores where payment has been made
@@ -230,6 +241,7 @@ public class TradingSystem {
     /**
      * UC 2.8
      * This method is used to purchase all the products that the registered user added to his cart.
+     *
      * @param paymentDetails - the user credit card number & expiration date
      * @param user           - the user that made
      * @return list of receipts for stores where payment has been made
@@ -270,27 +282,27 @@ public class TradingSystem {
         shoppingCart.applyDiscountPolicies();
         log.info("applied stores discount policies on shopping cart");
         int chargeTransactionId = externalServiceManagement.charge(paymentDetails, shoppingCart);
-        if(chargeTransactionId<10000 || chargeTransactionId > 100000){
+        if (chargeTransactionId < 10000 || chargeTransactionId > 100000) {
             //charge failed
-            throw new ChargeException("failed to charge: "+paymentDetails.getHolderName()+" for purchase");
+            throw new ChargeException("failed to charge: " + paymentDetails.getHolderName() + " for purchase");
         }
-        log.info("The card holder:"+paymentDetails.getHolderName()+" has been charged by his purchase.");
+        log.info("The card holder:" + paymentDetails.getHolderName() + " has been charged by his purchase.");
         int supplyTransId;
         try {//request shipping for the purchase
             supplyTransId = externalServiceManagement.deliver(billingAddress, shoppingCart);
-            if(supplyTransId < 10000 || supplyTransId > 100000){
-                throw new DeliveryRequestException("supply rejected for: "+billingAddress.getCustomerFullName());
+            if (supplyTransId < 10000 || supplyTransId > 100000) {
+                throw new DeliveryRequestException("supply rejected for: " + billingAddress.getCustomerFullName());
             }
         } catch (DeliveryRequestException exception) {
             //in case delivery request rejected, cancel charged cart
-            externalServiceManagement.cancelCharge(paymentDetails, shoppingCart,String.valueOf(chargeTransactionId));
+            externalServiceManagement.cancelCharge(paymentDetails, shoppingCart, String.valueOf(chargeTransactionId));
             throw new DeliveryRequestException("The delivery request for: " + customerName + " " +
                     "has been rejected.");
         }
         log.info("delivery request accepted");
         shoppingCart.updateAllAmountsInStock();
         log.info("all amounts of products in stock of stores were updated");
-        return shoppingCart.createReceipts(customerName,chargeTransactionId,supplyTransId);
+        return shoppingCart.createReceipts(customerName, chargeTransactionId, supplyTransId);
     }
 
     private boolean validationOfPurchaseArgs(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress) {
@@ -305,6 +317,7 @@ public class TradingSystem {
     /**
      * UC 3.2
      * This method is used to open a new store in the system
+     *
      * @param user      - the user that wants to open the store
      * @param storeName - the name of the store that the user decided
      * @return - false if the user is not registered, and true after the new store is added to store list
@@ -313,7 +326,7 @@ public class TradingSystem {
                            String storeName,
                            String description) {
         if (Objects.nonNull(user) && Strings.isNotBlank(storeName) && Strings.isNotBlank(description)
-            && tradingSystemDao.isRegistered(user)) {
+                && tradingSystemDao.isRegistered(user)) {
             Store newStore = new Store(user, storeName, description);
             user.addNewOwnedStore(newStore);
             tradingSystemDao.updateStoreAndUserSystem(newStore, user);
@@ -328,8 +341,9 @@ public class TradingSystem {
     /**
      * UC 4.5
      * This method is used to add a new manager to an existing store
-     * @param ownedStore     - The store to which you want to add a manager
-     * @param ownerUser      - owner of the store
+     *
+     * @param ownedStore - The store to which you want to add a manager
+     * @param ownerUser  - owner of the store
      * @return true if the addition was successful, false if there were a problem
      */
     public MangerStore addMangerToStore(Store ownedStore, UserSystem ownerUser, String newManagerUsername) {
@@ -337,9 +351,9 @@ public class TradingSystem {
         if (Objects.nonNull(ownedStore) && Objects.nonNull(ownerUser) && Objects.nonNull(newManagerUser) &&
                 newManagerUser.isPresent()) {
             MangerStore mangerStore = ownedStore.appointAdditionManager(ownerUser, newManagerUser.get());
-            if(Objects.nonNull(mangerStore)) {
+            if (Objects.nonNull(mangerStore)) {
                 log.info(String.format("user %s was added as manager in store '%d'", newManagerUser.get().getUserName(), ownedStore.getStoreId()));
-                if(newManagerUser.get().addNewManageStore(ownedStore)){
+                if (newManagerUser.get().addNewManageStore(ownedStore)) {
                     newManagerUser.get().newNotification(Notification.builder()
                             .content(String.format("You are manger of store id %s", ownedStore.getStoreId()))
                             .build());
@@ -356,6 +370,7 @@ public class TradingSystem {
     /**
      * UC 4.3
      * This method is used to add a new owner to an existing store
+     *
      * @param ownedStore   - The store to which you want to add a manager
      * @param ownerUser    - owner of the store
      * @param newOwnerUser - the user that needs to be added as an owner
@@ -378,11 +393,11 @@ public class TradingSystem {
         return false;
     }
 
-    private void approveOwner(UserSystem ownerUser, UserSystem newOwnerUser, Store store){
-        if(store.isApproveOwner(newOwnerUser) == StatusOwner.APPROVE){
+    private void approveOwner(UserSystem ownerUser, UserSystem newOwnerUser, Store store) {
+        if (store.isApproveOwner(newOwnerUser) == StatusOwner.APPROVE) {
             newOwnerUser.addNewOwnedStore(store);
             newOwnerUser.newNotification(Notification.builder()
-            .content(String.format("You are now owner of store %s on name %s", store.getStoreId(), store.getStoreName()))
+                    .content(String.format("You are now owner of store %s on name %s", store.getStoreId(), store.getStoreName()))
                     .build());
         }
     }
@@ -390,6 +405,7 @@ public class TradingSystem {
     /**
      * UC 4.7
      * remove manager from the store
+     *
      * @param ownedStSore  - the store
      * @param ownerUser    - the owner of the store that want remove the manager
      * @param managerStore - the manager that want to remove
@@ -399,8 +415,8 @@ public class TradingSystem {
         if (Objects.nonNull(ownedStSore) && Objects.nonNull(ownerUser) && Objects.nonNull(managerStore)
                 && ownedStSore.removeManager(ownerUser, managerStore)) {
             managerStore.newNotification(Notification.builder()
-            .content(String.format("You are Not more manger of store id %s", ownedStSore.getStoreId()))
-            .build());
+                    .content(String.format("You are Not more manger of store id %s", ownedStSore.getStoreId()))
+                    .build());
             tradingSystemDao.updateStoreAndUserSystem(ownedStSore, ownerUser);
             log.info(String.format("user %s was removed as manager from store '%d'", managerStore.getUserName(), ownedStSore.getStoreId()));
             return true;
@@ -412,8 +428,9 @@ public class TradingSystem {
     /**
      * UC 4.4
      * remove owner from store
-     * @param store  - the store
-     * @param ownerUser    - the owner of the store that want remove the other owner
+     *
+     * @param store       - the store
+     * @param ownerUser   - the owner of the store that want remove the other owner
      * @param removeOwner - the owner that needs to removed
      * @return true if manager was removed, else false
      */
@@ -435,7 +452,7 @@ public class TradingSystem {
      * connect to Notification System
      */
     public void connectNotificationSystem(Observer observer, String principal) {
-        observer.connectNotificationSystem( principal);
+        observer.connectNotificationSystem(principal);
     }
 
     public Set<Store> getStores() {
@@ -482,6 +499,7 @@ public class TradingSystem {
 
     /**
      * get the shopping bag cost with original products prices
+     *
      * @param bagsToCalculate
      * @return
      */
@@ -521,5 +539,22 @@ public class TradingSystem {
 
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
         return tradingSystemDao.getShoppingCart(username, uuid);
+    }
+
+    public Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid) {
+        Set<DailyVisitor> dailyVisitors = tradingSystemDao.getDailyVisitors(username, requestGetDailyVisitors, uuid);
+        Date toDay = new Date();
+        Optional<DailyVisitor> dailyVisitorToday = dailyVisitors.stream().filter(dailyVisitor ->
+                DateUtils.isSameDay(toDay, dailyVisitor.getDate()))
+                .findFirst();
+        dailyVisitorToday.map(dailyVisitor -> subject.regDailyVisitor(username))
+                .orElseGet(() -> subject.unRegDailyVisitor(username));
+        return dailyVisitors;
+    }
+
+    public void stopDailyVisitors(String username, UUID uuid) {
+        if (tradingSystemDao.isValidUuid(username, uuid) && tradingSystemDao.isAdmin(username)) {
+            subject.unRegDailyVisitor(username);
+        }
     }
 }
