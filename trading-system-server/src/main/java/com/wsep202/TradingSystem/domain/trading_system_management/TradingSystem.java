@@ -9,12 +9,14 @@ import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Billi
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 import javafx.util.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -121,7 +123,8 @@ public class TradingSystem {
                 !tradingSystemDao.isLogin(userName)) {
             userSystem.get().login();
             UUID uuid = UUID.randomUUID();
-            tradingSystemDao.login(userName, uuid);
+            Optional<UpdateDailyVisitor> updateDailyVisitorOpt = tradingSystemDao.login(userName, uuid);
+            updateDailyVisitorOpt.ifPresent(updateDailyVisitor -> subject.sendDailyVisitor(updateDailyVisitor));
             boolean isAdmin = tradingSystemDao.isAdmin(userName);
             log.info(String.format("user: %s logged in successfully, is admin: %b", userName, isAdmin));
             return new Pair<>(uuid, isAdmin);
@@ -143,9 +146,7 @@ public class TradingSystem {
                 tradingSystemDao.isLogin(user.getUserName())) {
             user.logout();
             tradingSystemDao.logout(user.getUserName());
-            if(user.isAdmin()){
-                subject.unRegDailyVisitor(user.getUserName());
-            }
+            subject.unRegDailyVisitor(user.getUserName());
             log.info(String.format("user: %s logout successfully", (user.getUserName())));
             return true;
         }
@@ -543,7 +544,8 @@ public class TradingSystem {
     public Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid) {
         Set<DailyVisitor> dailyVisitors = tradingSystemDao.getDailyVisitors(username, requestGetDailyVisitors, uuid);
         Date toDay = new Date();
-        Optional<DailyVisitor> dailyVisitorToday = dailyVisitors.stream().filter(dailyVisitor -> dailyVisitor.getDate().equals(toDay))
+        Optional<DailyVisitor> dailyVisitorToday = dailyVisitors.stream().filter(dailyVisitor ->
+                DateUtils.isSameDay(toDay, dailyVisitor.getDate()))
                 .findFirst();
         dailyVisitorToday.map(dailyVisitor -> subject.regDailyVisitor(username))
                 .orElseGet(() -> subject.unRegDailyVisitor(username));

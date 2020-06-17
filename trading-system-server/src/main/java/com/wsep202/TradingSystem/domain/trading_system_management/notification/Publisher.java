@@ -30,7 +30,8 @@ public class Publisher implements Subject {
         if (Objects.isNull(obj)) {
             throw new RegisterObserverException("Null Observer");
         }
-        if (!observers.contains(obj)) {
+        if (observers.stream()
+        .noneMatch(observer -> observer.getUserName().equals(obj.getUserName()))) {
             observers.add(obj);
         }
     }
@@ -38,12 +39,15 @@ public class Publisher implements Subject {
     @Override
     @Synchronized("publisherSync")
     public void unregister(Observer obj) {
-        observers.remove(obj);
+        observers.stream().filter(observer -> observer.getUserName().equals(obj.getUserName())).findFirst()
+                .ifPresent(observers::remove);
     }
 
     @Override
     public void update(Observer obj) {
-        observersWithNotification.add(obj);
+        if(observers.stream().noneMatch(observer -> observer.getUserName().equals(obj.getUserName()))){
+            observersWithNotification.add(obj);
+        }
     }
 
     @Override

@@ -8,7 +8,7 @@ import {UpdateDailyVisitor} from '../../../shared/updateDailyVisitorDto.model';
   templateUrl: './visitor-daily.component.html',
   styleUrls: ['./visitor-daily.component.css']
 })
-export class VisitorDailyComponent implements OnInit, OnDestroy {
+export class VisitorDailyComponent implements OnInit{
 
   @ViewChild('startTime', {static: false}) startTime: ElementRef;
 
@@ -22,12 +22,8 @@ export class VisitorDailyComponent implements OnInit, OnDestroy {
   firstIndex: number;
   lastIndex: number;
 
-  dailyVistors: DailyVistorDto[];
+  dailyVistors: DailyVistorDto[] = [];
   constructor(private userService: UserService) { }
-
-  ngOnDestroy(): void {
-      this.userService.stopDailyVisitor();
-    }
 
   ngOnInit(): void {
     this.firstIndex = 0;
@@ -48,20 +44,26 @@ export class VisitorDailyComponent implements OnInit, OnDestroy {
     this.userService.dailyVisitorReceivedEvent.subscribe((response: UpdateDailyVisitor) => {
       if (response !== undefined){
         const today = new Date();
-        const dailyVistorDto = this.dailyVistors.find(daily => daily.date === today);
+        const dailyVistorDto = this.dailyVistors.find(daily => {
+          const dateOfVisitor = new Date(daily.date);
+          return dateOfVisitor.getFullYear() === today.getFullYear() &&
+            dateOfVisitor.getDay() === today.getDay() && dateOfVisitor.getMonth() === today.getMonth();
+        });
         if (response.admins > 0){
-          dailyVistorDto.admins = dailyVistorDto.admins ++;
-        }else if (response.simpleUser > 0){
-          dailyVistorDto.simpleUser = dailyVistorDto.simpleUser ++;
-        }else if (response.managerStores > 0){
-          dailyVistorDto.managerStores = dailyVistorDto.managerStores ++;
-        }else if (response.ownerStores > 0){
-          dailyVistorDto.ownerStores = dailyVistorDto.ownerStores ++;
-        }else if (response.guests > 0){
-          dailyVistorDto.guests = dailyVistorDto.guests ++;
+          dailyVistorDto.admins = dailyVistorDto.admins + 1;
         }
-        console.log(dailyVistorDto);
-        console.log(this.dailyVistors);
+        if (response.simpleUser > 0){
+          dailyVistorDto.simpleUser = dailyVistorDto.simpleUser + 1;
+        }
+        if (response.managerStores > 0){
+          dailyVistorDto.managerStores = dailyVistorDto.managerStores + 1;
+        }
+        if (response.ownerStores > 0){
+          dailyVistorDto.ownerStores = dailyVistorDto.ownerStores + 1;
+        }
+        if (response.guests > 0){
+          dailyVistorDto.guests = dailyVistorDto.guests + 1;
+        }
       }
     });
   }
@@ -82,5 +84,18 @@ export class VisitorDailyComponent implements OnInit, OnDestroy {
 
   getDate(date: Date) {
     return new Date(date).toISOString().split('T')[0];
+  }
+
+  onNext() {
+    this.userService.stopDailyVisitor().subscribe();
+    this.firstIndex = this.firstIndex + 10;
+    this.lastIndex = this.lastIndex + 10;
+    this.onGetVistorDaily();
+  }
+
+  onPrev() {
+    this.firstIndex = this.firstIndex - 10;
+    this.lastIndex = this.lastIndex - 10;
+    this.onGetVistorDaily();
   }
 }

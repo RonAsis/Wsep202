@@ -29,7 +29,7 @@ export class WebSocketAPI {
       });
       thisRef.stompClient.subscribe(thisRef.dailyVisitor, (sdkEvent) => {
         console.log(sdkEvent.body);
-        thisRef.onMessageReceived(JSON.parse(sdkEvent.body));
+        thisRef.OnDailyVisitorReceived(JSON.parse(sdkEvent.body));
       });
     }, this.errorCallBack);
   }

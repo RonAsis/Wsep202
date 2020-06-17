@@ -304,8 +304,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     public Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid) {
         if (isValidUuid(username, uuid) && isAdmin(username)) {
             Pageable pageable = PageRequest.of(requestGetDailyVisitors.getFirstIndex(), requestGetDailyVisitors.getLastIndex(), Sort.by("date").ascending());
-            return dailyVisitorsRepository.findByDateBetween(requestGetDailyVisitors.getStart(), requestGetDailyVisitors.getEnd(), pageable).stream()
-                    .collect(Collectors.toSet());
+            return new HashSet<>(dailyVisitorsRepository.findByDateBetween(requestGetDailyVisitors.getStart(), requestGetDailyVisitors.getEnd(), pageable));
         }
         throw new NotAdministratorException(username);
     }

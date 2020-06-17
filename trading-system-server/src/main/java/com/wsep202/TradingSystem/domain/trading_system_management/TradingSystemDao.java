@@ -1,14 +1,15 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.sun.org.apache.bcel.internal.generic.SWITCH;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class TradingSystemDao {
 
@@ -69,13 +70,15 @@ public abstract class TradingSystemDao {
         return Objects.nonNull(usersLogin.get(userName));
     }
 
-    public void login(String userName, UUID uuid){
+    public Optional<UpdateDailyVisitor> login(String userName, UUID uuid){
         usersLogin.put(userName, uuid);
+        AtomicReference<UpdateDailyVisitor> updateDailyVisitor = new AtomicReference<>();
         getUserSystem(userName)
                 .ifPresent(userSystem -> {
                     login(userSystem.getUserName(), userSystem.getShoppingCart());
-                    userSystem.updateDaily(this);
+                    updateDailyVisitor.set(userSystem.updateDaily(this));
                 });
+        return Optional.of(updateDailyVisitor.get());
     }
 
     public abstract void login(String username, ShoppingCart shoppingCart);

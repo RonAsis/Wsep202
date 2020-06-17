@@ -243,8 +243,8 @@ export class HttpService {
     const url = `${this.adminUrl}/` + 'stop-daily-visitors/' +
       `${username}/` +
       `${uuid}`;
-    return this.http.post<void>(null,
-      url);
+    return this.http.post<void>(
+      url, null);
   }
 
   public viewPurchaseHistoryUserByAdmin(administratorUsername: string, username: string, uuid: string) {
