@@ -25,9 +25,20 @@ public class PaymentDetails {
     /**
      * ccv of the, the digits on the back of the card
      */
-    private int ccv;
+    private String ccv;
     /**
      * the id of the credit card holder
      */
     private String holderIDNumber;
+    /**
+     * valid thru details
+     */
+    private String month;
+    private String year;
+    /**
+     * name of the credit card holder
+     */
+    private String holderName;
+
+
 }

@@ -621,7 +621,7 @@ public class TradingSystemFacade {
         BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
         List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, user);
         return Objects.nonNull(receipts) ? convertReceiptList(receipts) : null;
-    }
+    }   
 
     public List<StoreDto> getOwnerStores(String ownerUsername, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
