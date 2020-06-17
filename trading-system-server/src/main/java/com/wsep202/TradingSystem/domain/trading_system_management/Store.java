@@ -783,8 +783,12 @@ public class Store {
         if (validatePermission(user, StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
             //discount.setNewId();  //generate new ID for the new discount
             discounts.add(discount);
+            log.info("The discount with description: "+discount.getDescription()+"" +
+                    " added successfully to the store with id: "+storeId);
             return discount;
         }
+        log.info("The discount with id: "+discount.getDiscountId()+" and description: "+discount.getDescription()+"" +
+                " failed to add to the store with id: "+storeId);
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
