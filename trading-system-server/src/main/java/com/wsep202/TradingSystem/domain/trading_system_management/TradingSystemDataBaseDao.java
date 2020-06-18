@@ -157,7 +157,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
         if (Objects.nonNull(res)) {
             storeRepository.save(store);
             List<Purchase> purchaseList = new LinkedList<>(storeRepository.findById(store.getStoreId()).get().getPurchasePolicies());
-            res.setPurchasePolicyId(purchaseList.get(purchaseList.size() - 1).getPurchasePolicyId());
+            res.setPurchaseId(purchaseList.get(purchaseList.size() - 1).getPurchaseId());
         }
         return res;
     }

@@ -6,21 +6,16 @@ import com.wsep202.TradingSystem.domain.trading_system_management.discount.Disco
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.*;
 
-@Getter
 @Setter
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class ComposedPurchase extends PurchasePolicy{
 
     /**
@@ -33,7 +28,7 @@ public class ComposedPurchase extends PurchasePolicy{
      * children components of the composite Purchase policy
      * the operands of the composed Purchase policy
      */
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST,CascadeType.REMOVE}, orphanRemoval = true)
     private List<Purchase> composedPurchasePolicies;
 
     @Override

@@ -34,8 +34,7 @@ export class ShareService {
         productShoppingCartDto.originalCost,
         5,
         productShoppingCartDto.storeId,
-        productShoppingCartDto.cost,
-        '');
+        productShoppingCartDto.cost);
       shoppingCart.addToShoppingCart(product, productShoppingCartDto.amountInShoppingCart);
     });
     return shoppingCart;

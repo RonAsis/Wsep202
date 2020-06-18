@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.mapping;
 import com.github.rozidan.springboot.modelmapper.TypeMapConfigurer;
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.*;
 import com.wsep202.TradingSystem.dto.*;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
@@ -344,4 +345,208 @@ public class TradingSystemMapper {
         }
     }
 
+    @Component
+    public static class PurchasePolicyDtoToPurchase extends TypeMapConfigurer<PurchasePolicyDto, Purchase> {
+        @Override
+        public void configure(TypeMap<PurchasePolicyDto, Purchase> typeMap) {
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(Purchase::setPurchasePolicy));
+
+            Converter<String, PurchaseType> stringToPurchaseTypeConverter =
+                    ctx -> ctx.getSource() == null ? null : PurchaseType.getPurchaseType(ctx.getSource());
+
+            typeMap.addMappings(mapper -> mapper.using(stringToPurchaseTypeConverter)
+                    .map(PurchasePolicyDto::getPurchaseType, Purchase::setPurchaseType));
+
+            typeMap.setPostConverter(context -> {
+                PurchasePolicyDto purchasePolicyDto = context.getSource();
+                CompositeOperator compositeOperator = Objects.nonNull(purchasePolicyDto.getCompositeOperator()) ?
+                        CompositeOperator.getCompositeOperators(purchasePolicyDto.getCompositeOperator()) : null;
+                PurchasePolicy purchasePolicy;
+                switch (context.getDestination().getPurchaseType()) {
+                    case COMPOSED_POLICY:
+                        purchasePolicy = ComposedPurchase.builder()
+                                .compositeOperator(compositeOperator)
+                                .composedPurchasePolicies(convertPurchasePolicyDtoToPurchase(purchasePolicyDto.getComposedPurchasePolicies()))
+                                .build();
+                        break;
+                    case PRODUCT_DETAILS:
+                        purchasePolicy = ProductDetailsPolicy.builder()
+                                .min(purchasePolicyDto.getMin())
+                                .max(purchasePolicyDto.getMax())
+                                .productId(purchasePolicyDto.getProductSn())
+                                .build();
+                        break;
+                    case SHOPPING_BAG_DETAILS:
+                        purchasePolicy = ShoppingBagDetailsPolicy.builder()
+                                .min(purchasePolicyDto.getMin())
+                                .max(purchasePolicyDto.getMax())
+                                .build();
+                        break;
+                    case SYSTEM_DETAILS:
+                        purchasePolicy = SystemDetailsPolicy.builder()
+                                .storeWorkDays(convertIntegerDayToDay(purchasePolicyDto.getStoreWorkDays()))
+                                .build();
+                        break;
+                    case USER_DETAILS:
+                        purchasePolicy = UserDetailsPolicy.builder()
+                                .countriesPermitted(purchasePolicyDto.getCountriesPermitted())
+                                .build();
+                        break;
+                    default:
+                        purchasePolicy = null;
+                        break;
+                }
+                context.getDestination().setPurchasePolicy(purchasePolicy);
+                return context.getDestination();
+            });
+        }
+
+        /**
+         * the discounts of composite
+         */
+        private List<Purchase> convertPurchasePolicyDtoToPurchase(List<PurchasePolicyDto> purchasePolicies) {
+            return purchasePolicies.stream()
+                    .map(purchasePolicyDto -> {
+                        Purchase purchase = Purchase.builder()
+                                .purchaseId(purchasePolicyDto.getPurchaseId())
+                                .description(purchasePolicyDto.getDescription())
+                                .purchaseType(PurchaseType.getPurchaseType(purchasePolicyDto.getPurchaseType()))
+                                .build();
+                        PurchasePolicy purchasePolicy;
+                        switch (purchase.getPurchaseType()) {
+                            case PRODUCT_DETAILS:
+                                purchasePolicy = ProductDetailsPolicy.builder()
+                                        .min(purchasePolicyDto.getMin())
+                                        .max(purchasePolicyDto.getMax())
+                                        .productId(purchasePolicyDto.getProductSn())
+                                        .build();
+                                break;
+                            case SHOPPING_BAG_DETAILS:
+                                purchasePolicy = ShoppingBagDetailsPolicy.builder()
+                                        .min(purchasePolicyDto.getMin())
+                                        .max(purchasePolicyDto.getMax())
+                                        .build();
+                                break;
+                            case SYSTEM_DETAILS:
+                                purchasePolicy = SystemDetailsPolicy.builder()
+                                        .storeWorkDays(convertIntegerDayToDay(purchasePolicyDto.getStoreWorkDays()))
+                                        .build();
+                                break;
+                            case USER_DETAILS:
+                                purchasePolicy = UserDetailsPolicy.builder()
+                                        .countriesPermitted(purchasePolicyDto.getCountriesPermitted())
+                                        .build();
+                                break;
+                            default:
+                                purchasePolicy = null;
+                                break;
+                        }
+                        purchase.setPurchasePolicy(purchasePolicy);
+                        return purchase;
+                    }).collect(Collectors.toList());
+        }
+
+        private Set<Day> convertIntegerDayToDay(Set<Integer> storeWorkDays) {
+            Set<Day> res = new HashSet<>();
+            for (Integer intDay : storeWorkDays) {
+                res.add(Day.getDay(intDay));
+            }
+            return res;
+        }
+    }
+    @Component
+    public static class PurchaseToPurchasePolicyDto extends TypeMapConfigurer<Purchase, PurchasePolicyDto> {
+        @Override
+        public void configure(TypeMap<Purchase, PurchasePolicyDto> typeMap) {
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(PurchasePolicyDto::setCompositeOperator));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(PurchasePolicyDto::setComposedPurchasePolicies));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(PurchasePolicyDto::setDescription));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(PurchasePolicyDto::setMin));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(PurchasePolicyDto::setMax));
+            typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(PurchasePolicyDto::setProductSn));
+            //typeMap.addMappings(configurableMapExpression -> configurableMapExpression.skip(PurchasePolicyDto::setPurchaseId));
+
+            Converter<PurchaseType, String> PurchaseTypeToStringConverter =
+                    ctx -> ctx.getSource() == null ? null : ctx.getSource().type;
+
+            typeMap.addMappings(mapper -> mapper.using(PurchaseTypeToStringConverter)
+                    .map(Purchase::getPurchaseType, PurchasePolicyDto::setPurchaseType));
+
+            typeMap.setPostConverter(context -> {
+                context.getDestination().setDescription(context.getSource().getDescription());
+                switch (context.getSource().getPurchaseType()) {
+                    case COMPOSED_POLICY:
+                        ComposedPurchase composedPurchase = (ComposedPurchase) context.getSource().getPurchasePolicy();
+                        context.getDestination().setCompositeOperator(composedPurchase.getCompositeOperator().name);
+                        context.getDestination().setComposedPurchasePolicies(convertToPurchasePolicyDto(composedPurchase.getComposedPurchasePolicies()));
+                        break;
+                    case PRODUCT_DETAILS:
+                        ProductDetailsPolicy productDetailsPolicy = (ProductDetailsPolicy) context.getSource().getPurchasePolicy();
+                        context.getDestination().setMin(productDetailsPolicy.getMin());
+                        context.getDestination().setProductSn(productDetailsPolicy.getProductId());
+                        context.getDestination().setMax(productDetailsPolicy.getMax());
+                        break;
+                    case SHOPPING_BAG_DETAILS:
+                        ShoppingBagDetailsPolicy shoppingBagDetailsPolicy = (ShoppingBagDetailsPolicy) context.getSource().getPurchasePolicy();
+                        context.getDestination().setMax(shoppingBagDetailsPolicy.getMax());
+                        context.getDestination().setMin(shoppingBagDetailsPolicy.getMin());
+                        break;
+                    case SYSTEM_DETAILS:
+                        SystemDetailsPolicy systemDetailsPolicy = (SystemDetailsPolicy) context.getSource().getPurchasePolicy();
+                        context.getDestination().setStoreWorkDays(convertDayToIntegerDay(systemDetailsPolicy.getStoreWorkDays()));
+                        break;
+                    case USER_DETAILS:
+                        UserDetailsPolicy userDetailsPolicyDto = (UserDetailsPolicy) context.getSource().getPurchasePolicy();
+                        context.getDestination().setCountriesPermitted(userDetailsPolicyDto.getCountriesPermitted());
+                        break;
+                    default:
+                        break;
+                }
+                return context.getDestination();
+            });
+        }
+
+        private List<PurchasePolicyDto> convertToPurchasePolicyDto(List<Purchase> composedPurchasePolicies) {
+            return composedPurchasePolicies.stream()
+                    .map(purchase -> {
+                        PurchasePolicyDto purchasePolicyDto = PurchasePolicyDto.builder()
+                                .description(purchase.getDescription())
+                                .purchaseId(purchase.getPurchaseId())
+                                .purchaseType(purchase.getPurchaseType().type)
+                                .build();
+                        switch (purchase.getPurchaseType()) {
+                            case PRODUCT_DETAILS:
+                                ProductDetailsPolicy productDetailsPolicy = (ProductDetailsPolicy) purchase.getPurchasePolicy();
+                                purchasePolicyDto.setMin(productDetailsPolicy.getMin());
+                                purchasePolicyDto.setProductSn(productDetailsPolicy.getProductId());
+                                purchasePolicyDto.setMax(productDetailsPolicy.getMax());
+                                break;
+                            case SHOPPING_BAG_DETAILS:
+                                ShoppingBagDetailsPolicy shoppingBagDetailsPolicy = (ShoppingBagDetailsPolicy) purchase.getPurchasePolicy();
+                                purchasePolicyDto.setMax(shoppingBagDetailsPolicy.getMax());
+                                purchasePolicyDto.setMin(shoppingBagDetailsPolicy.getMin());
+                                break;
+                            case SYSTEM_DETAILS:
+                                SystemDetailsPolicy systemDetailsPolicy = (SystemDetailsPolicy) purchase.getPurchasePolicy();
+                                purchasePolicyDto.setStoreWorkDays(convertDayToIntegerDay(systemDetailsPolicy.getStoreWorkDays()));
+                                break;
+                            case USER_DETAILS:
+                                UserDetailsPolicy userDetailsPolicyDto = (UserDetailsPolicy) purchase.getPurchasePolicy();
+                                purchasePolicyDto.setCountriesPermitted(userDetailsPolicyDto.getCountriesPermitted());
+                                break;
+                            default:
+                                break;
+                        }
+                        return purchasePolicyDto;
+                    }).collect(Collectors.toList());
+        }
+
+        private static Set<Integer> convertDayToIntegerDay(Set<Day> storeWorkDays) {
+            Set<Integer> res = new HashSet<>();
+            for (Day day : storeWorkDays) {
+                res.add(day.day);
+            }
+            return res;
+        }
+    }
 }

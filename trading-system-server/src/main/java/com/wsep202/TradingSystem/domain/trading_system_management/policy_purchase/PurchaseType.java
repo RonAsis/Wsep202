@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 public enum PurchaseType {
 
-    PRODUCT_DETAILS("product"),
-    SHOPPING_BAG_DETAILS("shopping bag details"),
-    SYSTEM_DETAILS("system details"),
-    USER_DETAILS("user details"),
+    PRODUCT_DETAILS("specific product"),
+    SHOPPING_BAG_DETAILS("all store"),
+    SYSTEM_DETAILS("on system"),
+    USER_DETAILS("on user"),
     COMPOSED_POLICY("compose");
 
 

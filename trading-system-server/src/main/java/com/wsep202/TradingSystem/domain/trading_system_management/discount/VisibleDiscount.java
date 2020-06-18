@@ -30,8 +30,9 @@ public class VisibleDiscount extends DiscountPolicy {
      * amount of product from to apply discount
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @MapKeyColumn(name = "amountOfProductsForApplyDiscounts" )
+    @MapKeyColumn(name = "amountOfProductsForApplyDiscounts")
     @Cascade(value = { CascadeType.ALL })
+    @JoinTable()
     private Map<Product, Integer> amountOfProductsForApplyDiscounts;
 
     @Override

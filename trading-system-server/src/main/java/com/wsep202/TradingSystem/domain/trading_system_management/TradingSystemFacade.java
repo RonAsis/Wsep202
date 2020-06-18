@@ -228,6 +228,8 @@ public class TradingSystemFacade {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PURCHASE_POLICY);
         Purchase purchase = modelMapper.map(purchasePolicyDto, Purchase.class);
+        if(purchasePolicyDto.getMin() > purchasePolicyDto.getMax())
+            throw new PurchasePolicyException("Received minimum > maximum --> didn't insert policy");
         Purchase purchaseRes = tradingSystemDao.addEditPurchase(store, user, purchase);
         return Objects.nonNull(purchaseRes) ? modelMapper.map(purchaseRes, PurchasePolicyDto.class) : null;
     }
