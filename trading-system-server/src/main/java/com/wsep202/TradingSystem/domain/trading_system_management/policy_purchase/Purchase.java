@@ -29,7 +29,7 @@ public class Purchase {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected long purchasePolicyId;
+    protected long purchaseId;
 
     /**
      * the actual type of purchase policy
