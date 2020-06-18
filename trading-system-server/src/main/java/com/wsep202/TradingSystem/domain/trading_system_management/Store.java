@@ -89,7 +89,7 @@ public class Store {
     /**
      * list of appointing agreements of owners in the store
      */
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<AppointingAgreement> appointingAgreements;
 
     /**

@@ -1,0 +1,104 @@
+activities:
+# register u2
+  - type: register
+    userName: u2
+    password: u2
+    firstName: u2
+    lastName: u2
+
+    #u2 login
+  - type: login
+    userName: u2
+    password: u2
+
+    #u2 open store
+  - type: openStore
+    userNameOwner: u2
+    storeName: s1
+    description: s1
+
+  # u2 add u3 as store owner
+  - type: addOwner
+    userName: u2
+    storeId: 0
+    newOwnerUsername: u3
+
+  #u2 approve u4 as owner
+  - type: approveOwner
+    ownerUsername: u2
+    ownerToApprove: u4
+    storeId: 0
+    status: true
+
+  # adding conditional store discount
+  # must be by u6 when is logged in and approved to have permissions of edit discount
+  - type: addDiscount
+    userName: u5
+    storeId: 0
+    discountDto:
+      discountId: -1 # id<0 means its a new discount => goes to add discount/ else go to edit
+      discountPercentage: 10.0
+      endTime: 2040-08-11
+      productsUnderThisDiscount: []
+      description: discount inserted from initial file!
+      amountOfProductsForApplyDiscounts: []
+      minPrice: 5
+      composedDiscounts: []
+      compositeOperator: and
+      discountType: conditional store
+
+  #add Manager
+  - type: addManager
+    ownerUserName: u2
+    storeId: 0
+    newManagerUsername: u3
+
+  #add permission
+  - type: addPermission
+    ownerUserName: u2
+    storeId: 0
+    managerUsername: u3
+    permission: edit managers
+
+  #add purchase policy in type product details
+#  - type: addPolicyPurchase
+ #   userName: u6
+  #  storeId: 0
+   # policyDto:
+    #  purchaseId: -2
+     # purchaseType: specific product
+      #description: must buy at least 1 diaper and les or equal 99
+      #countriesPermitted: []
+      #storeWorkDays: []
+      #min: 1
+      #max: 99
+      #productSn: 0 #verify the product diapers got the SN 0
+      #compositeOperator: or
+      #composedPurchasePolicies: []
+
+  #add product
+  - type: addProduct
+    userName: u2
+    storeId: 0
+    productName: diapers
+    category: health
+    amount: 20
+    cost: 30
+
+  #logout
+  - type: logout
+    userName: u2
+
+  #purchase shopping cart
+  - type: purchaseBuyer
+    userName: u2
+    paymentDetailsDto:
+      creditCardNumber: asdfghjkl
+      ccv: abc
+      holderIDNumber: asdfghjkl
+    billingAddressDto:
+      customerFullName: bar
+      address: granit st
+      city: gilon
+      country: israel
+      zipCode: hgtrefg

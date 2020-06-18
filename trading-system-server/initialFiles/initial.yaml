@@ -54,19 +54,6 @@ activities:
     ownerUserName: u3
     storeId: 0
     newManagerUsername: u5
-    ################################################################
-
-      # the following must be when us is logged in and after u3 appoint u5 as owner in store 0
-  - type: approveOwner
-    ownerUsername: u2
-    ownerToApprove: u5
-    storeId: 0
-    status: true
-
-    ###################################################################
-
-
-
   - type: addPermission
     ownerUserName: u3
     storeId: 0
@@ -79,62 +66,9 @@ activities:
     ownerUserName: u5
     storeId: 0
     newManagerUsername: u6
-
-
-###############################################################
-  - type: addPermission
-    ownerUserName: u3
-    storeId: 0
-    managerUsername: u5
-    permission: edit discount
-
-
-
-  # adding conditional store discount
-  # must be by u6 when is logged in and approved to have permissions of edit discount
-
-  - type: addDiscount
-    userName: u5
-    storeId: 0
-    discountDto:
-      discountId: -1 # id<0 means its a new discount => goes to add discount/ else go to edit
-      discountPercentage: 10.0
-      endTime: 2040-08-11
-      productsUnderThisDiscount: []
-      description: discount inserted from initial file!
-      amountOfProductsForApplyDiscounts: []
-      minPrice: 5
-      composedDiscounts: []
-      compositeOperator: and
-      discountType: conditional store
-#############################################################################################
   - type: logout
     userName: u2
   - type: logout
     userName: u3
   - type: logout
     userName: u5
-
-
-
-  #- type: addPolicyPurchase
-  #  userName: u6
-  #  storeId: 0
-  #  policyDto:
-  #    purchaseId: -2
-  #    purchaseType: specific product
-  #    description: must buy at least 1 diaper and les or equal 99
-  #    countriesPermitted: []
-  #    storeWorkDays: []
-  #    min: 1
-  #    max: 99
-  #    productSn: 0 #verify the product diapers got the SN 0
-  #    compositeOperator: none
-  #    composedPurchasePolicies: []
-
-
-
-
-
-
-
