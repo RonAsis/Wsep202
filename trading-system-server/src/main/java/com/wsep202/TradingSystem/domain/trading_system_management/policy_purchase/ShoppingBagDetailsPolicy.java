@@ -5,22 +5,20 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.Entity;
 import java.util.Map;
 
-@Setter
-@Getter
+@EqualsAndHashCode(callSuper = true)
+@Data
 @Slf4j
 @Builder
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShoppingBagDetailsPolicy extends PurchasePolicy {
 
-    private int min,max;
-
-    public ShoppingBagDetailsPolicy(int min, int max) {
-        this.min = min;
-        this.max = max;
-    }
+    private int min;
+    private int max;
 
     @Override
     public boolean isApproved(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {

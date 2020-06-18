@@ -23,7 +23,7 @@ import java.util.Set;
 @Builder
 public class PurchasePolicyDto {
 
-    protected long purchaseId;
+    private long purchaseId;
 
     /**
      * one of the following : 'all store', 'specific product', 'on system', 'on user',  'compose'

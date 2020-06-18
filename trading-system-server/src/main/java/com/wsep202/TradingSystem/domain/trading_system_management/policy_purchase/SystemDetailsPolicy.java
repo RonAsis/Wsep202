@@ -13,14 +13,12 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
 
-@Setter
-@Getter
+@Data
 @Slf4j
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class SystemDetailsPolicy extends PurchasePolicy {
 
 

@@ -7,14 +7,16 @@ import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Billi
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.util.*;
 
-@Setter
-@Getter
-@NoArgsConstructor
+@Data
+@Slf4j
 @Builder
+@Entity
+@NoArgsConstructor
 @AllArgsConstructor
 public class ComposedPurchase extends PurchasePolicy{
 
@@ -95,7 +97,7 @@ public class ComposedPurchase extends PurchasePolicy{
     }
 
     public boolean edit(CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies){
-        if (composedPurchasePolicies != null && composedPurchasePolicies != null &&
+        if (composedPurchasePolicies != null &&
         !composedPurchasePolicies.isEmpty()){
             this.compositeOperator = compositeOperator;
             this.composedPurchasePolicies = composedPurchasePolicies;

@@ -34,14 +34,8 @@ public class Purchase {
     /**
      * the actual type of purchase policy
      */
-    @Embedded
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private PurchasePolicy purchasePolicy;
-
-    /**
-     * use only for db communications
-     */
-    @ManyToOne
-    private Store store;
 
     /**
      * the type of policy
@@ -53,14 +47,6 @@ public class Purchase {
      * describes the verbal description of the policy
      */
     private String description;
-
-    public Purchase(String description,
-                    PurchasePolicy purchasePolicy,
-                    PurchaseType purchaseType) {
-        this.description = description;
-        this.purchasePolicy = purchasePolicy;
-        this.purchaseType = purchaseType;
-    }
 
     /**
      * the following method check if the user and the received products stands in the current

@@ -18,8 +18,14 @@ import java.util.Map;
 
 @Data
 @NoArgsConstructor
-@Embeddable
-public abstract class PurchasePolicy {
+@AllArgsConstructor
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public class PurchasePolicy {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private long id;
 
     /**
      * check if the purchase details stands in the purchase policy of the store
@@ -29,7 +35,7 @@ public abstract class PurchasePolicy {
      * @param userAddress the shipment details of the user
      * @return true in case the purchase in the store is legal for this policy
      */
-    public abstract boolean isApproved(Purchase purchase, Map<Product,Integer> products, BillingAddress userAddress);
+    public boolean isApproved(Purchase purchase, Map<Product,Integer> products, BillingAddress userAddress){return  false;}
 
 }
 

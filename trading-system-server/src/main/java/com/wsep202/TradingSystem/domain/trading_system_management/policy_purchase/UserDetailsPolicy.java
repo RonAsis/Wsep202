@@ -22,6 +22,7 @@ import java.util.Set;
 @Data
 @Slf4j
 @Builder
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDetailsPolicy extends PurchasePolicy {
@@ -30,7 +31,7 @@ public class UserDetailsPolicy extends PurchasePolicy {
      * list of countries that the store have deliveries to
      */
     @MapKeyColumn(name = "countriesPermitted")
-    @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Set<String> countriesPermitted;
 
