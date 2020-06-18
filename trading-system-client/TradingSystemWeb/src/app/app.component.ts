@@ -53,7 +53,7 @@ export class AppComponent implements OnInit{
   }
 
   sendMessage() {
-    this.webSocketService.getWebSocketAPI()._send();
+    this.webSocketService.getWebSocketAPI()._send_connect();
   }
 
   handleMessage(message: NotificationDto) {

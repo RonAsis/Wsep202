@@ -9,6 +9,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.Own
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 public class TradingSystemDaoImpl extends TradingSystemDao {
@@ -242,10 +244,13 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     }
 
     @Override
-    public Set<DailyVisitor> getDailyVisitors(String username, Date start, Date end, UUID uuid) {
+    public Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid) {
         if (isValidUuid(username, uuid) && isAdmin(username)) {
-            return dailyVisitors.stream()
-                    .filter(dailyVisitor -> dailyVisitor.getDate().after(start) && dailyVisitor.getDate().before(end))
+            List<DailyVisitor> dailyVisitors = this.dailyVisitors.stream()
+                    .filter(dailyVisitor -> dailyVisitor.getDate().after(requestGetDailyVisitors.getStart()) && dailyVisitor.getDate().before(requestGetDailyVisitors.getEnd()))
+                    .collect(Collectors.toList());
+            return IntStream.range(requestGetDailyVisitors.getFirstIndex(), requestGetDailyVisitors.getLastIndex())
+                    .mapToObj(dailyVisitors::get)
                     .collect(Collectors.toSet());
         }
         throw  new NotAdministratorException(username);

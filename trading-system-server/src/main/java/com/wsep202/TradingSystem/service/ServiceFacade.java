@@ -1,5 +1,6 @@
 package com.wsep202.TradingSystem.service;
 
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 import com.wsep202.TradingSystem.dto.NotificationDto;
 import com.wsep202.TradingSystem.service.user_service.NotificationService;
 import com.wsep202.TradingSystem.service.user_service.NotificationServiceImpl;
@@ -16,5 +17,9 @@ public class ServiceFacade {
 
     public void sendNotification(List<NotificationDto> notificationDtos){
         notificationService.sendNotification(notificationDtos);
+    }
+
+    public boolean sendDailyVisitor(UpdateDailyVisitor updateDailyVisitor) {
+        return notificationService.sendDailyVisitor(updateDailyVisitor);
     }
 }

@@ -205,7 +205,7 @@ export class HttpService {
   public addProductToShoppingCart(username: string,
                                   product: Product,
                                   amount: number,
-                                  uuid: string){
+                                  uuid: string) {
     const url = `${this.buyerUrl}/` + 'add-product-to-shopping-cart/' +
       `${username}/` +
       `${amount}/` +
@@ -239,6 +239,14 @@ export class HttpService {
       url);
   }
 
+  stopDailyVisitor(username: string, uuid: string) {
+    const url = `${this.adminUrl}/` + 'stop-daily-visitors/' +
+      `${username}/` +
+      `${uuid}`;
+    return this.http.post<void>(
+      url, null);
+  }
+
   public viewPurchaseHistoryUserByAdmin(administratorUsername: string, username: string, uuid: string) {
     const url = `${this.adminUrl}/` + 'view-purchase-history-user/' +
       `${administratorUsername}/` +
@@ -256,13 +264,14 @@ export class HttpService {
       url);
   }
 
-  getDailyVisitors(administratorUsername: string, startDate: Date, endDate: Date, uuid: string) {
+  getDailyVisitors(administratorUsername: string, startDate: Date, endDate: Date, firstIndexNum: number, lastIndexNum: number, uuid: string) {
     const url = `${this.adminUrl}/` + 'get-daily-visitors/' +
       `${administratorUsername}/` +
       `${uuid}`;
     return this.http.post<DailyVistorDto[]>(
-      url, {start: startDate, end: endDate});
+      url, {start: startDate, end: endDate, firstIndex: firstIndexNum, lastIndex: lastIndexNum});
   }
+
   //////////////////////////// SellerManagerController ///////////////////////////
 
   public viewPurchaseHistoryOfManager(username: string, storeId: number, uuid: string) {
@@ -557,9 +566,10 @@ export class HttpService {
     return this.http.get<OwnerToApprove[]>(
       url);
   }
+
   //////////////////////////////////////// general /////////////////////////////
 
-  private getImageHttpFormat(image: File){
+  private getImageHttpFormat(image: File) {
     const uploadImageData = new FormData();
     if (image !== null && image !== undefined) {
       console.log('file define');
@@ -567,4 +577,6 @@ export class HttpService {
     }
     return uploadImageData;
   }
+
+
 }

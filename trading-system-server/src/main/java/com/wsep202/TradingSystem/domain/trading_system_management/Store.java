@@ -260,9 +260,11 @@ public class Store {
      * @param buyerName
      * @return
      */
-    public Receipt createReceipt(ShoppingBag bag, String buyerName) {
+    public Receipt createReceipt(ShoppingBag bag, String buyerName,int payTransId, int suppTransId) {
+        String payId = String.valueOf(payTransId);
+        String supplyId = String.valueOf(suppTransId);
         return new Receipt(this.storeId, buyerName, bag.getTotalCostOfBag()
-                , bag.getProductListFromStore());
+                , bag.getProductListFromStore(),payId,supplyId);
     }
 
     //////////////////////////////////////////////shopping cart /////////////////////////////////////////////

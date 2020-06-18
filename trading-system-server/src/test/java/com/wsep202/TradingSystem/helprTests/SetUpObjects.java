@@ -27,7 +27,7 @@ public class SetUpObjects {
     public static PaymentDetails setUpPaymentDetails() {
         return PaymentDetails.builder()
                 .creditCardNumber("123456789")
-                .ccv(3)
+                .ccv("3")
                 .build();
     }
 

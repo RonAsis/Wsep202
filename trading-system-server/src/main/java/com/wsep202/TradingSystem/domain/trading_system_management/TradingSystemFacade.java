@@ -12,6 +12,8 @@ import com.wsep202.TradingSystem.domain.trading_system_management.purchase.Billi
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.ServiceFacade;
 import javafx.util.Pair;
@@ -616,7 +618,7 @@ public class TradingSystemFacade {
         BillingAddress billingAddress = Objects.nonNull(billingAddressDto) ? modelMapper.map(billingAddressDto, BillingAddress.class) : null;
         List<Receipt> receipts = tradingSystem.purchaseShoppingCart(paymentDetails, billingAddress, user);
         return Objects.nonNull(receipts) ? convertReceiptList(receipts) : null;
-    }
+    }   
 
     public List<StoreDto> getOwnerStores(String ownerUsername, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
@@ -882,8 +884,9 @@ public class TradingSystemFacade {
         return tradingSystemDao.approveOwner(ownedStore, ownerUser, ownerToApprove, status);
     }
 
-    public List<DailyVisitorDto> getDailyVisitors(String username, Date start, Date end, UUID uuid){
-        return convertSetDailyVisitorsToDailyVisitorsDtoSet(tradingSystemDao.getDailyVisitors(username, start, end, uuid));
+    public List<DailyVisitorDto> getDailyVisitors(String username, RequestGetDailyVisitorsDto requestGetDailyVisitorsDto, UUID uuid){
+        RequestGetDailyVisitors requestGetDailyVisitors = modelMapper.map(requestGetDailyVisitorsDto, RequestGetDailyVisitors.class);
+        return convertSetDailyVisitorsToDailyVisitorsDtoSet(tradingSystem.getDailyVisitors(username, requestGetDailyVisitors, uuid));
     }
 
     public void updateDailyVisitor(String dailyVisitorsField){
@@ -893,5 +896,13 @@ public class TradingSystemFacade {
         Type listType = new TypeToken<List<DailyVisitorDto>>() {
         }.getType();
         return modelMapper.map(dailyVisitors, listType);
+    }
+
+    public boolean sendDailyVisitor(UpdateDailyVisitor updateDailyVisitor) {
+        return serviceFacade.sendDailyVisitor(updateDailyVisitor);
+    }
+
+    public void stopDailyVisitors(String username, UUID uuid) {
+        tradingSystem.stopDailyVisitors(username, uuid);
     }
 }

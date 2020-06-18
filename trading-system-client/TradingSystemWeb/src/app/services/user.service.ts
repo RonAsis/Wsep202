@@ -9,6 +9,7 @@ import {PaymentDetails} from '../shared/paymentDetails.model';
 import {BillingAddress} from '../shared/billingAddress.model';
 import {ShareService} from './share.service';
 import {Store} from '../shared/store.model';
+import {UpdateDailyVisitor} from '../shared/updateDailyVisitorDto.model';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class UserService {
 
   // events
   userLoggingEvent = new EventEmitter<boolean>();
-
+  dailyVisitorReceivedEvent = new EventEmitter<UpdateDailyVisitor>();
   registerEvent = new EventEmitter<boolean>();
 
   userLogoutEvent = new EventEmitter<boolean>();
@@ -175,11 +176,16 @@ export class UserService {
     return this.httpService.approveOwner(this.username, storeId, ownerToApprove, status, this.uuid);
   }
 
-  public getDailyVisitors(startDate: Date, endDate: Date){
-    return this.httpService.getDailyVisitors(this.username, startDate, endDate, this.uuid);
+  public getDailyVisitors(startDate: Date, endDate: Date, firstIndexNum: number, lastIndexNum: number){
+    return this.httpService.getDailyVisitors(this.username, startDate, endDate, firstIndexNum, lastIndexNum, this.uuid);
   }
 
   private createBasicAuthenticationHttpHeader(username: string, password: string){
     return 'Basic ' + window.btoa(username + ':' + password);
+  }
+
+  stopDailyVisitor() {
+    console.log('stop dailt visitor');
+    return this.httpService.stopDailyVisitor(this.username, this.uuid);
   }
 }

@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.notification;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Observer;
+import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 
 public interface Subject {
 
@@ -13,4 +14,10 @@ public interface Subject {
     public void notifyObservers();
 
     public void Broadcast(Notification notification);
+
+    boolean regDailyVisitor(String username);
+
+    boolean unRegDailyVisitor(String username);
+
+    void sendDailyVisitor(UpdateDailyVisitor updateDailyVisitor);
 }
