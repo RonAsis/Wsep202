@@ -2,25 +2,22 @@ package com.wsep202.TradingSystem.domain.trading_system_management.policy_purcha
 import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import java.util.Map;
 
 @Setter
 @Getter
 @Slf4j
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShoppingBagDetailsPolicy extends PurchasePolicy {
 
     private int min,max;
-
-    public ShoppingBagDetailsPolicy(int min, int max) {
-        this.min = min;
-        this.max = max;
-    }
 
     @Override
     public boolean isApproved(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {

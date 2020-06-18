@@ -2,9 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management.policy_purcha
 import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -14,6 +12,8 @@ import java.util.Optional;
 @Getter
 @Slf4j
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductDetailsPolicy extends PurchasePolicy {
 
     /**
@@ -26,12 +26,6 @@ public class ProductDetailsPolicy extends PurchasePolicy {
      * the SN of product which has limitations amounts
      */
     private int productId;
-
-    public ProductDetailsPolicy(int min, int max, int productId) {
-        this.min = min;
-        this.max = max;
-        this.productId = productId;
-    }
 
     @Override
     public boolean isApproved(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {

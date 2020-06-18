@@ -4,10 +4,7 @@ import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.ElementCollection;
@@ -22,6 +19,7 @@ import java.util.Set;
 @Getter
 @Slf4j
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class SystemDetailsPolicy extends PurchasePolicy {
 

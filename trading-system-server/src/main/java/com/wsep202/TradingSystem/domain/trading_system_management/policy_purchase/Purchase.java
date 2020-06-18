@@ -3,6 +3,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management.policy_purcha
  * the class defines a purchase policy in store
  */
 
+import com.wsep202.TradingSystem.domain.trading_system_management.Store;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountType;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
@@ -27,20 +28,27 @@ public class Purchase {
      * unique id of the purchase policy in the store
      */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected long purchasePolicyId;
 
     /**
      * the actual type of purchase policy
      */
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @Embedded
     private PurchasePolicy purchasePolicy;
+
+    /**
+     * use only for db communications
+     */
+    @ManyToOne
+    private Store store;
 
     /**
      * the type of policy
      */
     @Enumerated(EnumType.STRING)
     private PurchaseType purchaseType;
+
     /**
      * describes the verbal description of the policy
      */

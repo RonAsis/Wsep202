@@ -8,6 +8,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.CascadeType;
@@ -19,6 +20,7 @@ import java.util.*;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class ComposedPurchase extends PurchasePolicy{
 
     /**

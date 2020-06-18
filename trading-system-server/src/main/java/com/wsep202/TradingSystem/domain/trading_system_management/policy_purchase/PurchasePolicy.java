@@ -18,19 +18,8 @@ import java.util.Map;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Embeddable
 public abstract class PurchasePolicy {
-
-    /**
-     * unique id
-     */
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private long id;;
-
-
 
     /**
      * check if the purchase details stands in the purchase policy of the store

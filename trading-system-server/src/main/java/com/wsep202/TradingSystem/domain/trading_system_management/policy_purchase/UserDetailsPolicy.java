@@ -20,7 +20,6 @@ import java.util.Set;
 @Data
 @Slf4j
 @Builder
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDetailsPolicy extends PurchasePolicy {
