@@ -24,7 +24,6 @@ public class AddDiscountDefinition extends ActivityDefinition{
     private int storeId;
     private DiscountDto discountDto;
 
-
     public final static String type = "addDiscount";
 
     @Override

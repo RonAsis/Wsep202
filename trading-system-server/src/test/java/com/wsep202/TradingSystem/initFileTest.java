@@ -42,7 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 
-@TestPropertySource(locations= "classpath:test.yaml")
+@TestPropertySource(locations= "classpath:init_files/test.yaml")
 @ExtendWith(SpringExtension.class)
 public class initFileTest {
     TradingSystem tradingSystemMock;
@@ -291,7 +291,7 @@ public class initFileTest {
     private void verifyDefinitionTypeActivated(String type, Context context) {
 
         //get the path for the init file directory
-        try (Stream<Path> walk = Files.walk(ResourceUtils.getFile(ActivationPaths.TEST_INIT_FILES).toPath())) {
+        try (Stream<Path> walk = Files.walk(ResourceUtils.getFile("src/test/java/resources/init_files/").toPath())) {
 
             //collect all the yaml files
             List<Path> pathList = walk.collect(Collectors.toList());
@@ -299,9 +299,7 @@ public class initFileTest {
             pathList = FormatFile.filterYamlFiles(pathList);
 
             for (Path path : pathList) {
-                if(path.toString().contains("test")) {  //get the init file test path
                     doActions(path, context,type);    //activate the proper method
-                }
             }
 
         } catch (IOException e) {
@@ -310,7 +308,6 @@ public class initFileTest {
         }
         Assertions.assertTrue(isActivated);
     }
-
 
     private void doActions(Path path, Context context,String type) {
         InputStream inputStream = getInputStream(path);
