@@ -1,15 +1,13 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.wsep202.TradingSystem.domain.exception.ChargeException;
-import com.wsep202.TradingSystem.domain.exception.DeliveryRequestException;
 import com.wsep202.TradingSystem.domain.exception.ExternalSystemException;
-import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import externals.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;

@@ -26,7 +26,7 @@ public class OwnersAppointee implements Serializable {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     private UserSystem appointeeUser;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     private Set<UserSystem> appointedUsers = new HashSet<>();
 

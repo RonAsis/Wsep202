@@ -61,7 +61,9 @@ public class AppStartupRunner implements ApplicationRunner {
             pathList = FormatFile.filterYamlFiles(pathList);
 
             for (Path path : pathList) {
-                doActions(path, context);
+                if(!path.toString().contains("Test")) {
+                    doActions(path, context);
+                }
             }
 
         } catch (IOException e) {
