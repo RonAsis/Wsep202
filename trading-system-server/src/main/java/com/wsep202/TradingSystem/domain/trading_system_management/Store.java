@@ -90,7 +90,7 @@ public class Store {
     /**
      * list of appointing agreements of owners in the store
      */
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<AppointingAgreement> appointingAgreements;
 
     /**
@@ -345,6 +345,8 @@ public class Store {
                     appointingAgreement.changeApproval(ownerUser.getUserName(), status ? StatusOwner.APPROVE : StatusOwner.NOT_APPROVE);
                     ownerUser.removeAgreement(storeId, ownerToApprove);
                     isApproveOwner(appointingAgreement.getNewOwner());
+                    log.info("The owner: "+ownerUser.getUserName()+" approved: "+ownerToApprove+"" +
+                            "with status: "+status);
                     return true;
                 }).orElse(false);
     }
@@ -880,8 +882,12 @@ public class Store {
         if (validatePermission(user, StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
             //discount.setNewId();  //generate new ID for the new discount
             discounts.add(discount);
+            log.info("The discount with description: "+discount.getDescription()+"" +
+                    " added successfully to the store with id: "+storeId);
             return discount;
         }
+        log.info("The discount with id: "+discount.getDiscountId()+" and description: "+discount.getDescription()+"" +
+                " failed to add to the store with id: "+storeId);
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 
