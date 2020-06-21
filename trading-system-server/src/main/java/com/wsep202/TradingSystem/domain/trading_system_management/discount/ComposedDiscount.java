@@ -50,6 +50,7 @@ public class ComposedDiscount extends DiscountPolicy {
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         if (amountOfProductsForApplyDiscounts!=null&&!amountOfProductsForApplyDiscounts.isEmpty() && isApprovedProducts(discount, products)) {
             //composed discount terms are met so apply the discount as set in its properties.
             createConditionalDiscount().applyDiscount(discount, products);
@@ -97,6 +98,7 @@ public class ComposedDiscount extends DiscountPolicy {
     }
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         boolean isApproved = !isExpired(discount);
         switch (compositeOperator) {
             case AND:
@@ -129,5 +131,10 @@ public class ComposedDiscount extends DiscountPolicy {
         return composedDiscounts.stream()
                 .filter(discountCur -> discountCur.isApprovedProducts(products))
                 .toArray().length;
+    }
+    private void verifyValidity(Discount discount) {
+        if(compositeOperator==null){
+            throw new CompositeOperatorNullException(discount.getDiscountId());
+        }
     }
 }
