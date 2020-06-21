@@ -31,8 +31,8 @@ public class SetUpObjects {
                 .build();
     }
 
-    public static List<Receipt> setUpReceipts() {
-        List<Receipt> receipts = new ArrayList<>();
+    public static Set<Receipt> setUpReceipts() {
+        Set<Receipt> receipts = new HashSet<>();
         for (int counter = 0; counter <= 10; counter++) {
             receipts.add(Receipt.builder()
                     .receiptSn(counter)
@@ -117,7 +117,7 @@ public class SetUpObjects {
 //        PurchasePolicy purchasePolicy = new PurchasePolicy();
 //        DiscountPolicy discountPolicy = new DiscountPolicy();
         Set<UserSystem> owners = setupUsers();
-        List<Receipt> receipts = setUpReceipts();
+        Set<Receipt> receipts = setUpReceipts();
 
         return Store.builder()
                 .storeId(storeId)
