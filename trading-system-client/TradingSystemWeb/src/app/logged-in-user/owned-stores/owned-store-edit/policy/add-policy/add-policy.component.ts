@@ -91,7 +91,7 @@ export class AddPolicyComponent implements OnInit {
           this.policy.countriesPermitted : [];
       this.selectedStoreWorkDays =
         this.policy.storeWorkDays !== undefined && this.policy.storeWorkDays !== null ?
-          this.policy.storeWorkDays.map(value => value.toString()) : [];
+          this.policy.storeWorkDays.map((value => this.convertIntToDay(value))) : [];
       this.selectedComposedPurchasePolicies =
         this.policy.composedPurchasePolicies !== undefined && this.policy.composedPurchasePolicies !== null ?
           this.policy.composedPurchasePolicies : [];
@@ -215,6 +215,25 @@ export class AddPolicyComponent implements OnInit {
     }
   }
 
+  private convertIntToDay(value: number): string {
+    switch (value) {
+      case 1:
+        return 'Sunday';
+      case 2:
+        return 'Monday';
+      case 3:
+        return 'Tuesday';
+      case 4:
+        return 'Wednesday';
+      case 5:
+        return 'Thursday';
+      case 6:
+        return 'Friday';
+      case 7:
+        return 'Saturday';
+    }
+  }
+
   onAddPolicy() {
     if (this.min !== null && this.min !== undefined && (this.min.nativeElement.value === null
       || this.min.nativeElement.value === undefined)) {
@@ -250,7 +269,8 @@ export class AddPolicyComponent implements OnInit {
         this.selectedStoreWorkDays.map(value => this.convertDayToInt(value)),
         this.min !== null && this.min !== undefined ? this.min.nativeElement.value : 1,
         this.max !== null && this.max !== undefined ? this.max.nativeElement.value : 1,
-        this.selectedProductUnderPolicy !== null && this.selectedProductUnderPolicy !== undefined ?
+        this.selectedProductUnderPolicy !== null && this.selectedProductUnderPolicy !== undefined &&
+        this.selectedProductUnderPolicy.slice().pop() !== null && this.selectedProductUnderPolicy.slice().pop() !== undefined ?
           this.selectedProductUnderPolicy.slice().pop().productSn : -1,
         this.selectedComposite,
         this.optionsComposedPurchasePolicies !== null && this.optionsComposedPurchasePolicies !== undefined ?
