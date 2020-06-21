@@ -27,8 +27,8 @@ import java.util.UUID;
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
 
-// *********** UC 5.1.1 - viewing the store's purchase history ***********
-public class ViewPurchaseHistoryTest {
+// *********** UC 4.2 (inherited from owner) - adding/ editing the store's discounts ***********
+public class AddEditDiscountTest {
     @Autowired
     GuestService guestService;
     @Autowired
@@ -47,32 +47,25 @@ public class ViewPurchaseHistoryTest {
     private Integer storeId;
     private ProductDto productDto;
     int counter = 0;
+    DiscountDto discountDto;
 
     @BeforeEach
     void setUp() {
         if (this.helper == null || this.helper.getGuestService() == null ) {
             this.helper = new ServiceTestsHelper(this.guestService, this.buyerRegisteredService, this.sellerOwnerService);
         }
+        this.manager.setUserName(this.manager.getUserName()+counter);
         this.helper.registerUser(this.manager.getUserName(), this.userPassword,
                 this.manager.getFirstName(), this.manager.getLastName(), image);
+        this.user.setUserName(this.user.getUserName()+counter);
         this.helper.registerUser(this.user.getUserName(), this.userPassword,
                 this.user.getFirstName(), this.user.getLastName(), image);
-        Pair<UUID, Boolean> returnedValue = this.helper.loginUser(this.user.getUserName(),
-                this.userPassword);
-        if (returnedValue != null){
-            this.uuid = returnedValue.getKey();
-        }
-        Pair<Integer, ProductDto> returnedValueOpen = this.helper.openStoreAndAddProduct(this.user, this.uuid);
-        if (returnedValueOpen != null){
-            this.productDto = returnedValueOpen.getValue();
-            this.storeId = returnedValueOpen.getKey();
-        }
+        this.uuid = this.helper.loginUser(this.user.getUserName(), this.userPassword).getKey();
+        this.storeId = this.helper.openStoreAddProductAndAddManager(this.user, this.uuid, this.manager.getUserName());
         this.helper.logoutUser(this.user.getUserName(), this.uuid);
-
-        returnedValue = this.helper.loginUser(this.manager.getUserName(), this.userPassword);
-        if (returnedValue != null){
-            this.uuid = returnedValue.getKey();
-        }
+        this.uuid = this.helper.loginUser(this.manager.getUserName(), this.userPassword).getKey();
+        this.discountDto = new DiscountDto();
+        this.discountDto.setMinPrice(20);
     }
 
     @AfterEach
@@ -82,64 +75,62 @@ public class ViewPurchaseHistoryTest {
 
 
     /**
-     * view the history purchase of a valid store
-     * no purchases
+     * add discount
      */
     @Test
-    void viewHistoryNoPurchases() {
-        List<ReceiptDto> returnedHistory = this.sellerManagerService.viewPurchaseHistoryOfManager(
-                this.manager.getUserName(), this.storeId, this.uuid);
-        Assertions.assertNull(returnedHistory);
-    }
-
-    /**
-     * view the history purchase of a valid store
-     * invalid manager
-     */
-    @Test
-    void viewHistoryNoPurchasesInvalidManager() {
-        Assertions.assertThrows(Exception.class, ()-> {
-            this.sellerManagerService.viewPurchaseHistoryOfManager(
-                    this.manager.getUserName()+"Not", this.storeId, this.uuid);
-        });
-    }
-
-    /**
-     * view the history purchase of an invalid store
-     */
-    @Test
-    void viewHistoryNoPurchasesInvalidStore() {
-        Assertions.assertNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-                this.manager.getUserName(), this.storeId+15, this.uuid));
-    }
-
-    /**
-     * view the history purchase of an invalid store
-     * invalid manager
-     */
-    @Test
-    void viewHistoryNoPurchasesInvalidStoreInvalidManager() {
-        Assertions.assertThrows(Exception.class, ()-> {
-            this.sellerManagerService.viewPurchaseHistoryOfManager(
-                    this.manager.getUserName()+"Not", this.storeId+15, this.uuid);
-        });
-    }
-
-    /**
-     * view the history purchase of a valid store
-     */
-    @Test
-    void viewHistoryPurchases() {
+    void addDiscountPermittedManager() {
         this.helper.logoutUser(this.manager.getUserName(), this.uuid);
         this.uuid = this.helper.loginUser(this.user.getUserName(), this.userPassword).getKey();
-        this.helper.addProductToShoppingCartAndPurchaseAndAppointManager(this.user.getUserName(), this.storeId, this.productDto.getProductSn(), this.uuid, this.manager.getUserName());
+        this.helper.addPermission(this.user.getUserName(), this.storeId, this.manager.getUserName(), "edit discount", this.uuid);
         this.helper.logoutUser(this.user.getUserName(), this.uuid);
 
-        this.uuid = null;
         this.uuid = this.helper.loginUser(this.manager.getUserName(), this.userPassword).getKey();
-        Assertions.assertNotNull(this.sellerManagerService.viewPurchaseHistoryOfManager(
-                this.manager.getUserName(), this.storeId, this.uuid));
-        this.helper.logoutUser(this.manager.getUserName(), this.uuid);
+        Assertions.assertNotNull(this.sellerManagerService.addEditDiscount
+                (this.manager.getUserName(), this.storeId, this.discountDto, this.uuid)); ;
+    }
 
+    /**
+     * add discount
+     * not permitted manager
+     */
+    @Test
+    void addDiscountNotPermittedManager() {
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerManagerService.addEditDiscount(this.manager.getUserName(), this.storeId, this.discountDto, this.uuid);
+        });
+    }
+
+    /**
+     * add discount
+     * invalid user
+     */
+    @Test
+    void addDiscountInvalidManager() {
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerManagerService.addEditDiscount(this.manager.getUserName()+"Not", this.storeId, this.discountDto, this.uuid);
+        });
+    }
+
+
+    /**
+     * add discount
+     * invalid store
+     */
+    @Test
+    void addDiscountInvalidStore() {
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerManagerService.addEditDiscount(this.manager.getUserName(), this.storeId+15, this.discountDto, this.uuid);
+        });
+    }
+
+    /**
+     * add discount
+     * invalid user
+     */
+    @Test
+    void addDiscountNullDiscount() {
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.sellerManagerService.addEditDiscount(this.manager.getUserName(), this.storeId, null, this.uuid);
+        });
     }
 }
