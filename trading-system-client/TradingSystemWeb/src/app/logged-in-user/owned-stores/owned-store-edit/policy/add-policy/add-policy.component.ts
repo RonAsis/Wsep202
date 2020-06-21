@@ -25,7 +25,7 @@ export class AddPolicyComponent implements OnInit {
   @ViewChild('description', {static: false}) description: ElementRef;
 
   optionsProductUnderPolicy: Product[];
-  selectedProductUnderPolicy: number;
+  selectedProductUnderPolicy: Product[];
   productUnderPolicySettings: IDropdownSettings;
 
   optionsCountriesPermitted: string[];
@@ -36,9 +36,9 @@ export class AddPolicyComponent implements OnInit {
   selectedStoreWorkDays: string[];
   storeWorkDaysSettings: IDropdownSettings;
 
-  optionsComposedPolicies: Policy[];
-  selectedComposedPolicies: Policy[];
-  composedPoliciesSettings: IDropdownSettings;
+  optionsComposedPurchasePolicies: Policy[];
+  selectedComposedPurchasePolicies: Policy[];
+  composedPurchasePoliciesSettings: IDropdownSettings;
 
   purchaseType: string;
 
@@ -60,9 +60,8 @@ export class AddPolicyComponent implements OnInit {
     this.purchaseType = 'all store';
     this.selectedCountriesPermitted = [];
     this.selectedStoreWorkDays = [];
-    this.selectedComposedPolicies = [];
+    this.selectedComposedPurchasePolicies = [];
     this.countries = new Countries();
-
     this.initSettings();
 
     this.optionsProductUnderPolicy = this.store.products.slice();
@@ -72,7 +71,7 @@ export class AddPolicyComponent implements OnInit {
     this.storeService.getAllPurchasePolicies(this.store.storeId)
       .subscribe(response => {
         if (response !== null && response !== undefined) {
-          this.optionsComposedPolicies = response;
+          this.optionsComposedPurchasePolicies = response;
         }
       });
 
@@ -86,14 +85,14 @@ export class AddPolicyComponent implements OnInit {
     if (this.policy !== null && this.policy !== undefined) {
       this.selectedProductUnderPolicy =
         this.policy.productSn !== undefined && this.policy.productSn !== null ?
-          this.policy.productSn : -1;
+          this.store.products.filter(value => value.productSn === this.policy.productSn) : null;
       this.selectedCountriesPermitted =
         this.policy.countriesPermitted !== undefined && this.policy.countriesPermitted !== null ?
           this.policy.countriesPermitted : [];
       this.selectedStoreWorkDays =
         this.policy.storeWorkDays !== undefined && this.policy.storeWorkDays !== null ?
           this.policy.storeWorkDays.map(value => value.toString()) : [];
-      this.selectedComposedPolicies =
+      this.selectedComposedPurchasePolicies =
         this.policy.composedPurchasePolicies !== undefined && this.policy.composedPurchasePolicies !== null ?
           this.policy.composedPurchasePolicies : [];
       this.selectedComposite = this.policy.compositeOperator;
@@ -125,7 +124,7 @@ export class AddPolicyComponent implements OnInit {
       allowSearchFilter: true
     };
 
-    this.composedPoliciesSettings = {
+    this.composedPurchasePoliciesSettings = {
       singleSelection: false,
       idField: 'purchaseId',
       textField: 'description',
@@ -138,11 +137,6 @@ export class AddPolicyComponent implements OnInit {
   errorMessage(message: string) {
     this.message = message;
     this.messageColor = 'red';
-  }
-
-  sucMessage() {
-    this.message = 'the policy is added';
-    this.messageColor = 'blue';
   }
 
   onAllStore() {
@@ -186,7 +180,7 @@ export class AddPolicyComponent implements OnInit {
   }
 
   onSelectProductUnderPolicy(productItem: any) {
-    this.selectedProductUnderPolicy = this.store.products.find(product => product.productSn === productItem.productSn).productSn;
+    this.selectedProductUnderPolicy = this.store.products.filter(product => product.productSn === productItem.productSn);
   }
 
 
@@ -233,8 +227,8 @@ export class AddPolicyComponent implements OnInit {
       this.max.nativeElement.value !== null && this.max.nativeElement.value !== undefined) &&
       this.min.nativeElement.value > this.max.nativeElement.value) {
       this.errorMessage('You must type minimum value smaller or equals to maximum value');
-    } else if (this.description.nativeElement.value === null || this.description.nativeElement.value === undefined ||
-      this.description.nativeElement.value.length === 0) {
+    } else if ((this.description !== null && this.description !== undefined) && (this.description.nativeElement.value === null ||
+      this.description.nativeElement.value === undefined || this.description.nativeElement.value.length === 0)) {
       this.errorMessage('You must type description');
     } else if ((this.selectedProductUnderPolicy === null || this.selectedProductUnderPolicy === undefined) && this.purchaseType === 'specific product') {
       this.errorMessage('You must choose a product');
@@ -246,6 +240,8 @@ export class AddPolicyComponent implements OnInit {
       this.errorMessage('You must choose at least one day');
     } else {
       this.errorMessage('');
+      console.log(this.selectedComposedPurchasePolicies);
+      console.log(this.optionsComposedPurchasePolicies);
       const policy = new Policy(
         this.policy !== null && this.policy !== undefined ? this.policy.purchaseId : -1,
         this.purchaseType,
@@ -254,10 +250,12 @@ export class AddPolicyComponent implements OnInit {
         this.selectedStoreWorkDays.map(value => this.convertDayToInt(value)),
         this.min !== null && this.min !== undefined ? this.min.nativeElement.value : 1,
         this.max !== null && this.max !== undefined ? this.max.nativeElement.value : 1,
-        this.selectedProductUnderPolicy,
+        this.selectedProductUnderPolicy !== null && this.selectedProductUnderPolicy !== undefined ?
+          this.selectedProductUnderPolicy.slice().pop().productSn : -1,
         this.selectedComposite,
-        this.optionsComposedPolicies.filter(p => this.selectedComposedPolicies
-          .filter(p1 => p1.purchaseId === p.purchaseId).length === 1));
+        this.optionsComposedPurchasePolicies !== null && this.optionsComposedPurchasePolicies !== undefined ?
+          this.optionsComposedPurchasePolicies.filter(p => this.selectedComposedPurchasePolicies
+            .filter(p1 => p1.purchaseId === p.purchaseId).length === 1) : []);
       this.storeService.addPolicy(this.store.storeId, policy)
         .subscribe(response => {
           if (response !== undefined && response !== null) {
@@ -265,7 +263,6 @@ export class AddPolicyComponent implements OnInit {
           }
         });
       console.log(policy);
-      this.sucMessage();
     }
   }
 }

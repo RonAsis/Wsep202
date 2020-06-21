@@ -36,13 +36,13 @@
       <div *ngIf="purchaseType === 'all store'" class="row justify-content-start">
         <br>
       </div>
-      <div class="col-lg-4 from-group">
+      <div class="col-lg-6 from-group">
         <label for="min">Minimum</label>
         <input type="number" [min]="0" id="min" class="form-control"
                [value]="this.policy !== undefined ? this.policy.min : 0"
                #min/> &nbsp;
       </div>
-      <div class="col-lg-4 from-group">
+      <div class="col-lg-6 from-group">
         <label for="max">Maximum</label>
         <input type="number" [min]="0" id="max" class="form-control"
                [value]="this.policy !== undefined ? this.policy.max : 100"
@@ -102,13 +102,21 @@
   <div *ngIf="purchaseType === 'compose'" class="row justify-content-start">
     <div class="col-sm-4 from-group">
       <br>
+      <label for="description3">Description
+        <span class="required-asterisk">*</span>
+      </label>
+      <input type="text" id="description3" class="form-control"
+             [value]="this.policy !== undefined ? this.policy.description : ''"
+             #description/>
+
+      <br>
       <label>Composed Purchase Policies:</label>
       <div class="md-form">
         <ng-multiselect-dropdown
           [placeholder]="'Select Policies'"
-          [settings]="composedPoliciesSettings"
-          [data]="optionsComposedPolicies"
-          [(ngModel)]="selectedComposedPolicies">
+          [settings]="composedPurchasePoliciesSettings"
+          [data]="optionsComposedPurchasePolicies"
+          [(ngModel)]="selectedComposedPurchasePolicies">
         </ng-multiselect-dropdown>
       </div>
       <br>

@@ -94,7 +94,7 @@ public class SellerManagerController {
      */
     @ApiOperation(value = "get all Purchase Policies")
     @GetMapping("get-all-purchase-policies/{username}/{storeId}/{uuid}")
-    public List<PurchaseDto> getAllPurchasePolicies(@PathVariable String username,
+    public List<PurchasePolicyDto> getAllPurchasePolicies(@PathVariable String username,
                                                     @PathVariable int storeId,
                                                     @PathVariable UUID uuid) {
         return sellerManagerService.getAllStorePurchases(username, storeId, uuid);

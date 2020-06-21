@@ -44,7 +44,8 @@ public class PurchasePolicyDto {
      * in ShoppingBagDetails it is the amount of different items
      * in ProductDetails it is the amount of items from a specific one product
      */
-    private int min,max;
+    private int min;
+    private int max;
     /**
      * the SN of product which has limitations amounts
      */
