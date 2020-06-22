@@ -5,10 +5,12 @@ import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.time.DateUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -41,7 +43,7 @@ public abstract class DiscountPolicy {
      * check if the discount date has expired
      */
     public boolean isExpired(Discount discount) {
-        return discount.getEndTime().compareTo(Calendar.getInstance()) < 0;
+        return discount.isExpired();
     }
 
     ////////////////////////////////////// general /////////////////////////////////////////
