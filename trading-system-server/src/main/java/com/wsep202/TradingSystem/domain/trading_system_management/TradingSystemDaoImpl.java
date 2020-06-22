@@ -169,6 +169,11 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     }
 
     @Override
+    public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem) {
+        stores.add(ownedStore);
+    }
+
+    @Override
     public boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission) {
         return ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
     }

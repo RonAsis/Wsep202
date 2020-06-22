@@ -134,6 +134,26 @@ public class TradingSystem {
     }
 
     /**
+     * This method is used to check how many users are logged-in the system
+     * @return number of users logged-in
+     */
+    public int usersLoggedInSystem(){
+        return tradingSystemDao.usersLoggedInSystem();
+    }
+
+    /**
+     * This method is used to check if a certain user is logged-in
+     * @param userToCheck - the user's username
+     * @return true if the user is logged-in, else false
+     */
+    public boolean isLoggein(String userToCheck){
+        if (userToCheck != null){
+            return tradingSystemDao.isLogin(userToCheck);
+        }
+        return false;
+    }
+
+    /**
      * UC 3.1
      * logout the user from the system
      *
@@ -364,7 +384,7 @@ public class TradingSystem {
                 }
             }
         }
-        log.info(String.format("failed add user as manager in store id %s", ownedStore.getStoreId()));
+        log.info(String.format("failed add user as manager in store id"));
         return null;
     }
 
@@ -390,7 +410,7 @@ public class TradingSystem {
                 return true;
             }
         }
-        log.info(String.format("user %s failed for add agreement owner in store '%d'", newOwnerUser, ownedStore.getStoreId()));
+        log.info(String.format("user failed for add agreement owner in store"));
         return false;
     }
 
@@ -445,7 +465,7 @@ public class TradingSystem {
             log.info(String.format("user %s was removed as owner from store '%d'", removeOwner.getUserName(), store.getStoreId()));
             return true;
         }
-        log.info(String.format("failed remove user as owner from store %s", store.getStoreId()));
+        log.info(String.format("failed remove user as owner from store"));
         return false;
     }
 
