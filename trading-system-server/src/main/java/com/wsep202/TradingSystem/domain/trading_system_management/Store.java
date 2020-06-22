@@ -360,6 +360,10 @@ public class Store {
                         .findFirst()
                         .map(appointedOwner -> {
                             appointedOwner.addSubOwner(userSystemApproveOwner);
+                            userSystemApproveOwner.addNewOwnedStore(this);
+                            userSystemApproveOwner.newNotification(Notification.builder()
+                                    .content(String.format("You are now owner of store %s on name %s", getStoreId(), getStoreName()))
+                                    .build());
                             appointingAgreements.remove(appointingAgreement);
                             return appointedOwners.add(new OwnersAppointee(userSystemApproveOwner));
                         });
@@ -494,7 +498,8 @@ public class Store {
      * @return true if owner added successfully
      */
     public Set<UserSystem> addOwner(UserSystem owner, UserSystem willBeOwner) {
-        if (isOwner(owner) && !isOwner(willBeOwner) && !checkIfExistsAgreement(owner.getUserName())) {
+        if (isOwner(owner) && !isOwner(willBeOwner) && !checkIfExistsAgreement(owner.getUserName())
+                && !isOwner(willBeOwner) && !isManager(willBeOwner.getUserName())) {
             appointingAgreements.add(new AppointingAgreement( willBeOwner, owner.getUserName(), getOwnersUsername()));
             appointedOwners.stream()
                     .filter(appointedOwner -> !appointedOwner.getAppointeeUser().getUserName().equals(owner.getUserName()))
@@ -524,7 +529,8 @@ public class Store {
      */
     public MangerStore appointAdditionManager(UserSystem owner, UserSystem newManagerStore) {
         MangerStore newManager = null;
-        if (validatePermission(owner, StorePermission.EDIT_Managers)) {
+        if (validatePermission(owner, StorePermission.EDIT_Managers) && !isOwner(newManagerStore) &&
+        !isManager(newManagerStore.getUserName())) {
             newManager = new MangerStore(newManagerStore);
             ManagersAppointee managersAppointee = findManagersAppointee(owner.getUserName());
             managersAppointee.addManger(newManager);
@@ -696,6 +702,11 @@ public class Store {
         return getManagersStore().stream()
                 .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(username) &&
                         mangerStore.getStorePermissions().contains(permission));
+    }
+
+    private boolean isManager(String username) {
+        return getManagersStore().stream()
+                .anyMatch(mangerStore -> mangerStore.getAppointedManager().getUserName().equals(username));
     }
 
     public Set<MangerStore> getManagersStore() {

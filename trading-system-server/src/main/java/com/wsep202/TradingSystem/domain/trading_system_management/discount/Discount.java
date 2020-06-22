@@ -7,6 +7,7 @@ import com.wsep202.TradingSystem.domain.exception.IllegalProductPriceException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -103,8 +104,7 @@ public class Discount {
     ////////////////////////////////////// general /////////////////////////////////////////
 
     public boolean isExpired() {
-        return getEndTime().compareTo(Calendar.getInstance()) < 0;
+        return !DateUtils.isSameDay(new Date(), getEndTime().getTime()) && getEndTime().compareTo(Calendar.getInstance()) < 0;
     }
-
 
 }

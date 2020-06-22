@@ -93,7 +93,7 @@ public class UserSystem implements Observer, Serializable {
     private Set<Notification> notifications = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<OwnerToApprove> ownerToApproves;
+    private Set<OwnerToApprove> ownerToApproves = new HashSet<>();
 
     private String principal;
 
@@ -122,6 +122,7 @@ public class UserSystem implements Observer, Serializable {
         this.ownedStores = new HashSet<>();
         this.grantedAuthorities = new HashSet<>();
         managedStores = new HashSet<>();
+        this.ownerToApproves = new HashSet<>();
     }
 
     /**
@@ -138,6 +139,7 @@ public class UserSystem implements Observer, Serializable {
         this.ownedStores = new HashSet<>();
         this.grantedAuthorities = new HashSet<>();
         managedStores = new HashSet<>();
+        this.ownerToApproves = new HashSet<>();
     }
 
     /**

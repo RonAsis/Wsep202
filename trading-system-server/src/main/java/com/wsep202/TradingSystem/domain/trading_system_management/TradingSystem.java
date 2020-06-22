@@ -479,8 +479,8 @@ public class TradingSystem {
         for (Store store : bagsToCalculate.keySet()) {  //apply the discounts on the bags in the cart (update the products prices)
             store.applyDiscountPolicies(bagsToCalculate.get(store).getProductListFromStore());
         }
-        sumBeforeDiscounts = getOriginalTotalPrice(bagsToCalculate);
-        sumAfterDiscounts = getCurrentTotalPrice(bagsToCalculate);
+        sumBeforeDiscounts = getCurrentTotalPrice(bagsToCalculate);
+        sumAfterDiscounts = getOriginalTotalPrice(bagsToCalculate);
         return new Pair<>(sumBeforeDiscounts, sumAfterDiscounts);
     }
 
