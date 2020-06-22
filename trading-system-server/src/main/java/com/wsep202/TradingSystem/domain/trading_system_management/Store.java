@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @Entity
 public class Store {
 
+
     @Transient
     private final Object stockLock = new Object();
 
@@ -155,7 +156,7 @@ public class Store {
         return products.stream().filter(product -> product.getProductSn() == productId).findFirst()
                 .orElseThrow(() -> new ProductDoesntExistException(productId, storeId));
     }
-
+    @Synchronized("stockLock")
     public boolean removeProductFromStore(UserSystem user, int productSn) {
         if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {  //only owner can remove products from its store
             Set<Product> duplicate = new HashSet<>(products);
@@ -172,6 +173,9 @@ public class Store {
         return false;
     }
 
+    /**
+     * verify the user usersystem has permission to edit product
+     */
     public boolean validateCanEditProdcuts(UserSystem userSystem, int productSn) {
         return validatePermission(userSystem, StorePermission.EDIT_PRODUCT) &&
                 products.stream()
@@ -179,6 +183,9 @@ public class Store {
                         .findFirst().isPresent();
     }
 
+    /**
+     * verify the user has the right permission as owner or manager with permissions
+     */
     private boolean validatePermission(UserSystem user, StorePermission storePermission) {
         return isOwner(user) || isManagerWithPermission(user.getUserName(), storePermission);
     }
@@ -213,6 +220,7 @@ public class Store {
      * @param cost
      * @return true for success
      */
+    @Synchronized("stockLock")
     public boolean editProduct(UserSystem user, int productSn, String productName, String category,
                                int amount, double cost) {
         if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {   //the user is owner
@@ -261,6 +269,7 @@ public class Store {
      * @param amount
      * @return true if operation succeeded
      */
+    @Synchronized("stockLock")
     public boolean editProductAmountInStock(int productSn, int amount) {
         Optional<Product> product = products.stream().filter(p -> p.getProductSn() == productSn).findFirst();
         if (product.isPresent()) {    //update the product properties
@@ -279,6 +288,7 @@ public class Store {
      * @return true if all products in stock
      * otherwise exception
      */
+    @Synchronized("stockLock")
     public boolean isAllInStock(ShoppingBag bag) throws TradingSystemException {
         for (Product product : bag.getProductListFromStore().keySet()) {
             int amount = bag.getProductAmount(product.getProductSn());
@@ -299,6 +309,7 @@ public class Store {
      *
      * @param bag shopping bag
      */
+    @Synchronized("stockLock")
     public void updateStock(ShoppingBag bag) {
         for (Product product : bag.getProductListFromStore().keySet()) {
             int purchasedAmount = bag.getProductAmount(product.getProductSn());
