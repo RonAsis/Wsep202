@@ -4,6 +4,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.exception.ConditionalProductException;
+import com.wsep202.TradingSystem.domain.exception.IllegalPercentageException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -116,6 +117,9 @@ public class ConditionalProductDiscount extends DiscountPolicy {
     }
 
     private void verifyValidity(Discount discount) {
+        if(discount.getDiscountPercentage()<0){
+            throw new IllegalPercentageException(discount.getDiscountId(),discount.getDiscountPercentage());
+        }
         if(this.productsUnderThisDiscount==null){
             throw new ConditionalProductException("There are no products as condition. check discountId: "+discount.getDiscountId());
         }
