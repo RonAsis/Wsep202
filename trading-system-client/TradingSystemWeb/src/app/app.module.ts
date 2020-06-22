@@ -73,15 +73,18 @@ import {MatRadioModule} from '@angular/material/radio';
 import { DiscountsComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/discounts/discounts.component';
 import { DiscontEditComponent } from './logged-in-user/owned-stores/owned-store-edit/discount/discont-edit/discont-edit.component';
 import {DiscountItemComponent} from './logged-in-user/owned-stores/owned-store-edit/discount/discounts/product-discount-item/discount-item.component';
-import { AddEditPolicyComponent } from './logged-in-user/owned-stores/owned-store-edit/policy/add-edit-policy/add-edit-policy.component';
+// tslint:disable-next-line:max-line-length
+import {PolicyItemComponent} from './logged-in-user/owned-stores/owned-store-edit/policy/policies/product-policy-item/policy-item.component';
+import { AddPolicyComponent } from './logged-in-user/owned-stores/owned-store-edit/policy/add-policy/add-policy.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { ApproveOwnerComponent } from './logged-in-user/approve-owner/approve-owner.component';
 
 // MDB Angular Free
 import {WavesModule, TableModule, MDBBootstrapModule} from 'angular-bootstrap-md';
 import { VisitorDailyComponent } from './logged-in-user/admin/visitor-daily/visitor-daily.component';
-import {HttpIntercepterBasicAuthService} from "./services/http-intercepter-basic-auth.service";
-import {ShareService} from "./services/share.service";
+import {HttpIntercepterBasicAuthService} from './services/http-intercepter-basic-auth.service';
+import {ShareService} from './services/share.service';
+import {PoliciesComponent} from './logged-in-user/owned-stores/owned-store-edit/policy/policies/policies.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -128,6 +131,7 @@ import {ShareService} from "./services/share.service";
     AddManagerComponent,
     DiscountComponent,
     PolicyComponent,
+    PoliciesComponent,
     EditProductComponent,
     ManagersComponent,
     OwnersComponent,
@@ -138,10 +142,11 @@ import {ShareService} from "./services/share.service";
     ManagerItemComponent,
     AddDiscountComponent,
     DiscountItemComponent,
+    PolicyItemComponent,
     AmountProductsComponent,
     DiscountsComponent,
     DiscontEditComponent,
-    AddEditPolicyComponent,
+    AddPolicyComponent,
     ApproveOwnerComponent,
     VisitorDailyComponent
   ],

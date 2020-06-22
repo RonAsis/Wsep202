@@ -14,6 +14,7 @@ import {Discount} from '../shared/discount.model';
 import {OwnerToApprove} from '../shared/ownerToApprove.model';
 import {DailyVistorDto} from '../shared/dailyVistor.model';
 import {UserService} from './user.service';
+import {Policy} from '../shared/policy.model';
 
 @Injectable({
   providedIn: 'root'
@@ -39,11 +40,10 @@ export class HttpService {
     this.sellerOwnerUrl = this.serverUrl + '/seller-owner';
   }
 
-  createBasicAuthenticationHttpHeader(username: string, password: string) {
+  createBasicAuthenticationHttpHeader(username: string, password: string){
     return 'Basic' + window.btoa(username + ':' + password);
   }
-
-  createHeader(username: string, password: string) {
+  createHeader(username: string, password: string){
     return new HttpHeaders({
       Authorization: this.createBasicAuthenticationHttpHeader(username, password)
     });
@@ -87,8 +87,8 @@ export class HttpService {
                                    paymentDetails: PaymentDetails,
                                    billingAddress: BillingAddress) {
     const shoppingCartDtoConv = this.convertShoppingCartToJsonObject(shoppingCart);
-    const url = `${this.guestUrl}/` + 'purchase-shopping-cart-guest/';
-    return this.http.post<Receipt[]>(url,
+    const url = `${this.guestUrl}/` + 'purchase-shopping-cart-guest/' ;
+    return this.http.post<Receipt[] >(url,
       {shoppingCartDto: shoppingCartDtoConv, paymentDetailsDto: paymentDetails, billingAddressDto: billingAddress});
   }
 
@@ -104,7 +104,7 @@ export class HttpService {
     const convMap = this.convertShoppingCartToJsonObject(shoppingCart);
     console.log(convMap);
     const url = `${this.guestUrl}/` + 'get-total-price-of-shopping-cart/';
-    return this.http.post<{ key: number, value: number }>(
+    return this.http.post<{key: number, value: number}>(
       url, convMap);
   }
 
@@ -224,8 +224,8 @@ export class HttpService {
     const url = `${this.buyerUrl}/` + 'get-total-price-of-shopping-cart/' +
       `${username}/` +
       `${uuid}`;
-    return this.http.get<{ key: number, value: number }>(
-      url);
+    return this.http.get<{key: number, value: number}>(
+      url );
   }
 
   //////////////////////////// AdministratorController ///////////////////////////
@@ -291,7 +291,7 @@ export class HttpService {
       url);
   }
 
-  getMyPermissions(manageUsername: string, storeId: number, uuid: string) {
+  getMyPermissions(manageUsername: string, storeId: number, uuid: string){
     const url = `${this.sellerManagerUrl}/` + 'get-operations-can-do/' +
       `${manageUsername}/` +
       `${storeId}/` +
@@ -328,13 +328,21 @@ export class HttpService {
     return this.http.get<string[]>(
       url);
   }
-
   getAllDiscounts(username: string, storeId: number, uuid: string) {
     const url = `${this.sellerManagerUrl}/` + 'get-discounts/' +
       `${username}/` +
       `${storeId}/` +
       `${uuid}`;
     return this.http.get<Discount[]>(
+      url);
+  }
+
+  getAllPurchasePolicies(username: string, storeId: number, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'get-all-purchase-policies/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.get<Policy[]>(
       url);
   }
 
@@ -356,6 +364,14 @@ export class HttpService {
       url, discount);
   }
 
+  addPolicy(username: string, storeId: number, policy: Policy, uuid: string) {
+    const url = `${this.sellerManagerUrl}/` + 'add-policy/' +
+      `${username}/` +
+      `${storeId}/` +
+      `${uuid}`;
+    return this.http.post<Policy>(
+      url, policy);
+  }
   //////////////////////////// SellerOwnerController ///////////////////////////
 
   public viewPurchaseHistoryOfOwner(ownerUsername: string, storeId: number, uuid: string) {
@@ -561,5 +577,6 @@ export class HttpService {
     }
     return uploadImageData;
   }
+
 
 }

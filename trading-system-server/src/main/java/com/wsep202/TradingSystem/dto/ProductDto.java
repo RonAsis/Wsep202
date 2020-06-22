@@ -51,7 +51,4 @@ public class ProductDto {
      * the storeId that connected to the store that the product exists in it.
      */
     private int storeId;
-
-
-
 }

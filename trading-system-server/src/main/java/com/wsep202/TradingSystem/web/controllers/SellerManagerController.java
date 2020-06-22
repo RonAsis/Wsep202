@@ -1,8 +1,6 @@
 package com.wsep202.TradingSystem.web.controllers;
 
-import com.wsep202.TradingSystem.dto.DiscountDto;
-import com.wsep202.TradingSystem.dto.ReceiptDto;
-import com.wsep202.TradingSystem.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.SellerManagerService;
 import com.wsep202.TradingSystem.web.controllers.api.PublicApiPaths;
 import io.swagger.annotations.Api;
@@ -92,13 +90,14 @@ public class SellerManagerController {
 
     /**
      * get store discounts
+     * @return
      */
-    @ApiOperation(value = "get simple Discounts")
-    @GetMapping("get-simple-discounts/{username}/{storeId}/{uuid}")
-    public List<DiscountDto> getSimpleDiscounts(@PathVariable String username,
-                                                @PathVariable int storeId,
-                                                @PathVariable UUID uuid) {
-        return sellerManagerService.getSimpleDiscounts(username, storeId, uuid);
+    @ApiOperation(value = "get all Purchase Policies")
+    @GetMapping("get-all-purchase-policies/{username}/{storeId}/{uuid}")
+    public List<PurchasePolicyDto> getAllPurchasePolicies(@PathVariable String username,
+                                                    @PathVariable int storeId,
+                                                    @PathVariable UUID uuid) {
+        return sellerManagerService.getAllStorePurchases(username, storeId, uuid);
     }
     
     /**
@@ -116,7 +115,7 @@ public class SellerManagerController {
     /**
      * add or edit discount
      */
-    @ApiOperation(value = "remove discount")
+    @ApiOperation(value = "add or edit discount")
     @PostMapping("add-discount/{username}/{storeId}/{uuid}")
     public DiscountDto addEditDiscount(@PathVariable String username,
                                        @PathVariable int storeId,
@@ -125,5 +124,26 @@ public class SellerManagerController {
         return sellerManagerService.addEditDiscount(username, storeId, discountDto, uuid);
     }
 
+    /**
+     * add or edit policy
+     */
+    @ApiOperation(value = "add or edit policy")
+    @PostMapping("add-policy/{username}/{storeId}/{uuid}")
+    public PurchasePolicyDto addEditPurchasePolicy(@PathVariable String username,
+                                             @PathVariable int storeId,
+                                             @RequestBody PurchasePolicyDto policyDto,
+                                             @PathVariable UUID uuid) {
+        return sellerManagerService.addEditPurchasePolicy(username, storeId, policyDto, uuid);
+    }
 
+    /**
+     * get store purchase policies
+     */
+    @ApiOperation(value = "get simple Discounts")
+    @GetMapping("get-simple-discounts/{username}/{storeId}/{uuid}")
+    public List<DiscountDto> getSimpleDiscounts(@PathVariable String username,
+                                                @PathVariable int storeId,
+                                                @PathVariable UUID uuid) {
+        return sellerManagerService.getSimpleDiscounts(username, storeId, uuid);
+    }
 }
