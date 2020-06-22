@@ -6,6 +6,7 @@ import com.wsep202.TradingSystem.domain.image.ImagePath;
 import com.wsep202.TradingSystem.domain.image.ImageUtil;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
@@ -139,8 +140,14 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     }
 
     @Override
+    public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
+        purchase.setPurchaseId(getNewId());
+        return store.addEditPurchase(user, purchase);
+    }
+
+    @Override
     public boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn) {
-        boolean ans = ownerStore.validateCanEditProdcuts(user, productSn);
+        boolean ans = ownerStore.validateCanEditProducts(user, productSn);
         if (ans) {
             updateShoppingCart(user, new LinkedList<>(users), ownerStore, ownerStore.getProduct(productSn));
             log.info(String.format("Delete productSn %d from store %d", productSn, ownerStore.getStoreId()));

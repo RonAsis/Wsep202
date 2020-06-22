@@ -2,21 +2,21 @@ package com.wsep202.TradingSystem.domain.trading_system_management.policy_purcha
 
 import com.wsep202.TradingSystem.domain.exception.PurchasePolicyException;
 import com.wsep202.TradingSystem.domain.exception.TradingSystemException;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.CascadeType;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.*;
 
-@Getter
-@Setter
+@Data
+@Slf4j
+@Builder
+@Entity
+@NoArgsConstructor
 @AllArgsConstructor
 public class ComposedPurchase extends PurchasePolicy{
 
@@ -30,7 +30,7 @@ public class ComposedPurchase extends PurchasePolicy{
      * children components of the composite Purchase policy
      * the operands of the composed Purchase policy
      */
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade={CascadeType.PERSIST,CascadeType.REMOVE}, orphanRemoval = true)
     private List<Purchase> composedPurchasePolicies;
 
     @Override
@@ -52,7 +52,7 @@ public class ComposedPurchase extends PurchasePolicy{
                 return true;
 
             } else if (compositeOperator == CompositeOperator.XOR) {                  //XOR case
-                int sumOfTrue = getSumOfTrue(purchase, products, userAddress);
+                int sumOfTrue = getSumOfTrue(products, userAddress);
                 if (sumOfTrue % 2 != 0) { //xor between odd amount of true = true
                     return true;
                 }
@@ -63,18 +63,13 @@ public class ComposedPurchase extends PurchasePolicy{
         return false;
     }
 
-    private int getSumOfTrue(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {
-        int sumOfTrue = 0;
-        for (Purchase policy : composedPurchasePolicies) {
-            try {
-                if (policy.getPurchasePolicy().isApproved(purchase,products, userAddress)) {
-                    sumOfTrue++;
-                }
-            }catch (TradingSystemException ex){
-                //do nothing
-            }
-        }
-        return sumOfTrue;
+
+
+
+    private int getSumOfTrue( Map<Product, Integer> products, BillingAddress userAddress) {
+        return composedPurchasePolicies.stream()
+                .filter(purchase1 -> purchase1.isApproved(products,userAddress))
+                .toArray().length;
     }
 
     private String getAllExceptionsMessages(Purchase purchase, Map<Product, Integer> products, BillingAddress userAddress) {
@@ -102,7 +97,7 @@ public class ComposedPurchase extends PurchasePolicy{
     }
 
     public boolean edit(CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies){
-        if (composedPurchasePolicies != null && composedPurchasePolicies != null &&
+        if (composedPurchasePolicies != null &&
         !composedPurchasePolicies.isEmpty()){
             this.compositeOperator = compositeOperator;
             this.composedPurchasePolicies = composedPurchasePolicies;

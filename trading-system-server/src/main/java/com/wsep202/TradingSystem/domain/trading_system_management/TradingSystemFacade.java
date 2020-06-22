@@ -226,27 +226,24 @@ public class TradingSystemFacade {
      * @param uuid     - users UUID
      * @return true if success, else false
      */
-    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
-    public PurchasePolicyDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
-        // TODO need organize : PurchasePolicyDto not define good -domain ==> need do like discount
-        //                      need convert PurchasePolicyDto to PurchasePolicy and not send the vaule inside
+
+    public PurchasePolicyDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchasePolicyDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PURCHASE_POLICY);
-        Purchase purchase = modelMapper.map(purchaseDto, Purchase.class);
-        PurchasePolicyDto ans = modelMapper.map(store.addEditPurchase(user, purchase, purchaseDto.getCountriesPermitted(),
-                purchaseDto.getStoreWorkDays(), purchaseDto.getMin(), purchaseDto.getMax(),
-                purchaseDto.getProductId(), purchaseDto.getCompositeOperator(),
-                convert(purchaseDto.getComposedPurchasePolicies())), PurchasePolicyDto.class);
-        return ans;
+        Purchase purchase = modelMapper.map(purchasePolicyDto, Purchase.class);
+        if(purchasePolicyDto.getMin() > purchasePolicyDto.getMax())
+            throw new PurchasePolicyException("Received minimum > maximum --> didn't insert policy");
+        Purchase purchaseRes = tradingSystemDao.addEditPurchase(store, user, purchase);
+        return Objects.nonNull(purchaseRes) ? modelMapper.map(purchaseRes, PurchasePolicyDto.class) : null;
     }
 
     private List<Purchase> convert(List<PurchasePolicyDto> list) {
         // TODO need remove from here the convert purchase need to be in the model mapper
         List<Purchase> purchases = new LinkedList<>();
-        for (PurchasePolicyDto ppd : list) {
+        /*for (PurchasePolicyDto ppd : list) {
             Purchase purchase = new Purchase(ppd.getPurchasePolicy(), ppd.getPurchaseType());
             purchases.add(purchase);
-        }
+        }*/
         return purchases;
     }
 
@@ -764,7 +761,7 @@ public class TradingSystemFacade {
         return convertDiscountList(allDiscounts);
     }
 
-    public List<PurchaseDto> getAllStorePurchases(String ownerUsername, int storeId, UUID uuid) {
+    public List<PurchasePolicyDto> getAllStorePurchases(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
         Store store = user.getOwnerStore(storeId);
         List<Purchase> allPurchases = new LinkedList<>(store.getPurchasePolicies());
@@ -868,8 +865,8 @@ public class TradingSystemFacade {
         return modelMapper.map(discounts, listType);
     }
 
-    private List<PurchaseDto> convertPurchaseList(@NotNull List<@NotNull Purchase> purchases) {
-        Type listType = new TypeToken<List<Purchase>>() {
+    private List<PurchasePolicyDto> convertPurchaseList(@NotNull List<@NotNull Purchase> purchases) {
+        Type listType = new TypeToken<List<PurchasePolicyDto>>() {
         }.getType();
         return modelMapper.map(purchases, listType);
     }

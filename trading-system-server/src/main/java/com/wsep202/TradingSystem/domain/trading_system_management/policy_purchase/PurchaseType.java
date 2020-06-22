@@ -5,7 +5,11 @@ import java.util.Arrays;
 
 public enum PurchaseType {
 
-    BUY_IMMEDIATELY("Buy immediately");
+    PRODUCT_DETAILS("specific product"),
+    SHOPPING_BAG_DETAILS("all store"),
+    SYSTEM_DETAILS("on system"),
+    USER_DETAILS("on user"),
+    COMPOSED_POLICY("compose");
 
 
     public final String type;

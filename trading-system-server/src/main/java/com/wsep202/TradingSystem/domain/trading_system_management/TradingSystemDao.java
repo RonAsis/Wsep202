@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.OwnerToApprove;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitor;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.DailyVisitorsField;
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.RequestGetDailyVisitors;
@@ -45,6 +46,8 @@ public abstract class TradingSystemDao {
     public abstract boolean removeDiscount(Store store, UserSystem user, int discountId);
 
     public abstract Discount addEditDiscount(Store store, UserSystem user, Discount discount);
+
+    public abstract Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase);
 
     public abstract boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn);
 

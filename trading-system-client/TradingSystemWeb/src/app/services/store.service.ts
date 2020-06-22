@@ -6,6 +6,7 @@ import {Receipt} from '../shared/receipt.model';
 import {HttpService} from './http.service';
 import {UserService} from './user.service';
 import {Discount} from '../shared/discount.model';
+import {Policy} from '../shared/policy.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,8 @@ export class StoreService {
   private mangerStore = false;
   discountSelected = new EventEmitter<Discount>();
   discountAdded = new EventEmitter<Discount>();
+  policySelected = new EventEmitter<Policy>();
+  policyAdded = new EventEmitter<Policy>();
   constructor(private httpService: HttpService, private userService: UserService) {
   }
 
@@ -145,12 +148,22 @@ export class StoreService {
     return this.httpService.getSimpleDiscounts(this.userService.getUsername(), storeId, this.userService.getUuid());
   }
 
+  getAllPurchasePolicies(storeId: number) {
+    return this.httpService.getAllPurchasePolicies(this.userService.getUsername(), storeId, this.userService.getUuid());
+  }
+
   addDiscount(storeId: number, discount: Discount) {
     return this.httpService.addDiscount(this.userService.getUsername(), storeId, discount, this.userService.getUuid());
+  }
+
+  addPolicy(storeId: number, policy: Policy) {
+    return this.httpService.addPolicy(this.userService.getUsername(), storeId, policy, this.userService.getUuid());
   }
 
   removeOwner(storeId: number, ownerRemove: string){
     return this.httpService.removeOwner(this.userService.getUsername(), storeId, ownerRemove, this.userService.getUuid());
 
   }
+
+
 }

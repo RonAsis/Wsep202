@@ -3,6 +3,9 @@ package com.wsep202.TradingSystem.domain.trading_system_management.policy_purcha
  * the class defines a purchase policy in store
  */
 
+import com.wsep202.TradingSystem.domain.trading_system_management.Store;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountType;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.CompositeOperator;
@@ -11,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Builder
@@ -24,93 +24,50 @@ import java.util.Set;
 @Entity
 public class Purchase {
 
-    protected static int purchaseIdAcc = 1;
     /**
-     * saves the last purchaseSnAcc when a new product is created
+     * unique id of the purchase policy in the store
      */
-
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Min(value = 1, message = "Must be greater than or equal zero")
-    protected int purchaseId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected long purchaseId;
 
     /**
-     * types of discounts in the store
+     * the actual type of purchase policy
      */
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private PurchasePolicy purchasePolicy;
 
-
+    /**
+     * the type of policy
+     */
+    @Enumerated(EnumType.STRING)
     private PurchaseType purchaseType;
 
-    public Purchase(PurchasePolicy purchasePolicy,
-                    PurchaseType purchaseType) {
-        this.purchasePolicy = purchasePolicy;
-        this.purchaseType = purchaseType;
-        purchaseId = generatePurchaseSn();
-    }
-
-    private int generatePurchaseSn(){
-        return purchaseIdAcc++;
-    }
+    /**
+     * describes the verbal description of the policy
+     */
+    private String description;
 
     /**
-     * edit the right policy
-     * @param countriesPermitted - for user policy
-     * @param storeWorkDays - for system policy
-     * @param min - for product OR bag policy
-     * @param max - for product OR bag policy
-     * @param productId - for product policy
-     * @param compositeOperator - for composed policy
-     * @param composedPurchasePolicies - for composed policy
-     * @return true if policy was changed
+     * the following method check if the user and the received products stands in the current
+     * purchase policy of the store.
      */
-    public boolean edit(Set<String> countriesPermitted, Set<Day> storeWorkDays, int min, int max, int productId,
-                        CompositeOperator compositeOperator, List<Purchase> composedPurchasePolicies){
-        boolean isChanged = false;
-        if (purchasePolicy instanceof ProductDetailsPolicy){
-            isChanged = ((ProductDetailsPolicy) purchasePolicy).
-                    edit(this, min, max, productId);
-        }
-        else if (purchasePolicy instanceof ShoppingBagDetailsPolicy) {
-            isChanged = ((ShoppingBagDetailsPolicy) purchasePolicy).
-                    edit(this, min, max);
-        }
-        else if (purchasePolicy instanceof UserDetailsPolicy){
-            isChanged = ((UserDetailsPolicy) purchasePolicy).
-                    edit(this,countriesPermitted);
-        }
-        else if (purchasePolicy instanceof SystemDetailsPolicy){
-            isChanged = ((SystemDetailsPolicy) purchasePolicy).
-                    edit(this, storeWorkDays);
-        }
-        else{
-            isChanged = ((ComposedPurchase) purchasePolicy).
-                    edit(compositeOperator, composedPurchasePolicies);
-
-        }
-        return isChanged;
-    }
-
-
     public boolean isApproved(Map<Product, Integer> products, BillingAddress userAddress){
-       return purchasePolicy.isApproved(this, products,userAddress);
+        return purchasePolicy.isApproved(this, products,userAddress);
+    }
 
+    ///////////////////////////////////////////////// edit /////////////////////////////////////
+
+    public boolean editPurchase(String description,
+                                PurchasePolicy purchasePolicy,
+                                PurchaseType purchaseType) {
+        this.description = description;
+        this.purchasePolicy = purchasePolicy;
+        this.purchaseType = purchaseType;
+        return true;
     }
 
 
-    /////////////////////////////////////is-methods/////////////////////////////////////////
 
 
-
-//    /**
-//     * the types of purchase exist in the store
-//     */
-//    @ManyToMany
-//    @JoinTable()
-//    private Map<String, PurchasePolicy> purchasePolicies;
-    //    /**
-//     * tells if its purchase policy at the shopping bag level
-//     */
-//    private boolean isShoppingBagPurchaseLimit;
 }

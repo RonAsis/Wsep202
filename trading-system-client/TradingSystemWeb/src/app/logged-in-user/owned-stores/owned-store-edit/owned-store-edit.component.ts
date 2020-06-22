@@ -28,9 +28,9 @@ export class OwnedStoreEditComponent implements OnInit {
         this.isOwner = true;
         this.loadedFeature = 'Edit-Product';
       }else{
-        this.storeService.getMyPermissions(this.store.storeId).subscribe(response => {
-          if ( response !== undefined){
-            this.permissions = response;
+        this.storeService.getMyPermissions(this.store.storeId).subscribe(response1 => {
+          if ( response1 !== undefined){
+            this.permissions = response1;
             this.loadedFeature = this.permissions.includes('Edit-Product') ? 'Edit-Product' : this.permissions[0];
           }
         });
@@ -46,6 +46,10 @@ export class OwnedStoreEditComponent implements OnInit {
     this.loadedFeature = 'Add Discount';
   }
 
+  onAddPolicy() {
+    this.loadedFeature = 'Add Policy';
+  }
+
   onManagers() {
     this.loadedFeature = 'Managers';
   }
@@ -54,8 +58,8 @@ export class OwnedStoreEditComponent implements OnInit {
     this.loadedFeature = 'Owners';
   }
 
-  onPolicy() {
-    this.loadedFeature = 'Policy';
+  onPolicies() {
+    this.loadedFeature = 'Policies';
   }
 
   onDiscounts() {
@@ -64,6 +68,10 @@ export class OwnedStoreEditComponent implements OnInit {
 
   discountAdded($event: Discount) {
     this.onDiscounts();
+  }
+
+  policyAdded($event: any) {
+    this.onPolicies();
   }
 
   isManagerCanEditDiscount() {

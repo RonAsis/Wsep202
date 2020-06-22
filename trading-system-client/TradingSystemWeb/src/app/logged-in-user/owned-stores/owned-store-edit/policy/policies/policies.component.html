@@ -1,0 +1,11 @@
+<div class="row">
+  <div class="row">
+    <div class="col-xs-12">
+      <app-policy-item
+        *ngFor="let policy of policies"
+        [policy]="policy"
+        (policyWasSelected)="policySelected($event)"></app-policy-item>
+    </div>
+  </div>
+</div>
+
