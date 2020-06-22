@@ -14,7 +14,7 @@
         <li><a href="#" (click)="onSelect('Owned-stores')">Owned-stores</a></li>
         <li><a href="#" (click)="onSelect('Managed-stores')">Managed-stores</a></li>
         <li><a href="#" (click)="onSelect('approve-owner')">
-          <span class="badge">3</span>
+          <span class="badge">{{numOfApprove}}</span>
           <span>Approve-owner</span>
           </a></li>
         <li *ngIf="getIsAdmin()"><a href="#" (click)="onSelect('History-purchase-user')">History-purchase-user</a></li>
