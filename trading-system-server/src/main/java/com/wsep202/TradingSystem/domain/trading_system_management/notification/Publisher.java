@@ -8,9 +8,12 @@ import com.wsep202.TradingSystem.domain.trading_system_management.statistics.Upd
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.mariadb.jdbc.internal.util.dao.QueryException;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.util.CollectionUtils;
 
+import java.net.ConnectException;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -54,15 +57,19 @@ public class Publisher implements Subject {
     @Synchronized("publisherSync")
     @Scheduled(fixedRateString = "6000", initialDelayString = "0")
     public void notifyObservers() {
-        List<Notification> notifications = new LinkedList<>();
-        observersWithNotification.forEach(observer -> {
-            List<Notification> notificationsObserver = observer.getNotifications();
-            tradingSystemDao.updateUser((UserSystem) observer);
-            notifications.addAll(notificationsObserver);
-        });
-        if (!CollectionUtils.isEmpty(notifications)) {
-            tradingSystemFacade.sendNotification(notifications);
-            observersWithNotification = new HashSet<>();
+        try {
+            List<Notification> notifications = new LinkedList<>();
+            observersWithNotification.forEach(observer -> {
+                List<Notification> notificationsObserver = observer.getNotifications();
+                tradingSystemDao.updateUser((UserSystem) observer);
+                notifications.addAll(notificationsObserver);
+            });
+            if (!CollectionUtils.isEmpty(notifications)) {
+                tradingSystemFacade.sendNotification(notifications);
+                observersWithNotification = new HashSet<>();
+            }
+        }catch(CannotCreateTransactionException exception ){
+            log.error("Connection to DB loss", exception);
         }
     }
 

@@ -23,6 +23,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
@@ -157,6 +158,7 @@ public class TradingSystemFacade {
      * @param cost          - the cost of the product
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public ProductDto addProduct(@NotBlank String ownerUsername, int storeId,
                                  @NotBlank String productName, @NotBlank String category,
                                  int amount, double cost, UUID uuid) {
@@ -206,6 +208,7 @@ public class TradingSystemFacade {
      * @param uuid     - users UUID
      * @return true if success, else false
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT);
@@ -223,6 +226,7 @@ public class TradingSystemFacade {
      * @param uuid     - users UUID
      * @return true if success, else false
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public PurchasePolicyDto addEditPurchase(String username, int storeId, PurchasePolicyDto purchaseDto, UUID uuid) {
         // TODO need organize : PurchasePolicyDto not define good -domain ==> need do like discount
         //                      need convert PurchasePolicyDto to PurchasePolicy and not send the vaule inside
@@ -285,6 +289,7 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public boolean editProduct(@NotBlank String ownerUsername, int storeId, int productSn, @NotBlank String productName,
                                @NotBlank String category, int amount, double cost, UUID uuid) {
         try {
@@ -311,6 +316,7 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class, RuntimeException.class})
     public boolean addOwner(@NotBlank String ownerUsername, int storeId, @NotBlank String newOwnerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -332,6 +338,7 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -483,6 +490,7 @@ public class TradingSystemFacade {
      * @param storeName     - the name of the new store
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public StoreDto openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(usernameOwner, uuid);

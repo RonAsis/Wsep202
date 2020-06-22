@@ -80,8 +80,7 @@ import { ApproveOwnerComponent } from './logged-in-user/approve-owner/approve-ow
 // MDB Angular Free
 import {WavesModule, TableModule, MDBBootstrapModule} from 'angular-bootstrap-md';
 import { VisitorDailyComponent } from './logged-in-user/admin/visitor-daily/visitor-daily.component';
-import {HttpIntercepterBasicAuthService} from "./services/http-intercepter-basic-auth.service";
-import {ShareService} from "./services/share.service";
+import {HttpIntercepterBasicAuthService} from './services/http-intercepter-basic-auth.service';
 @NgModule({
   declarations: [
     AppComponent,
