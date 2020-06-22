@@ -55,14 +55,14 @@
         <label for="month">Expiration Card Month
           <span class="required-asterisk">*</span>
         </label>
-        <input (keypress)="numberOnly($event)" min="1" max="12" type="text" id="month" class="form-control"
+        <input (keypress)="numberOnly($event)" [maxLength]="2" min="1" max="12" type="text" id="month" class="form-control"
                #expirationMonth/>
       </div>
       <div class="col-sm-5 from-group">
         <label for="year">Expiration Card Year
           <span class="required-asterisk">*</span>
         </label>
-        <input (keypress)="numberOnly($event)" type="text" id="year" class="form-control"
+        <input (keypress)="numberOnly($event)" [maxLength]="4" type="text" id="year" class="form-control"
                #expirationYear/>
       </div>
       <div class="col-sm-5 from-group">

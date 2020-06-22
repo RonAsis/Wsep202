@@ -27,7 +27,7 @@ export class PurchaseShoppingCartComponent implements OnInit {
   @Input() cartTotal: number;
   @Input() cartTotalAfterDiscount: number;
 
-  @ViewChild('disabledPurchase', {static: false}) disabledPurchase: boolean;
+  @ViewChild('disabledPurchase', {static: false}) disabledPurchase: boolean = false;
 
   messageColor: string;
   message: string;
@@ -69,14 +69,18 @@ export class PurchaseShoppingCartComponent implements OnInit {
           this.disabledPurchase = false;
           if (response === undefined){
             this.errorMessage('There is no response from the server');
+            this.disabledPurchase = false;
           }else{
             this.shareService.setReceipts(response);
             this.userService.deleteShoppingCart();
             this.shareService.featureSelected.emit('History-purchase');
           }
         }, (error: HttpErrorResponse) => {
+          this.disabledPurchase = false;
           this.errorMessage(error.error.message);
-          });
+        });
+    }else{
+      this.disabledPurchase = false;
     }
   }
 
