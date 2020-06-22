@@ -37,6 +37,7 @@ public class VisibleDiscount extends DiscountPolicy {
 
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         if (!isExpired(discount)) {
             products.keySet().forEach(product -> {
                 if (isProductHaveDiscount(amountOfProductsForApplyDiscounts, product)) {
@@ -51,6 +52,7 @@ public class VisibleDiscount extends DiscountPolicy {
 
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         return !isExpired(discount) && products.keySet().stream()
                 .anyMatch(product -> isProductHaveDiscount(amountOfProductsForApplyDiscounts, product));
     }
@@ -68,6 +70,11 @@ public class VisibleDiscount extends DiscountPolicy {
     @Override
     public void removeProductFromDiscount(int productSn) {
         removeProductFromCollection(amountOfProductsForApplyDiscounts, productSn);
+    }
+    private void verifyValidity(Discount discount) {
+        if (discount.getDiscountPercentage() < 0) {
+            throw new IllegalPercentageException(discount.getDiscountId(), discount.getDiscountPercentage());
+        }
     }
 
 }

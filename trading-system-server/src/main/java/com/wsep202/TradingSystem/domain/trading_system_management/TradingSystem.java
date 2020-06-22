@@ -21,6 +21,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,7 +33,6 @@ import java.util.stream.Stream;
 public class TradingSystem {
 
     private final Object purchaseLock = new Object();
-
 
     private ExternalServiceManagement externalServiceManagement;
 
@@ -93,7 +93,7 @@ public class TradingSystem {
      * @param image
      * @return true if the registration succeeded
      */
-    @Synchronized
+    @Synchronized()
     public boolean registerNewUser(UserSystem userToRegister, MultipartFile image) {
         if (Objects.nonNull(userToRegister)
                 && !tradingSystemDao.isRegistered(userToRegister)
@@ -233,6 +233,7 @@ public class TradingSystem {
      * @param paymentDetails - the user credit card number & expiration date
      * @return list of receipts for stores where payment has been made
      */
+    @Synchronized("purchaseLock")
     public List<Receipt> purchaseShoppingCartGuest(ShoppingCart shoppingCart, PaymentDetails paymentDetails, BillingAddress billingAddress) {
         return purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
     }
@@ -268,10 +269,10 @@ public class TradingSystem {
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
-
-    private List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
-                                             ShoppingCart shoppingCart, BillingAddress billingAddress,
-                                             String customerName)
+    @Transactional(rollbackOn = {TradingSystemException.class, RuntimeException.class})
+    List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
+                                     ShoppingCart shoppingCart, BillingAddress billingAddress,
+                                     String customerName)
             throws TradingSystemException {
         //check validity of the arguments fields
         if (validationOfPurchaseArgs(paymentDetails, shoppingCart, billingAddress)) return null;

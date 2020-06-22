@@ -16,9 +16,12 @@ import lombok.experimental.FieldNameConstants;
 @EqualsAndHashCode(callSuper = true)
 public class ApproveOwnerDefinition extends ActivityDefinition {
 
-    public final static String type = "approveOwner";
+    private String ownerUsername;
+    private String ownerToApprove;
+    private int storeId;
+    private boolean status;
 
-    private String username;
+    public final static String type = "approveOwner";
 
     @Override
     public String getType() {
@@ -27,6 +30,8 @@ public class ApproveOwnerDefinition extends ActivityDefinition {
 
     @Override
     public void apply(Context context, TradingSystemFacade tradingSystemFacade) {
-        // TODO
+        tradingSystemFacade.approveOwner(ownerUsername,
+                context.getRealStoreId(storeId),
+                ownerToApprove,status,context.getUuid(ownerUsername));
     }
 }

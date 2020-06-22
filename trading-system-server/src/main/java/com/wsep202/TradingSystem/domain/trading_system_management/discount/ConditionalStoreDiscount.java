@@ -30,6 +30,8 @@ public class ConditionalStoreDiscount extends DiscountPolicy {
     private double minPrice;
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
+
         //The discount time is not expired yet
         if (!isExpired(discount) && !discount.isApplied()) {
             double totalPurchasedCost = getTotalPurchasedCost(products);
@@ -46,6 +48,7 @@ public class ConditionalStoreDiscount extends DiscountPolicy {
 
     @Override
     public boolean isApprovedProducts(Discount discount, Map<Product, Integer> products) {
+        verifyValidity(discount);
         return !isExpired(discount) && minPrice <= getTotalPurchasedCost(products);
     }
 
@@ -62,5 +65,13 @@ public class ConditionalStoreDiscount extends DiscountPolicy {
     @Override
     public void removeProductFromDiscount(int productSn) {
         // not need to do anything there is not product
+    }
+    private void verifyValidity(Discount discount) {
+        if(discount.getDiscountPercentage()<0){
+            throw new IllegalPercentageException(discount.getDiscountId(),discount.getDiscountPercentage());
+        }
+        if(minPrice<0){
+            throw new IllegalMinPriceException(discount.getDiscountId(),minPrice);
+        }
     }
 }

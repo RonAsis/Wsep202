@@ -90,7 +90,7 @@ public class Store {
     /**
      * list of appointing agreements of owners in the store
      */
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<AppointingAgreement> appointingAgreements;
 
     /**
@@ -156,13 +156,7 @@ public class Store {
         return products.stream().filter(product -> product.getProductSn() == productId).findFirst()
                 .orElseThrow(() -> new ProductDoesntExistException(productId, storeId));
     }
-
-    /**
-     * return true if the product with the given productSn was remove, else returns false
-     * @param user - the store owner name
-     * @param productSn - the productSn to remove
-     * @return - true id remove succeed, else returns false
-     */
+    @Synchronized("stockLock")
     public boolean removeProductFromStore(UserSystem user, int productSn) {
         if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {  //only owner can remove products from its store
             Set<Product> duplicate = new HashSet<>(products);
@@ -180,27 +174,19 @@ public class Store {
     }
 
     /**
-     * returns true of the given user has the permission to edit a product and checks that the product is in the store
-     * @param userSystem - the user to check on
-     * @param productSn - the given product
-     * @return - true if the owner and the products are valid, else returns false
+     * verify the user usersystem has permission to edit product
      */
-    public boolean validateCanEditProducts(UserSystem userSystem, int productSn) {
+    public boolean validateCanEditProdcuts(UserSystem userSystem, int productSn) {
         return validatePermission(userSystem, StorePermission.EDIT_PRODUCT) &&
                 products.stream()
                         .filter(product -> product.getProductSn() == productSn)
                         .findFirst().isPresent();
     }
 
-    /**
-     * check is the given user has the given permission
-     * @param user - the user to check on
-     * @param storePermission - the permission to check on
-     * @return - true if the user has the given permission, else returns false
-     */
     private boolean validatePermission(UserSystem user, StorePermission storePermission) {
         return isOwner(user) || isManagerWithPermission(user.getUserName(), storePermission);
     }
+
 
     /**
      * owner adds a new product to the store
@@ -229,6 +215,7 @@ public class Store {
      * @param cost
      * @return true for success
      */
+    @Synchronized("stockLock")
     public boolean editProduct(UserSystem user, int productSn, String productName, String category,
                                int amount, double cost) {
         if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {   //the user is owner
@@ -275,6 +262,7 @@ public class Store {
      * @param amount
      * @return true if operation succeeded
      */
+    @Synchronized("stockLock")
     public boolean editProductAmountInStock(int productSn, int amount) {
         Optional<Product> product = products.stream().filter(p -> p.getProductSn() == productSn).findFirst();
         if (product.isPresent()) {    //update the product properties
@@ -292,6 +280,7 @@ public class Store {
      * @return true if all products in stock
      * otherwise exception
      */
+    @Synchronized("stockLock")
     public boolean isAllInStock(ShoppingBag bag) throws TradingSystemException {
         for (Product product : bag.getProductListFromStore().keySet()) {
             int amount = bag.getProductAmount(product.getProductSn());
@@ -311,6 +300,7 @@ public class Store {
      * after the purchase
      * @param bag shopping bag
      */
+    @Synchronized("stockLock")
     public void updateStock(ShoppingBag bag) {
         for (Product product : bag.getProductListFromStore().keySet()) {
             int purchasedAmount = bag.getProductAmount(product.getProductSn());
@@ -345,6 +335,8 @@ public class Store {
                     appointingAgreement.changeApproval(ownerUser.getUserName(), status ? StatusOwner.APPROVE : StatusOwner.NOT_APPROVE);
                     ownerUser.removeAgreement(storeId, ownerToApprove);
                     isApproveOwner(appointingAgreement.getNewOwner());
+                    log.info("The owner: "+ownerUser.getUserName()+" approved: "+ownerToApprove+"" +
+                            "with status: "+status);
                     return true;
                 }).orElse(false);
     }
@@ -880,8 +872,12 @@ public class Store {
         if (validatePermission(user, StorePermission.EDIT_DISCOUNT)) {  //verify the user is owner of the store
             //discount.setNewId();  //generate new ID for the new discount
             discounts.add(discount);
+            log.info("The discount with description: "+discount.getDescription()+"" +
+                    " added successfully to the store with id: "+storeId);
             return discount;
         }
+        log.info("The discount with id: "+discount.getDiscountId()+" and description: "+discount.getDescription()+"" +
+                " failed to add to the store with id: "+storeId);
         throw new NotAdministratorException(String.format("%s not owner and not manager in the store %d", user.getUserName(), storeId));
     }
 

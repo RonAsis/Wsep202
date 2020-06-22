@@ -10,9 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 @Getter
 @Setter
 @Slf4j
@@ -33,11 +30,12 @@ public class ExternalServiceManagement {
      * default connect if we don't have any prefers for the external systems
      */
     public void connect() {
+        //initial the factory objects
         chargeFactory = new ChargeSystemFactory();
         supplyFactory = new SupplySystemFactory();
-
-        chargeSystem = chargeFactory.createChargeSystem("https://cs-bgu-wsep.herokuapp.com/");
-        supplySystem = supplyFactory.createSupplySystem("https://cs-bgu-wsep.herokuapp.com/");
+        //get the concrete external systems as services from the factory related object
+        chargeSystem = chargeFactory.createChargeSystem(ExternAddressesConfig.ACTUAL_CHARGE_SYS_ADDR);
+        supplySystem = supplyFactory.createSupplySystem(ExternAddressesConfig.ACTUAL_SUPPLY_SYS_ADDR);
         log.info("The system is now initialized with external systems services");
     }
 

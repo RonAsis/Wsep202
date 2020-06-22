@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -120,6 +121,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public Product addProductToStore(Store store, UserSystem owner, Product product) {
         if (store.addNewProduct(owner, product)) {
             Store storeSaved = storeRepository.save(store);
@@ -131,6 +133,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public boolean removeDiscount(Store store, UserSystem user, int discountId) {
         boolean res = false;
         if (store.removeDiscount(user, discountId)) {
@@ -141,6 +144,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public Discount addEditDiscount(Store store, UserSystem user, Discount discount) {
         Discount res = store.addEditDiscount(user, discount);
         if (Objects.nonNull(res)) {
@@ -163,6 +167,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn) {
         boolean ans = ownerStore.validateCanEditProducts(user, productSn);
         if (ans) {
@@ -184,6 +189,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public boolean editProduct(Store ownerStore, UserSystem user, int productSn, String productName, String category, int amount, double cost) {
         boolean ans = ownerStore.editProduct(user, productSn, productName, category, amount, cost);
         if (ans) {
@@ -194,12 +200,14 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem) {
         storeRepository.save(ownedStore);
         userRepository.save(userSystem);
     }
 
     @Override
+    @Transactional
     public boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission) {
         boolean ans = ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
         if (ans) {
@@ -209,6 +217,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public boolean removePermission(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission) {
         boolean ans = ownedStore.removePermission(ownerUser, managerStore, storePermission);
         if (ans) {
@@ -218,12 +227,14 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public boolean saveProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product, int amount) {
         Product productInShoppingBag = store.getProduct(product.getProductSn());
         return shoppingCart.addProductToCart(store, productInShoppingBag, amount);
     }
 
     @Override
+    @Transactional
     public boolean removeProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product) {
         boolean ans = shoppingCart.removeProductInCart(store, product);
         if (ans) {
@@ -233,11 +244,13 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public void updateUser(UserSystem user) {
         userRepository.save(user);
     }
 
     @Override
+    @Transactional
     public boolean changeProductAmountInShoppingBag(String username, ShoppingCart shoppingCart, int storeId, int amount, int productSn) {
         boolean ans = shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
         if (ans) {
@@ -247,16 +260,19 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public void updateStore(Store ownedStore) {
         storeRepository.save(ownedStore);
     }
 
     @Override
+    @Transactional
     public void login(String username, ShoppingCart shoppingCart) {
         tradingSystemCashing.addShoppingCart(username, shoppingCart);
     }
 
     @Override
+    @Transactional
     public void saveShoppingCart(UserSystem userSystem) {
         ShoppingCart shoppingCart = tradingSystemCashing.removeShoppingCart(userSystem.getUserName());
         userSystem.setShoppingCart(shoppingCart);
@@ -264,6 +280,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
         if (isValidUuid(username, uuid)) {
             return tradingSystemCashing.getShoppingCart(username);
@@ -272,11 +289,13 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public void loadShoppingCart(UserSystem user) {
         user.setShoppingCart(tradingSystemCashing.getShoppingCart(user.getUserName()));
     }
 
     @Override
+    @Transactional
     public Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid) {
         if (isValidUuid(ownerUsername, uuid)) {
             return userRepository.findById(ownerUsername)
@@ -287,6 +306,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public boolean approveOwner(Store ownedStore, UserSystem ownerUser, String ownerToApprove, boolean status) {
         boolean res = ownedStore.approveOwner(ownerUser, ownerToApprove, status);
         if (res) {
@@ -296,6 +316,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public void updateDailyVisitors(DailyVisitorsField dailyVisitorsField) {
         Date toDay = new Date();
         dailyVisitorsRepository.findById(toDay)
@@ -311,6 +332,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
+    @Transactional
     public Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid) {
         if (isValidUuid(username, uuid) && isAdmin(username)) {
             Pageable pageable = PageRequest.of(requestGetDailyVisitors.getFirstIndex(), requestGetDailyVisitors.getLastIndex(), Sort.by("date").ascending());

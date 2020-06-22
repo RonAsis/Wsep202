@@ -1,0 +1,68 @@
+activities:
+
+    ## use case:
+    ## u2 open store, appoint u3 as owner,
+    ## u3 appoint u4 as owner
+    ## u2 approve u4
+
+  # register u1,2,3,4,5,6
+  - type: register
+    userName: u2
+    password: u2
+    firstName: u2
+    lastName: u2
+  - type: register
+    userName: u3
+    password: u3
+    firstName: u3
+    lastName: u3
+  - type: register
+    userName: u4
+    password: u4
+    firstName: u4
+    lastName: u4
+  - type: register
+    userName: u5
+    password: u5
+    firstName: u5
+    lastName: u5
+  - type: register
+    userName: u6
+    password: u6
+    firstName: u6
+    lastName: u6
+
+    #u2 login
+  - type: login
+    userName: u2
+    password: u2
+
+    #u2 open store
+  - type: openStore
+    userNameOwner: u2
+    storeName: s1
+    description: s1
+
+# u2 add u3 as store owner
+  - type: addOwner
+    userName: u2
+    storeId: 0
+    newOwnerUsername: u3
+
+  #u3 login
+ # - type: login
+   # userName: u3
+   # password: u3
+
+  # u3 add u4 as store owner
+  #- type: addOwner
+   # userName: u3
+   # storeId: 0
+   # newOwnerUsername: u4
+
+  #u2 approve u4 as owner
+  #- type: approveOwner
+   # ownerUsername: u2
+   # ownerToApprove: u4
+   # storeId: 0
+   # status: true
