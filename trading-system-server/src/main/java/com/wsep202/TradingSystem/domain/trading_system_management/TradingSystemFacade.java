@@ -163,6 +163,10 @@ public class TradingSystemFacade {
                                  @NotBlank String productName, @NotBlank String category,
                                  int amount, double cost, UUID uuid) {
         try {
+            if (cost<0 || amount<0) {
+                log.error("cost and amount can't be negative");
+                return null;
+            }
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get registered user with ownerUsername
             Store ownerStore = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PRODUCT); //verify he owns store with storeId
             //convert to a category we can add to the product
