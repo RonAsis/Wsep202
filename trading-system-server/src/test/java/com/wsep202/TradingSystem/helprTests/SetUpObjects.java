@@ -1,6 +1,9 @@
 package com.wsep202.TradingSystem.helprTests;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountType;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.VisibleDiscount;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 
@@ -44,6 +47,21 @@ public class SetUpObjects {
                     .build());
         }
         return receipts;
+    }
+
+    public static List<Discount> setUpDiscounts(){
+        List<Discount> discounts = new ArrayList<>();
+        for (int counter = 0; counter <= 10; counter++) {
+            discounts.add(Discount.builder()
+                    .discountId(counter)
+                    .discountPolicy(VisibleDiscount.builder().build())
+                    .endTime(Calendar.getInstance())
+                    .discountPercentage(10)
+                    .description("setted discount")
+                    .discountType(DiscountType.VISIBLE)
+                    .build());
+        }
+        return discounts;
     }
 
     public static Set<Product> setUpProducts() {

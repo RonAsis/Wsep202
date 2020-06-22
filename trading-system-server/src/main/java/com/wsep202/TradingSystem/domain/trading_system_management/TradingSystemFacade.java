@@ -182,7 +182,7 @@ public class TradingSystemFacade {
     }
 
     /**
-     * UC 4.2
+     * UC 4.2 NTH
      * owner wants remove a discount policy from store
      *
      * @param username   - name of owner
@@ -196,6 +196,8 @@ public class TradingSystemFacade {
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT); //verify he owns store with storeId
         return tradingSystemDao.removeDiscount(store, user, discountId);
     }
+
+    //////////////future feature - remove purchase extension of edit purchase/////////
 
     /**
      * UC 4.2
