@@ -288,7 +288,6 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public void loadShoppingCart(UserSystem user) {
         user.setShoppingCart(tradingSystemCashing.getShoppingCart(user.getUserName()));
     }

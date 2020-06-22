@@ -39,7 +39,6 @@ export class ProductEditItemComponent implements OnInit {
         }
       }
     );
-    console.log(this.productItem);
     this.selectedCategory = this.productItem.category;
   }
 
