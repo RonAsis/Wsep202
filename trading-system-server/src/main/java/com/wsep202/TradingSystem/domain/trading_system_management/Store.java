@@ -176,7 +176,7 @@ public class Store {
     /**
      * verify the user usersystem has permission to edit product
      */
-    public boolean validateCanEditProdcuts(UserSystem userSystem, int productSn) {
+    public boolean validateCanEditProducts(UserSystem userSystem, int productSn) {
         return validatePermission(userSystem, StorePermission.EDIT_PRODUCT) &&
                 products.stream()
                         .filter(product -> product.getProductSn() == productSn)
