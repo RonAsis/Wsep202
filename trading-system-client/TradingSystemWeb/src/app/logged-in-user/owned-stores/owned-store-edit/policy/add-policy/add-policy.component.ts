@@ -141,41 +141,26 @@ export class AddPolicyComponent implements OnInit {
 
   onAllStore() {
     this.errorMessage('');
-    if (this.description !== null && this.description !== undefined) {
-      this.description.nativeElement.value = '';
-    }
     this.purchaseType = 'all store';
   }
 
   onSpecificProduct() {
     this.errorMessage('');
-    if (this.description !== null && this.description !== undefined) {
-      this.description.nativeElement.value = '';
-    }
     this.purchaseType = 'specific product';
   }
 
   onSystem() {
     this.errorMessage('');
-    if (this.description !== null && this.description !== undefined) {
-      this.description.nativeElement.value = '';
-    }
     this.purchaseType = 'on system';
   }
 
   onUser() {
     this.errorMessage('');
-    if (this.description !== null && this.description !== undefined) {
-      this.description.nativeElement.value = '';
-    }
     this.purchaseType = 'on user';
   }
 
   onComposePolicy() {
     this.errorMessage('');
-    if (this.description !== null && this.description !== undefined) {
-      this.description.nativeElement.value = '';
-    }
     this.purchaseType = 'compose';
   }
 
