@@ -49,8 +49,6 @@ public class HttpsConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(PublicApiPaths.GUEST_PATH+ "/**").permitAll()
                 .antMatchers(PublicApiPaths.ADMIN_PATH+ "/**").hasRole("ADMIN")
                 .antMatchers("/**").permitAll()
-//                .and().formLogin()
-//                .and().logout().logoutSuccessUrl(PublicApiPaths.GUEST_PATH+ "/**").permitAll()
                 .and().httpBasic(); // Authenticate users with HTTP basic authentication
 
         // REST is stateless
