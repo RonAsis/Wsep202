@@ -385,19 +385,29 @@ public class Store {
      */
     public boolean removeOwner(UserSystem ownerStore, UserSystem ownerToRemove) {
         boolean response = false;
-        getMySubMangers(ownerToRemove.getUserName()).forEach(subManager -> {
-            removeManager(ownerToRemove, subManager.getAppointedManager());
-        });
-        if (isOwner(ownerStore) && removeOwnerRecursive(ownerStore, ownerToRemove)) {  //the ownerToRemove is able to remove his appointments
-            response = appointedOwners.stream()
-                    .filter(appointedOwner -> appointedOwner.getAppointeeUser().getUserName().equals(ownerStore.getUserName()))
-                    .findFirst()
-                    .map(appointedOwner -> appointedOwner.removeSubOwner(ownerToRemove.getUserName(), this))
-                    .orElse(false);
+        if(checkIsAppointedOf(ownerStore, ownerToRemove)) {
+            getMySubMangers(ownerToRemove.getUserName()).forEach(subManager -> {
+                removeManager(ownerToRemove, subManager.getAppointedManager());
+            });
+            if (isOwner(ownerStore) && removeOwnerRecursive(ownerStore, ownerToRemove)) {  //the ownerToRemove is able to remove his appointments
+                response = appointedOwners.stream()
+                        .filter(appointedOwner -> appointedOwner.getAppointeeUser().getUserName().equals(ownerStore.getUserName()))
+                        .findFirst()
+                        .map(appointedOwner -> appointedOwner.removeSubOwner(ownerToRemove.getUserName(), this))
+                        .orElse(false);
+            }
         }
         return response;
     }
 
+    private boolean checkIsAppointedOf(UserSystem ownerStore, UserSystem ownerToRemove){
+        return appointedOwners.stream()
+                .filter(appointedOwner -> appointedOwner.getAppointeeUser().getUserName().equals(ownerStore.getUserName()))
+                .findFirst()
+                .map(appointedOwner -> appointedOwner.getAppointedUsers().stream()
+                .anyMatch(subOwner -> subOwner.getUserName().equals(ownerToRemove.getUserName())))
+                .orElse(false);
+    }
     private boolean removeOwnerRecursive(UserSystem ownerStore, UserSystem user) {
         boolean response = false;
         if (isOwner(ownerStore)) {  //the user is able to remove his appointments
