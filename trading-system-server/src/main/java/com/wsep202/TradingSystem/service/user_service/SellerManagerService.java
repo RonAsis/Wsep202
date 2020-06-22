@@ -72,7 +72,7 @@ public class SellerManagerService {
         return tradingSystemFacade.getAlltDiscounts(username, storeId, uuid);
     }
 
-    public List<PurchaseDto> getAllStorePurchases(String username, int storeId, UUID uuid) {
+    public List<PurchasePolicyDto> getAllStorePurchases(String username, int storeId, UUID uuid) {
         return tradingSystemFacade.getAllStorePurchases(username, storeId, uuid);
     }
 }

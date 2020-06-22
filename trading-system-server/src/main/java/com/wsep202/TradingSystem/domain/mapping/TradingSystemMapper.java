@@ -5,12 +5,14 @@ import com.wsep202.TradingSystem.domain.trading_system_management.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.*;
 import com.wsep202.TradingSystem.dto.*;
+import io.swagger.models.auth.In;
 import org.modelmapper.Converter;
 import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class TradingSystemMapper {
@@ -448,9 +450,10 @@ public class TradingSystemMapper {
 
         private Set<Day> convertIntegerDayToDay(Set<Integer> storeWorkDays) {
             Set<Day> res = new HashSet<>();
-            for (Integer intDay : storeWorkDays) {
-                res.add(Day.getDay(intDay));
-            }
+            storeWorkDays.stream().forEach(integer -> {
+                if(Objects.nonNull(integer))
+                    res.add(Day.getDay(integer.intValue()));
+            });
             return res;
         }
     }

@@ -761,7 +761,7 @@ public class TradingSystemFacade {
         return convertDiscountList(allDiscounts);
     }
 
-    public List<PurchaseDto> getAllStorePurchases(String ownerUsername, int storeId, UUID uuid) {
+    public List<PurchasePolicyDto> getAllStorePurchases(String ownerUsername, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
         Store store = user.getOwnerStore(storeId);
         List<Purchase> allPurchases = new LinkedList<>(store.getPurchasePolicies());
@@ -865,8 +865,8 @@ public class TradingSystemFacade {
         return modelMapper.map(discounts, listType);
     }
 
-    private List<PurchaseDto> convertPurchaseList(@NotNull List<@NotNull Purchase> purchases) {
-        Type listType = new TypeToken<List<Purchase>>() {
+    private List<PurchasePolicyDto> convertPurchaseList(@NotNull List<@NotNull Purchase> purchases) {
+        Type listType = new TypeToken<List<PurchasePolicyDto>>() {
         }.getType();
         return modelMapper.map(purchases, listType);
     }
