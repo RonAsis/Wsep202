@@ -161,6 +161,10 @@ public class Product {
     }
 
     public Product cloneProduct(){
-        return new Product(name,category,amount,cost,storeId);
+        Product returnedProduct = new Product(name,category,amount,cost,storeId);
+        returnedProduct.setProductSn(productSn);
+        returnedProduct.setOriginalCost(originalCost);
+        returnedProduct.setRank(rank);
+        return returnedProduct;
     }
 }

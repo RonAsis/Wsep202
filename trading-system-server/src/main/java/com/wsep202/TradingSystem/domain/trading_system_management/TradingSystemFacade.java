@@ -173,7 +173,7 @@ public class TradingSystemFacade {
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             Product product = factoryObjects.createProduct(productName, productCategory, amount, cost, storeId);
             Product productRes = tradingSystemDao.addProductToStore(ownerStore, user, product);
-            return Objects.nonNull(productRes) ? modelMapper.map(product, ProductDto.class) : null;
+            return Objects.nonNull(productRes) ? modelMapper.map(productRes, ProductDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("add product failed", e);
             return null;

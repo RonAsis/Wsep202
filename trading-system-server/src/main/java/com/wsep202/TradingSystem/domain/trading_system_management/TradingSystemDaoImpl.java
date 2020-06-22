@@ -157,8 +157,10 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
         if (ans) {
             updateShoppingCart(user, new LinkedList<>(users), ownerStore, ownerStore.getProduct(productSn));
             log.info(String.format("Delete productSn %d from store %d", productSn, ownerStore.getStoreId()));
+            return true;
         }
-        return ownerStore.removeProductFromStore(user, productSn);
+        //return ownerStore.removeProductFromStore(user, productSn);
+        return false;
     }
 
     @Override
