@@ -13,10 +13,12 @@ export class HeaderLoggedInUserComponent implements OnInit {
   @Output() featureSelectedLogging = new EventEmitter<string>();
   private isAdmin: boolean;
   private prevFeature: string;
+  public numOfApprove: number;
 
   constructor(private storeService: StoreService, private userService: UserService,
               private shareService: ShareService) {
     this.isAdmin = userService.getIsAdmin();
+    this.numOfApprove = 0;
   }
 
   ngOnInit(): void {
@@ -45,6 +47,11 @@ export class HeaderLoggedInUserComponent implements OnInit {
   private teraAll() {
     this.storeService.setOwnerStores(false);
     this.storeService.setManagerStores(false);
+    this.userService.getMyOwnerToApprove().subscribe(response => {
+      if (response){
+        this.numOfApprove = response.length;
+      }
+    });
   }
 
   getIsAdmin() {

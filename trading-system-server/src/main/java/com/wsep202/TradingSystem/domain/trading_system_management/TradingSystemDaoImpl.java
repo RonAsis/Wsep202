@@ -22,7 +22,13 @@ import java.util.stream.IntStream;
 @Slf4j
 public class TradingSystemDaoImpl extends TradingSystemDao {
 
-    private static int idAcc = 0;
+    private static int idAccStore = 0;
+    private static int idAccUserSystem = 0;
+    private static int idAccProduct = 0;
+    private static int idAccDiscount = 0;
+    private static int idAccPolicy = 0;
+    private static int idAccReceipt = 0;
+
     private Set<Store> stores;
     private Set<UserSystem> users;
     private Set<UserSystem> administrators;
@@ -65,7 +71,7 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
         return userSystem.isPresent() ? userSystem : findUserSystem(administrators, username);
     }
 
-    private Optional<UserSystem> findUserSystem(Set<UserSystem> userSystems, String username){
+    private Optional<UserSystem> findUserSystem(Set<UserSystem> userSystems, String username) {
         return userSystems.stream()
                 .filter(user -> user.getUserName().equals(username))
                 .findFirst();
@@ -98,7 +104,7 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public void addStore(Store newStore) {
-        newStore.setStoreId(getNewId());
+        newStore.setStoreId(getNewIdStore());
         this.stores.add(newStore);
     }
 
@@ -124,8 +130,8 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public Product addProductToStore(Store store, UserSystem owner, Product product) {
-        product.setProductSn(getNewId());
-        return store.addNewProduct(owner, product)? product : null;
+        product.setProductSn(getNewIdProduct());
+        return store.addNewProduct(owner, product) ? product : null;
     }
 
     @Override
@@ -135,13 +141,13 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public Discount addEditDiscount(Store store, UserSystem user, Discount discount) {
-        discount.setDiscountId(getNewId());
+        discount.setDiscountId(getNewIdDiscount());
         return store.addEditDiscount(user, discount);
     }
 
     @Override
     public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
-        purchase.setPurchaseId(getNewId());
+        purchase.setPurchaseId(getNewIdPolicy());
         return store.addEditPurchase(user, purchase);
     }
 
@@ -197,12 +203,12 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
-        if(isValidUuid(username, uuid)){
+        if (isValidUuid(username, uuid)) {
             return users.stream()
                     .filter(userSystem -> userSystem.getUserName().equals(username))
                     .findFirst()
                     .map(UserSystem::getShoppingCart)
-                    .orElseThrow(()-> new UserDontExistInTheSystemException(username));
+                    .orElseThrow(() -> new UserDontExistInTheSystemException(username));
         }
         throw new UserDontExistInTheSystemException(username);
     }
@@ -214,9 +220,9 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid) {
-        if(isValidUuid(ownerUsername, uuid)){
+        if (isValidUuid(ownerUsername, uuid)) {
             return users.stream()
-            .filter(userSystem -> userSystem.getUserName().equals(ownerUsername))
+                    .filter(userSystem -> userSystem.getUserName().equals(ownerUsername))
                     .findFirst()
                     .map(UserSystem::getOwnerToApproves)
                     .orElse(new HashSet<>());
@@ -236,7 +242,7 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
                 .filter(dailyVisitor -> DateUtils.isSameDay(dailyVisitor.getDate(), toDay))
                 .findFirst()
                 .map(dailyVisitor -> dailyVisitor.update(dailyVisitorsField))
-                .orElseGet(()->{
+                .orElseGet(() -> {
                     DailyVisitor dailyVisitor = new DailyVisitor();
                     dailyVisitors.add(dailyVisitor);
                     return dailyVisitor.update(dailyVisitorsField);
@@ -253,11 +259,23 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
                     .mapToObj(dailyVisitors::get)
                     .collect(Collectors.toSet());
         }
-        throw  new NotAdministratorException(username);
+        throw new NotAdministratorException(username);
     }
 
-    private int getNewId(){
-        return idAcc++;
+    private int getNewIdStore() {
+        return idAccStore++;
+    }
+
+    private int getNewIdProduct() {
+        return idAccProduct++;
+    }
+
+    private int getNewIdDiscount() {
+        return idAccDiscount++;
+    }
+
+    private int getNewIdPolicy() {
+        return idAccPolicy++;
     }
 
 }
