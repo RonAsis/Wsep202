@@ -107,10 +107,11 @@ public class ShoppingCart {
     public boolean removeProductInCart(Store storeOfProduct, Product productToRemove) {
         boolean response = false;
        if(checkParameters(storeOfProduct,productToRemove) && isProductInStore(storeOfProduct, productToRemove)) {
-           if(Objects.nonNull(shoppingBagsList.get(storeOfProduct))){
-               shoppingBagsList.get(storeOfProduct).removeProductFromBag(productToRemove);
-               response = true;
-           }
+           response = shoppingBagsList.entrySet().stream()
+                   .filter(entry -> entry.getKey().getStoreId() == storeOfProduct.getStoreId())
+                   .findFirst()
+                   .map(storeShoppingBagEntry -> storeShoppingBagEntry.getValue().removeProductFromBag(productToRemove))
+                   .orElse(false);
        }
        return response;
     }
