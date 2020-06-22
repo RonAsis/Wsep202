@@ -13,8 +13,8 @@
   </div>
 
   <div>
-    <select [ngModel]="selectedCategory" (ngModelChange)="onSelectCategory($event)">
-      <option *ngFor="let category of categories" value={{selectedCategory}}>
+    <select [value]="selectedCategory" [ngModel]="selectedCategory" (ngModelChange)="onSelectCategory($event)">
+      <option *ngFor="let category of categories" value={{category}}>
         {{category}}
       </option>
     </select>
