@@ -123,9 +123,10 @@ public class UserSystem implements Observer, Serializable {
         this.grantedAuthorities = new HashSet<>();
         managedStores = new HashSet<>();
         this.ownerToApproves = new HashSet<>();
+        this.receipts = new HashSet<>();
     }
-
     /**
+
      * use for new user
      */
     public UserSystem(String userName, String firstName, String lastName, String password) {
@@ -140,6 +141,7 @@ public class UserSystem implements Observer, Serializable {
         this.grantedAuthorities = new HashSet<>();
         managedStores = new HashSet<>();
         this.ownerToApproves = new HashSet<>();
+        this.receipts = new HashSet<>();
     }
 
     /**
