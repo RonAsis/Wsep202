@@ -123,43 +123,6 @@ public class Product {
         return canReduce;
     }
 
-    /**
-     * Returns a presentation of a product.
-     * @return - a representation of a product.
-     */
-    public String showProductInfo() {
-        return "Product serial number: " + productSn +
-                "\nProduct name: " + name +
-                "\nProduct amount: " + amount +
-                "\nProduct cost: " + cost +
-                "\nProduct rank: " + rank +
-                "\nProduct store id: " + storeId;
-    }
-
-    /**
-     * check if the current product name contains the given key words
-     * @param keyWords - the key words to check for
-     * @return - the current product.
-     */
-    public Product productNameThatContainsKeyWords(List<String> keyWords){
-        boolean contains = true;
-        for(String keyWord : keyWords)
-            if (!name.contains(keyWord))
-                contains = false;
-        if(!contains)
-            return null;
-        return this;
-    }
-
-    /**
-     * check if all product fields are valid
-     * @return true if valid fields
-     */
-    public boolean isValidProduct() {
-        return !Strings.isNullOrEmpty(this.name) &&
-                !Strings.isNullOrEmpty(this.category.category);
-    }
-
     public Product cloneProduct(){
         Product returnedProduct = new Product(name,category,amount,cost,storeId);
         returnedProduct.setProductSn(productSn);

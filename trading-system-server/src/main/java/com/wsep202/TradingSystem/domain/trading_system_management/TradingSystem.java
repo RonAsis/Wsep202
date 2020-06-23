@@ -235,9 +235,11 @@ public class TradingSystem {
      */
     @Synchronized("purchaseLock")
     public List<Receipt> purchaseShoppingCartGuest(ShoppingCart shoppingCart, PaymentDetails paymentDetails, BillingAddress billingAddress) {
-        return purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
+        List<Receipt> receipts = purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
+        shoppingCart.getShoppingBagsList().keySet()
+                .forEach(store -> tradingSystemDao.updateStore(store));
+        return receipts;
     }
-
 
     /**
      * UC 2.8
@@ -475,7 +477,8 @@ public class TradingSystem {
         double sumBeforeDiscounts;  //sum of original price
         double sumAfterDiscounts; //sum of the prices after discount
         //update the products in the bags with their discounts
-        Map<Store, ShoppingBag> bagsToCalculate = cartToCalculate.getShoppingBagsList();
+        Map<Store, ShoppingBag> bagsToCalculate = cartToCalculate.getCopyOfShoppingBagsList();
+
         for (Store store : bagsToCalculate.keySet()) {  //apply the discounts on the bags in the cart (update the products prices)
             store.applyDiscountPolicies(bagsToCalculate.get(store).getProductListFromStore());
         }

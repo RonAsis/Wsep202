@@ -21,9 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Slf4j
@@ -37,19 +37,16 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     private final TradingSystemCashing tradingSystemCashing;
 
     @Override
-    @Transactional
     public void registerAdmin(UserSystem admin) {
         userRepository.save(admin);
     }
 
     @Override
-    @Transactional
     public boolean isRegistered(UserSystem userSystem) {
         return userRepository.existsById(userSystem.getUserName());
     }
 
     @Override
-    @Transactional
     public void addUserSystem(UserSystem userToRegister, MultipartFile image) {
         if (Objects.nonNull(image)) {
             String urlImage = ImageUtil.saveImage(ImagePath.ROOT_IMAGE_DIC + ImagePath.USER_IMAGE_DIC + image.getOriginalFilename(), image);
@@ -59,20 +56,17 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public Optional<UserSystem> getUserSystem(String username) {
         return userRepository.findById(username);
     }
 
     @Override
-    @Transactional
     public boolean isAdmin(String username) {
         Optional<UserSystem> user = userRepository.findById(username);
         return user.isPresent() && user.get().isAdmin();
     }
 
     @Override
-    @Transactional
     public Optional<UserSystem> getAdministratorUser(String username) {
         return userRepository.findOne(Example.of(UserSystem.builder()
                 .userName(username)
@@ -81,25 +75,21 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public Optional<Store> getStore(int storeId) {
         return storeRepository.findById(storeId);
     }
 
     @Override
-    @Transactional
     public void addStore(Store newStore) {
-        storeRepository.save(newStore);
+        saveStore(newStore);
     }
 
     @Override
-    @Transactional
     public Set<Store> getStores() {
         return new HashSet<>(storeRepository.findAll());
     }
 
     @Override
-    @Transactional
     public Set<Product> getProducts() {
         if (tradingSystemCashing.getProducts().isEmpty()) {
             Set<Product> productSet = storeRepository.findAll().stream()
@@ -114,7 +104,6 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public Set<UserSystem> getUsers() {
         return new HashSet<>(userRepository.findAll());
     }
@@ -123,7 +112,8 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     @Transactional
     public Product addProductToStore(Store store, UserSystem owner, Product product) {
         if (store.addNewProduct(owner, product)) {
-            Store storeSaved = storeRepository.save(store);
+            Store storeSaved = saveStore(store);
+
             int productSn = new LinkedList<>(storeSaved.getProducts()).getLast().getProductSn();
             product.setProductSn(productSn);
             tradingSystemCashing.addProduct(product);
@@ -132,22 +122,20 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public boolean removeDiscount(Store store, UserSystem user, int discountId) {
         boolean res = false;
         if (store.removeDiscount(user, discountId)) {
-            storeRepository.save(store);
+            saveStore(store);
             res = true;
         }
         return res;
     }
 
     @Override
-    @Transactional
     public Discount addEditDiscount(Store store, UserSystem user, Discount discount) {
         Discount res = store.addEditDiscount(user, discount);
         if (Objects.nonNull(res)) {
-            storeRepository.save(store);
+            saveStore(store);
             List<Discount> discounts = new LinkedList<>(storeRepository.findById(store.getStoreId()).get().getDiscounts());
             res.setDiscountId(discounts.get(discounts.size() - 1).getDiscountId());
         }
@@ -158,7 +146,7 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
         Purchase res = store.addEditPurchase(user, purchase);
         if (Objects.nonNull(res)) {
-            storeRepository.save(store);
+            saveStore(store);
             List<Purchase> purchaseList = new LinkedList<>(storeRepository.findById(store.getStoreId()).get().getPurchasePolicies());
             res.setPurchaseId(purchaseList.get(purchaseList.size() - 1).getPurchaseId());
         }
@@ -166,13 +154,12 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public boolean deleteProductFromStore(Store ownerStore, UserSystem user, int productSn) {
         boolean ans = ownerStore.validateCanEditProducts(user, productSn);
         if (ans) {
             updateDbWithCashing();
             updateShoppingCart(user, userRepository.findAll(), ownerStore, ownerStore.getProduct(productSn));
-            storeRepository.save(ownerStore);
+            saveStore(ownerStore);
             log.info(String.format("Delete productSn %d from store %d", productSn, ownerStore.getStoreId()));
             tradingSystemCashing.removeProduct(productSn);
         }
@@ -188,52 +175,52 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public boolean editProduct(Store ownerStore, UserSystem user, int productSn, String productName, String category, int amount, double cost) {
         boolean ans = ownerStore.editProduct(user, productSn, productName, category, amount, cost);
         if (ans) {
-            storeRepository.save(ownerStore);
-            tradingSystemCashing.editProduct(ownerStore.getProduct(productSn));
+            Store store = saveStore(ownerStore);
+            tradingSystemCashing.editProduct(store.getProduct(productSn));
         }
         return ans;
     }
 
     @Override
-    @Transactional
     public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem) {
-        storeRepository.save(ownedStore);
+        saveStore(ownedStore);
         userRepository.save(userSystem);
     }
 
+    private Store saveStore(Store ownedStore) {
+        Store storeSave = storeRepository.save(ownedStore);
+        tradingSystemCashing.updateStoreInShoppingCart(ownedStore);
+        return storeSave;
+    }
+
     @Override
-    @Transactional
     public boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission) {
         boolean ans = ownedStore.addPermissionToManager(ownerUser, managerStore, storePermission);
         if (ans) {
-            storeRepository.save(ownedStore);
+            saveStore(ownedStore);
         }
         return ans;
     }
 
     @Override
-    @Transactional
     public boolean removePermission(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission) {
         boolean ans = ownedStore.removePermission(ownerUser, managerStore, storePermission);
         if (ans) {
-            storeRepository.save(ownedStore);
+            saveStore(ownedStore);
         }
         return ans;
     }
 
     @Override
-    @Transactional
     public boolean saveProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product, int amount) {
         Product productInShoppingBag = store.getProduct(product.getProductSn());
         return shoppingCart.addProductToCart(store, productInShoppingBag, amount);
     }
 
     @Override
-    @Transactional
     public boolean removeProductInShoppingBag(String username, ShoppingCart shoppingCart, Store store, Product product) {
         boolean ans = shoppingCart.removeProductInCart(store, product);
         if (ans) {
@@ -243,13 +230,11 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public void updateUser(UserSystem user) {
         userRepository.save(user);
     }
 
     @Override
-    @Transactional
     public boolean changeProductAmountInShoppingBag(String username, ShoppingCart shoppingCart, int storeId, int amount, int productSn) {
         boolean ans = shoppingCart.changeProductAmountInShoppingBag(storeId, amount, productSn);
         if (ans) {
@@ -259,19 +244,18 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public void updateStore(Store ownedStore) {
-        storeRepository.save(ownedStore);
+        saveStore(ownedStore);
+        tradingSystemCashing.updateStoreInShoppingCart(ownedStore);
+        ownedStore.getProducts().forEach(tradingSystemCashing::editProduct);
     }
 
     @Override
-    @Transactional
     public void login(String username, ShoppingCart shoppingCart) {
         tradingSystemCashing.addShoppingCart(username, shoppingCart);
     }
 
     @Override
-    @Transactional
     public void saveShoppingCart(UserSystem userSystem) {
         ShoppingCart shoppingCart = tradingSystemCashing.removeShoppingCart(userSystem.getUserName());
         userSystem.setShoppingCart(shoppingCart);
@@ -279,7 +263,6 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
         if (isValidUuid(username, uuid)) {
             return tradingSystemCashing.getShoppingCart(username);
@@ -293,7 +276,6 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public Set<OwnerToApprove> getMyOwnerToApprove(String ownerUsername, UUID uuid) {
         if (isValidUuid(ownerUsername, uuid)) {
             return userRepository.findById(ownerUsername)
@@ -304,7 +286,6 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public boolean approveOwner(Store ownedStore, UserSystem ownerUser, String ownerToApprove, boolean status) {
         boolean res = ownedStore.approveOwner(ownerUser, ownerToApprove, status);
         if (res) {
@@ -314,7 +295,6 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public void updateDailyVisitors(DailyVisitorsField dailyVisitorsField) {
         Date toDay = new Date();
         dailyVisitorsRepository.findById(toDay)
@@ -330,7 +310,6 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     }
 
     @Override
-    @Transactional
     public Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid) {
         if (isValidUuid(username, uuid) && isAdmin(username)) {
             Pageable pageable = PageRequest.of(requestGetDailyVisitors.getFirstIndex(), requestGetDailyVisitors.getLastIndex(), Sort.by("date").ascending());
