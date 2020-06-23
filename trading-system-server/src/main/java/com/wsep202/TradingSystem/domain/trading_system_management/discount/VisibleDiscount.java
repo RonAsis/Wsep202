@@ -5,7 +5,10 @@ package com.wsep202.TradingSystem.domain.trading_system_management.discount;
 
 import com.wsep202.TradingSystem.domain.exception.IllegalPercentageException;
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -21,8 +24,6 @@ import java.util.Map;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class VisibleDiscount extends DiscountPolicy {
 
     /**
@@ -37,13 +38,15 @@ public class VisibleDiscount extends DiscountPolicy {
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
         verifyValidity(discount);
-        if (!isExpired(discount) && !discount.isApplied()) {
+        if (!isExpired(discount)) {
             products.keySet().forEach(product -> {
                 if (isProductHaveDiscount(amountOfProductsForApplyDiscounts, product)) {
-                    double discountCost = (discount.getDiscountPercentage() / 100) * product.getCost();
+                    double discountCost = (discount.getDiscountPercentage() / 100) * product.getOriginalCost();
                     setCostAfterDiscount(discount, product, discountCost);
                 }
             });
+        } else {  //check if needs to update back the price
+            undoDiscount(discount, products);
         }
     }
 
