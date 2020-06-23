@@ -128,7 +128,7 @@ public class ShoppingCart {
         boolean response = false;
         if(checkParameters(storeOfProduct,productToAdd) && isProductInStore(storeOfProduct, productToAdd)) {
             if(shoppingBagsList.keySet().stream()
-            .noneMatch(store -> store.getStoreId() == storeOfProduct.getStoreId())){
+                    .noneMatch(store -> store.getStoreId() == storeOfProduct.getStoreId())){
                 ShoppingBag storeShoppingBag = new ShoppingBag(storeOfProduct);
                 response =  storeShoppingBag.addProductToBag(productToAdd, amountOfProduct) && addBagToCart(storeOfProduct, storeShoppingBag);
             }else{
@@ -139,7 +139,11 @@ public class ShoppingCart {
                 response  = true;
             }
         }
-        log.info(String.format("the product %s  %s to cart", productToAdd.getName(), response? "added" : "not added"));
+        if (productToAdd!=null)
+            log.info(String.format("the product %s  %s to cart", productToAdd.getName(), response? "added" : "not added"));
+        else
+            log.info("the null product not added to cart");
+
         return response;
     }
 

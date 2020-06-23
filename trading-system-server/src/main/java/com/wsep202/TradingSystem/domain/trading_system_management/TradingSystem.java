@@ -302,7 +302,7 @@ public class TradingSystem {
         log.info("all products in stock");
         shoppingCart.approvePurchasePolicy(billingAddress);
         log.info("applied stores purchase policies on shopping cart");
-        shoppingCart.applyDiscountPolicies(); //TODO: return the exceptions!!!!!! otherwise logic problem
+        shoppingCart.applyDiscountPolicies();
         log.info("applied stores discount policies on shopping cart");
         int chargeTransactionId = externalServiceManagement.charge(paymentDetails, shoppingCart);
         if (chargeTransactionId < 10000 || chargeTransactionId > 100000) {

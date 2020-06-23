@@ -66,18 +66,6 @@ public class SellerManagerController {
     }
 
     /**
-     * remove discount
-     */
-    @ApiOperation(value = "remove discount")
-    @PostMapping("remove-discount/{username}/{storeId}/{discountId}/{uuid}")
-    public boolean removeDiscount(@PathVariable String username,
-                                  @PathVariable int storeId,
-                                  @PathVariable int discountId,
-                                  @PathVariable UUID uuid) {
-        return sellerManagerService.removeDiscount(username, storeId, discountId, uuid);
-    }
-
-    /**
      * get store discounts
      */
     @ApiOperation(value = "get composite operators")

@@ -125,8 +125,8 @@ public class UserSystem implements Observer, Serializable {
         this.ownerToApproves = new HashSet<>();
         this.receipts = new HashSet<>();
     }
-    /**
 
+    /**
      * use for new user
      */
     public UserSystem(String userName, String firstName, String lastName, String password) {
@@ -366,7 +366,12 @@ public class UserSystem implements Observer, Serializable {
      */
     public void addReceipts(List<Receipt> receipts) {
         if (Objects.nonNull(receipts)) {
-            this.receipts.addAll(receipts);
+            if(Objects.nonNull(this.receipts))
+                this.receipts.addAll(receipts);
+            else{
+                this.receipts = new HashSet<>();
+                this.receipts.addAll(receipts);
+            }
         }
     }
 

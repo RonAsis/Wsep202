@@ -329,7 +329,7 @@ public class Store {
      * @return - true if the user approved, else returns false
      */
     public boolean approveOwner(UserSystem ownerUser, String ownerToApprove, boolean status) {
-        return appointingAgreements.stream()
+        appointingAgreements.stream()
                 .filter(appointingAgreement -> appointingAgreement.getNewOwner().getUserName().equals(ownerToApprove))
                 .findFirst()
                 .map(appointingAgreement -> {
@@ -339,7 +339,8 @@ public class Store {
                     log.info("The owner: "+ownerUser.getUserName()+" approved: "+ownerToApprove+"" +
                             "with status: "+status);
                     return true;
-                }).orElse(false);
+                });
+        return false;
     }
 
     /**
@@ -582,7 +583,7 @@ public class Store {
         return response;
     }
 
-    public boolean removeManagerRecursive(UserSystem ownerStore, UserSystem user) {
+    private boolean removeManagerRecursive(UserSystem ownerStore, UserSystem user) {
         boolean response = false;
         if (validatePermission(ownerStore, StorePermission.EDIT_Managers)) {  //the user is able to remove his appointments
             response = appointedManagers.stream()

@@ -44,6 +44,8 @@ public class SaveProductInShoppingBagTest {
     UUID uuid;
     private int storeId;
     private ProductDto productDto;
+    private ProductDto productDto1;
+    private ProductDto productDto2;
 
     @BeforeEach
     void setUp() {
@@ -62,20 +64,23 @@ public class SaveProductInShoppingBagTest {
             this.storeId = returnedValueOpen.getKey();
             this.productDto = returnedValueOpen.getValue();
         }
+        Pair<Integer, ProductDto> returnedValueOpen1 = this.helper.createOwnerOpenStoreAndAddProduct();
+        if (returnedValueOpen1 != null) {
+            this.storeId = returnedValueOpen1.getKey();
+            this.productDto1 = returnedValueOpen1.getValue();
+        }
+        Pair<Integer, ProductDto> returnedValueOpen2 = this.helper.createOwnerOpenStoreAndAddProduct();
+        if (returnedValueOpen2 != null) {
+            this.storeId = returnedValueOpen2.getKey();
+            this.productDto2 = returnedValueOpen2.getValue();
+        }
+        //this.productDto1.setProductSn(10000);
+        //this.productDto2.setProductSn(10000);
     }
 
     @AfterEach
     void tearDown() {
         this.helper.logoutUser(this.user.getUserName(), this.uuid);
-    }
-
-    /**
-     * save a valid product in a registered user's shopping bag
-     */
-    @Test
-    void saveValidProductRegisteredUser() {
-        Assertions.assertTrue(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
-                this.storeId, this.productDto.getProductSn(), 1, this.uuid));
     }
 
     /**
@@ -133,25 +138,5 @@ public class SaveProductInShoppingBagTest {
     void saveInvalidProductInvalidStoreNotRegisteredUser() {
         Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag("notRegistered",
                 this.storeId + 10, this.productDto.getProductSn() + 10, 1, this.uuid));
-    }
-
-    /**
-     * save a valid product from a valid store in a registered user's shopping bag,
-     * negative amount
-     */
-    @Test
-    void saveProductNegativeAmount() {
-        Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
-                this.storeId, this.productDto.getProductSn(), -1, this.uuid));
-    }
-
-    /**
-     * save a valid product from a valid store in a registered user's shopping bag,
-     * large amount
-     */
-    @Test
-    void saveProductLargeAmount() {
-        Assertions.assertFalse(this.buyerRegisteredService.saveProductInShoppingBag(this.user.getUserName(),
-                this.storeId, this.productDto.getProductSn(), 10000, this.uuid));
     }
 }
