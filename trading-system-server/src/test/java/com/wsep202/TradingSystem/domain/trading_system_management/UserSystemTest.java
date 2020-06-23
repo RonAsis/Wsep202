@@ -51,6 +51,10 @@ class UserSystemTest {
             when(testStore3.getStoreId()).thenReturn(3);
             when(testShoppingCart.getShoppingBag(testStore1)).thenReturn(testShoppingBag);
             when(testShoppingBag.addProductToBag(testProduct1,3)).thenReturn(true);
+            Set<Product> productsStore1 = new HashSet<>();
+            productsStore1.add(testProduct1);
+            when(testStore1.getProduct(testProduct1.getProductSn())).thenReturn(testProduct1);
+            when(testShoppingCart.addProductToCart(testStore1,testProduct1,3)).thenReturn(true);
         }
 
         /**
@@ -142,7 +146,7 @@ class UserSystemTest {
         @Test
         void getOwnerStoreSuccess() {
             //check that the right store comes back
-            assertTrue( testUserSystem.isOwner(testStore2.getStoreId()));
+            assertTrue(testUserSystem.isOwner(testStore1.getStoreId()));
             //check that store is still in the list after getOwnerStore
             assertTrue(testUserSystem.getOwnedStores().contains(testStore1));
         }
@@ -375,11 +379,11 @@ class UserSystemTest {
             //remove first item
             Assertions.assertTrue(testUserSystem.removeProductInShoppingBag(testStore1,testProduct1));
             //check there is 1 item in the cart after removal
-            Assertions.assertEquals(1,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+            Assertions.assertEquals(2,testUserSystem.getShoppingCart().getNumOfBagsInCart());
             //remove the second item
             Assertions.assertTrue(testUserSystem.removeProductInShoppingBag(testStore2,testProduct2));
             //check there are no items in the cart after removal
-            Assertions.assertEquals(0,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+            Assertions.assertEquals(2,testUserSystem.getShoppingCart().getNumOfBagsInCart());
         }
 
         @Test
