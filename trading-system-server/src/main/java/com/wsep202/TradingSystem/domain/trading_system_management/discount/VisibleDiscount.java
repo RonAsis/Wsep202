@@ -37,15 +37,13 @@ public class VisibleDiscount extends DiscountPolicy {
     @Override
     public void applyDiscount(Discount discount, Map<Product, Integer> products) {
         verifyValidity(discount);
-        if (!isExpired(discount)) {
+        if (!isExpired(discount) && !discount.isApplied()) {
             products.keySet().forEach(product -> {
                 if (isProductHaveDiscount(amountOfProductsForApplyDiscounts, product)) {
-                    double discountCost = (discount.getDiscountPercentage() / 100) * product.getOriginalCost();
+                    double discountCost = (discount.getDiscountPercentage() / 100) * product.getCost();
                     setCostAfterDiscount(discount, product, discountCost);
                 }
             });
-        } else {  //check if needs to update back the price
-            undoDiscount(discount, products);
         }
     }
 

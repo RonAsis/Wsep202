@@ -62,6 +62,14 @@ export class AddProductComponent implements OnInit {
     this.selectedCategory = category;
   }
 
+  numberOnly(event): boolean {
+    const charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      return false;
+    }
+    return true;
+  }
+
   private clearFields() {
     this.productNameInput.nativeElement.value = '';
     this.cost.nativeElement.value = 1;

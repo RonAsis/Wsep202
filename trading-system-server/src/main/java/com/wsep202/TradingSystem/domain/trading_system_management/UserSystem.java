@@ -370,11 +370,6 @@ public class UserSystem implements Observer, Serializable {
         }
     }
 
-    public ShoppingCart getShoppingCart() {
-        shoppingCart.applyDiscountPolicies();
-        return shoppingCart;
-    }
-
     public void addOwnerToApprove(int storeId, String storeName, String userName) {
         OwnerToApprove ownerToApprove = new OwnerToApprove(storeId, storeName, userName);
         ownerToApproves.add(ownerToApprove);

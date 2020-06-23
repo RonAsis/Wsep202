@@ -50,6 +50,7 @@ public class ConditionalProductDiscount extends DiscountPolicy {
                 products.forEach((product, amount) -> {
                     if (isApprovedCondition(discount, product, amount)) {
                         int amountProductInAmountOfProductsForApplyDiscounts = getAmountProductInAmountOfProductsForApplyDiscounts(discount, product);
+                        amountProductInAmountOfProductsForApplyDiscounts = amountProductInAmountOfProductsForApplyDiscounts == -1 ? amount : amountProductInAmountOfProductsForApplyDiscounts;
                         double discountCost = calculateDiscount(discount.getDiscountPercentage(), amountProductInAmountOfProductsForApplyDiscounts,
                                 amount, product.getOriginalCost());
                         product.setCost(product.getCost() - discountCost);    //update the price by discountCost
@@ -57,10 +58,6 @@ public class ConditionalProductDiscount extends DiscountPolicy {
                 });
             }
             discount.setApplied(true);  //discount already performed
-        } else {  //check if needs to update back the price
-            if(discount.isApplied()) {
-                undoDiscount(discount, products);
-            }
         }
     }
 
@@ -95,7 +92,7 @@ public class ConditionalProductDiscount extends DiscountPolicy {
         return productsApplyDiscounts.entrySet().stream()
                 .filter(productInDisCount -> productInDisCount.getKey().getProductSn() == product.getProductSn())
                 .map(Map.Entry::getValue)
-                .findFirst().orElse(-1);
+                .findFirst().orElse(0);
     }
 
     private double calculateDiscount(double discountPercentage, int amountToApply, Integer amountInBag, double price) {

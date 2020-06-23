@@ -6,5 +6,5 @@ export class Product {
               public cost: number,
               public rank: number,
               public storeId: number,
-              public costAfterDiscount: number) {}
+              public originalCost: number) {}
 }

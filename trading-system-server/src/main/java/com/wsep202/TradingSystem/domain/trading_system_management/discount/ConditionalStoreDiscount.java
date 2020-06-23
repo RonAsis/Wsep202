@@ -37,12 +37,10 @@ public class ConditionalStoreDiscount extends DiscountPolicy {
             double totalPurchasedCost = getTotalPurchasedCost(products);
             if (minPrice <= totalPurchasedCost) {
                 products.keySet().forEach(product -> {
-                    setCostAfterDiscount(discount, product, calculateDiscount(discount, product.getOriginalCost()));
+                    setCostAfterDiscount(discount, product, calculateDiscount(discount, product.getCost()));
                 });
             }
             discount.setApplied(true);
-        } else {  //check if needs to update back the price
-            undoDiscount(discount, products);
         }
     }
 
