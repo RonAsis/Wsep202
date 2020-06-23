@@ -69,7 +69,8 @@ public class Store {
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @OrderBy("discountId DESC")
-    private Set<Discount> discounts;
+    @Builder.Default
+    private Set<Discount> discounts = new HashSet<>();
 
     /**
      * list of purchases made in the store
