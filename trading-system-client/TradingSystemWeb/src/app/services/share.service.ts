@@ -31,10 +31,10 @@ export class ShareService {
         productShoppingCartDto.name,
         '',
         productShoppingCartDto.amountInShoppingCart,
-        productShoppingCartDto.originalCost,
+        productShoppingCartDto.cost,
         5,
         productShoppingCartDto.storeId,
-        productShoppingCartDto.cost);
+        productShoppingCartDto.originalCost);
       shoppingCart.addToShoppingCart(product, productShoppingCartDto.amountInShoppingCart);
     });
     return shoppingCart;
@@ -45,7 +45,7 @@ export class ShareService {
       .reduce((acc, cur) => {
         cur.productListFromStore.forEach((amountInShoppingCart, product) =>
           acc.push(new ProductShoppingCartDto(product.productSn,
-            product.name, amountInShoppingCart, product.cost,  product.costAfterDiscount, product.storeId)));
+            product.name, amountInShoppingCart, product.cost,  product.originalCost, product.storeId)));
         return acc;
       }, []);
   }

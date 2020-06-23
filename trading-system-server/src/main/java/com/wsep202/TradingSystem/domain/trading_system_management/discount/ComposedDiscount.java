@@ -32,8 +32,9 @@ public class ComposedDiscount extends DiscountPolicy {
     /**
      * products that has the specified discount
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "productsUnderThisDiscount")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Map<Product, Integer> productsUnderThisDiscount;
 
     /**
@@ -68,7 +69,7 @@ public class ComposedDiscount extends DiscountPolicy {
                                 oneAlreadyApply.set(true);
                             }
                         }
-                        //discountCur.setApplied(true); they do it by alone
+                        discountCur.setApplied(true);
                     });
                     break;
                 case XOR:   //as logic xor, we will try to apply odd amount of discounts
@@ -82,7 +83,7 @@ public class ComposedDiscount extends DiscountPolicy {
                                 discountCur.applyDiscount(products);
                             }
                         }
-                        //discountCur.setApplied(true); they do it by alone
+                        discountCur.setApplied(true);
                     });
                     break;
             }

@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management.cashing;
 
 import com.wsep202.TradingSystem.domain.trading_system_management.Product;
+import com.wsep202.TradingSystem.domain.trading_system_management.ShoppingBag;
 import com.wsep202.TradingSystem.domain.trading_system_management.ShoppingCart;
 import com.wsep202.TradingSystem.domain.trading_system_management.Store;
 import lombok.Data;
@@ -19,41 +20,41 @@ public class TradingSystemCashing {
 
     private Set<Product> products;
 
-    public TradingSystemCashing (){
+    public TradingSystemCashing() {
         shoppingCartMap = new HashMap<>();
         products = new HashSet<>();
     }
 
-    public void addProduct(Product product){
+    public void addProduct(Product product) {
         products.add(product);
     }
 
-    public void removeProduct(int productSn){
+    public void removeProduct(int productSn) {
         products.stream()
                 .filter(product -> product.getProductSn() == productSn)
                 .findFirst()
                 .map(product -> products.remove(product));
     }
 
-    public void editProduct(Product product){
+    public void editProduct(Product product) {
         removeProduct(product.getProductSn());
         addProduct(product);
     }
 
-    public Set<Product> getProducts(){
+    public Set<Product> getProducts() {
         return new HashSet<>(products);
     }
 
-    public void addShoppingCart(String username, ShoppingCart shoppingCart){
+    public void addShoppingCart(String username, ShoppingCart shoppingCart) {
         shoppingCartMap.put(username, shoppingCart);
     }
 
-    public void editShoppingCart(String username, ShoppingCart shoppingCart){
+    public void editShoppingCart(String username, ShoppingCart shoppingCart) {
         removeShoppingCart(username);
         addShoppingCart(username, shoppingCart);
     }
 
-    public ShoppingCart removeShoppingCart(String username){
+    public ShoppingCart removeShoppingCart(String username) {
         return shoppingCartMap.remove(username);
     }
 
@@ -65,4 +66,15 @@ public class TradingSystemCashing {
         products = productSet;
     }
 
+    public void updateStoreInShoppingCart(Store storeToUpdate) {
+        shoppingCartMap.forEach((key, value) -> {
+            Map<Store, ShoppingBag> shoppingBagsList = value.getShoppingBagsList();
+            shoppingBagsList.entrySet().stream()
+                    .filter(storeShoppingBagEntry -> storeShoppingBagEntry.getKey().getStoreId() == storeToUpdate.getStoreId())
+                    .findFirst().ifPresent(storeShoppingBagEntry -> {
+                shoppingBagsList.put(storeToUpdate, storeShoppingBagEntry.getValue());
+                shoppingBagsList.remove(storeShoppingBagEntry.getKey());
+            });
+        });
+    }
 }

@@ -47,11 +47,13 @@ export class HeaderLoggedInUserComponent implements OnInit {
   private teraAll() {
     this.storeService.setOwnerStores(false);
     this.storeService.setManagerStores(false);
-    this.userService.getMyOwnerToApprove().subscribe(response => {
-      if (response){
-        this.numOfApprove = response.length;
-      }
-    });
+    if (this.userService.isLoggingUser()) {
+      this.userService.getMyOwnerToApprove().subscribe(response => {
+        if (response) {
+          this.numOfApprove = response.length;
+        }
+      });
+    }
   }
 
   getIsAdmin() {
