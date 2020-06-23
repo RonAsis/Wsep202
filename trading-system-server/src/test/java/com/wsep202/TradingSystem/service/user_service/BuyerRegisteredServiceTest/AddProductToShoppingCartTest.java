@@ -4,11 +4,12 @@ import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.config.httpSecurity.HttpSecurityConfig;
-import com.wsep202.TradingSystem.domain.trading_system_management.UserSystem;
+import com.wsep202.TradingSystem.dto.ProductDto;
+import com.wsep202.TradingSystem.dto.StoreDto;
+import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
 import com.wsep202.TradingSystem.service.user_service.GuestService;
 import com.wsep202.TradingSystem.service.user_service.SellerOwnerService;
-import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.service.user_service.ServiceTestsHelper;
 import javafx.util.Pair;
 import org.junit.jupiter.api.AfterEach;
@@ -24,14 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TradingSystemConfiguration.class, HttpSecurityConfig.class, ObjectMapperConfig.class, GuestService.class, BuyerRegisteredService.class, SellerOwnerService.class})
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
 
-// *********** UC 2.7.2 (inherited from guest) - removing a product from shopping bag ***********
-public class RemoveProductInShoppingBagTest {
+// *********** UC 2.6 (inherited from guest) - saving a product in a shopping bag ***********
+public class AddProductToShoppingCartTest {
     @Autowired
     GuestService guestService;
     @Autowired
@@ -43,7 +43,6 @@ public class RemoveProductInShoppingBagTest {
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
-    int storeId = 0;
 
     @BeforeEach
     void setUp() {
@@ -65,39 +64,47 @@ public class RemoveProductInShoppingBagTest {
     }
 
     /**
-     * remove a product from empty shopping bag
+     * add a valid product in a registered user's shopping bag
      */
     @Test
-    void removeProductFromEmptyShoppingBag() {
-        Assertions.assertFalse(this.buyerRegisteredService.removeProductInShoppingBag(this.user.getUserName(),
-                10, 0, this.uuid));
+    void addValidProductRegisteredUser() {
+        Pair<Integer, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAndAddProduct();
+        Assertions.assertTrue(this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
+                1, returnedValue.getValue(), this.uuid));
     }
 
     /**
-     * remove a product from an empty username's shopping bag
+     * add a valid product in a not registered user's shopping bag
      */
     @Test
-    void removeProductEmptyUsername() {
-        Assertions.assertFalse(this.buyerRegisteredService.removeProductInShoppingBag("",
-                0, 0, uuid));
-}
-
-    /**
-     * remove a product from a username who's not registered's shopping bag
-     */
-    @Test
-    void removeProductUserNotRegistered() {
-        Assertions.assertFalse(this.buyerRegisteredService.removeProductInShoppingBag("notRegistered",
-                0, 0, uuid));
+    void addValidProductNotRegisteredUser() {
+        Assertions.assertThrows(Exception.class, ()-> {
+            Pair<Integer, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAndAddProduct();
+            this.buyerRegisteredService.addProductToShoppingCart("notRegistered",
+                    1, returnedValue.getValue(), this.uuid);
+        });
     }
 
     /**
-     * remove a product that isn't in the user's shopping bag, from a registered user's shopping bag
+     * add an invalid product in a not registered user's shopping bag
      */
     @Test
-    void removeProductUserRegistered() {
-        Pair<Integer, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAddProductAndAddToShoppingCart(this.user.getUserName(), this.uuid);
-        Assertions.assertTrue(this.buyerRegisteredService.removeProductInShoppingBag(this.user.getUserName(),
-                returnedValue.getKey(), returnedValue.getValue().getProductSn(), uuid));
+    void addInvalidProductNotRegisteredUser() {
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.buyerRegisteredService.addProductToShoppingCart("notRegistered",
+                    1, null, this.uuid);
+        });
+    }
+
+
+    /**
+     * add an invalid product in a registered user's shopping bag
+     */
+    @Test
+    void addInvalidProductRegisteredUser() {
+        Assertions.assertThrows(Exception.class, ()-> {
+            this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
+                    1, null, this.uuid);
+        });
     }
 }

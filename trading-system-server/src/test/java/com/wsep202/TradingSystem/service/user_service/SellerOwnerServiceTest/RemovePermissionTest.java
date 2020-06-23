@@ -4,10 +4,10 @@ import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.config.httpSecurity.HttpSecurityConfig;
-import com.wsep202.TradingSystem.dto.ProductDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.*;
+import io.swagger.models.auth.In;
 import javafx.util.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -27,8 +27,8 @@ import java.util.UUID;
 @SpringBootTest(args = {"admin","admin"})
 @WithModelMapper
 
-// *********** UC 4.6 - adding a permission to a manager ***********
-public class AddPermissionTest {
+// *********** UC 4.6 - removing a manager's permission ***********
+public class RemovePermissionTest {
     @Autowired
     GuestService guestService;
     @Autowired
@@ -70,53 +70,60 @@ public class AddPermissionTest {
                 this.storeId, this.manager.getUserName(), this.uuid);
         this.helper.logoutUser(this.user.getUserName(), this.uuid);
     }
+
     /**
-     * add a valid permission, that is already permitted
+     * remove a valid permission, that is basic
      */
     @Test
-    void addAddedPermission() {
-        Assertions.assertFalse(this.sellerOwnerService.addPermission(this.user.getUserName(), this.storeId,
-                this.manager.getUserName(), "view", this.uuid));
+    void removeBasicPermission() {
+        Assertions.assertTrue(this.sellerOwnerService.removePermission(this.user.getUserName(), this.storeId,
+                this.manager.getUserName(), "view",this.uuid));
     }
 
     /**
-     * add a valid permission, that isn't already permitted
+     * remove a valid permission, that is basic
      */
     @Test
-    void addValidNotAddedPermission() {
-        Assertions.assertTrue(this.sellerOwnerService.addPermission(this.user.getUserName(), this.storeId,
-                this.manager.getUserName(), "edit purchase policy", this.uuid));
+    void removeValidPermissionInvalidStore() {
+        Assertions.assertFalse(this.sellerOwnerService.removePermission(this.user.getUserName(), this.storeId+5,
+                this.manager.getUserName(), "view",this.uuid));
     }
 
     /**
-     * add an invalid permission
+     * remove a valid permission
      */
     @Test
-    void addInvalidPermission() {
-        Assertions.assertFalse(this.sellerOwnerService.addPermission(this.user.getUserName(), this.storeId,
-                this.manager.getUserName(), "NotPermission", this.uuid));
+    void removeNotAddedPermission() {
+        Assertions.assertFalse(this.sellerOwnerService.removePermission(this.user.getUserName(), this.storeId,
+                this.manager.getUserName(), "edit",this.uuid));
     }
 
     /**
-     * add a valid permission, that is already permitted
-     * invalid manager
+     * remove invalid permission
      */
     @Test
-    void addAddedPermissionInvalidManager() {
-        Assertions.assertFalse(this.sellerOwnerService.addPermission(this.user.getUserName(), this.storeId,
-                "NotManager", "view", this.uuid));
+    void removeInvalidPermission() {
+        Assertions.assertFalse(this.sellerOwnerService.removePermission(this.user.getUserName(), this.storeId,
+                this.manager.getUserName(), "NotPermission",this.uuid));
     }
 
     /**
-     * add an invalid permission
-     * invalid manager
-     * invalid store
+     * remove invalid permission, invalid manager
      */
     @Test
-    void addInvalidPermissionInvalidManagerInvalidOwnerInvalidStore() {
+    void removeValidPermissionInvalidManager() {
+        Assertions.assertFalse(this.sellerOwnerService.removePermission(this.user.getUserName(), this.storeId,
+                "NotManager", "NotPermission",this.uuid));
+    }
+
+    /**
+     * remove invalid permission
+     */
+    @Test
+    void removeInvalidPermissionInvalidOwner() {
         Assertions.assertThrows(Exception.class, ()-> {
-            this.sellerOwnerService.addPermission("NotOwner", this.storeId,
-                "NotManager", "NotPermission", this.uuid);
-    });
-}
+            this.sellerOwnerService.removePermission("NotOwner", this.storeId,
+                    this.manager.getUserName(), "NotPermission",this.uuid);
+        });
+    }
 }
