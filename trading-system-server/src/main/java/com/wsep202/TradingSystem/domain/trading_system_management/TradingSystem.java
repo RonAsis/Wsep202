@@ -12,6 +12,7 @@ import com.wsep202.TradingSystem.domain.trading_system_management.statistics.Req
 import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
 import javafx.util.Pair;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
