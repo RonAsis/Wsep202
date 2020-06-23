@@ -34,12 +34,18 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     private Set<UserSystem> administrators;
     private Set<DailyVisitor> dailyVisitors;
 
+
     public TradingSystemDaoImpl() {
         super();
         this.stores = new HashSet<>();
         this.users = new HashSet<>();
         this.administrators = new HashSet<>();
         dailyVisitors = new HashSet<>();
+    }
+
+    public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem) {
+        stores.add(ownedStore);
+        //userRepository.save(userSystem);
     }
 
     @Override
@@ -141,13 +147,13 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public Discount addEditDiscount(Store store, UserSystem user, Discount discount) {
-        discount.setDiscountId(getNewIdDiscount());
+        //discount.setDiscountId(getNewIdDiscount());
         return store.addEditDiscount(user, discount);
     }
 
     @Override
     public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
-        purchase.setPurchaseId(getNewIdPolicy());
+       // purchase.setPurchaseId(getNewIdPolicy());
         return store.addEditPurchase(user, purchase);
     }
 
@@ -262,6 +268,12 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
                     .collect(Collectors.toSet());
         }
         throw new NotAdministratorException(username);
+    }
+    public void setStores(Set<Store> stores){
+        this.stores = stores;
+    }
+    public void setUsers(Set<UserSystem> users){
+        this.users = users;
     }
 
     private int getNewIdStore() {

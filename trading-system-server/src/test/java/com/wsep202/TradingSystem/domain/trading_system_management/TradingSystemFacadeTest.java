@@ -1,5 +1,9 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
+import com.github.rozidan.springboot.modelmapper.WithModelMapper;
+import com.wsep202.TradingSystem.config.ObjectMapperConfig;
+import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+import com.wsep202.TradingSystem.config.httpSecurity.HttpSecurityConfig;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
@@ -9,23 +13,26 @@ import com.wsep202.TradingSystem.domain.trading_system_management.statistics.Upd
 import com.wsep202.TradingSystem.dto.*;
 import com.wsep202.TradingSystem.helprTests.AssertionHelperTest;
 import com.wsep202.TradingSystem.service.ServiceFacade;
+import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
+import com.wsep202.TradingSystem.service.user_service.GuestService;
 import javafx.util.Pair;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.security.core.parameters.P;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.wsep202.TradingSystem.helprTests.SetUpObjects.setUpDiscounts;
-import static com.wsep202.TradingSystem.helprTests.SetUpObjects.setUpReceipts;
+import static com.wsep202.TradingSystem.helprTests.SetUpObjects.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -48,9 +55,7 @@ class TradingSystemFacadeTest {
     private Discount discount;
     private MangerStore mangerStore;
 
-    @AfterEach
-    void tearDown() {
-    }
+
 
     @Nested
     public class TradingSystemFacadeTestUnit {
@@ -736,125 +741,578 @@ class TradingSystemFacadeTest {
 
     }
 
+    @ExtendWith(SpringExtension.class)
+    @ContextConfiguration(classes = {TradingSystemConfiguration.class, HttpSecurityConfig.class, ObjectMapperConfig.class})
+    @SpringBootTest(args = {"admin","admin"})
+    @WithModelMapper
     @Nested
     public class TradingSystemFacadeTestIntegration {
+
+        @Autowired
+        private ModelMapper modelMapper = new ModelMapper();
+        //required entities for tests
+        @Autowired
+        private TradingSystem tradingSystem;
+        @Autowired
+        private TradingSystemFacade tradingSystemFacade;
+        private UserSystem userSystem;
+        private Store store;
+        @Autowired
+        private FactoryObjects factoryObjects;
+        private PaymentDetails paymentDetails;
+        private BillingAddress billingAddress;
+        @Autowired
+        private ServiceFacade serviceFacade;
+        private MultipartFile userImage;
+        private ShoppingCart shoppingCart;
+        @Autowired
+        private TradingSystemDao tradingSystemDao;
+        private Product product;
+        private Discount discount;
+        private MangerStore mangerStore;
+        UserSystem user;
+
+        int name = 0;
 
         @BeforeEach
         void setUp() {
         }
 
-
-        @Test
-        void viewPurchaseHistory() {
+        @AfterEach
+        void tearDown() {
+            tradingSystemDao.setIsLogins(new HashMap<>());
+            tradingSystemDao.setStores(new HashSet<>());
+            tradingSystemDao.setUsers(new HashSet<>());
         }
 
+        /**
+         * test: logged in user view his purchase history
+         * get the purchase history of logged in user with uuid
+         * @pre user is logged in with receipts
+         * UC 3.7
+         */
         @Test
-        void testViewPurchaseHistory() {
+        void userViewHisPurchaseHistory() {
+            user = setUserSystem();
+          //  user.setUserName("4");
+            setupRegister(user);
+            UUID uuid = setupLogin(user);
+            Set<Receipt> receipts = setUpReceipts();
+            UserSystem userInSystem = tradingSystem.getUser(user.getUserName(),uuid);
+            userInSystem.setReceipts(receipts);
+            //call the function
+            //tradingSystem.getUser(user.getUserName(), uuid).setReceipts(receipts);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory(user.getUserName(),uuid);
+            AssertionHelperTest.assertReceipts(receipts.stream().collect(Collectors.toList()), receiptDtos);
         }
 
+
+        /**
+         * view purchase history of admin
+         *  * UC 6.4.1
+         */
         @Test
-        void testViewPurchaseHistory1() {
+        void testViewPurchaseHistoryAdmin() {
+            UUID uuid = setupLogin("admin","admin");
+            Set<Receipt> receipts = setUpReceipts();
+            UserSystem userInSystem = tradingSystem.getUser("admin",uuid);
+            userInSystem.setReceipts(receipts);
+            //call the function
+            //tradingSystem.getUser(user.getUserName(), uuid).setReceipts(receipts);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistory("admin",uuid);
+            AssertionHelperTest.assertReceipts(receipts.stream().collect(Collectors.toList()), receiptDtos);
         }
 
+
+        /**
+         * UC 5.1
+         * view purchase history of store as manager
+         * 1. register 2 users
+         * 2. login with one of them
+         * 3. open store
+         * 4. add manager (the second)
+         * 4.5. add receipts to the store
+         * 5. login with the second
+         * 6.view history after create receipts for him
+         */
         @Test
-        void viewPurchaseHistoryOfManager() {
+        void testViewPurchaseHistoryManager() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            user1.setUserName("2");
+            UserSystem user2 = setUserSystem2();
+            user2.setUserName("3");
+            setupRegister(user1);
+            setupRegister(user2);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            Store store1 = tradingSystem.getStore(storeId);
+            Set<Receipt> receipts = setUpReceipts();
+            store1.setReceipts(receipts);
+            setupAddManager(user1,storeId,user2.getUserName(),uuid);
+            UUID uuid2 = setupLogin(user2);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfManager(user2.getUserName(),storeId,uuid2);
+            AssertionHelperTest.assertReceipts(receipts.stream().collect(Collectors.toList()), receiptDtos);
         }
 
+        /**
+         * UC 4.10
+         * owner view purchase history of store
+         */
         @Test
         void viewPurchaseHistoryOfOwner() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            user1.setUserName("1");
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            Store store1 = tradingSystem.getStore(storeId);
+            Set<Receipt> receipts = setUpReceipts();
+            store1.setReceipts(receipts);
+            List<ReceiptDto> receiptDtos = tradingSystemFacade.viewPurchaseHistoryOfOwner(user1.getUserName(),storeId,uuid);
+            AssertionHelperTest.assertReceipts(receipts.stream().collect(Collectors.toList()), receiptDtos);
         }
 
+        /**
+         * test UC 4.1
+         * add product to store
+         * 1. register
+         * 2.login
+         * 3.open store
+         * 4.add product
+         */
         @Test
         void addProduct() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            user1.setUserName("koko");
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            Set<Product> products = setUpProducts();
+            Product product = products.iterator().next();
+            product.setStoreId(storeId);
+            ProductDto productDto = tradingSystemFacade.addProduct(user1.getUserName(),storeId,product.getName()
+                    ,product.getCategory().category
+                    ,product.getAmount(),product.getCost()
+                    ,uuid);
+            AssertionHelperTest.assertProduct(product,productDto);
         }
 
+        /**
+         * UC 4.2
+         * owner wants add a new policy  an existing one a discount policy from store
+         */
         @Test
-        void getStoreDiscounts() {
+        void addDiscount() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            List<Discount> discounts = setUpDiscounts();
+            Discount discount = discounts.get(0);
+            DiscountDto discountDto1 = modelMapper.map(discount,DiscountDto.class);
+            DiscountDto discountDto2 = tradingSystemFacade.addEditDiscount(user1.getUserName(),storeId,
+                    discountDto1,uuid);
+            AssertionHelperTest.assertionDiscount(discount,discountDto2);
         }
-
+        /**
+         * UC 4.2
+         * owner wants edit a new policy or edit an existing one a discount policy from store
+         * 1. add discount
+         * 2. edit discount
+         */
         @Test
-        void removeDiscount() {
+        void editDiscount() {
+            //first add
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            List<Discount> discounts = setUpDiscounts();
+            Discount discount = discounts.get(0);
+            DiscountDto discountDto1 = modelMapper.map(discount,DiscountDto.class);
+            DiscountDto discountDto2 = tradingSystemFacade.addEditDiscount(user1.getUserName(),storeId,
+                    discountDto1,uuid);
+            //now edit
+            //discount should have id>0 so go to edit
+            DiscountDto discountDto3 = tradingSystemFacade.addEditDiscount(user1.getUserName(),storeId,
+                    discountDto2,uuid);
+            AssertionHelperTest.assertionDiscount(discount,discountDto3);
         }
 
+        /**
+         * UC 4.2
+         * owner wants add a new policy from store
+         */
         @Test
-        void addEditDiscount() {
+        void addPurchase() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            List<Purchase> purchases = setUpPurchases();
+            Purchase purchase = purchases.get(0);
+            PurchasePolicyDto purchaseDto1 = modelMapper.map(purchase,PurchasePolicyDto.class);
+            PurchasePolicyDto purchaseDto2 = tradingSystemFacade.addEditPurchase(user1.getUserName(),storeId,
+                    purchaseDto1,uuid);
+            AssertionHelperTest.assertionPurchase(purchase,purchaseDto2);
         }
-
+        /**
+         * UC 4.2
+         * owner wants edit a new policy from store
+         */
         @Test
-        void addEditPurchase() {
+        void editPurchase() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            List<Purchase> purchases = setUpPurchases();
+            Purchase purchase = purchases.get(0);
+            PurchasePolicyDto purchaseDto1 = modelMapper.map(purchase,PurchasePolicyDto.class);
+            PurchasePolicyDto purchaseDto2 = tradingSystemFacade.addEditPurchase(user1.getUserName(),storeId,
+                    purchaseDto1,uuid);
+            //now edit
+            //purchase should have id>0 so go to edit
+            PurchasePolicyDto purchaseDto3 = tradingSystemFacade.addEditPurchase(user1.getUserName(),storeId,
+                    purchaseDto2,uuid);
+            AssertionHelperTest.assertionPurchase(purchase,purchaseDto3);
         }
 
-        @Test
-        void getCompositeOperators() {
-        }
-
+        /**
+         * test: delete product from store
+         * @pre there is product to delete in store
+         * 1. add product to store to meet pre
+         * 2. delete product
+         */
         @Test
         void deleteProductFromStore() {
+            //add
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            Set<Product> products = setUpProducts();
+            Product product = products.iterator().next();
+            product.setStoreId(storeId);
+            ProductDto productDto = tradingSystemFacade.addProduct(user1.getUserName(),storeId,product.getName()
+                    ,product.getCategory().category
+                    ,product.getAmount(),product.getCost()
+                    ,uuid);
+            //delete the product from store
+            Assertions.assertTrue(tradingSystemFacade.deleteProductFromStore(user1.getUserName(),storeId,
+                    0,uuid));
         }
 
+        /**
+         * test UC 4.1
+         * edit product
+         * 1.add product
+         * 2.edit
+         */
         @Test
         void editProduct() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            Set<Product> products = setUpProducts();
+            Product product = products.iterator().next();
+            product.setStoreId(storeId);
+            ProductDto productDto = tradingSystemFacade.addProduct(user1.getUserName(),storeId,product.getName()
+                    ,product.getCategory().category
+                    ,product.getAmount(),product.getCost()
+                    ,uuid);
+            //edit
+            //change amount
+            product.setAmount(7);
+            boolean res = tradingSystemFacade.editProduct(user1.getUserName(),storeId,1,product.getName(),
+                    product.getCategory().category,product.getAmount(),product.getCost(),uuid);
+            Assertions.assertTrue(res);
         }
 
+        /**
+         * UC 4.3
+         * add new owner to store
+         * owner appoint new owner to his store
+         */
         @Test
         void addOwner() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            UserSystem user2 = setUserSystem2();    //appointee
+            setupRegister(user1);
+            setupRegister(user2);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            //add owner
+            boolean res = tradingSystemFacade.addOwner(user1.getUserName(),storeId,
+                    user2.getUserName(),uuid);
+            Assertions.assertTrue(res);
+
         }
 
+        /**
+         * UC 4.5
+         * add manger to the store with the default permission
+         */
         @Test
         void addManager() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            UserSystem user2 = setUserSystem2();    //appointee
+            setupRegister(user1);
+            setupRegister(user2);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            //add manager
+            ManagerDto managerDto = tradingSystemFacade.addManager(user1.getUserName(),storeId,
+                    user2.getUserName(),uuid);
+            Assertions.assertEquals(user2.getUserName(),managerDto.getUsername());
         }
 
+        /**
+         * UC 4.6
+         * add permission the manger in the store
+         */
         @Test
         void addPermission() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            UserSystem user2 = setUserSystem2();    //appointee
+            setupRegister(user1);
+            setupRegister(user2);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            //add manager
+            setupAddManager(user1,storeId,user2.getUserName(),uuid);
+            //add permission
+            Assertions.assertTrue(tradingSystemFacade.addPermission(user1.getUserName(),storeId,user2.getUserName(),
+                    StorePermission.EDIT_DISCOUNT.function,uuid));
         }
 
+        /**
+         * UC 4.6
+         * remove permission the manger in the store
+         * 1. add permission
+         * 2. remove permission
+         */
         @Test
         void removePermission() {
+            //add permission
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            UserSystem user2 = setUserSystem2();    //appointee
+            setupRegister(user1);
+            setupRegister(user2);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            //add manager
+            setupAddManager(user1,storeId,user2.getUserName(),uuid);
+            //add permission
+            setupAddPermission(user1,storeId,user2, StorePermission.EDIT_DISCOUNT.function,uuid);
+            Assertions.assertTrue(tradingSystemFacade.removePermission(user1.getUserName(),
+                    storeId,user2.getUserName(),StorePermission.EDIT_DISCOUNT.function,uuid));
         }
 
-        @Test
-        void getPermissionOfManager() {
-        }
-
+        /**
+         * test UC 4.7
+         * remove manager
+         */
         @Test
         void removeManager() {
+            //first add manager
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            UserSystem user2 = setUserSystem2();    //appointee
+            setupRegister(user1);
+            setupRegister(user2);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            //add manager
+            ManagerDto managerDto = tradingSystemFacade.addManager(user1.getUserName(),storeId,
+                    user2.getUserName(),uuid);
+            //remove manager
+            Assertions.assertTrue(tradingSystemFacade.removeManager(user1.getUserName(),storeId,
+                    user2.getUserName(),uuid));
         }
 
+        /**
+         * test UC 4.4
+         * remove owner from the store by the owner that appointed him
+         */
         @Test
         void removeOwner() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            UserSystem user2 = setUserSystem2();    //appointee
+            setupRegister(user1);
+            setupRegister(user2);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            //add owner
+             tradingSystemFacade.addOwner(user1.getUserName(),storeId,
+                    user2.getUserName(),uuid);
+            //remove owner
+            boolean res = tradingSystemFacade.removeOwner(user1.getUserName(),storeId,
+                    user2.getUserName(),uuid);
+            Assertions.assertTrue(res);
         }
 
+        /**test
+         * UC 3.1
+         * the user name logout from the system
+         */
         @Test
         void logout() {
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            boolean res = tradingSystemFacade.logout(user1.getUserName(),uuid);
+            Assertions.assertTrue(res);
         }
 
+        /**
+         * test
+         * UC 3.2
+         * open new store
+         */
         @Test
         void openStore() {
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            Store store = setupCreateStore();
+            StoreDto storeDto = tradingSystemFacade.openStore(user1.getUserName(),store.getStoreName(),
+                    store.getDescription(),uuid);
+            AssertionHelperTest.assertionStore(store,storeDto);
         }
 
+
+        /**
+         * test
+         * UC 2.2
+         * register new user to the system
+         */
         @Test
         void registerUser() {
+            UserSystem user1 = setUserSystem();
+            boolean res = tradingSystemFacade.registerUser(user1.getUserName(),user1.getPassword(),
+                    user1.getFirstName(),user1.getLastName(),null);
+            Assertions.assertTrue(res);
         }
 
+        /**
+         * test
+         * UC 2.3
+         * user login to the system
+         */
         @Test
         void login() {
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            Pair<UUID,Boolean> res = tradingSystemFacade.login(user1.getUserName(),user1.getPassword());
+            Assertions.assertNotNull(res.getKey());
         }
 
+        /**
+         * UC 2.6 - save product in shopping bag
+         * 1. register
+         * 2. login
+         * 3. open store
+         * 4. add product to store
+         * 5. add product to bag
+         */
         @Test
         void saveProductInShoppingBag() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            Product product = factoryObjects.createProduct("mouse",ProductCategory.ELECTRONICS,
+                    8,39,storeId);
+            setupAddProduct(user1,uuid,storeId,product);
+            boolean res = tradingSystemFacade.saveProductInShoppingBag(user1.getUserName(),storeId,
+                    product.getProductSn(), 2,uuid);
+            Assertions.assertTrue(res);
+
         }
 
+        /**
+         * UC 2.7
+         * view products in shopping cart
+         * verify that the logged in user have shopping cart
+         */
         @Test
         void watchShoppingCart() {
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            ShoppingCartDto shoppingCartDto = tradingSystemFacade
+                    .watchShoppingCart(user1.getUserName(),uuid);
+            Assertions.assertNotNull(shoppingCartDto);
         }
 
+        /**
+         * UC 2.7
+         * remove product in shopping bag
+         * 1. add product to shopping bag
+         * 2. remove the product from shopping bag
+         */
         @Test
         void removeProductInShoppingBag() {
+            //add
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            Product product = factoryObjects.createProduct("mouse",ProductCategory.ELECTRONICS,
+                    8,39,storeId);
+            setupAddProduct(user1,uuid,storeId,product);
+            tradingSystemFacade.saveProductInShoppingBag(user1.getUserName(),storeId,
+                    product.getProductSn(), 2,uuid);
+            //remove
+            boolean res = tradingSystemFacade.removeProductInShoppingBag(user1.getUserName(),
+                    storeId,product.getProductSn(),uuid);
+            Assertions.assertTrue(res);
         }
 
+        /**
+         * UC 2.8
+         * purchase shopping cart use for guest
+         */
         @Test
         void purchaseShoppingCart() {
+            //open store and product
+            int storeId = 0;
+            UserSystem user1 = setUserSystem();
+            setupRegister(user1);
+            UUID uuid = setupLogin(user1);
+            setupOpenStore(user1,uuid);
+            Product product = factoryObjects.createProduct("mouse",ProductCategory.ELECTRONICS,
+                    8,39,storeId);
+            setupAddProduct(user1,uuid,storeId,product);
+            ShoppingCartDto shoppingCartDto = createCartDto();
+            PaymentDetailsDto paymentDetails = createPaymentDto();
+            BillingAddressDto billingAddressDto = createBillingAddrDto();
+            List<ReceiptDto> receipts = tradingSystemFacade.purchaseShoppingCart(shoppingCartDto,
+                    paymentDetails,billingAddressDto);
+            Assertions.assertNotNull(receipts);
         }
+
+
+
 
         @Test
         void testPurchaseShoppingCart() {
@@ -974,6 +1432,129 @@ class TradingSystemFacadeTest {
 
         @Test
         void stopDailyVisitors() {
+        }
+
+        ///////////////////////////setups
+
+        /**
+         * user 1 gives function permission to user 2
+         */
+        private void setupAddPermission(UserSystem user1, int storeId, UserSystem user2, String function, UUID uuid) {
+            tradingSystemFacade.addPermission(user1.getUserName(),storeId,user2.getUserName(),function,uuid);
+        }
+
+        /**
+         * user1 adds username as owner of the store with id storeId
+         */
+        private void setupAddManager(UserSystem user1, int storeId, String userName, UUID uuid) {
+            tradingSystemFacade.addManager(user1.getUserName(),storeId,userName,uuid);
+        }
+
+        private void setupAddProduct(UserSystem user,UUID uuid,int storeId, Product product){
+            tradingSystemFacade.addProduct(user.getUserName(),storeId,product.getName(),
+                    product.getCategory().category,product.getAmount(),product.getCost(),uuid);
+        }
+
+        /**
+         * create basic user for the tests
+         */
+        private UserSystem setUserSystem() {
+            UserSystem user = UserSystem.builder()
+                    .userName("barp")
+                    .password("12345678")
+                    .firstName("bar")
+                    .lastName("per")
+                    .isAdmin(false)
+                    .build();
+            return user;
+        }
+        private UserSystem setUserSystem2() {
+            UserSystem user = UserSystem.builder()
+                    .userName("sponge")
+                    .password("12345677")
+                    .firstName("sp")
+                    .lastName("bob")
+                    .isAdmin(false)
+                    .build();
+            return user;
+        }
+        /**
+         * login the received user
+         * return the uuid for the session of the logged in user
+         */
+        private UUID setupLogin(UserSystem user) {
+            Pair<UUID,Boolean> res;
+            res = tradingSystemFacade.login(user.getUserName(),user.getPassword());
+            return res.getKey();
+        }
+        private UUID setupLogin(String username, String password) {
+            Pair<UUID,Boolean> res;
+            res = tradingSystemFacade.login(username,password);
+            return res.getKey();
+        }
+
+        /**
+         * register the received user to the system
+         * @param user
+         */
+        private void setupRegister(UserSystem user) {
+            boolean ans=tradingSystemFacade.registerUser(user.getUserName(),user.getPassword(),
+                    user.getFirstName(),user.getLastName(),null);
+            int i=0;
+            i++;
+        }
+        /**
+         * open store with user1
+         */
+        private void setupOpenStore(UserSystem user1,UUID uuid) {
+            tradingSystemFacade.openStore(user1.getUserName(),""+user1.getUserName()+" store",
+                    "store description",uuid);
+        }
+
+        /**
+         * create store
+         */
+        private Store setupCreateStore() {
+            return Store.builder()
+                    .storeId(0)
+                    .storeName("store name")
+                    .description("store desc")
+                    .build();
+        }
+        /**
+         * create shopping cart
+         */
+        private ShoppingCartDto createCartDto() {
+            Map<Integer,ShoppingBagDto> bags = new HashMap<>();
+            Map<Integer,Integer> oneBag = new HashMap<>();
+            oneBag.put(0,1);    //productid 1 with amount 1 in bag
+            bags.put(0, ShoppingBagDto.builder()
+                    .productListFromStore(oneBag)
+                    .build());
+            return ShoppingCartDto.builder()
+                    .shoppingBags(bags)
+                    .build();
+        }
+        //payment method and billing address
+        private PaymentDetailsDto createPaymentDto() {
+            return PaymentDetailsDto.builder()
+                    .ccv("123")
+                    .creditCardNumber("123456789")
+                    .holderIDNumber("305026487")
+                    .holderName("bill")
+                    .month("3")
+                    .year("2222")
+                    .build();
+        }
+
+        private BillingAddressDto createBillingAddrDto() {
+            return BillingAddressDto.builder()
+                    .address("gilon 1")
+                    .city("gilom")
+                    .country("astonia")
+                    .customerFullName("cust full name")
+                    .zipCode("2010300")
+                    .build();
         }
 
     }

@@ -55,6 +55,10 @@ public abstract class TradingSystemDao {
 
     public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem){}
 
+    public void setStores(Set<Store> stores){}
+
+    public void setUsers(Set<UserSystem> users){}
+
     public abstract boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
 
     public abstract boolean removePermission(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
@@ -71,6 +75,9 @@ public abstract class TradingSystemDao {
 
     public  boolean isLogin(String userName){
         return Objects.nonNull(usersLogin.get(userName));
+    }
+    public void setIsLogins(Map<String,UUID> usersLogin){
+        this.usersLogin = usersLogin;
     }
 
     public Optional<UpdateDailyVisitor> login(String userName, UUID uuid){
