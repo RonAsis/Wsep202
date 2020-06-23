@@ -6,8 +6,15 @@ import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.config.httpSecurity.HttpSecurityConfig;
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountPolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.DiscountType;
+import com.wsep202.TradingSystem.domain.trading_system_management.discount.VisibleDiscount;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Publisher;
 import com.wsep202.TradingSystem.domain.trading_system_management.notification.Subject;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.ProductDetailsPolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchaseType;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import javafx.util.Pair;
@@ -66,10 +73,11 @@ class TradingSystemTest {
         @BeforeEach
         void setUp() {
             externalServiceManagement = mock(ExternalServiceManagement.class);
-            admin = UserSystem.builder()
-                    .userName("admin")
-                    .password("admin")
-                    .build();
+            admin = new UserSystem("admin","adminFirst","adminLast","admin",true);
+//            admin = UserSystem.builder()
+//                    .userName("admin")
+//                    .password("admin")
+//                    .build();
             admin1 = mock(UserSystem.class);
             passwordEncoder = mock(PasswordEncoder.class);
             tradingSystemDao = mock(TradingSystemDao.class);
@@ -98,7 +106,7 @@ class TradingSystemTest {
             doNothing().when(userSystem1).setManagedStores(new HashSet<Store>());
             doNothing().when(userSystem).setOwnedStores(new HashSet<Store>());
             doNothing().when(userSystem).setManagedStores(new HashSet<Store>());
-           // doNothing().when(tradingSystemDao).registerAdmin(admin);
+            doNothing().when(tradingSystemDao).registerAdmin(admin);
         }
 
         /**
@@ -941,10 +949,13 @@ class TradingSystemTest {
             //usersLogin.put("usernameTest", UUID.randomUUID());
             //tradingSystem.setUsersLogin(usersLogin);
             when(userSystem.getUserName()).thenReturn("usernameTest");
-            when(tradingSystemDao.isLogin(userSystem.getUserName())).thenReturn(true);
-            tradingSystem.setSubject(mock(Subject.class));
-            when(tradingSystem.getSubject().unRegDailyVisitor(userSystem.getUserName())).thenReturn(true);
+            when(tradingSystemDao.isLogin("usernameTest")).thenReturn(true);
+            Subject subject = mock(Subject.class);
+            tradingSystem.setSubject(subject);
+            when(subject.unRegDailyVisitor("usernameTest")).thenReturn(true);
             when(tradingSystemDao.usersLoggedInSystem()).thenReturn(0);
+            when(userSystem.logout()).thenReturn(true);
+           //doNothing().when(tradingSystemDao).logout("usernameTest");
             //when(userSystem.isLogin()).thenReturn(true);
         }
 
@@ -1841,14 +1852,16 @@ class TradingSystemTest {
         @Test
         void guestPurchaseShoppingCartPositive() {
             setUpPurchaseCartSuc();
+            int amountOfProductInStore = store.getProduct(product.getProductSn()).getAmount();
             List<Receipt> receipts = tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress);
             //check that the return object is not null
             Assertions.assertNotNull(receipts);
             //check that the product was bought
             Assertions.assertTrue(receipts.get(0).getProductsBought().containsKey(product));
             //check that the total price is correct
-           Assertions.assertEquals(Double.parseDouble(formatter.format(product.getCost()*5)),receipts.get(0).getAmountToPay());
-
+            Assertions.assertEquals(Double.parseDouble(formatter.format(product.getCost()*5)),receipts.get(0).getAmountToPay());
+            //check the stock in store updated
+            Assertions.assertTrue(amountOfProductInStore > store.getProduct(product.getProductSn()).getAmount());
         }
 
         /**
@@ -1859,8 +1872,11 @@ class TradingSystemTest {
         @Test
         void guestPurchaseShoppingCartEmptyCart() {
             setUpEmptyCart();
+            int amountOfProductInStore = store.getProduct(product.getProductSn()).getAmount();
             //check that the system does not allow to buy an empty cart
             Assertions.assertNull(tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
+            //check that the amount of the product didn't change in store after fail charge
+            Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
         }
 
         /**
@@ -1871,12 +1887,15 @@ class TradingSystemTest {
         @Test
         void guestPurchaseShoppingCartNullObject() {
             setUpNotEmptyCart();
+            int amountOfProductInStore = store.getProduct(product.getProductSn()).getAmount();
             //check that the system does not allow to buy a null cart
             Assertions.assertNull(tradingSystem1.purchaseShoppingCartGuest(null,paymentDetails,billingAddress));
             //check that the system does not allow to use a null payment details
             Assertions.assertNull(tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,null,billingAddress));
             //check that the system does not allow to use a null billing address
             Assertions.assertNull(tradingSystem1.purchaseShoppingCartGuest(null,paymentDetails,null));
+            //check that the amount of the product didn't change in store after fail charge
+            Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
         }
 
         /**
@@ -1887,9 +1906,14 @@ class TradingSystemTest {
         @Test
         void guestPurchaseShoppingCartProductsNotInStock() {
             setUpProductNotInStock();
+            int amountOfProductInStore = store.getProduct(product.getProductSn()).getAmount();
+            //check that the amount trying to buy is to big, not enough in store
+            Assertions.assertTrue(amountOfProductInStore < testShoppingCart.getShoppingBag(store).getProductAmount(product.getProductSn()));
             //check that the system does not allow to buy an empty cart
             Assertions.assertThrows(NotInStockException.class, ()->
                     tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
+            //check that the amount of the product didn't change in store after fail charge
+            Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
         }
 
         /**
@@ -1944,6 +1968,68 @@ class TradingSystemTest {
             Assertions.assertTrue(userSystem2.getReceipts().containsAll(receipts));
             //check the stock in store updated
             Assertions.assertTrue(amountOfProductInStore > store.getProduct(product.getProductSn()).getAmount());
+        }
+
+        /**
+         * UC 2.8
+         * This test check if the purchaseShoppingCart method fails
+         * when there is a problem with the stores discount policy and the product are
+         * not removed from cart or from stock
+         */
+        @Test
+        void purchaseCartDiscountPolicyFail(){
+            setUpDiscountPolicy();
+            int amountOfProductInStore = store.getProduct(product.getProductSn()).getAmount();
+            //check that the policy fails
+            Assertions.assertThrows(IllegalPercentageException.class, ()->
+                    tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
+            //check that product is in the cart after deliver failed
+            Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
+            //check that the amount of the product didn't change in store after fail charge
+            Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+        }
+
+        private void setUpDiscountPolicy(){
+            setUpPurchaseCartSuc();
+            Map<Product, Integer> products = new HashMap<>();
+            products.put(product,1);
+            VisibleDiscount visibleDiscount = new VisibleDiscount();
+            visibleDiscount.setAmountOfProductsForApplyDiscounts(products);
+            Discount discount = new Discount(-12,//percentage to big
+            Calendar.getInstance(),
+            "crazy discount",
+                    visibleDiscount,
+            DiscountType.VISIBLE);
+            store.addDiscount(storeOwner,discount);//add policy to store
+        }
+
+        /**
+         * UC 2.8
+         * This test check if the purchaseShoppingCart method fails
+         * when there is a problem with the stores Purchase policy and the product are
+         * not removed from cart or from stock.
+         */
+        @Test
+        void purchaseCartPurchasePolicyFail(){
+            setUpPurchasePolicy();
+            int amountOfProductInStore = store.getProduct(product.getProductSn()).getAmount();
+            //check that the policy fails, try to by 5 amount of the product, when the max is 3
+            Assertions.assertThrows(PurchasePolicyException.class, ()->
+                    tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
+            //check that product is in the cart after deliver failed
+            Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
+            //check that the amount of the product didn't change in store after fail charge
+            Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+        }
+
+        private void setUpPurchasePolicy(){
+            setUpPurchaseCartSuc();
+            Map<Product, Integer> products = new HashMap<>();
+            products.put(product,1);
+            ProductDetailsPolicy productDetailsPolicy = new ProductDetailsPolicy(1,3,product.getProductSn());
+            Purchase purchase = new Purchase(productDetailsPolicy, PurchaseType.PRODUCT_DETAILS
+                    , "policy for product" + product.getName());
+            store.addPurchasePolicy(storeOwner,purchase);//add policy to store
         }
 
         /**
@@ -2243,8 +2329,6 @@ class TradingSystemTest {
             //appointed by storeOwner, needs to be deleted if storeOwner wad removed
             Assertions.assertFalse(store.isOwner(newManager));
         }
-
-
 
         /**
          * UC 4.4

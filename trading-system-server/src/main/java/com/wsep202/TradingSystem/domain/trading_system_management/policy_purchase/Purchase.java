@@ -56,6 +56,11 @@ public class Purchase {
         return purchasePolicy.isApproved(this, products,userAddress);
     }
 
+    public Purchase(PurchasePolicy purchasePolicy, PurchaseType purchaseType, String description){
+        this.purchasePolicy = purchasePolicy;
+        this.purchaseType = purchaseType;
+        this.description = description;
+    }
     ///////////////////////////////////////////////// edit /////////////////////////////////////
 
     public boolean editPurchase(String description,
