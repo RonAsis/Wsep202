@@ -16,12 +16,6 @@ public class FactoryObjects {
     }
 
     public Product createProduct(String productName, ProductCategory productCategory, int amount, double cost, int storeId) {
-        return Product.builder()
-                .name(productName)
-                .category(productCategory)
-                .amount(amount)
-                .cost(cost)
-                .storeId(storeId)
-                .build();
+        return new Product(productName,productCategory,amount,cost,storeId);
     }
 }

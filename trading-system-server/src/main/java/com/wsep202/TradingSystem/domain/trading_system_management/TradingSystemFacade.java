@@ -23,6 +23,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.Type;
@@ -157,17 +158,22 @@ public class TradingSystemFacade {
      * @param cost          - the cost of the product
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public ProductDto addProduct(@NotBlank String ownerUsername, int storeId,
                                  @NotBlank String productName, @NotBlank String category,
                                  int amount, double cost, UUID uuid) {
         try {
+            if (cost<0 || amount<0) {
+                log.error("cost and amount can't be negative");
+                return null;
+            }
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid); //get registered user with ownerUsername
             Store ownerStore = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PRODUCT); //verify he owns store with storeId
             //convert to a category we can add to the product
             ProductCategory productCategory = ProductCategory.getProductCategory(category);
             Product product = factoryObjects.createProduct(productName, productCategory, amount, cost, storeId);
             Product productRes = tradingSystemDao.addProductToStore(ownerStore, user, product);
-            return Objects.nonNull(productRes) ? modelMapper.map(product, ProductDto.class) : null;
+            return Objects.nonNull(productRes) ? modelMapper.map(productRes, ProductDto.class) : null;
         } catch (TradingSystemException e) {
             log.error("add product failed", e);
             return null;
@@ -208,6 +214,7 @@ public class TradingSystemFacade {
      * @param uuid     - users UUID
      * @return true if success, else false
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT);
@@ -285,6 +292,7 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public boolean editProduct(@NotBlank String ownerUsername, int storeId, int productSn, @NotBlank String productName,
                                @NotBlank String category, int amount, double cost, UUID uuid) {
         try {
@@ -311,6 +319,7 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class, RuntimeException.class})
     public boolean addOwner(@NotBlank String ownerUsername, int storeId, @NotBlank String newOwnerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -332,6 +341,7 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -483,6 +493,7 @@ public class TradingSystemFacade {
      * @param storeName     - the name of the new store
      * @return true if succeed
      */
+    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public StoreDto openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(usernameOwner, uuid);

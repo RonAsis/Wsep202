@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.google.common.base.Strings;
+import com.wsep202.TradingSystem.domain.exception.IllegalProductCostOrAmountException;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
@@ -75,6 +76,10 @@ public class Product {
     private int storeId;
 
     public Product(String name, ProductCategory category, int amount, double cost, int storeId){
+        if (cost<0 || amount<0) {
+            log.error("cost and amount can't be negative");
+            throw new IllegalProductCostOrAmountException(productSn);
+        }
         this.name = name;
         this.category = category;
         this.amount = amount;
@@ -156,6 +161,10 @@ public class Product {
     }
 
     public Product cloneProduct(){
-        return new Product(name,category,amount,cost,storeId);
+        Product returnedProduct = new Product(name,category,amount,cost,storeId);
+        returnedProduct.setProductSn(productSn);
+        returnedProduct.setOriginalCost(originalCost);
+        returnedProduct.setRank(rank);
+        return returnedProduct;
     }
 }
