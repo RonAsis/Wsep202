@@ -248,7 +248,7 @@ class ShoppingCartTest {
             //before remove check there is 1 bag in cart
             assertEquals(1, shoppingCart.getNumOfBagsInCart());
             //check that removal was successful
-            assertTrue(shoppingCart.removeProductInCart(store3, product1));
+            assertFalse(shoppingCart.removeProductInCart(store3, product1));
         }
 
         /**

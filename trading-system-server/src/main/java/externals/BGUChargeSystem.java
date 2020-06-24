@@ -52,7 +52,7 @@ public class BGUChargeSystem implements ChargeService {
             }
             log.info(String.format("Get valid body [%s] from external charge system on charge", response.getBody()));
             return Integer.parseInt(response.getBody());
-        } catch (ResourceAccessException e) {
+        } catch (Exception e) {
             log.error("Can't connect to the charge system", e);
             throw new ExternalSystemException("failed to handshake the BGU charge system.");
         }

@@ -104,7 +104,7 @@ public abstract class TradingSystemDao {
     public abstract ShoppingCart getShoppingCart(String username, UUID uuid);
 
     public abstract void loadShoppingCart(UserSystem user);
-    
+
     protected void updateShoppingCart(UserSystem owner, List<UserSystem> userSystems, Store store, Product product){
         userSystems.forEach(userSystem -> {
             if(userSystem.removeProductInShoppingBag(store, product)){
@@ -131,5 +131,4 @@ public abstract class TradingSystemDao {
     public int usersLoggedInSystem(){
         return usersLogin.size();
     }
-
 }

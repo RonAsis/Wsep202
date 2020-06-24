@@ -395,7 +395,7 @@ class StoreTest {
          * checks that user that wasn't approved
          */
         @Test
-        @Disabled
+       // @Disabled
         void approveOwnerNegative(){
             UserSystem notOwner = mock(UserSystem.class);
             when(notOwner.getUserName()).thenReturn("notOwner");
@@ -407,7 +407,7 @@ class StoreTest {
             Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
 
             Assertions.assertFalse(storeUT.getOwnersUsername().contains(notOwner.getUserName()));
-            Assertions.assertFalse(storeUT.approveOwner(notOwner, managerUser.getUserName(), true));
+            storeUT.approveOwner(notOwner, managerUser.getUserName(), true);
             Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
             Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
         }
@@ -1484,7 +1484,7 @@ class StoreTest {
          * checks that user that wasn't approved
          */
         @Test
-        @Disabled
+       // @Disabled
         void approveOwnerNegative(){
             UserSystem notOwner = new UserSystem();
             notOwner.setUserName("notOwner");
@@ -1496,7 +1496,7 @@ class StoreTest {
             Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
 
             Assertions.assertFalse(storeUT.getOwnersUsername().contains(notOwner.getUserName()));
-            Assertions.assertFalse(storeUT.approveOwner(notOwner, managerUser.getUserName(), true));
+            storeUT.approveOwner(notOwner, managerUser.getUserName(), true);
             Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
             Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
         }
