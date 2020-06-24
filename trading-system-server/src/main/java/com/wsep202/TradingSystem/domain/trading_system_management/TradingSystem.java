@@ -324,9 +324,15 @@ public class TradingSystem {
         log.info("delivery request accepted");
         userSystem.getShoppingCart().updateAllAmountsInStock();
         log.info("all amounts of products in stock of stores were updated");
+        Map<Store, ShoppingBag> shoppingBagsList = userSystem.getShoppingCart().getShoppingBagsList();
+        List<Receipt> receipts = userSystem.getShoppingCart().createReceipts(userSystem.getUserName(), chargeTransactionId, supplyTransId);
         tradingSystemDao.updateUser(userSystem);
-        userSystem.getShoppingCart().getShoppingBagsList().keySet().forEach(store -> tradingSystemDao.updateStore(store));
-        return userSystem.getShoppingCart().createReceipts(userSystem.getUserName(), chargeTransactionId, supplyTransId);
+        shoppingBagsList.keySet().forEach(store -> {
+            Optional<Receipt> receiptOptional = receipts.stream().filter(receipt -> receipt.getStoreId() == store.getStoreId()).findFirst();
+            receiptOptional.ifPresent(receipt -> store.addReceipt(receipt));
+            tradingSystemDao.updateStore(store);
+        });
+        return receipts;
     }
 
 
