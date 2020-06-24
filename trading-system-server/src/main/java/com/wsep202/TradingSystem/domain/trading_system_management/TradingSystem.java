@@ -254,8 +254,6 @@ public class TradingSystem {
     @Synchronized("purchaseLock")
     public List<Receipt> purchaseShoppingCartGuest(ShoppingCart shoppingCart, PaymentDetails paymentDetails, BillingAddress billingAddress) {
         List<Receipt> receipts = purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
-        shoppingCart.getShoppingBagsList().keySet()
-                .forEach(store -> tradingSystemDao.updateStore(store));
         return receipts;
     }
 
@@ -321,9 +319,11 @@ public class TradingSystem {
         }
         log.info("delivery request accepted");
         shoppingCart.updateAllAmountsInStock();
+        shoppingCart.getShoppingBagsList().keySet().forEach(store -> tradingSystemDao.updateStore(store));
         log.info("all amounts of products in stock of stores were updated");
         return shoppingCart.createReceipts(customerName, chargeTransactionId, supplyTransId);
     }
+
 
     private boolean validationOfPurchaseArgs(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress) {
         if (shoppingCart == null || paymentDetails == null || billingAddress == null || shoppingCart.getNumOfBagsInCart() == 0 || shoppingCart.getShoppingBagsList() == null) {
