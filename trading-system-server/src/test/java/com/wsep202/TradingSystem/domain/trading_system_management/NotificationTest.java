@@ -47,9 +47,9 @@ public class NotificationTest {
     @BeforeEach
     void setUp() {
         admin = new UserSystem("admin", "admin", "admin", "admin");
-        owner1 = new UserSystem("owner1", "owner1", "owner1", "password");
-        owner2 = new UserSystem("owner2", "owner2", "owner2", "password");
-        newOwner = new UserSystem("newOwner", "newOwner", "newOwner", "password");
+        owner1 = new UserSystem("owner1notification", "owner1", "owner1", "password");
+        owner2 = new UserSystem("owner2notification", "owner2", "owner2", "password");
+        newOwner = new UserSystem("newOwnerNotification", "newOwner", "newOwner", "password");
 
         tradingSystemFacade.registerUser(owner1.getUserName(), owner1.getPassword(), owner1.getFirstName(), owner1.getLastName(), null);
         tradingSystemFacade.registerUser(owner2.getUserName(), owner2.getPassword(), owner2.getFirstName(), owner2.getLastName(), null);
@@ -63,8 +63,12 @@ public class NotificationTest {
         Set<UserSystem> usersInSystem = tradingSystem.getUsers(actualAdmin);
 
         for(UserSystem userSystem: usersInSystem){
-            userSystem.setPrincipal("principal");
-            Assertions.assertEquals(userSystem.getNotifications(), new ArrayList<>());
+            if (userSystem.getUserName().equals(owner1.getUserName())
+                    || userSystem.getUserName().equals(owner2.getUserName())
+                    || userSystem.getUserName().equals(newOwner.getUserName())){
+                userSystem.setPrincipal("principal");
+                Assertions.assertEquals(userSystem.getNotifications(), new ArrayList<>());
+            }
         }
 
         tradingSystemFacade.logout(admin.getUserName(), uuid);
@@ -82,9 +86,9 @@ public class NotificationTest {
         store = new Store(owner1, "store");
         store.setDescription("description");
         tradingSystemFacade.openStore(owner1.getUserName(), store.getStoreName(), store.getDescription(), uuid);
-        tradingSystemFacade.logout(owner1.getUserName(), uuid);
+        // tradingSystemFacade.logout(owner1.getUserName(), uuid);
 
-        uuid = tradingSystemFacade.login(owner1.getUserName(), owner1.getPassword()).getKey();
+        //uuid = tradingSystemFacade.login(owner1.getUserName(), owner1.getPassword()).getKey();
         tradingSystemFacade.addOwner(owner1.getUserName(), store.getStoreId(), owner2.getUserName(), uuid);
         tradingSystemFacade.addOwner(owner1.getUserName(), store.getStoreId(), newOwner.getUserName(), uuid);
         tradingSystemFacade.logout(owner1.getUserName(), uuid);
@@ -109,7 +113,8 @@ public class NotificationTest {
                 content = String.format("You have a new Owner to approve in storeId %s", store.getStoreId());
                 Assertions.assertEquals(content, approveOwnerNotification.getContent());
             }
-            else{
+            else if (userSystem.getUserName().equals(owner1.getUserName())
+                    || userSystem.getUserName().equals(newOwner.getUserName())){
                 Assertions.assertEquals(userSystem.getNotifications(), new ArrayList<>());
             }
         }
@@ -134,7 +139,7 @@ public class NotificationTest {
                 String content = String.format("You are now owner of store %s on name %s", store.getStoreId(), store.getStoreName());
                 Assertions.assertEquals(content, addedAsNewOwner.getContent());
             }
-            else{
+            else if (userSystem.getUserName().equals(owner2.getUserName())){
                 Assertions.assertEquals(userSystem.getNotifications(), new ArrayList<>());
             }
         }

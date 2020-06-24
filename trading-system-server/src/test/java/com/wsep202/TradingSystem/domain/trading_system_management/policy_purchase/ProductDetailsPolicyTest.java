@@ -158,7 +158,7 @@ class ProductDetailsPolicyTest {
 
         @Test
         void isApprovedBadMax() {
-            productDetailsPolicy.setMax(2);
+            productDetailsPolicy.setMax(-2);
             //check that the method fails
             assertThrows(PurchasePolicyException.class, () -> productDetailsPolicy.isApproved(testPurchase, testProducts, testBillingAddress1));
         }

@@ -4,6 +4,7 @@ import com.github.rozidan.springboot.modelmapper.WithModelMapper;
 import com.wsep202.TradingSystem.config.ObjectMapperConfig;
 import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
 import com.wsep202.TradingSystem.config.httpSecurity.HttpSecurityConfig;
+import com.wsep202.TradingSystem.dto.ProductDto;
 import com.wsep202.TradingSystem.dto.StoreDto;
 import com.wsep202.TradingSystem.dto.UserSystemDto;
 import com.wsep202.TradingSystem.service.user_service.*;
@@ -65,8 +66,6 @@ public class RemoveOwnerTest {
 
     @AfterEach
     void tearDown() {
-        this.sellerOwnerService.removeOwner(this.user.getUserName(),
-                this.storeId, this.oldOwner.getUserName(), this.uuid);
         this.helper.logoutUser(this.user.getUserName(), this.uuid);
     }
 
@@ -75,6 +74,7 @@ public class RemoveOwnerTest {
      */
     @Test
     void removeValidOwner() {
+        this.sellerOwnerService.addOwner(this.user.getUserName(), this.storeId, this.oldOwner.getUserName(), uuid);
         Assertions.assertTrue(this.sellerOwnerService.removeOwner(this.user.getUserName(),
                 this.storeId, this.oldOwner.getUserName(), this.uuid));
     }
@@ -89,6 +89,8 @@ public class RemoveOwnerTest {
             this.sellerOwnerService.removeOwner("NotOwner",
                     this.storeId, this.oldOwner.getUserName(), this.uuid);
         });
+        this.sellerOwnerService.removeOwner(this.user.getUserName(),
+                this.storeId, this.oldOwner.getUserName(), this.uuid);
     }
 
     /**
@@ -99,6 +101,8 @@ public class RemoveOwnerTest {
     void removeValidOwnerInvalidStore() {
         Assertions.assertFalse(this.sellerOwnerService.removeOwner(this.user.getUserName(),
                 8, this.oldOwner.getUserName(), this.uuid));
+        this.sellerOwnerService.removeOwner(this.user.getUserName(),
+                this.storeId, this.oldOwner.getUserName(), this.uuid);
     }
 
     /**
@@ -112,6 +116,8 @@ public class RemoveOwnerTest {
             this.sellerOwnerService.removeOwner("NotOwner",
                     8, this.oldOwner.getUserName(), this.uuid);
         });
+        this.sellerOwnerService.removeOwner(this.user.getUserName(),
+                this.storeId, this.oldOwner.getUserName(), this.uuid);
     }
 
     /**
@@ -121,6 +127,8 @@ public class RemoveOwnerTest {
     void removeInvalidOwner() {
         Assertions.assertFalse(this.sellerOwnerService.removeOwner(this.user.getUserName(),
                 this.storeId, "NotOwner", this.uuid));
+        this.sellerOwnerService.removeOwner(this.user.getUserName(),
+                this.storeId, this.oldOwner.getUserName(), this.uuid);
     }
 
     /**
@@ -133,6 +141,8 @@ public class RemoveOwnerTest {
             this.sellerOwnerService.removeOwner("NotOwner",
                     this.storeId, "NotOwner", this.uuid);
         });
+        this.sellerOwnerService.removeOwner(this.user.getUserName(),
+                this.storeId, this.oldOwner.getUserName(), this.uuid);
     }
 
     /**
@@ -143,6 +153,8 @@ public class RemoveOwnerTest {
     void removeInvalidOwnerInvalidStore() {
         Assertions.assertFalse(this.sellerOwnerService.removeOwner(this.user.getUserName(),
                 8, "NotOwner", this.uuid));
+        this.sellerOwnerService.removeOwner(this.user.getUserName(),
+                this.storeId, this.oldOwner.getUserName(), this.uuid);
     }
 
     /**
@@ -156,6 +168,8 @@ public class RemoveOwnerTest {
             this.sellerOwnerService.addPermission("newUser", this.storeId,
                     this.oldOwner.getUserName(), "edit", this.uuid);
         });
+        this.sellerOwnerService.removeOwner(this.user.getUserName(),
+                this.storeId, this.oldOwner.getUserName(), this.uuid);
     }
 }
 

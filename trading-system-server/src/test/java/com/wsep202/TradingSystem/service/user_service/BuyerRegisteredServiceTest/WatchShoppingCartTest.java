@@ -64,18 +64,6 @@ public class WatchShoppingCartTest {
     }
 
     /**
-     * add a valid product in a registered user's shopping bag
-     */
-    @Test
-    void viewShoppingCartValidProductRegisteredUser() {
-        Pair<Integer, ProductDto> returnedValue = this.helper.createOwnerOpenStoreAndAddProduct();
-        this.buyerRegisteredService.addProductToShoppingCart(this.user.getUserName(),
-                1, returnedValue.getValue(), this.uuid);
-        Assertions.assertNotNull(this.buyerRegisteredService.watchShoppingCart(this.user.getUserName(), this.uuid));
-    }
-
-
-    /**
      * view a user's empty shopping cart
      */
     @Test

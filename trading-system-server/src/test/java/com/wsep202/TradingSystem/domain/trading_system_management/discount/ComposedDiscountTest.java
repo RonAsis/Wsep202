@@ -149,7 +149,7 @@ class ComposedDiscountTest {
             double totalAfterDiscounts = getTotalCost(productsToCheckAndApply);
             double totalOrigCost = getTotalOrigCost(productsToCheckAndApply);
             //success compare prices value of bag - all discounts applied as expected
-            Assertions.assertEquals(1027.5, totalAfterDiscounts);
+            Assertions.assertEquals(1132.5, totalAfterDiscounts);
             Assertions.assertEquals(2480, totalOrigCost);
         }
 

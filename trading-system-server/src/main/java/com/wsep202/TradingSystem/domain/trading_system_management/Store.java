@@ -135,10 +135,12 @@ public class Store {
         this.storeName = storeName;
         appointedOwners.add(new OwnersAppointee(owner));
         this.rank = 5;
+        discounts = new HashSet<>();
     }
 
     public Store(UserSystem owner, String storeName, String description) {
         // storeId = generateStoreSn();
+        discounts = new HashSet<>();
         initStore(owner, storeName);
         this.description = description;
     }
