@@ -74,6 +74,7 @@ public class WatchShoppingCartTest {
         Assertions.assertNotNull(this.buyerRegisteredService.watchShoppingCart(this.user.getUserName(), this.uuid));
     }
 
+
     /**
      * view a user's empty shopping cart
      */

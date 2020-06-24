@@ -69,7 +69,8 @@ public class Store {
      */
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @OrderBy("discountId DESC")
-    private Set<Discount> discounts;
+    @Builder.Default
+    private Set<Discount> discounts = new HashSet<>();
 
     /**
      * list of purchases made in the store
@@ -218,14 +219,14 @@ public class Store {
     @Synchronized("stockLock")
     public boolean editProduct(UserSystem user, int productSn, String productName, String category,
                                int amount, double cost) {
-        if (validatePermission(user, StorePermission.EDIT_PRODUCT)) {   //the user is owner
-
+        if (validatePermission(user, StorePermission.EDIT_PRODUCT) && amount>=0 && cost>=0) {   //the user is owner
             Optional<Product> optionalProduct = products.stream().
                     filter(product -> product.getProductSn() == productSn).findFirst();
             if (optionalProduct.isPresent()) {
                 //remove the old
                 products.remove(optionalProduct.get());
                 //replace by updated
+                optionalProduct.get().setCost(cost);
                 optionalProduct.get().setOriginalCost(cost);
                 optionalProduct.get().setName(productName);
                 optionalProduct.get().setCategory(ProductCategory.getProductCategory(category));
@@ -581,7 +582,7 @@ public class Store {
         return response;
     }
 
-    public boolean removeManagerRecursive(UserSystem ownerStore, UserSystem user) {
+    private boolean removeManagerRecursive(UserSystem ownerStore, UserSystem user) {
         boolean response = false;
         if (validatePermission(ownerStore, StorePermission.EDIT_Managers)) {  //the user is able to remove his appointments
             response = appointedManagers.stream()
@@ -854,10 +855,12 @@ public class Store {
      */
     public void applyDiscountPolicies(Map<Product, Integer> productsBag) {
         updateExpiredDiscounts();   //remove discounts that their time is expired from store.
-        discounts.forEach(discount -> discount.applyDiscount(productsBag));
+        discounts.stream().filter(discount -> discount.getDiscountType() == DiscountType.COMPOSE)
+                .forEach(discount -> discount.applyDiscount(productsBag));
+        discounts.stream().filter(discount -> discount.getDiscountType() != DiscountType.COMPOSE)
+                .forEach(discount -> discount.applyDiscount(productsBag));
+        discounts.forEach(discount -> discount.setApplied(false));
     }
-
-
 
     public boolean removeDiscount(UserSystem userSystem, int discountId) {
         if (validatePermission(userSystem, StorePermission.EDIT_DISCOUNT)) {
@@ -942,22 +945,5 @@ public class Store {
         }
         return -1; // userName doesn't exist in appointedOwners
     }
-
-    /**
-     * checking if the given user has an appointing agreement
-     *
-     * @param userName - the user to be checked
-     * @return true if the user has an appointing agreement
-     */
-    private boolean checkIfNewOwnerHasAppointingAgreement(String userName) {
-        for (AppointingAgreement appointingAgreement : appointingAgreements) {
-            if (appointingAgreement.getNewOwner().equals(userName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
 
 }

@@ -2,6 +2,7 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.NoManagerInStoreException;
 import com.wsep202.TradingSystem.domain.exception.NoOwnerInStoreException;
+import com.wsep202.TradingSystem.domain.exception.ProductDoesntExistException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -50,6 +51,10 @@ class UserSystemTest {
             when(testStore3.getStoreId()).thenReturn(3);
             when(testShoppingCart.getShoppingBag(testStore1)).thenReturn(testShoppingBag);
             when(testShoppingBag.addProductToBag(testProduct1,3)).thenReturn(true);
+            Set<Product> productsStore1 = new HashSet<>();
+            productsStore1.add(testProduct1);
+            when(testStore1.getProduct(testProduct1.getProductSn())).thenReturn(testProduct1);
+            when(testShoppingCart.addProductToCart(testStore1,testProduct1,3)).thenReturn(true);
         }
 
         /**
@@ -141,7 +146,7 @@ class UserSystemTest {
         @Test
         void getOwnerStoreSuccess() {
             //check that the right store comes back
-            assertTrue( testUserSystem.isOwner(testStore2.getStoreId()));
+            assertTrue(testUserSystem.isOwner(testStore1.getStoreId()));
             //check that store is still in the list after getOwnerStore
             assertTrue(testUserSystem.getOwnedStores().contains(testStore1));
         }
@@ -232,6 +237,10 @@ class UserSystemTest {
                     .build();
             testProduct1 = new Product("Hunger Games", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore1.getStoreId());
             testProduct2 = new Product("Harry Potter", ProductCategory.BOOKS_MOVIES_MUSIC, 45, 12.9, testStore2.getStoreId());
+            testProduct2.setProductSn(1); // because the productSn of testProduct1 is 0
+            Set<Product> productsStore1 = new HashSet<>();
+            productsStore1.add(testProduct1);
+            testStore1.setProducts(productsStore1);
         }
 
         /**
@@ -245,7 +254,7 @@ class UserSystemTest {
             //check that number of owned stores after addition is 1
             assertEquals(1, testUserSystem.getOwnedStores().size());
             //check that the object are equals
-            assertTrue(testUserSystem.isOwner(testStore2.getStoreId()));
+            assertTrue(testUserSystem.isOwner(testStore1.getStoreId()));
             //check that there are still 1 store in the owned list
             assertEquals(1, testUserSystem.getOwnedStores().size());
         }
@@ -356,6 +365,9 @@ class UserSystemTest {
 
         @Test
         void saveProductAndRemoveBagSuccess(){
+            Set<Product> productsStore2 = new HashSet<>();
+            productsStore2.add(testProduct2);
+            testStore2.setProducts(productsStore2);
             //add first item to cart
             Assertions.assertTrue(testUserSystem.saveProductInShoppingBag(testStore1, testProduct1,3));
             //check there is 1 item in the cart after addition
@@ -367,11 +379,11 @@ class UserSystemTest {
             //remove first item
             Assertions.assertTrue(testUserSystem.removeProductInShoppingBag(testStore1,testProduct1));
             //check there is 1 item in the cart after removal
-            Assertions.assertEquals(1,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+            Assertions.assertEquals(2,testUserSystem.getShoppingCart().getNumOfBagsInCart());
             //remove the second item
             Assertions.assertTrue(testUserSystem.removeProductInShoppingBag(testStore2,testProduct2));
             //check there are no items in the cart after removal
-            Assertions.assertEquals(0,testUserSystem.getShoppingCart().getNumOfBagsInCart());
+            Assertions.assertEquals(2,testUserSystem.getShoppingCart().getNumOfBagsInCart());
         }
 
         @Test
@@ -380,11 +392,17 @@ class UserSystemTest {
             //check there is 1 item in the cart after addition
             Assertions.assertEquals(1,testUserSystem.getShoppingCart().getNumOfBagsInCart());
             //wrong store and product
-            Assertions.assertFalse(testUserSystem.removeProductInShoppingBag(testStore2,testProduct2));
+            assertThrows(ProductDoesntExistException.class, ()->{
+                 testUserSystem.removeProductInShoppingBag(testStore2,testProduct2);
+            });
             //right store wrong product
-            Assertions.assertFalse(testUserSystem.removeProductInShoppingBag(testStore1,testProduct2));
+            assertThrows(ProductDoesntExistException.class, ()->{
+                testUserSystem.removeProductInShoppingBag(testStore1,testProduct2);
+            });
             //wrong store right product
-            Assertions.assertFalse(testUserSystem.removeProductInShoppingBag(testStore2,testProduct1));
+            assertThrows(ProductDoesntExistException.class, ()->{
+                testUserSystem.removeProductInShoppingBag(testStore2,testProduct1);
+            });
         }
     }
 }

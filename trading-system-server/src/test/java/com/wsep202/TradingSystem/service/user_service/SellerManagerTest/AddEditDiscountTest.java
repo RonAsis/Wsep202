@@ -85,6 +85,7 @@ public class AddEditDiscountTest {
         this.helper.logoutUser(this.user.getUserName(), this.uuid);
 
         this.uuid = this.helper.loginUser(this.manager.getUserName(), this.userPassword).getKey();
+        this.discountDto.setDiscountId(-1);
         Assertions.assertNotNull(this.sellerManagerService.addEditDiscount
                 (this.manager.getUserName(), this.storeId, this.discountDto, this.uuid)); ;
     }

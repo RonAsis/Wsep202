@@ -44,6 +44,7 @@ public class AdministratorService {
         return tradingSystemFacade.getUsers(administratorUsername, uuid);
     }
 
+    // UC 6.5 - watching daily information
     public List<DailyVisitorDto> getDailyVisitors(String username, RequestGetDailyVisitorsDto requestGetDailyVisitorsDto, UUID uuid){
         return tradingSystemFacade.getDailyVisitors(username, requestGetDailyVisitorsDto, uuid);
     }

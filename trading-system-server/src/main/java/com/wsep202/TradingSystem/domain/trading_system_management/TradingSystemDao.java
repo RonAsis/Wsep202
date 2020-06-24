@@ -53,9 +53,7 @@ public abstract class TradingSystemDao {
 
     public abstract boolean editProduct(Store ownerStore, UserSystem user, int productSn, String productName, String category, int amount, double cost);
 
-    public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem){}
-
-
+    public abstract void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem);
 
     public abstract boolean addPermissionToManager(Store ownedStore, UserSystem ownerUser, UserSystem managerStore, StorePermission storePermission);
 
@@ -129,4 +127,8 @@ public abstract class TradingSystemDao {
     public void setStores(Set<Store> stores){}
 
     public void setUsers(Set<UserSystem> users){}
+
+    public int usersLoggedInSystem(){
+        return usersLogin.size();
+    }
 }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Builder
@@ -127,7 +128,7 @@ public class ShoppingCart {
         boolean response = false;
         if(checkParameters(storeOfProduct,productToAdd) && isProductInStore(storeOfProduct, productToAdd)) {
             if(shoppingBagsList.keySet().stream()
-            .noneMatch(store -> store.getStoreId() == storeOfProduct.getStoreId())){
+                    .noneMatch(store -> store.getStoreId() == storeOfProduct.getStoreId())){
                 ShoppingBag storeShoppingBag = new ShoppingBag(storeOfProduct);
                 response =  storeShoppingBag.addProductToBag(productToAdd, amountOfProduct) && addBagToCart(storeOfProduct, storeShoppingBag);
             }else{
@@ -138,7 +139,11 @@ public class ShoppingCart {
                 response  = true;
             }
         }
-        log.info(String.format("the product %s  %s to cart", productToAdd.getName(), response? "added" : "not added"));
+        if (productToAdd!=null)
+            log.info(String.format("the product %s  %s to cart", productToAdd.getName(), response? "added" : "not added"));
+        else
+            log.info("the null product not added to cart");
+
         return response;
     }
 
@@ -215,7 +220,7 @@ public class ShoppingCart {
     public boolean changeProductAmountInShoppingBag(int storeId, int amount, int productSn) {
         return shoppingBagsList.entrySet().stream()
                 .filter(storeShoppingBagEntry -> storeShoppingBagEntry.getKey().getStoreId() == storeId)
-                .map(storeShoppingBagEntry -> storeShoppingBagEntry.getValue())
+                .map(Map.Entry::getValue)
                 .findFirst().map(shoppingBag -> shoppingBag.changeAmountOfProductInBag(productSn , amount)).orElse(false);
     }
 
@@ -241,5 +246,21 @@ public class ShoppingCart {
                     .get(store).getProductListFromStore(),billingAddress);
         }
         return true;
+    }
+
+    public Map<Store, ShoppingBag> getCopyOfShoppingBagsList(){
+        return shoppingBagsList.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> cloneShoppingBag(entry.getValue())
+                ));
+    }
+
+    private ShoppingBag cloneShoppingBag(ShoppingBag shoppingBag) {
+        Map<Product, Integer> collect = shoppingBag.getProductListFromStore()
+                .entrySet().stream()
+                .collect(Collectors.toMap(productIntegerEntry -> productIntegerEntry.getKey().cloneProduct(),
+                        Map.Entry::getValue));
+        return new ShoppingBag(collect);
     }
 }

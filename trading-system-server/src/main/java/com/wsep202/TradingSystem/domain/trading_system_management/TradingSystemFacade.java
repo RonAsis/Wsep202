@@ -243,16 +243,6 @@ public class TradingSystemFacade {
         return Objects.nonNull(purchaseRes) ? modelMapper.map(purchaseRes, PurchasePolicyDto.class) : null;
     }
 
-    private List<Purchase> convert(List<PurchasePolicyDto> list) {
-        // TODO need remove from here the convert purchase need to be in the model mapper
-        List<Purchase> purchases = new LinkedList<>();
-        /*for (PurchasePolicyDto ppd : list) {
-            Purchase purchase = new Purchase(ppd.getPurchasePolicy(), ppd.getPurchaseType());
-            purchases.add(purchase);
-        }*/
-        return purchases;
-    }
-
     public List<String> getCompositeOperators(String username, int storeId, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid);
         return CompositeOperator.getStringCompositeOperators();
@@ -292,16 +282,11 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
-    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public boolean editProduct(@NotBlank String ownerUsername, int storeId, int productSn, @NotBlank String productName,
                                @NotBlank String category, int amount, double cost, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(ownerUsername, uuid);
             Store ownerStore = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_PRODUCT);
-            if (amount < 0 || cost < 0) {
-                log.error("editProduct failed- amount/cost must be greater than 0");
-                return false;
-            }
             return tradingSystemDao.editProduct(ownerStore, user, productSn, productName, category, amount, cost);
         } catch (TradingSystemException e) {
             log.error("editProduct failed", e);
@@ -319,7 +304,6 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
-    @Transactional(rollbackOn = {TradingSystemException.class, RuntimeException.class})
     public boolean addOwner(@NotBlank String ownerUsername, int storeId, @NotBlank String newOwnerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -341,7 +325,6 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
-    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -493,7 +476,6 @@ public class TradingSystemFacade {
      * @param storeName     - the name of the new store
      * @return true if succeed
      */
-    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public StoreDto openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(usernameOwner, uuid);

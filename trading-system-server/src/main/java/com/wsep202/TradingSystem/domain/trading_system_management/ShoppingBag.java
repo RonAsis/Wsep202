@@ -33,7 +33,7 @@ public class ShoppingBag {
     @ElementCollection(fetch = FetchType.EAGER)
     @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
     @MapKeyColumn(name = "products")
-    private Map<Product, Integer> productListFromStore;
+    private Map<Product, Integer> productListFromStore = new HashMap<>();
 
     public ShoppingBag( Map<Product, Integer> productListFromStore){
         this.productListFromStore = productListFromStore;

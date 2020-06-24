@@ -123,6 +123,7 @@ public class UserSystem implements Observer, Serializable {
         this.grantedAuthorities = new HashSet<>();
         managedStores = new HashSet<>();
         this.ownerToApproves = new HashSet<>();
+        this.receipts = new HashSet<>();
     }
 
     /**
@@ -140,6 +141,7 @@ public class UserSystem implements Observer, Serializable {
         this.grantedAuthorities = new HashSet<>();
         managedStores = new HashSet<>();
         this.ownerToApproves = new HashSet<>();
+        this.receipts = new HashSet<>();
     }
 
     /**
@@ -364,13 +366,13 @@ public class UserSystem implements Observer, Serializable {
      */
     public void addReceipts(List<Receipt> receipts) {
         if (Objects.nonNull(receipts)) {
-            this.receipts.addAll(receipts);
+            if(Objects.nonNull(this.receipts))
+                this.receipts.addAll(receipts);
+            else{
+                this.receipts = new HashSet<>();
+                this.receipts.addAll(receipts);
+            }
         }
-    }
-
-    public ShoppingCart getShoppingCart() {
-        shoppingCart.applyDiscountPolicies();
-        return shoppingCart;
     }
 
     public void addOwnerToApprove(int storeId, String storeName, String userName) {

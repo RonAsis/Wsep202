@@ -21,11 +21,9 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -134,6 +132,26 @@ public class TradingSystem {
     }
 
     /**
+     * This method is used to check how many users are logged-in the system
+     * @return number of users logged-in
+     */
+    public int usersLoggedInSystem(){
+        return tradingSystemDao.usersLoggedInSystem();
+    }
+
+    /**
+     * This method is used to check if a certain user is logged-in
+     * @param userToCheck - the user's username
+     * @return true if the user is logged-in, else false
+     */
+    public boolean isLoggein(String userToCheck){
+        if (userToCheck != null){
+            return tradingSystemDao.isLogin(userToCheck);
+        }
+        return false;
+    }
+
+    /**
      * UC 3.1
      * logout the user from the system
      *
@@ -235,9 +253,11 @@ public class TradingSystem {
      */
     @Synchronized("purchaseLock")
     public List<Receipt> purchaseShoppingCartGuest(ShoppingCart shoppingCart, PaymentDetails paymentDetails, BillingAddress billingAddress) {
-        return purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
+        List<Receipt> receipts = purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
+        shoppingCart.getShoppingBagsList().keySet()
+                .forEach(store -> tradingSystemDao.updateStore(store));
+        return receipts;
     }
-
 
     /**
      * UC 2.8
@@ -269,7 +289,6 @@ public class TradingSystem {
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
-    @Transactional(rollbackOn = {TradingSystemException.class, RuntimeException.class})
     List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
                                      ShoppingCart shoppingCart, BillingAddress billingAddress,
                                      String customerName)
@@ -280,7 +299,7 @@ public class TradingSystem {
         log.info("all products in stock");
         shoppingCart.approvePurchasePolicy(billingAddress);
         log.info("applied stores purchase policies on shopping cart");
-        shoppingCart.applyDiscountPolicies(); //TODO: return the exceptions!!!!!! otherwise logic problem
+        shoppingCart.applyDiscountPolicies();
         log.info("applied stores discount policies on shopping cart");
         int chargeTransactionId = externalServiceManagement.charge(paymentDetails, shoppingCart);
         if (chargeTransactionId < 10000 || chargeTransactionId > 100000) {
@@ -364,7 +383,7 @@ public class TradingSystem {
                 }
             }
         }
-        log.info(String.format("failed add user as manager in store id %s", ownedStore.getStoreId()));
+        log.info(String.format("failed add user as manager in store id"));
         return null;
     }
 
@@ -390,7 +409,7 @@ public class TradingSystem {
                 return true;
             }
         }
-        log.info(String.format("user %s failed for add agreement owner in store '%d'", newOwnerUser, ownedStore.getStoreId()));
+        log.info(String.format("user failed for add agreement owner in store"));
         return false;
     }
 
@@ -445,7 +464,7 @@ public class TradingSystem {
             log.info(String.format("user %s was removed as owner from store '%d'", removeOwner.getUserName(), store.getStoreId()));
             return true;
         }
-        log.info(String.format("failed remove user as owner from store %s", store.getStoreId()));
+        log.info(String.format("failed remove user as owner from store"));
         return false;
     }
 
@@ -475,7 +494,8 @@ public class TradingSystem {
         double sumBeforeDiscounts;  //sum of original price
         double sumAfterDiscounts; //sum of the prices after discount
         //update the products in the bags with their discounts
-        Map<Store, ShoppingBag> bagsToCalculate = cartToCalculate.getShoppingBagsList();
+        Map<Store, ShoppingBag> bagsToCalculate = cartToCalculate.getCopyOfShoppingBagsList();
+
         for (Store store : bagsToCalculate.keySet()) {  //apply the discounts on the bags in the cart (update the products prices)
             store.applyDiscountPolicies(bagsToCalculate.get(store).getProductListFromStore());
         }

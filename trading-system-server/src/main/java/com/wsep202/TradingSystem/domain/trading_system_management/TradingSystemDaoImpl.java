@@ -34,18 +34,12 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     private Set<UserSystem> administrators;
     private Set<DailyVisitor> dailyVisitors;
 
-
     public TradingSystemDaoImpl() {
         super();
         this.stores = new HashSet<>();
         this.users = new HashSet<>();
         this.administrators = new HashSet<>();
         dailyVisitors = new HashSet<>();
-    }
-
-    public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem) {
-        stores.add(ownedStore);
-        //userRepository.save(userSystem);
     }
 
     @Override
@@ -153,7 +147,7 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
-       // purchase.setPurchaseId(getNewIdPolicy());
+        //purchase.setPurchaseId(getNewIdPolicy());
         return store.addEditPurchase(user, purchase);
     }
 
@@ -172,6 +166,11 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     @Override
     public boolean editProduct(Store ownerStore, UserSystem user, int productSn, String productName, String category, int amount, double cost) {
         return ownerStore.editProduct(user, productSn, productName, category, amount, cost);
+    }
+
+    @Override
+    public void updateStoreAndUserSystem(Store ownedStore, UserSystem userSystem) {
+        stores.add(ownedStore);
     }
 
     @Override
@@ -211,12 +210,19 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
-        if (isValidUuid(username, uuid)) {
-            return users.stream()
-                    .filter(userSystem -> userSystem.getUserName().equals(username))
-                    .findFirst()
-                    .map(UserSystem::getShoppingCart)
-                    .orElseThrow(() -> new UserDontExistInTheSystemException(username));
+        if(isValidUuid(username, uuid)){
+            if (users.stream().anyMatch(userSystem -> userSystem.getUserName().equals(username)))
+                return users.stream()
+                        .filter(userSystem -> userSystem.getUserName().equals(username))
+                        .findFirst()
+                        .map(UserSystem::getShoppingCart)
+                        .orElseThrow(()-> new UserDontExistInTheSystemException(username));
+            else
+                return administrators.stream()
+                        .filter(userSystem -> userSystem.getUserName().equals(username))
+                        .findFirst()
+                        .map(UserSystem::getShoppingCart)
+                        .orElseThrow(()-> new UserDontExistInTheSystemException(username));
         }
         throw new UserDontExistInTheSystemException(username);
     }
@@ -269,16 +275,6 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
         }
         throw new NotAdministratorException(username);
     }
-    public void setStores(Set<Store> stores){
-        this.stores = stores;
-    }
-    public void setUsers(Set<UserSystem> users){
-        this.users = users;
-    }
-    public void setIsLogins(Set<UserSystem> usersLogin){
-        this.users = usersLogin;
-    }
-
 
     private int getNewIdStore() {
         return idAccStore++;

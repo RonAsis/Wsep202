@@ -40,7 +40,7 @@ public class ViewPurchaseHistoryTest {
 
     ServiceTestsHelper helper;
     UserSystemDto user = new UserSystemDto("username","name","lname");
-    UserSystemDto manager = new UserSystemDto("manager","name","lname");
+    UserSystemDto manager = new UserSystemDto("managerr","name","lname");
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
