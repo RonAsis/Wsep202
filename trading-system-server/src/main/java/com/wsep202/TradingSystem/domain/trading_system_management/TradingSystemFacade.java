@@ -158,7 +158,6 @@ public class TradingSystemFacade {
      * @param cost          - the cost of the product
      * @return true if succeed
      */
-    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public ProductDto addProduct(@NotBlank String ownerUsername, int storeId,
                                  @NotBlank String productName, @NotBlank String category,
                                  int amount, double cost, UUID uuid) {
@@ -214,7 +213,6 @@ public class TradingSystemFacade {
      * @param uuid     - users UUID
      * @return true if success, else false
      */
-    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {
         UserSystem user = tradingSystem.getUser(username, uuid); //get registered user with ownerUsername
         Store store = user.getOwnerOrManagerWithPermission(storeId, StorePermission.EDIT_DISCOUNT);

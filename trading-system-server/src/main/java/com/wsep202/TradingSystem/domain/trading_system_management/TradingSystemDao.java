@@ -131,4 +131,5 @@ public abstract class TradingSystemDao {
     public int usersLoggedInSystem(){
         return usersLogin.size();
     }
+
 }

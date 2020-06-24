@@ -133,19 +133,21 @@ public class TradingSystem {
 
     /**
      * This method is used to check how many users are logged-in the system
+     *
      * @return number of users logged-in
      */
-    public int usersLoggedInSystem(){
+    public int usersLoggedInSystem() {
         return tradingSystemDao.usersLoggedInSystem();
     }
 
     /**
      * This method is used to check if a certain user is logged-in
+     *
      * @param userToCheck - the user's username
      * @return true if the user is logged-in, else false
      */
-    public boolean isLoggein(String userToCheck){
-        if (userToCheck != null){
+    public boolean isLoggein(String userToCheck) {
+        if (userToCheck != null) {
             return tradingSystemDao.isLogin(userToCheck);
         }
         return false;
@@ -253,9 +255,10 @@ public class TradingSystem {
      */
     @Synchronized("purchaseLock")
     public List<Receipt> purchaseShoppingCartGuest(ShoppingCart shoppingCart, PaymentDetails paymentDetails, BillingAddress billingAddress) {
-        List<Receipt> receipts = purchaseAndDeliver(paymentDetails, shoppingCart, billingAddress, "Guest");
-        shoppingCart.getShoppingBagsList().keySet()
-                .forEach(store -> tradingSystemDao.updateStore(store));
+        List<Receipt> receipts = purchaseAndDeliver(paymentDetails, billingAddress, UserSystem.builder()
+                .userName("Guest")
+                .shoppingCart(shoppingCart)
+                .build());
         return receipts;
     }
 
@@ -274,7 +277,7 @@ public class TradingSystem {
             return null;
         }
         tradingSystemDao.loadShoppingCart(user);
-        List<Receipt> receipts = purchaseAndDeliver(paymentDetails, user.getShoppingCart(), billingAddress, user.getUserName());
+        List<Receipt> receipts = purchaseAndDeliver(paymentDetails, billingAddress, user);
         user.addReceipts(receipts);
         tradingSystemDao.updateUser(user);
         return receipts;
@@ -285,23 +288,22 @@ public class TradingSystem {
      * This method makes the payment in the externalServiceManagement using the charge method.
      *
      * @param paymentDetails - the users credit card details
-     * @param shoppingCart   - the user personal shopping cart
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
     List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
-                                     ShoppingCart shoppingCart, BillingAddress billingAddress,
-                                     String customerName)
+                                     BillingAddress billingAddress,
+                                     UserSystem userSystem)
             throws TradingSystemException {
         //check validity of the arguments fields
-        if (validationOfPurchaseArgs(paymentDetails, shoppingCart, billingAddress)) return null;
-        shoppingCart.isAllBagsInStock();    //ask the cart to check all products in stock
+        if (validationOfPurchaseArgs(paymentDetails, userSystem.getShoppingCart(), billingAddress)) return null;
+        userSystem.getShoppingCart().isAllBagsInStock();    //ask the cart to check all products in stock
         log.info("all products in stock");
-        shoppingCart.approvePurchasePolicy(billingAddress);
+        userSystem.getShoppingCart().approvePurchasePolicy(billingAddress);
         log.info("applied stores purchase policies on shopping cart");
-        shoppingCart.applyDiscountPolicies();
+        userSystem.getShoppingCart().applyDiscountPolicies();
         log.info("applied stores discount policies on shopping cart");
-        int chargeTransactionId = externalServiceManagement.charge(paymentDetails, shoppingCart);
+        int chargeTransactionId = externalServiceManagement.charge(paymentDetails, userSystem.getShoppingCart());
         if (chargeTransactionId < 10000 || chargeTransactionId > 100000) {
             //charge failed
             throw new ChargeException("failed to charge: " + paymentDetails.getHolderName() + " for purchase");
@@ -309,21 +311,24 @@ public class TradingSystem {
         log.info("The card holder:" + paymentDetails.getHolderName() + " has been charged by his purchase.");
         int supplyTransId;
         try {//request shipping for the purchase
-            supplyTransId = externalServiceManagement.deliver(billingAddress, shoppingCart);
+            supplyTransId = externalServiceManagement.deliver(billingAddress, userSystem.getShoppingCart());
             if (supplyTransId < 10000 || supplyTransId > 100000) {
                 throw new DeliveryRequestException("supply rejected for: " + billingAddress.getCustomerFullName());
             }
         } catch (DeliveryRequestException exception) {
             //in case delivery request rejected, cancel charged cart
-            externalServiceManagement.cancelCharge(paymentDetails, shoppingCart, String.valueOf(chargeTransactionId));
-            throw new DeliveryRequestException("The delivery request for: " + customerName + " " +
+            externalServiceManagement.cancelCharge(paymentDetails, userSystem.getShoppingCart(), String.valueOf(chargeTransactionId));
+            throw new DeliveryRequestException("The delivery request for: " + userSystem.getUserName() + " " +
                     "has been rejected.");
         }
         log.info("delivery request accepted");
-        shoppingCart.updateAllAmountsInStock();
+        userSystem.getShoppingCart().updateAllAmountsInStock();
         log.info("all amounts of products in stock of stores were updated");
-        return shoppingCart.createReceipts(customerName, chargeTransactionId, supplyTransId);
+        tradingSystemDao.updateUser(userSystem);
+        userSystem.getShoppingCart().getShoppingBagsList().keySet().forEach(store -> tradingSystemDao.updateStore(store));
+        return userSystem.getShoppingCart().createReceipts(userSystem.getUserName(), chargeTransactionId, supplyTransId);
     }
+
 
     private boolean validationOfPurchaseArgs(PaymentDetails paymentDetails, ShoppingCart shoppingCart, BillingAddress billingAddress) {
         if (shoppingCart == null || paymentDetails == null || billingAddress == null || shoppingCart.getNumOfBagsInCart() == 0 || shoppingCart.getShoppingBagsList() == null) {

@@ -190,7 +190,8 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
         userRepository.save(userSystem);
     }
 
-    private Store saveStore(Store ownedStore) {
+    @Transactional
+    public Store saveStore(Store ownedStore) {
         Store storeSave = storeRepository.save(ownedStore);
         tradingSystemCashing.updateStoreInShoppingCart(ownedStore);
         return storeSave;
@@ -246,8 +247,8 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
     @Override
     public void updateStore(Store ownedStore) {
         saveStore(ownedStore);
-        tradingSystemCashing.updateStoreInShoppingCart(ownedStore);
         ownedStore.getProducts().forEach(tradingSystemCashing::editProduct);
+
     }
 
     @Override
@@ -272,6 +273,11 @@ public class TradingSystemDataBaseDao extends TradingSystemDao {
 
     @Override
     public void loadShoppingCart(UserSystem user) {
+        tradingSystemCashing.getShoppingCartMap().get(user.getUserName())
+                .getShoppingBagsList().keySet().forEach(store -> {
+            Optional<Store> storeOptional = storeRepository.findById(store.getStoreId());
+            storeOptional.ifPresent(storeCur -> tradingSystemCashing.updateStoreInShoppingCart(storeCur));
+        });
         user.setShoppingCart(tradingSystemCashing.getShoppingCart(user.getUserName()));
     }
 

@@ -55,8 +55,7 @@ public class Store {
      */
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("productSn DESC")
-    private Set<Product> products = new LinkedHashSet<>();
+    private Set<Product> products = new HashSet<>();
 
     /**
      * The set purchase policy for the store
@@ -132,7 +131,7 @@ public class Store {
         appointingAgreements = new HashSet<>();
         appointedOwners = new HashSet<>();
         appointedManagers = new HashSet<>();
-        products = new LinkedHashSet<>();
+        products = new HashSet<>();
         this.storeName = storeName;
         appointedOwners.add(new OwnersAppointee(owner));
         this.rank = 5;
