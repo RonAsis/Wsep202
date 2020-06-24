@@ -71,11 +71,7 @@ public class UserSystem implements Observer, Serializable {
      * The user personal shopping cart
      */
     @Builder.Default
-    @OneToOne(fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE,
-                    CascadeType.REMOVE,
-                    CascadeType.REFRESH,
-                    DETACH}, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private ShoppingCart shoppingCart = new ShoppingCart();
 
     /**
