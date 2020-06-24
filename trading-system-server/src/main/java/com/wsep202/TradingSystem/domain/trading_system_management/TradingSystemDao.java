@@ -123,4 +123,10 @@ public abstract class TradingSystemDao {
     public abstract void updateDailyVisitors(DailyVisitorsField dailyVisitorsField);
 
     public abstract Set<DailyVisitor> getDailyVisitors(String username, RequestGetDailyVisitors requestGetDailyVisitors, UUID uuid);
+    public void setIsLogins(Map<String,UUID> usersLogin){
+        this.usersLogin = usersLogin;
+    }
+    public void setStores(Set<Store> stores){}
+
+    public void setUsers(Set<UserSystem> users){}
 }

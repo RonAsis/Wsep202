@@ -1,45 +1,46 @@
-package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import com.github.rozidan.springboot.modelmapper.WithModelMapper;
-import com.wsep202.TradingSystem.config.ObjectMapperConfig;
-import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
-import com.wsep202.TradingSystem.config.httpSecurity.HttpSecurityConfig;
-import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
-import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
-import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
-import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
-import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
-import com.wsep202.TradingSystem.dto.*;
-import com.wsep202.TradingSystem.helprTests.AssertionHelperTest;
-import com.wsep202.TradingSystem.service.ServiceFacade;
-import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
-import com.wsep202.TradingSystem.service.user_service.GuestService;
-import javafx.util.Pair;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.security.core.parameters.P;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.multipart.MultipartFile;
+        package com.wsep202.TradingSystem.domain.trading_system_management;
 
-import java.lang.reflect.Type;
-import java.util.*;
-import java.util.stream.Collectors;
+        import com.github.rozidan.springboot.modelmapper.WithModelMapper;
+        import com.wsep202.TradingSystem.config.ObjectMapperConfig;
+        import com.wsep202.TradingSystem.config.TradingSystemConfiguration;
+        import com.wsep202.TradingSystem.config.httpSecurity.HttpSecurityConfig;
+        import com.wsep202.TradingSystem.domain.factory.FactoryObjects;
+        import com.wsep202.TradingSystem.domain.trading_system_management.discount.Discount;
+        import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
+        import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
+        import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
+        import com.wsep202.TradingSystem.domain.trading_system_management.statistics.UpdateDailyVisitor;
+        import com.wsep202.TradingSystem.dto.*;
+        import com.wsep202.TradingSystem.helprTests.AssertionHelperTest;
+        import com.wsep202.TradingSystem.service.ServiceFacade;
+        import com.wsep202.TradingSystem.service.user_service.BuyerRegisteredService;
+        import com.wsep202.TradingSystem.service.user_service.GuestService;
+        import javafx.util.Pair;
+        import org.junit.jupiter.api.*;
+        import org.junit.jupiter.api.extension.ExtendWith;
+        import org.modelmapper.ModelMapper;
+        import org.modelmapper.TypeToken;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.boot.test.context.SpringBootTest;
+        import org.springframework.boot.test.util.TestPropertyValues;
+        import org.springframework.security.core.parameters.P;
+        import org.springframework.test.context.ContextConfiguration;
+        import org.springframework.test.context.junit.jupiter.SpringExtension;
+        import org.springframework.web.multipart.MultipartFile;
 
-import static com.wsep202.TradingSystem.helprTests.SetUpObjects.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+        import java.lang.reflect.Type;
+        import java.util.*;
+        import java.util.stream.Collectors;
+
+        import static com.wsep202.TradingSystem.helprTests.SetUpObjects.*;
+        import static org.junit.jupiter.api.Assertions.*;
+        import static org.mockito.Mockito.*;
 
 class TradingSystemFacadeTest {
     @Autowired
     private ModelMapper modelMapper = new ModelMapper();
-//required entities for tests
+    //required entities for tests
     private TradingSystem tradingSystem;
     private TradingSystemFacade tradingSystemFacade;
     private UserSystem userSystem;
@@ -50,7 +51,7 @@ class TradingSystemFacadeTest {
     private ServiceFacade serviceFacade;
     private MultipartFile userImage;
     private ShoppingCart shoppingCart;
-    private TradingSystemDaoImpl tradingSystemDao;
+    private TradingSystemDao tradingSystemDao;
     private Product product;
     private Discount discount;
     private MangerStore mangerStore;
@@ -765,8 +766,8 @@ class TradingSystemFacadeTest {
         private ServiceFacade serviceFacade;
         private MultipartFile userImage;
         private ShoppingCart shoppingCart;
-        //@Autowired
-        private TradingSystemDaoImpl tradingSystemDao;
+        @Autowired
+        private TradingSystemDao tradingSystemDao;
         private Product product;
         private Discount discount;
         private MangerStore mangerStore;
@@ -776,13 +777,11 @@ class TradingSystemFacadeTest {
 
         @BeforeEach
         void setUp() {
-            tradingSystemDao = new TradingSystemDaoImpl();
-            tradingSystemFacade = new TradingSystemFacade(tradingSystem,modelMapper,factoryObjects,serviceFacade,tradingSystemDao);
         }
 
         @AfterEach
         void tearDown() {
-            tradingSystemDao.setIsLogins(new HashSet<>());
+            tradingSystemDao.setIsLogins(new HashMap<>());
             tradingSystemDao.setStores(new HashSet<>());
             tradingSystemDao.setUsers(new HashSet<>());
         }
@@ -796,7 +795,7 @@ class TradingSystemFacadeTest {
         @Test
         void userViewHisPurchaseHistory() {
             user = setUserSystem();
-          //  user.setUserName("4");
+            //  user.setUserName("4");
             setupRegister(user);
             UUID uuid = setupLogin(user);
             Set<Receipt> receipts = setUpReceipts();
@@ -1078,7 +1077,7 @@ class TradingSystemFacadeTest {
             //add manager
             ManagerDto managerDto = tradingSystemFacade.addManager(user1.getUserName(),storeId,
                     user2.getUserName(),uuid);
-            Assertions.assertEquals(user2.getUserName(),managerDto.getUsername());
+            Assertions.assertNotNull(managerDto);
         }
 
         /**
@@ -1161,7 +1160,7 @@ class TradingSystemFacadeTest {
             UUID uuid = setupLogin(user1);
             setupOpenStore(user1,uuid);
             //add owner
-             tradingSystemFacade.addOwner(user1.getUserName(),storeId,
+            tradingSystemFacade.addOwner(user1.getUserName(),storeId,
                     user2.getUserName(),uuid);
             //remove owner
             boolean res = tradingSystemFacade.removeOwner(user1.getUserName(),storeId,
@@ -1320,7 +1319,21 @@ class TradingSystemFacadeTest {
         void testPurchaseShoppingCart() {
         }
 
+        @Test
+        void getOwnerStores() {
+        }
 
+        @Test
+        void getMangeStores() {
+        }
+
+        @Test
+        void getStores() {
+        }
+
+        @Test
+        void getProducts() {
+        }
 
         @Test
         void connectNotificationSystem() {
@@ -1330,19 +1343,77 @@ class TradingSystemFacadeTest {
         void sendNotification() {
         }
 
+        @Test
+        void getCategories() {
+        }
 
+        @Test
+        void getOperationsCanDo() {
+        }
+
+        @Test
+        void getAllOperationOfManger() {
+        }
+
+        @Test
+        void getTotalPriceOfShoppingCart() {
+        }
 
         @Test
         void addProductToShoppingCart() {
         }
 
+        @Test
+        void getShoppingCart() {
+        }
 
+        @Test
+        void testGetTotalPriceOfShoppingCart() {
+        }
+
+        @Test
+        void getUsers() {
+        }
+
+        @Test
+        void getDiscountsSimple() {
+        }
+
+        @Test
+        void getAlltDiscounts() {
+        }
+
+        @Test
+        void getAllStorePurchases() {
+        }
+
+        @Test
+        void getAllUsernameNotOwnerNotManger() {
+        }
+
+        @Test
+        void getMySubOwners() {
+        }
+
+        @Test
+        void getMySubMangers() {
+        }
+
+        @Test
+        void getPermissionCantDo() {
+        }
+
+        @Test
+        void isOwner() {
+        }
 
         @Test
         void changeProductAmountInShoppingBag() {
         }
 
-
+        @Test
+        void getMyOwnerToApprove() {
+        }
 
         @Test
         void approveOwner() {
@@ -1491,3 +1562,4 @@ class TradingSystemFacadeTest {
 
 
 }
+
