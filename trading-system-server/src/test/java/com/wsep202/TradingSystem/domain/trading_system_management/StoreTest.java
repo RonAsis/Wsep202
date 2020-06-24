@@ -2,11 +2,15 @@ package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.*;
 import com.wsep202.TradingSystem.domain.trading_system_management.discount.*;
+import com.wsep202.TradingSystem.domain.trading_system_management.ownerStore.StatusOwner;
 import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.Purchase;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchasePolicy;
+import com.wsep202.TradingSystem.domain.trading_system_management.policy_purchase.PurchaseType;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.Assert;
 
 import java.util.*;
 
@@ -15,7 +19,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 class StoreTest {
     private MangerStore managerStore; //the manager object of the manager user
+    private MangerStore managerStore1; //the manager object of the manager user
     private UserSystem managerUser; //role as manager to add and get
+    private UserSystem managerUser1; //role as manager to add and get
     private UserSystem newOwner;    //role as an appointed owner in the store
     private UserSystem fakeOwner;   //role as not owner in the store
     private UserSystem owner;   //role as appointing owner in the store
@@ -38,9 +44,11 @@ class StoreTest {
 
 
     private boolean assertReceipt(Receipt receipt, int storeId, String buyerName, double totalCostOfBag,
-                               Map<Product,Integer> productListFromStore) {
-        return ((receipt.getStoreId() == storeId) && (receipt.getUserName().equals(buyerName)) &&
-                (receipt.getAmountToPay() == totalCostOfBag) && receipt.getProductsBought().equals(productListFromStore));
+                                  Map<Product,Integer> productListFromStore) {
+        return ((receipt.getStoreId() == storeId) &&
+                (receipt.getUserName().equals(buyerName)) &&
+                (receipt.getAmountToPay() == totalCostOfBag) &&
+                (receipt.getProductsBought().equals(productListFromStore)));
     }
 
     @Nested
@@ -51,20 +59,25 @@ class StoreTest {
             //new manager to add
             newOwner = mock(UserSystem.class);   //the user the owner want to appoint as a new store owner
             //stubbing
-            when(newOwner.getUserName()).thenReturn("Jones");
+            when(newOwner.getUserName()).thenReturn("newOwner");
 
             //manager for get and add owner tests
             managerUser = mock(UserSystem.class);
-            when(managerUser.getUserName()).thenReturn("Alex");
+            when(managerUser.getUserName()).thenReturn("managerUser");
             managerStore = new MangerStore(managerUser);
+
+            //manager for get and add owner tests
+            managerUser1 = mock(UserSystem.class);
+            when(managerUser1.getUserName()).thenReturn("managerUser1");
+            managerStore1 = new MangerStore(managerUser1);
 
             //not owner of the store
             fakeOwner = mock(UserSystem.class);
-            when(fakeOwner.getUserName()).thenReturn("Donald");
+            when(fakeOwner.getUserName()).thenReturn("fakeOwner");
 
             //owner and opener of the store
             owner = mock(UserSystem.class);
-            when(owner.getUserName()).thenReturn("Michael");
+            when(owner.getUserName()).thenReturn("owner");
             storeUT = new Store(owner, "Store under test");
             product = mock(Product.class);
 
@@ -197,7 +210,6 @@ class StoreTest {
             int amount = 4; //new amount
             double cost = 100000.5; //new cost
             //success: the product edited
-            storeUT.editProduct(owner, productSN, name, category, amount, cost);
             Assertions.assertTrue(storeUT.editProduct(owner, productSN, name, category, amount, cost));
         }
 
@@ -245,8 +257,31 @@ class StoreTest {
             Map<Product, Integer> products = new HashMap<>();
             products.put(product,1);
             when(shoppingBag.getProductListFromStore()).thenReturn(products);
-//            Assertions.assertTrue(assertReceipt(storeUT.createReceipt(shoppingBag, owner.getUserName()),
-//                    storeUT.getStoreId(),owner.getUserName(), product.getCost(), products));    //success: the product added by the owner
+            Assertions.assertTrue(assertReceipt(storeUT.createReceipt(shoppingBag, owner.getUserName(), 1, 1),
+                    storeUT.getStoreId(),owner.getUserName(), product.getCost(), products));    //success: the product added by the owner
+        }
+
+        /**
+         * creates a new receipt with wrong parameters
+         */
+        @Test
+        void createReceiptNegative() {
+            Map<Product, Integer> products = null;
+            when(shoppingBag.getProductListFromStore()).thenReturn(products);
+            Receipt returnedReceipt = storeUT.createReceipt(shoppingBag, owner.getUserName(), 1, 1);
+            Assertions.assertEquals(0, returnedReceipt.getAmountToPay());
+        }
+
+
+        /**
+         * creates a new receipt with empty cart
+         */
+        @Test
+        void createReceiptNegativeEmptyCart() {
+            Map<Product, Integer> products = new HashMap<>();
+            when(shoppingBag.getProductListFromStore()).thenReturn(products);
+            Receipt returnedReceipt = storeUT.createReceipt(shoppingBag, owner.getUserName(), 1, 1);
+            Assertions.assertEquals(0, returnedReceipt.getAmountToPay());
         }
 
         /**
@@ -261,7 +296,7 @@ class StoreTest {
         }
 
         /**
-         * check not update amount of inexist product in the stock
+         * check not update amount of product that isn't in the stock
          */
         @Test
         public void editProductAmountInStockNegative() {
@@ -321,8 +356,8 @@ class StoreTest {
          */
         @Test
         void getOwnersUsernameNegative(){
-            boolean result = (storeUT.getOwnersUsername().stream()
-                    .filter(owner1 -> owner1.equals(managerUser.getUserName())).findFirst().isPresent()) ? true : false;
+            boolean result = storeUT.getOwnersUsername().stream()
+                    .anyMatch(owner1 -> owner1.equals(managerUser.getUserName()));
             Assertions.assertFalse(result);
         }
 
@@ -331,17 +366,252 @@ class StoreTest {
          */
         @Test
         void approveOwnerPositive(){
-            storeUT.addOwner(owner,newOwner);
-            Assertions.assertEquals(0, storeUT.getAppointingAgreements().size());
-            Assertions.assertFalse(storeUT.approveOwner(newOwner,managerUser.getUserName(), true)); // status = true ==> need to approve
-            Assertions.assertEquals(0, storeUT.getAppointingAgreements().size());
-
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
             storeUT.addOwner(owner, managerUser); // creates an appointing agreement
             Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
-            Assertions.assertTrue(storeUT.approveOwner(newOwner,managerUser.getUserName(), true)); // status = true ==> need to approve
+            storeUT.approveOwner(newOwner, managerUser.getUserName(), true);
             Assertions.assertEquals(0, storeUT.getAppointingAgreements().size());
+            Assertions.assertEquals(3, storeUT.getOwnersUsername().size());
         }
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /**
+         * checks that user that wasn't approved
+         */
+        @Test
+        void dontApproveOwnerPositive(){
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+            storeUT.addOwner(owner, managerUser); // creates an appointing agreement
+            Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
+            storeUT.approveOwner(newOwner, managerUser.getUserName(), false);
+            Assertions.assertEquals(0, storeUT.getAppointingAgreements().size());
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+        }
+
+        /**
+         * checks that user that wasn't approved
+         */
+        @Test
+        void approveOwnerNegative(){
+            UserSystem notOwner = mock(UserSystem.class);
+            when(notOwner.getUserName()).thenReturn("notOwner");
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+            storeUT.addOwner(owner, managerUser); // creates an appointing agreement
+            Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
+
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(notOwner.getUserName()));
+            Assertions.assertFalse(storeUT.approveOwner(notOwner, managerUser.getUserName(), true));
+            Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+        }
+
+        @Test
+        void isApproveOwnerPositive(){
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+            storeUT.addOwner(owner, managerUser); // creates an appointing agreement
+            Assertions.assertEquals(StatusOwner.WAITING, storeUT.isApproveOwner(managerUser));
+        }
+
+        @Test
+        void isApproveOwnerNegative(){
+            Assertions.assertEquals(StatusOwner.WAITING, storeUT.isApproveOwner(managerUser));
+        }
+
+        /**
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct, no managers was appointed by removed owner
+         */
+        @Test
+        void removeOwnerNoManagers(){
+            UserSystem ownerToRemove = mock(UserSystem.class);
+            when(ownerToRemove.getUserName()).thenReturn("ownerToRemove");
+            when(ownerToRemove.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            storeUT.addOwner(owner, ownerToRemove);
+            storeUT.approveOwner(newOwner, ownerToRemove.getUserName(), true);
+
+            Assertions.assertTrue(storeUT.removeOwner(owner, ownerToRemove));
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+        }
+
+        /**
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct, with that managers was appointed
+         * by removed owner.
+         */
+        @Test
+        void removeOwnerWithManagers(){
+            UserSystem ownerToRemove = mock(UserSystem.class);
+            when(ownerToRemove.getUserName()).thenReturn("ownerToRemove");
+            when(ownerToRemove.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            storeUT.addOwner(owner, ownerToRemove);
+            storeUT.approveOwner(newOwner, ownerToRemove.getUserName(), true);
+            storeUT.appointAdditionManager(ownerToRemove, managerUser);
+            storeUT.appointAdditionManager(ownerToRemove, managerUser1);
+
+            when(managerUser.removeManagedStore(storeUT)).thenReturn(true);
+            when(managerUser1.removeManagedStore(storeUT)).thenReturn(true);
+            when(managerUser.removeManagedStore(storeUT.getStoreId())).thenReturn(true);
+            when(managerUser1.removeManagedStore(storeUT.getStoreId())).thenReturn(true);
+
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
+            managerStore1 = mock(MangerStore.class);
+            when(managerStore1.getAppointedManager()).thenReturn(managerUser1);
+
+            int amountOfManagers = storeUT.getManagersStore().size();
+            Assertions.assertTrue(storeUT.removeOwner(owner, ownerToRemove));
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+            Assertions.assertEquals(amountOfManagers - 2, storeUT.getManagersStore().size());
+        }
+
+        /**
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct, with that managers was appointed
+         * by removed owner.
+         */
+        @Test
+        void removeOwnerWithManagersAndOwner(){
+            UserSystem ownerToRemove = mock(UserSystem.class);
+            when(ownerToRemove.getUserName()).thenReturn("ownerToRemove");
+            when(ownerToRemove.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(owner, ownerToRemove);
+            storeUT.approveOwner(owner, ownerToRemove.getUserName(), true);
+            storeUT.addOwner(ownerToRemove, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            storeUT.appointAdditionManager(newOwner, managerUser);
+            storeUT.appointAdditionManager(newOwner, managerUser1);
+
+            when(managerUser.removeManagedStore(storeUT)).thenReturn(true);
+            when(managerUser1.removeManagedStore(storeUT)).thenReturn(true);
+            when(managerUser.removeManagedStore(storeUT.getStoreId())).thenReturn(true);
+            when(managerUser1.removeManagedStore(storeUT.getStoreId())).thenReturn(true);
+
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
+            managerStore1 = mock(MangerStore.class);
+            when(managerStore1.getAppointedManager()).thenReturn(managerUser1);
+
+            when(newOwner.removeOwnedStore(storeUT)).thenReturn(true);
+            when(ownerToRemove.removeOwnedStore(storeUT)).thenReturn(true);
+            when(newOwner.isOwner(storeUT.getStoreId())).thenReturn(true);
+            when(ownerToRemove.isOwner(storeUT.getStoreId())).thenReturn(true);
+
+            Assertions.assertTrue(storeUT.removeOwner(owner, ownerToRemove));
+
+            Assertions.assertEquals(1, storeUT.getOwnersUsername().size());
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(newOwner.getUserName()));
+        }
+
+        @Test
+        void removeOwnerNotAnOwner(){
+            UserSystem ownerToRemove = mock(UserSystem.class);
+            when(ownerToRemove.getUserName()).thenReturn("ownerToRemove");
+            when(ownerToRemove.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+
+            int amountOfOwners = storeUT.getOwnersUsername().size();
+            Assertions.assertFalse(storeUT.removeOwner(owner, ownerToRemove));
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+            Assertions.assertEquals(amountOfOwners, storeUT.getOwnersUsername().size());
+        }
+
+        @Test
+        void removeOwnerHimself(){
+            int amountOfOwners = storeUT.getOwnersUsername().size();
+            Assertions.assertFalse(storeUT.removeOwner(owner, owner));
+            Assertions.assertTrue(storeUT.getOwnersUsername().contains(owner.getUserName()));
+            Assertions.assertEquals(amountOfOwners, storeUT.getOwnersUsername().size());
+        }
+        @Test
+        void getOwnerToRemovePositive(){
+            UserSystem ownerToRemove = mock(UserSystem.class);
+            when(ownerToRemove.getUserName()).thenReturn("ownerToRemove");
+            when(ownerToRemove.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            storeUT.addOwner(owner, ownerToRemove);
+            storeUT.approveOwner(newOwner, ownerToRemove.getUserName(), true);
+
+            Assertions.assertEquals(ownerToRemove, storeUT.getOwnerToRemove(owner, ownerToRemove.getUserName()));
+            Assertions.assertTrue(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+        }
+
+        @Test
+        void getOwnerToRemoveNegative(){
+            UserSystem ownerToRemove = mock(UserSystem.class);
+            when(ownerToRemove.getUserName()).thenReturn("ownerToRemove");
+            when(ownerToRemove.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+            Assertions.assertThrows(NoOwnerInStoreException.class, ()->
+            {storeUT.getOwnerToRemove(owner, ownerToRemove.getUserName());
+            });
+        }
+
+        @Test
+        void getMySubOwnersPositive(){
+            UserSystem newOwner2 = mock(UserSystem.class);
+            when(newOwner2.getUserName()).thenReturn("newOwner2");
+            when(newOwner2.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            storeUT.addOwner(owner, newOwner2);
+            storeUT.approveOwner(newOwner, newOwner2.getUserName(), true);
+
+            Assertions.assertTrue(storeUT.getMySubOwners(owner.getUserName()).contains(newOwner.getUserName()));
+            Assertions.assertTrue(storeUT.getMySubOwners(owner.getUserName()).contains(newOwner2.getUserName()));
+        }
+
+        @Test
+        void getMySubOwnersNegative(){
+            UserSystem newOwner2 = mock(UserSystem.class);
+            when(newOwner2.getUserName()).thenReturn("ownerToRemove");
+            when(newOwner2.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(newOwner2.getUserName()));
+            Assertions.assertEquals(new LinkedList<>(), storeUT.getMySubOwners(newOwner2.getUserName()));
+        }
+
+        @Test
+        void isOwnerPositive(){
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            Assertions.assertTrue(storeUT.isOwner(owner));
+            Assertions.assertTrue(storeUT.isOwner(newOwner));
+        }
+
+        @Test
+        void isOwnerNegative(){
+            Assertions.assertTrue(storeUT.isOwner(owner));
+            Assertions.assertFalse(storeUT.isOwner(newOwner));
+        }
 
         /**
          * @pre the appointing owner is registered as the store owner
@@ -349,7 +619,8 @@ class StoreTest {
          */
         @Test
         void addOwnerPositive() {
-            //Assertions.assertTrue(storeUT.addOwner(owner, newOwner));    //Success: owner appointing a newOwner as a new owner
+            // there are no owners who need to approve this
+            Assertions.assertTrue(storeUT.addOwner(owner, newOwner).isEmpty());    //Success: owner appointing a newOwner as a new owner
         }
 
         /**
@@ -359,9 +630,9 @@ class StoreTest {
         @Test
         void addOwnerNegativeNotOwner() {
             UserSystem newOwner = mock(UserSystem.class);   //the user the fake owner want to appoint as a new store owner
-            //stubbing
-            when(newOwner.getUserName()).thenReturn("Jones");
-            //Assertions.assertFalse(storeUT.addOwner(fakeOwner, newOwner)); //Fail: owner appointing a newOwner as a new owner
+            when(newOwner.getUserName()).thenReturn("newOwner");
+            // null is returned since owner isn't really a store owner
+            Assertions.assertNull(storeUT.addOwner(fakeOwner, newOwner)); //Fail: owner appointing a newOwner as a new owner
         }
 
         /**
@@ -369,104 +640,80 @@ class StoreTest {
          * adding an already owner by owner
          */
         @Test
-        void addOwnerNegativeNotAlreadyOwner() {
-            //Assertions.assertFalse(storeUT.addOwner(owner, owner)); //Fail: owner appointing a an already owner to be owner
+        void addOwnerNegativeAlreadyOwner() {
+            Assertions.assertNull(storeUT.addOwner(owner, owner)); //Fail: owner appointing a an already owner to be owner
+        }
+
+        @Test
+        void appointAdditionManagerPositive(){
+            UserSystem newOwner1 = mock(UserSystem.class);
+            when(newOwner1.getUserName()).thenReturn("newOwner1");
+
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            storeUT.addOwner(newOwner, newOwner1);
+            storeUT.approveOwner(owner, newOwner1.getUserName(), true);
+
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
+            Assertions.assertEquals(managerUser.getUserName(), storeUT.appointAdditionManager(newOwner, managerUser).getAppointedManager().getUserName());
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+            Assertions.assertEquals(managerUser1.getUserName(), storeUT.appointAdditionManager(newOwner1, managerUser1).getAppointedManager().getUserName());
+            Assertions.assertEquals(2, storeUT.getManagersStore().size());
+        }
+
+        @Test
+        void appointAdditionManagerNegative(){
+            // not an owner adding a manager
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
+            Assertions.assertNull(storeUT.appointAdditionManager(newOwner, managerUser));
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
         }
 
         /**
-         * get exist manager in store
+         * owner remove one of managers appointed by him
          */
         @Test
-        void getManagerPositive() {
-            //setup : adding alex as manager to the store
-            addManagerSetup();
-            //success: the manager alex is returned as expected
-            Assertions.assertEquals("Alex", storeUT.getManager(owner, "Alex").getUserName());
+        void removeManagerPositive() {
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
 
-        }
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
+            when(managerUser.removeManagedStore(storeUT)).thenReturn(true);
+            when(managerUser.removeManagedStore(storeUT.getStoreId())).thenReturn(true);
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
 
-
-        /**
-         * try to get a manager with owner which didn't appoint him
-         */
-        @Test
-        void notAppointingOwnerGetManagerNegative() {
-            //setup : adding alex as manager to the store
-            addManagerSetup();
-            //fail: the manager alex is not returned for the appointer fake
-            Assertions.assertEquals(null, storeUT.getManager(fakeOwner, "Alex"));
+            Assertions.assertTrue(storeUT.removeManager(owner, managerUser)); //success: owner can remove manager he appointed
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
         }
 
         /**
-         * get exist manager object in store
+         * user who is not owner cannot remove one of managers appointed by someone else
          */
         @Test
-        void getManagerObjectPositive() {
-            //setup : adding alex as manager to the store
-            addManagerSetup();
-            //success: the manager alex is returned as expected
-            //Assertions.assertEquals("Alex", storeUT.getManagerObject(owner, "Alex").getAppointedManager());
-        }
+        void removeManagerNegative() {
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
 
-        /**
-         * try to get a manager with owner which didn't appoint him
-         */
-        @Test
-        void notAppointingOwnerGetManagerObjectNegative() {
-            //setup : adding alex as manager to the store
-            addManagerSetup();
-            //fail: the manager alex is not returned for the appointer fake
-            //Assertions.assertEquals(null, storeUT.getManagerObject(fakeOwner, "Alex"));
-        }
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
+            when(managerUser.removeManagedStore(storeUT)).thenReturn(true);
+            when(managerUser.removeManagedStore(storeUT.getStoreId())).thenReturn(true);
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
 
-        /**
-         * owner adds a manager to the store
-         * owner can add a manager who is not already manager or owner of the store
-         */
-        @Test
-        void addManagerPositive() {
-            //success: owner can add a manager who is not already manager or owner of the store
-            //Assertions.assertTrue(storeUT.addManager(owner, managerUser) != null);
+            Assertions.assertFalse(storeUT.removeManager(fakeOwner, managerUser)); //success: owner can remove manager he appointed
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
         }
-
-        /**
-         * owner adds a manager to the store
-         * owner can't add a manager who is already manager
-         */
-        @Test
-        void addManagerAlreadyManagerNegative() {
-            addManagerSetup();  //adding the manager at the first time
-            //fail: owner can't add a manager who is already manager
-            //Assertions.assertFalse(storeUT.addManager(owner, managerUser) != null);  //add manager again
-        }
-
-        /**
-         * owner adds a manager to the store
-         * owner can't add a manager who is already owner
-         */
-        @Test
-        void addManagerAlreadyOwnerNegative() {
-            addOwnerSetup();  //adding the manager at the first time
-            //fail: owner can't add a manager who is already owner in the store
-            //Assertions.assertFalse(storeUT.addManager(owner, newOwner) != null);  //add manager again
-        }
-
-        /**
-         * owner adds a manager to the store
-         */
-        @Test
-        void notAppointingOwnerAddManagerNegative() {
-            //fail: not owner try to appoint a new manager for the store
-            //Assertions.assertFalse(storeUT.addManager(fakeOwner, managerUser) != null);  //add manager again
-        }
-
         /**
          * owner can add permissions to a manager he appointed
          */
         @Test
         void addPermissionToManagerPositive() {
-            addManagerSetup();  //add a manager to the store
-            //mock
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+
             managerStore = mock(MangerStore.class);
             when(managerStore.getAppointedManager()).thenReturn(managerUser);
             when(managerStore.addStorePermission(StorePermission.EDIT_PRODUCT)).thenReturn(true);
@@ -478,9 +725,10 @@ class StoreTest {
          * not owner try to add permissions to a manager
          */
         @Test
-        void notOwnerAddPermissionToManagerNegative() {
-            addManagerSetup();  //add a manager to the store
-            //mock
+        void AddPermissionToManagerNegative() {
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+
             managerStore = mock(MangerStore.class);
             when(managerStore.getAppointedManager()).thenReturn(managerUser);
             when(managerStore.addStorePermission(StorePermission.EDIT_PRODUCT)).thenReturn(true);
@@ -489,17 +737,89 @@ class StoreTest {
         }
 
         /**
+         * get exist manager in store
+         */
+        @Test
+        void getManagerPositive() {
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
+
+            Assertions.assertEquals(managerUser.getUserName(), storeUT.getManager(owner, managerUser.getUserName()).getUserName());
+        }
+
+        /**
+         * try to get a manager with owner which didn't appoint him
+         */
+        @Test
+        void getManagerNegative() {
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
+
+            Assertions.assertNull(storeUT.getManager(fakeOwner, managerUser.getUserName()));
+        }
+
+        @Test
+        void getOperationsCanDoPositive(){
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
+
+            List<String> operations = storeUT.getOperationsCanDo(managerUser);
+            Assertions.assertNotNull(operations);
+            Assertions.assertEquals(1, operations.size());
+            Assertions.assertTrue(operations.contains("view"));
+        }
+
+        @Test
+        void getOperationsCanDoNegative(){
+            List<String> operations = storeUT.getOperationsCanDo(managerUser);
+            Assertions.assertEquals(new ArrayList<>(), operations);
+        }
+
+        @Test
+        void getMySubMangersPositive(){
+            storeUT.appointAdditionManager(owner, managerUser);
+            storeUT.appointAdditionManager(owner, managerUser1);
+
+            when(managerUser.removeManagedStore(storeUT)).thenReturn(true);
+            when(managerUser1.removeManagedStore(storeUT)).thenReturn(true);
+            when(managerUser.removeManagedStore(storeUT.getStoreId())).thenReturn(true);
+            when(managerUser1.removeManagedStore(storeUT.getStoreId())).thenReturn(true);
+            managerStore = mock(MangerStore.class);
+            when(managerStore.getAppointedManager()).thenReturn(managerUser);
+            managerStore1 = mock(MangerStore.class);
+            when(managerStore1.getAppointedManager()).thenReturn(managerUser1);
+
+            List<MangerStore> mangerStoreList = storeUT.getMySubMangers(owner.getUserName());
+            Assertions.assertEquals(2, mangerStoreList.size());
+            for (MangerStore mangerStore: mangerStoreList)
+                Assertions.assertTrue(mangerStore.getAppointedManager().getUserName().equals(managerUser.getUserName())
+                        || mangerStore.getAppointedManager().getUserName().equals(managerUser1.getUserName()));
+        }
+
+        @Test
+        void getMySubMangersNegative(){
+            Assertions.assertEquals(0, storeUT.getMySubMangers(fakeOwner.getUserName()).size());
+        }
+
+        /**
          * owner remove permission from manager permissions list
          */
         @Test
         void removePermissionPositive() {
-            addManagerSetup();
-            //mock
+            storeUT.appointAdditionManager(owner, managerUser);
             managerStore = mock(MangerStore.class);
             when(managerStore.getAppointedManager()).thenReturn(managerUser);
             when(managerStore.removeStorePermission(StorePermission.VIEW)).thenReturn(true);
             //success : owner can remove permission from the manager's permissions list
-            //Assertions.assertTrue(storeUT.removePermissionFromManager(owner, managerUser, StorePermission.VIEW));
+            Assertions.assertTrue(storeUT.removePermission(owner, managerUser, StorePermission.VIEW));
         }
 
         /**
@@ -507,231 +827,296 @@ class StoreTest {
          */
         @Test
         void removePermissionNegative() {
-            addManagerSetup();
-            //mock
+            storeUT.appointAdditionManager(owner, managerUser);
             managerStore = mock(MangerStore.class);
             when(managerStore.getAppointedManager()).thenReturn(managerUser);
             when(managerStore.addStorePermission(StorePermission.VIEW)).thenReturn(true);
             //fail: the user trying to remove is not an owner who appointed the manager
-            //Assertions.assertFalse(storeUT.removePermissionFromManager(fakeOwner, managerUser, StorePermission.VIEW));
+            Assertions.assertFalse(storeUT.removePermission(fakeOwner, managerUser, StorePermission.VIEW));
         }
 
-        /**
-         * owner remove one of managers appointed by him
-         */
         @Test
-        void removeManagerPositive() {
-            //setup: insert manager into managers list of the store
-            addManagerSetup();
-            //Assertions.assertEquals(1, storeUT.getManagers().size());
-            //mock
+        void getPermissionOfManagerPositive(){
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
             managerStore = mock(MangerStore.class);
             when(managerStore.getAppointedManager()).thenReturn(managerUser);
-            //success: owner can remove manager he appointed
-            Assertions.assertTrue(storeUT.removeManager(owner, managerUser));
-            //Assertions.assertEquals(0, storeUT.getManagers().size());
+
+            Set<StorePermission> permissions = storeUT.getPermissionOfManager(owner, managerUser);
+            Assertions.assertNotNull(permissions);
+            Assertions.assertEquals(1, permissions.size());
+            Assertions.assertEquals("view", permissions.stream().findFirst().get().function);
         }
 
-        /**
-         * user who is not owner cannot remove one of managers appointed by someone else
-         */
         @Test
-        void removeManagerNegative() {
-            //setup: insert manager into managers list of the store
-            addManagerSetup();
-            //mock
+        void getPermissionOfManagerNegative(){
+            Set<StorePermission> operations = storeUT.getPermissionOfManager(fakeOwner, managerUser);
+            Assertions.assertNull(operations);
+        }
+
+        @Test
+        void getManagersStorePositive(){
+            storeUT.addOwner(owner, newOwner);
+            storeUT.approveOwner(owner, newOwner.getUserName(), true);
+            storeUT.appointAdditionManager(newOwner, managerUser);
+            storeUT.appointAdditionManager(newOwner, managerUser1);
+
             managerStore = mock(MangerStore.class);
             when(managerStore.getAppointedManager()).thenReturn(managerUser);
-            //fail: only the owner can remove manager he appointed
-            Assertions.assertFalse(storeUT.removeManager(fakeOwner, managerUser));
-            //Assertions.assertEquals(1, storeUT.getManagers().size());
+            managerStore1 = mock(MangerStore.class);
+            when(managerStore1.getAppointedManager()).thenReturn(managerUser1);
+
+            Set<MangerStore> mangerStoreSet = storeUT.getManagersStore();
+            Assertions.assertEquals(2, mangerStoreSet.size());
+            for (MangerStore mangerStore:mangerStoreSet)
+                Assertions.assertTrue(mangerStore.getAppointedManager().getUserName().equals(managerUser.getUserName())
+                        || mangerStore.getAppointedManager().getUserName().equals(managerUser1.getUserName()));
+        }
+
+        @Test
+        void getManagersStoreNegativeNoManagers(){
+            Set<MangerStore> mangerStoreSet = storeUT.getManagersStore();
+            Assertions.assertEquals(0, mangerStoreSet.size());
+        }
+
+        @Test
+        void managerHavePermissionPositive(){
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertTrue(storeUT.managerHavePermission(managerUser.getUserName(), StorePermission.VIEW));
+            Assertions.assertFalse(storeUT.managerHavePermission(managerUser.getUserName(), StorePermission.EDIT_PRODUCT));
+            storeUT.addPermissionToManager(owner, managerUser, StorePermission.EDIT_PRODUCT);
+            Assertions.assertTrue(storeUT.managerHavePermission(managerUser.getUserName(), StorePermission.EDIT_PRODUCT));
+        }
+
+        @Test
+        void managerHavePermissionNegative(){
+            Assertions.assertFalse(storeUT.managerHavePermission(managerUser.getUserName(), StorePermission.VIEW));
+        }
+
+        @Test
+        void getPermissionCantDoPositive(){
+            storeUT.appointAdditionManager(owner, managerUser);
+            Set <StorePermission> storePermissions = storeUT.getPermissionCantDo(owner, managerUser);
+            Assertions.assertFalse(storePermissions.contains(StorePermission.VIEW));
+            Assertions.assertTrue(storePermissions.contains(StorePermission.EDIT_PRODUCT));
+
+            storeUT.addPermissionToManager(owner, managerUser, StorePermission.EDIT_PRODUCT);
+            storePermissions = storeUT.getPermissionCantDo(owner, managerUser);
+            Assertions.assertFalse(storePermissions.contains(StorePermission.VIEW));
+            Assertions.assertFalse(storePermissions.contains(StorePermission.EDIT_PRODUCT));
+        }
+
+        @Test
+        void getPermissionCantDoNegative(){
+            storeUT.appointAdditionManager(owner, managerUser);
+            Assertions.assertNull(storeUT.getPermissionCantDo(fakeOwner, managerUser));
         }
 
         /**
-         * This test check if the removeOwner method succeeds
-         * when the parameters are correct, no managers was appointed by removed owner
+         * add new purchase policy to store
          */
         @Test
-        void removeOwnerNoManagers(){
-            setUpRemoveOwner();
-            //int ownerLiseSize = storeUT.getOwners().size();
-            //check that the list of owners is not empty
-            //Assertions.assertTrue(ownerLiseSize != 0);
-            //check before the remove that the user is an owner
-            //Assertions.assertTrue(storeUT.getOwners().contains(managerUser));
-            //check that the removal was successful
-            Assertions.assertTrue(storeUT.removeOwner(owner,managerUser));
-            //removed 9 owners from store
-            //Assertions.assertEquals(1, storeUT.getOwners().size());
-            //check that the removed owner does not contain the store in his owned store list
-            Assertions.assertFalse(managerUser.getOwnedStores().contains(storeUT));
+        public void addPurchasePolicyPositive() {
+            Assertions.assertEquals(0, storeUT.getPurchasePolicies().size());
+            storeUT.addPurchasePolicy(owner, purchasePolicy);
+            Assertions.assertEquals(1, storeUT.getPurchasePolicies().size());
+        }
+
+        @Test
+        public void addPurchasePolicyNegative() {
+            Assertions.assertEquals(0, storeUT.getPurchasePolicies().size());
+            Assertions.assertThrows(NotAdministratorException.class, ()->
+            {storeUT.addPurchasePolicy(fakeOwner, purchasePolicy);
+            });
+            Assertions.assertEquals(0, storeUT.getPurchasePolicies().size());
         }
 
         /**
-         * This test check if the removeOwner method succeeds
-         * when the parameters are correct, with that managers was appointed
-         * by removed owner.
+         * check the case of purchase that pass the exist store policy
+         * empty case: should approve there are no policies
          */
         @Test
-        void removeOwnerWithManagers(){
-            setUpRemoveOwnerManager();
-            //int ownerLiseSize = storeUT.getOwners().size();
-            //check that the list of owners is not empty
-            //Assertions.assertTrue(ownerLiseSize != 0);
-            //check that this user is a manager in store
-            Assertions.assertEquals(ownerRealUser,storeUT.getManager(managerUser,ownerRealUser.getUserName()));
-            //check before the remove that the user is an owner
-            //Assertions.assertTrue(storeUT.getOwners().contains(managerUser));
-            //check that the removal was successful
-            Assertions.assertTrue(storeUT.removeOwner(owner,managerUser));
-            //removed 9 owners from store
-            //Assertions.assertEquals(1, storeUT.getOwners().size());
-            //check that the manager was removed from store
-            //Assertions.assertFalse(storeUT.getManagers().contains(ownerRealUser));
-        }
-
-        @Test
-        void removeOwnerNotAnOwner(){
-            setUpRemoveOwner();
-            //int ownerLiseSize = storeUT.getOwners().size();
-            //check that the list of owners is not empty
-            //Assertions.assertTrue(ownerLiseSize != 0);
-            //check before the remove that the user is an owner
-            //Assertions.assertTrue(storeUT.getOwners().contains(managerUser));
-            //someone who is not an owner can't remove a real owner
-            Assertions.assertFalse(storeUT.removeOwner(fakeOwner,managerUser));
-            //can't remove someone who is not an owner of the store
-            Assertions.assertFalse(storeUT.removeOwner(owner,fakeOwner));
-            //check that the numbers of owners didn't change
-            //Assertions.assertEquals(ownerLiseSize, storeUT.getOwners().size());
-            //check after fail remove that managerUser is still an owner in store
-            //Assertions.assertTrue(storeUT.getOwners().contains(managerUser));
-        }
-
-        @Test
-        void removeOwnerHimself(){
-            setUpRemoveOwner();
-            //int ownerLiseSize = storeUT.getOwners().size();
-            //check that the list of owners is not empty
-            //Assertions.assertTrue(ownerLiseSize != 0);
-            //check before the remove that the user is an owner
-            //Assertions.assertTrue(storeUT.getOwners().contains(owner));
-            //an owner can't remove himself from the store
-            Assertions.assertFalse(storeUT.removeOwner(owner,owner));
-            //check that the numbers of owners didn't change
-            //Assertions.assertEquals(ownerLiseSize, storeUT.getOwners().size());
-            //check after fail remove that owner is still an owner in store
-            //Assertions.assertTrue(storeUT.getOwners().contains(owner));
-        }
-
-        @Test
-        void getAppointedOwnerSuc(){
-            setUpGetAppointedOwner();
-            //check that the right user returns
-            //Assertions.assertEquals(newOwner,storeUT.getAppointedOwner(owner,newOwner.getUserName()));
-        }
-
-        private void setUpGetAppointedOwner(){
-            when(owner.getUserName()).thenReturn("ownerTest");
-            when(newOwner.getUserName()).thenReturn("newOwnerTest");
-            Set<UserSystem> owners = new HashSet<>();
-            owners.add(owner);
-            owners.add(newOwner);
-            //storeUT.setOwners(owners);
-            Set<OwnersAppointee> appointedOwners = new HashSet<>();
-            Set<UserSystem> apOwner = new HashSet<>();
-            apOwner.add(newOwner);
-            //OwnersAppointee ownersAppointee = new OwnersAppointee(owner.getUserName(),apOwner);
-            //appointedOwners.add(ownersAppointee);
-            storeUT.setAppointedOwners(appointedOwners);
+        public void isApprovedPurchaseEmptyPoliciesPositive() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            BillingAddress billingAddress = mock(BillingAddress.class);
+            Assertions.assertTrue(storeUT.isApprovedPurchasePolicies(productBag, billingAddress));
         }
 
         /**
-         * user which is manager in the store requests for receipts
+         * check the case of purchase that pass the exist store policy
+         * should approve with buyer from the permmited country
          */
         @Test
-        void managerViewReceiptsPositive() {
-            addManagerSetup();
-            insertReceiptsSetup();
-            //List<Receipt> receipts = storeUT.managerViewReceipts(managerUser);  //get the receipts of store
-            int i = 0;
-            /*for (Receipt receipt : receipts) {
-                //success : manager can view the receipts and their fields as well
-                Assertions.assertEquals(i, receipt.getAmountToPay());
-                i++;
-            }*/
+        public void isApprovedPurchasePoliciesPositive() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            Purchase purchase = mock(Purchase.class);
+            when(purchase.getPurchasePolicy()).thenReturn(new PurchasePolicy());
+            when(purchase.getPurchaseType()).thenReturn(PurchaseType.SHOPPING_BAG_DETAILS);
+            storeUT.addPurchasePolicy(owner, purchase);
+            BillingAddress billingAddress = BillingAddress.builder().country("Israel").build();
+            Assertions.assertFalse(storeUT.isApprovedPurchasePolicies(productBag, billingAddress));
+        }
+
+
+        /**
+         * check the case of purchase that pass the exist store policy
+         * negative case: should approve with buyer from not permmited country
+         */
+        @Test
+        public void isApprovedPurchasePoliciesNegative() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            Purchase purchase = mock(Purchase.class);
+            when(purchase.getPurchasePolicy()).thenReturn(new PurchasePolicy());
+            when(purchase.getPurchaseType()).thenReturn(PurchaseType.PRODUCT_DETAILS);
+            storeUT.addPurchasePolicy(owner, purchase);
+            BillingAddress billingAddress = BillingAddress.builder().country("Israel").build();
+            Assertions.assertFalse(storeUT.isApprovedPurchasePolicies(productBag, billingAddress));
+        }
+        /**
+         * edit existed purchase in store
+         */
+        @Test
+        public void addEditPurchasePositive() {
+            purchasePolicy = mock(Purchase.class);
+            when(purchasePolicy.getPurchaseType()).thenReturn(PurchaseType.PRODUCT_DETAILS);
+            Assertions.assertEquals(purchasePolicy, storeUT.addPurchasePolicy(owner, purchasePolicy));
+            when(purchasePolicy.getPurchaseType()).thenReturn(PurchaseType.SHOPPING_BAG_DETAILS);
+            Assertions.assertEquals(purchasePolicy, storeUT.addEditPurchase(owner, purchasePolicy));
         }
 
         /**
-         * user which is not manager in the store requests for receipts
+         * edit not existed purchase in store
          */
         @Test
-        void notManagerViewReceiptsNegative() {
-            //Throwable exception = Assertions.assertThrows(NoManagerInStoreException.class, () -> storeUT.managerViewReceipts(fakeOwner));
-            //fail: the inserted user is not manager so cant see the receipts in store
-            //Assertions.assertEquals("The user name '" + "Donald" + "' is not manager in the store number: '" + storeUT.getStoreId() + "'", exception.getMessage());
+        public void addEditPurchaseNegative() {
+            purchasePolicy = mock(Purchase.class);
+            when(purchasePolicy.getPurchaseType()).thenReturn(PurchaseType.PRODUCT_DETAILS);
+            Assertions.assertEquals(purchasePolicy, storeUT.addPurchasePolicy(owner, purchasePolicy));
+            Assertions.assertThrows(Exception.class, ()-> storeUT.addEditPurchase(fakeOwner, purchasePolicy));
         }
 
-        /**
-         * user which is manager in the store requests for receipts
-         */
         @Test
-        void ownerViewReceiptsPositive() {
-            addOwnerSetup();
-            insertReceiptsSetup();
-            //List<Receipt> receipts = storeUT.ownerViewReceipts(owner);  //get the receipts of store
-            int i = 0;
-            /*for (Receipt receipt : receipts) {
-                //success : manager can view the receipts and their fields as well
-                Assertions.assertEquals(i, receipt.getAmountToPay());
-                i++;
-            }*/
+        public void applyDiscountPoliciesPositive() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            Discount discount1 = mock(Discount.class);
+            storeUT.addDiscount(owner, discount1);
+            Assertions.assertFalse(discount1.isApplied());
+            storeUT.applyDiscountPolicies(productBag);
+            Assertions.assertFalse(discount1.isApplied());
         }
 
-        /**
-         * user which is not owner in the store requests for receipts
-         */
         @Test
-        void notOwnerViewReceiptsNegative() {
-            //Throwable exception = Assertions.assertThrows(NoManagerInStoreException.class, () -> storeUT.ownerViewReceipts(fakeOwner));
-            //fail: the inserted user is not owner so cant see the receipts in store
-            //Assertions.assertEquals("The user name '" + "Donald" + "' is not manager in the store number: '" + storeUT.getStoreId() + "'", exception.getMessage());
+        public void applyDiscountPoliciesNegative() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            Discount discount1 = mock(Discount.class);
+            storeUT.addDiscount(owner,discount1);
+            when(product.getCost()).thenReturn((double) -10);
+            storeUT.applyDiscountPolicies(productBag);
+            Assertions.assertFalse(discount1.isApplied());
         }
 
-        /**
-         * functionality of watching the store information
-         */
         @Test
-        void showStoreInfo() {
-            //success: shows the store info as string
-            //Assertions.assertEquals("The store Store under test has ID: " + storeUT.getStoreId() + "", storeUT.showStoreInfo());
+        public void removeDiscountPositive(){
+            Discount discount1 = mock(Discount.class);
+            int discount1Id = (int) storeUT.addDiscount(owner, discount1).getDiscountId();
+            when(discount1.getDiscountId()).thenReturn((long) discount1Id);
+            Assertions.assertTrue(storeUT.removeDiscount(owner, (int) discount1.getDiscountId()));
         }
 
-        /**
-         * functionality of watching the store products information
-         */
         @Test
-        void showProductsInStoreInfo() {
-            //success: no products in store so show empty string
-            //Assertions.assertEquals("", storeUT.showProductsInStoreInfo());
+        public void removeDiscountNegative(){
+            Discount discount1 = mock(Discount.class);
+            int discount1Id = (int) storeUT.addDiscount(owner, discount1).getDiscountId();
+            when(discount1.getDiscountId()).thenReturn((long) discount1Id);
+            Assertions.assertThrows(Exception.class, ()->
+                    storeUT.removeDiscount(fakeOwner, (int) discount1.getDiscountId()));
         }
 
+        @Test
+        void getStoreDiscountsPositive(){
+            Discount discount1 = mock(Discount.class);
+            int discount1Id = (int) storeUT.addDiscount(owner, discount1).getDiscountId();
+            when(discount1.getDiscountId()).thenReturn((long) discount1Id);
+            Assertions.assertEquals(1, storeUT.getStoreDiscounts(owner).size());
+            Assertions.assertTrue(storeUT.getStoreDiscounts(owner).contains(discount1));
+        }
 
-        /////////////////////updates after UC 4.2//////////////////////////
+        @Test
+        void getStoreDiscountsNegative(){
+            Discount discount1 = mock(Discount.class);
+            int discount1Id = (int) storeUT.addDiscount(owner, discount1).getDiscountId();
+            when(discount1.getDiscountId()).thenReturn((long) discount1Id);
+            Assertions.assertThrows(Exception.class,()->
+                    storeUT.getStoreDiscounts(fakeOwner));
+        }
 
+        @Test
+        public void addDiscountPositive() {
+            Assertions.assertEquals(0, storeUT.getDiscounts().size());
+            Assertions.assertNotNull(storeUT.addDiscount(owner, discount));
+            Assertions.assertEquals(1, storeUT.getDiscounts().size());
+        }
 
-//////////////////setups///////////////////////////////////
+        @Test
+        public void addDiscountNegative() {
+            Assertions.assertEquals(0, storeUT.getDiscounts().size());
+            Assertions.assertThrows(NotAdministratorException.class, ()->
+                    storeUT.addDiscount(fakeOwner, discount));
+            Assertions.assertEquals(0, storeUT.getDiscounts().size());
+        }
 
-        private void insertReceiptsSetup() {
-            for (int i = 0; i < 10; i++) {
-                storeUT.getReceipts().add(Receipt.builder()
-                        .amountToPay(i)
-                        .productsBought(new HashMap<Product, Integer>())
-                        .purchaseDate(new Date())
-                        .storeId(0)
-                        .userName("felix")
-                        .build());
-            }
+        @Test
+        public void editDiscountPositive() {
+            discount = mock(Discount.class);
+            when(discount.getDiscountId()).thenReturn((long) 0);
+            when(discount.getDiscountPercentage()).thenReturn((double) 10);
+            storeUT.addDiscount(owner, discount);
+            when(discount.getDiscountPercentage()).thenReturn((double) 20);
+            Assertions.assertEquals(20, storeUT.addEditDiscount(owner, discount).getDiscountPercentage());
+        }
+
+        @Test
+        public void editDiscountNegative() {
+            discount = mock(Discount.class);
+            when(discount.getDiscountId()).thenReturn((long) 0);
+            when(discount.getDiscountPercentage()).thenReturn((double) 10);
+            storeUT.addDiscount(owner, discount);
+            when(discount.getDiscountPercentage()).thenReturn((double) 20);
+            Assertions.assertThrows(NotAdministratorException.class, ()->
+                    storeUT.addEditDiscount(fakeOwner, discount));
+        }
+
+        @Test
+        void getDiscountSimplePositive(){
+            Discount discount1 = mock(Discount.class);
+            Discount discount2 = mock(Discount.class);
+            Discount discount3 = mock(Discount.class);
+            when(discount1.getDiscountId()).thenReturn((long) 1);
+            when(discount2.getDiscountId()).thenReturn((long) 2);
+            when(discount3.getDiscountId()).thenReturn((long) 3);
+            when(discount1.getDiscountType()).thenReturn(DiscountType.COMPOSE);
+            when(discount2.getDiscountType()).thenReturn(DiscountType.VISIBLE);
+            when(discount3.getDiscountType()).thenReturn(DiscountType.CONDITIONAL_PRODUCT);
+
+            storeUT.addDiscount(owner, discount1);
+            storeUT.addDiscount(owner, discount2);
+            storeUT.addDiscount(owner, discount3);
+
+            List<Discount> discounts = storeUT.getDiscountSimple();
+            Assertions.assertEquals(2, discounts.size());
+            for (Discount discount: discounts)
+                Assertions.assertNotEquals(DiscountType.COMPOSE, discount.getDiscountType());
+        }
+
+        @Test
+        void getDiscountSimpleNegative(){
+            List<Discount> discounts = storeUT.getDiscountSimple();
+            Assertions.assertEquals(0, discounts.size());
         }
 
         private void addProductAsEditProductSetup() {
@@ -739,21 +1124,9 @@ class StoreTest {
             storeUT.addNewProduct(owner, product);
 
         }
-
-        private void addNewDiscountToStoreSetup() {
-            storeUT.addDiscount(owner, discount);
-        }
-
-        private void addManagerSetup() {
-            //storeUT.addManager(owner, managerUser);  //adding alex as new manager in the store
-        }
-
-        private void addOwnerSetup() {
-            storeUT.addOwner(owner, newOwner);
-        }
-
     }
 
+    // **************************************** Integration Test ****************************************
     @Nested
     public class StoreTestIntegration {
         Discount discount1;
@@ -766,32 +1139,39 @@ class StoreTest {
 
         @BeforeEach
         void setUp() {
+            newOwner = new UserSystem("newOwner", "new", "york", "uni");
+            owner = new UserSystem("owner", "I", "want", "sleep");
+
             //new manager to add
-            newOwnerReal = new UserSystem("new", "n", "y", "u");   //the user the owner want to appoint as a new store owner
+            newOwnerReal = new UserSystem("newOwnerReal", "n", "y", "u");   //the user the owner want to appoint as a new store owner
 
             //manager for get and add owner tests
-            managerUser = new UserSystem("Alex", "Alex", "Alex", "Alex");
+            managerUser = new UserSystem("managerUser", "Alex", "Alex", "Alex");
             managerStore = new MangerStore(managerUser);
 
+            managerUser1 = new UserSystem("managerUser1", "Alex", "Alex", "Alex");
+            managerStore1 = new MangerStore(managerUser1);
+
             //not owner of the store
-            fakeOwnerReal = new UserSystem("DT", "Donald", "Trump", "DT123");
+            fakeOwnerReal = new UserSystem("fakeOwnerReal", "Donald", "Trump", "DT123");
 
             //owner and opener of the store
-            ownerRealUser = new UserSystem("Michael", "micha", "toti", "pass");
+            ownerRealUser = new UserSystem("ownerRealUser", "micha", "toti", "pass");
             storeUT = new Store(ownerRealUser, "Store under test");
-            product = new Product("Bamba", ProductCategory.SPORTING_GOODS, 1, 11, storeUT.getStoreId());
-             product2 = Product.builder()
+            product = new Product("product", ProductCategory.SPORTING_GOODS, 1, 11, storeUT.getStoreId());
+            product2 = Product.builder()
                     .cost(10)
                     .productSn(66)
                     .originalCost(10)
-                    .name("doritos")
+                    .name("product2")
+                    .amount(100)
                     .storeId(storeUT.getStoreId())
                     .build();
-             product3 = Product.builder()
+            product3 = Product.builder()
                     .cost(20)
                     .productSn(67)
                     .originalCost(20)
-                    .name("doritos")
+                    .name("product3")
                     .storeId(storeUT.getStoreId())
                     .build();
             HashMap<Product,Integer> postProducts = new HashMap();
@@ -804,7 +1184,7 @@ class StoreTest {
             Calendar endTime = Calendar.getInstance();
             endTime.set(3000,1,1);
             List<Discount> discountsComposed = new ArrayList<>();
-             discount3 = Discount.builder().discountPercentage(10)
+            discount3 = Discount.builder().discountPercentage(10)
                     .endTime(endTime)
                     .description("cond")
                     .discountId(33)
@@ -814,15 +1194,15 @@ class StoreTest {
             discountsComposed.add(discount3);
             Map<Product,Integer> productsVis = new HashMap<>();
             productsVis.put(product,1);
-             discount1 = Discount.builder().discountPercentage(10)
+            discount1 = Discount.builder().discountPercentage(10)
                     .endTime(endTime)
                     .description("vis")
                     .discountId(34)
                     .discountType(DiscountType.VISIBLE)
                     .discountPolicy(VisibleDiscount.builder().amountOfProductsForApplyDiscounts(productsVis)
-                                    .build()).build();
+                            .build()).build();
             discountsComposed.add(discount1);
-             discount2 = Discount.builder().discountPercentage(10)
+            discount2 = Discount.builder().discountPercentage(10)
                     .endTime(endTime)
                     .description("store")
                     .discountId(35)
@@ -830,130 +1210,22 @@ class StoreTest {
                     .discountPolicy(ConditionalStoreDiscount.builder().minPrice(4.8)
                             .build()).build();
             discountsComposed.add(discount2);
-             composedDiscount = ComposedDiscount.builder()
+            composedDiscount = ComposedDiscount.builder()
                     .composedDiscounts(discountsComposed)
                     .compositeOperator(CompositeOperator.AND)
                     .build();
             Calendar time = Calendar.getInstance();
             time.set(3000,1,1);
-             discount4 = Discount.builder()
-                     .discountId(77)
-                     .discountPercentage(1)
-                     .discountType(DiscountType.COMPOSE)
-                     .description("compose")
-                     .endTime(time)
-                     .discountPolicy(composedDiscount)
-                     .build();
+            discount4 = Discount.builder()
+                    .discountId(77)
+                    .discountPercentage(1)
+                    .discountType(DiscountType.COMPOSE)
+                    .description("compose")
+                    .endTime(time)
+                    .discountPolicy(composedDiscount)
+                    .build();
             discount = Discount.builder().build();  //add simple cased discount
             purchasePolicy = Purchase.builder().build(); //add simple cased purchase policy
-        }
-
-        /**
-         * verifies the method returns occurences of products with the name inserted
-         * in case there are in the store
-         */
-        @Test
-        void searchProductByNamePositive() {
-            addNewProductSetUp();
-            //Set<Product> resultsForSearch = storeUT.searchProductByName("Bamba");
-            /*for (Product product : resultsForSearch) {
-                //success: there is one product in the list after filter by name PSP
-                Assertions.assertEquals("Bamba", product.getName());
-            }*/
-        }
-
-        /**
-         * check the case of searching for products with name that is not exist for any product
-         */
-        @Test
-        void searchProductByNameNegative() {
-            addNewProductSetUp();
-            //Set<Product> resultsForSearch = storeUT.searchProductByName("PSP");
-            //fail: no results for the name football
-            //Assertions.assertEquals(0, resultsForSearch.size());
-        }
-
-        /**
-         * get list of products only with the same category which inserted
-         */
-        @Test
-        void searchProductByCategoryPositive() {
-            addNewProductSetUp();
-            ProductCategory category = ProductCategory.SPORTING_GOODS;
-            /*Set<Product> resultsForSearch = storeUT.searchProductByCategory(category);
-            for (Product product : resultsForSearch) {
-                //success: all products in the list are in the same category
-                Assertions.assertEquals(category, product.getCategory());
-            }*/
-        }
-
-        /**
-         * handling with search of category which is not exist for the store products
-         */
-        @Test
-        void searchProductByCategoryNegative() {
-            addNewProductSetUp();
-            ProductCategory notInStoreCategory = ProductCategory.TOYS_HOBBIES;
-            //Set<Product> resultsForSearch = storeUT.searchProductByCategory(notInStoreCategory);
-            //fail: the requested category not exist so empty list of products returned
-            //Assertions.assertEquals(0, resultsForSearch.size());
-        }
-
-        /**
-         * verifies searching by keywords which is part of a name of product in store
-         * returns the proper products list
-         */
-        @Test
-        void searchProductByKeywordPositive() {
-            addNewProductSetUp();
-            List<String> keywords = new ArrayList<>();
-            keywords.add("mb");
-            /*Set<Product> resultsForSearch = storeUT.searchProductByKeyWords(keywords);
-            for (Product product : resultsForSearch) {
-                //success: there is match between keyword to product
-                Assertions.assertTrue(product.getName().contains("mb"));
-            }*/
-        }
-
-        /**
-         * test handling with searching of keyword which doesn't exist
-         */
-        @Test
-        void searchProductByKeywordNegative() {
-            addNewProductSetUp();
-            List<String> keywords = new ArrayList<>();
-            keywords.add("goo");
-            //Set<Product> resultsForSearch = storeUT.searchProductByKeyWords(keywords);
-            //fail: there is no match between keyword to products
-            //Assertions.assertEquals(0, resultsForSearch.size());
-        }
-
-
-        /**
-         * @pre the appointing owner is registered as the store owner
-         * adding an owner by an store owner
-         */
-        @Test
-        void addOwnerPositive() {
-            //Assertions.assertTrue(storeUT.addOwner(ownerRealUser, newOwnerReal));    //Success: owner appointing a newOwner as a new owner
-        }
-
-        /**
-         * @pre the appointing owner is not registered as the store owner
-         * adding an owner by not store owner
-         */
-        @Test
-        void addOwnerNegativeNotOwner() {
-            //Assertions.assertFalse(storeUT.addOwner(fakeOwnerReal, newOwnerReal)); //Fail: owner appointing a newOwner as a new owner
-        }
-
-        /**
-         * @pre the appointed owner is already an owner in the store
-         * adding an already owner by owner
-         */
-        @Test
-        void addOwnerNegativeNotAlreadyOwner() {
-            //Assertions.assertFalse(storeUT.addOwner(ownerRealUser, ownerRealUser)); //Fail: owner appointing a an already owner to be owner
         }
 
         /**
@@ -1016,6 +1288,23 @@ class StoreTest {
             Assertions.assertFalse(storeUT.removeProductFromStore(fakeOwnerReal, product.getProductSn()));    //fail: not owner cannot remove product
             Assertions.assertEquals(1, storeUT.getProducts().size()); //verify we decreased no. of products in store
         }
+        /**
+         * owner validates that he can edit a given product
+         */
+        @Test
+        void validateCanEditProductsPositive(){
+            addNewProductSetUp();
+            Assertions.assertTrue(storeUT.validateCanEditProducts(ownerRealUser,product.getProductSn()));
+        }
+
+        /**
+         * user that is not owner validates that he can edit a given product
+         */
+        @Test
+        void validateCanEditProductsNegative(){
+            addNewProductSetUp();
+            Assertions.assertFalse(storeUT.validateCanEditProducts(managerUser,product.getProductSn()));
+        }
 
         /**
          * setting an existing product in store with product properties by an owner
@@ -1030,7 +1319,6 @@ class StoreTest {
             int amount = 4; //new amount
             double cost = 100000.5; //new cost
             //success: the product edited
-            storeUT.editProduct(ownerRealUser, productSN, name, category, amount, cost);
             Assertions.assertTrue(storeUT.editProduct(ownerRealUser, productSN, name, category, amount, cost));
         }
 
@@ -1069,129 +1357,379 @@ class StoreTest {
         }
 
         /**
-         * get exist manager in store
+         * creates a new receipt with right parameters
          */
         @Test
-        void getManagerPositive() {
-            //setup : adding alex as manager to the store
-            addManagerSetup();
-            //success: the manager alex is returned as expected
-            Assertions.assertEquals("Alex", storeUT.getManager(ownerRealUser, "Alex").getUserName());
+        void createReceiptPositive() {
+            Map<Product, Integer> products = new HashMap<>();
+            products.put(product2, 1);
+            shoppingBag = new ShoppingBag();
+            shoppingBag.addProductToBag(product2, 1);
+            Assertions.assertTrue(assertReceipt(storeUT.createReceipt(shoppingBag, ownerRealUser.getUserName(), 1, 1),
+                    storeUT.getStoreId(), ownerRealUser.getUserName(), product2.getCost(), products));    //success: the product added by the owner
+        }
+
+        /**
+         * creates a new receipt with empty cart
+         */
+        @Test
+        void createReceiptNegative() {
+            shoppingBag = new ShoppingBag();
+            Receipt returnedReceipt = storeUT.createReceipt(shoppingBag, ownerRealUser.getUserName(), 1, 1);
+            Assertions.assertEquals(0, returnedReceipt.getAmountToPay());
+        }
+
+        /**
+         * check update amount of product in the stock (after purchase)
+         */
+        @Test
+        public void editProductAmountInStockPositive() {
+            addNewProductSetUp(); //add product to stock
+            Assertions.assertTrue(storeUT.editProductAmountInStock(0, 3));
+        }
+
+        /**
+         * check not update amount of product that isn't in the stock
+         */
+        @Test
+        public void editProductAmountInStockNegative() {
+            addNewProductSetUp(); //add product to stock
+            Assertions.assertFalse(storeUT.editProductAmountInStock(1, 3));
+        }
+
+        /**
+         * check that when product bout is in stock return true
+         */
+        @Test
+        public void isAllInStockPositive() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            addNewProductSetUp();   //add the bought product to stock
+            shoppingBag = new ShoppingBag(productBag);
+            Assertions.assertTrue(storeUT.isAllInStock(shoppingBag));
+        }
+
+        /**
+         * check that when product bout is not in stock return exception
+         */
+        @Test
+        public void isAllInStockNegative() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 100000);
+            addNewProductSetUp();   //add the bought product to stock
+            shoppingBag = new ShoppingBag(productBag);
+
+            Throwable exception = Assertions
+                    .assertThrows(NotInStockException.class, () -> storeUT.isAllInStock(shoppingBag));
+            Assertions.assertEquals("The product: " + product.getName()
+                            + " is out of stock in store: " + storeUT.getStoreName()
+                    , exception.getMessage());
+        }
+
+        /**
+         * check that getOwnersUsername returns the name of the owner of the store
+         */
+        @Test
+        void getOwnersUsernamePositive(){
+            Set<String> returnedOwners = storeUT.getOwnersUsername();
+            Assertions.assertEquals(1, returnedOwners.size());
+            Assertions.assertNotNull(returnedOwners.stream()
+                    .filter(owner1 -> owner1.equals(ownerRealUser.getUserName())).findFirst().get());
+        }
+
+        /**
+         * check that getOwnersUsername doesn't returns the name of a regulat user in the store
+         */
+        @Test
+        void getOwnersUsernameNegative(){
+            boolean result = storeUT.getOwnersUsername().stream()
+                    .anyMatch(owner1 -> owner1.equals(managerUser.getUserName()));
+            Assertions.assertFalse(result);
         }
 
 
         /**
-         * try to get a manager with owner which didn't appoint him
+         * checks that user that was approve
          */
         @Test
-        void notAppointingOwnerGetManagerNegative() {
-            //setup : adding alex as manager to the store
-            addManagerSetup();
-            //fail: the manager alex is not returned for the appointer fake
-            Assertions.assertEquals(null, storeUT.getManager(fakeOwnerReal, "Alex"));
+        void approveOwnerPositive(){
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+            storeUT.addOwner(ownerRealUser, managerUser); // creates an appointing agreement
+            Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
+            storeUT.approveOwner(newOwner, managerUser.getUserName(), true);
+            Assertions.assertEquals(0, storeUT.getAppointingAgreements().size());
+            Assertions.assertEquals(3, storeUT.getOwnersUsername().size());
         }
 
         /**
-         * get exist manager object in store
+         * checks that user that wasn't approved
          */
         @Test
-        void getManagerObjectPositive() {
-            //setup : adding alex as manager to the store
-            addManagerSetup();
-            //success: the manager alex is returned as expected
-            //Assertions.assertEquals("Alex", storeUT.getManagerObject(ownerRealUser, "Alex").getAppointedManager());
+        void dontApproveOwnerPositive(){
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+            storeUT.addOwner(ownerRealUser, managerUser); // creates an appointing agreement
+            Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
+            storeUT.approveOwner(newOwner, managerUser.getUserName(), false);
+            Assertions.assertEquals(0, storeUT.getAppointingAgreements().size());
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
         }
 
         /**
-         * try to get a manager with owner which didn't appoint him
+         * checks that user that wasn't approved
          */
         @Test
-        void notAppointingOwnerGetManagerObjectNegative() {
-            //setup : adding alex as manager to the store
-            addManagerSetup();
-            //fail: the manager alex is not returned for the appointer fake
-            //Assertions.assertEquals(null, storeUT.getManagerObject(fakeOwnerReal, "Alex"));
+        void approveOwnerNegative(){
+            UserSystem notOwner = new UserSystem();
+            notOwner.setUserName("notOwner");
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+            storeUT.addOwner(ownerRealUser, managerUser); // creates an appointing agreement
+            Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
+
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(notOwner.getUserName()));
+            Assertions.assertFalse(storeUT.approveOwner(notOwner, managerUser.getUserName(), true));
+            Assertions.assertEquals(1, storeUT.getAppointingAgreements().size());
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+        }
+
+        @Test
+        void isApproveOwnerPositive(){
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            Assertions.assertEquals(2, storeUT.getOwnersUsername().size());
+            storeUT.addOwner(ownerRealUser, managerUser); // creates an appointing agreement
+            Assertions.assertEquals(StatusOwner.WAITING, storeUT.isApproveOwner(managerUser));
+        }
+
+        @Test
+        void isApproveOwnerNegative(){
+            Assertions.assertEquals(StatusOwner.WAITING, storeUT.isApproveOwner(managerUser));
         }
 
         /**
-         * owner adds a manager to the store
-         * owner can add a manager who is not already manager or owner of the store
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct, no managers was appointed by removed owner
          */
         @Test
-        void addManagerPositive() {
-            //success: owner can add a manager who is not already manager or owner of the store
-            //Assertions.assertNotNull(storeUT.addManager(ownerRealUser, managerUser));
+        void removeOwnerNoManagers(){
+            UserSystem ownerToRemove = mock(UserSystem.class);
+            when(ownerToRemove.getUserName()).thenReturn("ownerToRemove");
+            when(ownerToRemove.getOwnedStores()).thenReturn(new HashSet<>());
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            storeUT.addOwner(ownerRealUser, ownerToRemove);
+            storeUT.approveOwner(newOwner, ownerToRemove.getUserName(), true);
+
+            Assertions.assertTrue(storeUT.removeOwner(ownerRealUser, ownerToRemove));
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
         }
 
         /**
-         * owner adds a manager to the store
-         * owner can't add a manager who is already manager
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct, with that managers was appointed
+         * by removed owner.
          */
         @Test
-        void addManagerAlreadyManagerNegative() {
-            addManagerSetup();  //adding the manager at the first time
-            //fail: owner can't add a manager who is already manager
-            //Assertions.assertFalse(storeUT.addManager(ownerRealUser, managerUser) != null);  //add manager again
+        void removeOwnerWithManagers(){
+            UserSystem ownerToRemove = new UserSystem();
+            ownerToRemove.setUserName("ownerToRemove");
+            ownerToRemove.setOwnedStores(new HashSet<>());
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            storeUT.addOwner(ownerRealUser, ownerToRemove);
+            storeUT.approveOwner(newOwner, ownerToRemove.getUserName(), true);
+            storeUT.appointAdditionManager(ownerToRemove, managerUser);
+            storeUT.appointAdditionManager(ownerToRemove, managerUser1);
+
+            Assertions.assertTrue(storeUT.removeOwner(ownerRealUser, ownerToRemove));
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
         }
 
         /**
-         * owner adds a manager to the store
-         * owner can't add a manager who is already owner
+         * This test check if the removeOwner method succeeds
+         * when the parameters are correct, with that managers was appointed
+         * by removed owner.
          */
         @Test
-        void addManagerAlreadyOwnerNegative() {
-            addOwnerSetup();  //adding the manager at the first time
-            //fail: owner can't add a manager who is already owner in the store
-            //Assertions.assertNull(storeUT.addManager(ownerRealUser, newOwnerReal));  //add manager again
+        void removeOwnerWithManagersAndOwner(){
+            UserSystem ownerToRemove = new UserSystem();
+            ownerToRemove.setUserName("ownerToRemove");
+            ownerToRemove.setOwnedStores(new HashSet<>());
+
+            storeUT.addOwner(ownerRealUser, ownerToRemove);
+            storeUT.approveOwner(ownerRealUser, ownerToRemove.getUserName(), true);
+            storeUT.addOwner(ownerToRemove, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            storeUT.appointAdditionManager(newOwner, managerUser);
+            storeUT.appointAdditionManager(newOwner, managerUser1);
+
+            Assertions.assertTrue(storeUT.removeOwner(ownerRealUser, ownerToRemove));
+
+            Assertions.assertEquals(1, storeUT.getOwnersUsername().size());
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(newOwner.getUserName()));
+        }
+
+        @Test
+        void removeOwnerNotAnOwner(){
+            UserSystem ownerToRemove = new UserSystem();
+            ownerToRemove.setUserName("ownerToRemove");
+            ownerToRemove.setOwnedStores(new HashSet<>());
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+
+            int amountOfOwners = storeUT.getOwnersUsername().size();
+            Assertions.assertFalse(storeUT.removeOwner(ownerRealUser, ownerToRemove));
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+            Assertions.assertEquals(amountOfOwners, storeUT.getOwnersUsername().size());
+        }
+
+        @Test
+        void removeOwnerHimself(){
+            int amountOfOwners = storeUT.getOwnersUsername().size();
+            Assertions.assertFalse(storeUT.removeOwner(ownerRealUser, owner));
+            Assertions.assertTrue(storeUT.getOwnersUsername().contains(ownerRealUser.getUserName()));
+            Assertions.assertEquals(amountOfOwners, storeUT.getOwnersUsername().size());
+        }
+
+        @Test
+        void getOwnerToRemovePositive(){
+            UserSystem ownerToRemove = new UserSystem();
+            ownerToRemove.setUserName("ownerToRemove");
+            ownerToRemove.setOwnedStores(new HashSet<>());
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            storeUT.addOwner(ownerRealUser, ownerToRemove);
+            storeUT.approveOwner(newOwner, ownerToRemove.getUserName(), true);
+
+            Assertions.assertEquals(ownerToRemove, storeUT.getOwnerToRemove(ownerRealUser, ownerToRemove.getUserName()));
+            Assertions.assertTrue(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+        }
+
+        @Test
+        void getOwnerToRemoveNegative(){
+            UserSystem ownerToRemove = new UserSystem();
+            ownerToRemove.setUserName("ownerToRemove");
+            ownerToRemove.setOwnedStores(new HashSet<>());
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(ownerToRemove.getUserName()));
+            Assertions.assertThrows(NoOwnerInStoreException.class, ()->
+            {storeUT.getOwnerToRemove(owner, ownerToRemove.getUserName());
+            });
+        }
+
+        @Test
+        void getMySubOwnersPositive(){
+            UserSystem newOwner2 = new UserSystem();
+            newOwner2.setUserName("newOwner2");
+            newOwner2.setOwnedStores(new HashSet<>());
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            storeUT.addOwner(ownerRealUser, newOwner2);
+            storeUT.approveOwner(newOwner, newOwner2.getUserName(), true);
+
+            Assertions.assertTrue(storeUT.getMySubOwners(ownerRealUser.getUserName()).contains(newOwner.getUserName()));
+            Assertions.assertTrue(storeUT.getMySubOwners(ownerRealUser.getUserName()).contains(newOwner2.getUserName()));
+        }
+
+        @Test
+        void getMySubOwnersNegative(){
+            UserSystem newOwner2 = new UserSystem();
+            newOwner2.setUserName("newOwner2");
+            newOwner2.setOwnedStores(new HashSet<>());
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+
+            Assertions.assertFalse(storeUT.getOwnersUsername().contains(newOwner2.getUserName()));
+            Assertions.assertEquals(new LinkedList<>(), storeUT.getMySubOwners(newOwner2.getUserName()));
+        }
+
+        @Test
+        void isOwnerPositive(){
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            Assertions.assertTrue(storeUT.isOwner(ownerRealUser));
+            Assertions.assertTrue(storeUT.isOwner(newOwner));
+        }
+
+        @Test
+        void isOwnerNegative(){
+            Assertions.assertTrue(storeUT.isOwner(ownerRealUser));
+            Assertions.assertFalse(storeUT.isOwner(newOwner));
         }
 
         /**
-         * owner adds a manager to the store
+         * @pre the appointing owner is registered as the store owner
+         * adding an owner by an store owner
          */
         @Test
-        void notAppointingOwnerAddManagerNegative() {
-            //fail: not owner try to appoint a new manager for the store
-            //Assertions.assertNull(storeUT.addManager(fakeOwnerReal, managerUser));  //add manager again
+        void addOwnerPositive() {
+            // there are no owners who need to approve this
+            Assertions.assertTrue(storeUT.addOwner(ownerRealUser, newOwner).isEmpty());    //Success: owner appointing a newOwner as a new owner
         }
 
         /**
-         * owner can add permissions to a manager he appointed
+         * @pre the appointing owner is not registered as the store owner
+         * adding an owner by not store owner
          */
         @Test
-        void addPermissionToManagerPositive() {
-            addManagerSetup();  //add a manager to the store
-            //success: permission added to manager
-            Assertions.assertTrue(storeUT.addPermissionToManager(ownerRealUser, managerUser, StorePermission.EDIT_PRODUCT));
+        void addOwnerNegativeNotOwner() {
+            UserSystem newOwner = new UserSystem();   //the user the fake owner want to appoint as a new store owner
+            newOwner.setUserName("newOwner");
+            // null is returned since owner isn't really a store owner
+            Assertions.assertNull(storeUT.addOwner(fakeOwnerReal, newOwner)); //Fail: owner appointing a newOwner as a new owner
         }
 
         /**
-         * not owner try to add permissions to a manager
+         * @pre the appointed owner is already an owner in the store
+         * adding an already owner by owner
          */
         @Test
-        void notOwnerAddPermissionToManagerNegative() {
-            addManagerSetup();  //add a manager to the store
-            //fail: permission is not added to manager
-            Assertions.assertFalse(storeUT.addPermissionToManager(fakeOwnerReal, managerUser, StorePermission.EDIT_PRODUCT));
+        void addOwnerNegativeAlreadyOwner() {
+            Assertions.assertNull(storeUT.addOwner(ownerRealUser, ownerRealUser)); //Fail: owner appointing a an already owner to be owner
         }
 
-        /**
-         * owner remove permission from manager permissions list
-         */
+
         @Test
-        void removePermissionPositive() {
-            addManagerSetup();
-            //success : owner can remove permission from the manager's permissions list
-            //Assertions.assertTrue(storeUT.removePermissionFromManager(ownerRealUser, managerUser, StorePermission.VIEW));
+        void appointAdditionManagerPositive(){
+            UserSystem newOwner1 = new UserSystem();
+            newOwner1.setUserName("newOwner1");
+
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            storeUT.addOwner(newOwner, newOwner1);
+            storeUT.approveOwner(ownerRealUser, newOwner1.getUserName(), true);
+
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
+            Assertions.assertEquals(managerUser.getUserName(), storeUT.appointAdditionManager(newOwner, managerUser).getAppointedManager().getUserName());
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+            Assertions.assertEquals(managerUser1.getUserName(), storeUT.appointAdditionManager(newOwner1, managerUser1).getAppointedManager().getUserName());
+            Assertions.assertEquals(2, storeUT.getManagersStore().size());
         }
 
-        /**
-         * not an owner try to remove permission from manager permissions list
-         */
         @Test
-        void removePermissionNegative() {
-            addManagerSetup();
-            //fail: the user trying to remove is not an owner who appointed the manager
-            //Assertions.assertFalse(storeUT.removePermissionFromManager(fakeOwnerReal, managerUser, StorePermission.VIEW));
+        void appointAdditionManagerNegative(){
+            // not an owner adding a manager
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
+            Assertions.assertNull(storeUT.appointAdditionManager(newOwner, managerUser));
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
         }
 
         /**
@@ -1199,12 +1737,10 @@ class StoreTest {
          */
         @Test
         void removeManagerPositive() {
-            //setup: insert manager into managers list of the store
-            addManagerSetup();
-            //Assertions.assertEquals(1, storeUT.getManagers().size());
-            //success: owner can remove manager he appointed
-            Assertions.assertTrue(storeUT.removeManager(ownerRealUser, managerUser));
-            //Assertions.assertEquals(0, storeUT.getManagers().size());
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+            Assertions.assertTrue(storeUT.removeManager(ownerRealUser, managerUser)); //success: owner can remove manager he appointed
+            Assertions.assertEquals(0, storeUT.getManagersStore().size());
         }
 
         /**
@@ -1212,143 +1748,187 @@ class StoreTest {
          */
         @Test
         void removeManagerNegative() {
-            //setup: insert manager into managers list of the store
-            addManagerSetup();
-            //fail: only the owner can remove manager he appointed
-            Assertions.assertFalse(storeUT.removeManager(fakeOwnerReal, managerUser));
-            //Assertions.assertEquals(1, storeUT.getManagers().size());
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+            Assertions.assertFalse(storeUT.removeManager(fakeOwnerReal, managerUser)); //success: owner can remove manager he appointed
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
         }
 
         /**
-         * get existing product in the store
+         * owner can add permissions to a manager he appointed
          */
         @Test
-        void getExistProductPositive() {
-            addNewProductSetUp();
-            //success: get exist product
-            Assertions.assertEquals(product, storeUT.getProduct(product.getProductSn()));
+        void addPermissionToManagerPositive() {
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertTrue(storeUT.addPermissionToManager(ownerRealUser, managerUser, StorePermission.EDIT_PRODUCT));
         }
 
         /**
-         * get existing product in the store
+         * not owner try to add permissions to a manager
          */
         @Test
-        void getNotExistProductNegative() {
-            //success: get exist product
-            Throwable exception = Assertions.
-                    assertThrows(ProductDoesntExistException.class, () -> storeUT.getProduct(33));
-            Assertions.assertEquals("A product with id '" + 33 + "' is not exist in store with id: '" + storeUT.getStoreId() + "'", exception.getMessage());
+        void AddPermissionToManagerNegative() {
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertFalse(storeUT.addPermissionToManager(fakeOwnerReal, managerUser, StorePermission.EDIT_PRODUCT));
         }
 
         /**
-         * user which is manager in the store requests for receipts
+         * get exist manager in store
          */
         @Test
-        void managerViewReceiptsPositive() {
-            addManagerSetup();
-            insertReceiptsSetup();
-            /*List<Receipt> receipts = storeUT.managerViewReceipts(managerUser);  //get the receipts of store
-            int i = 0;
-            for (Receipt receipt : receipts) {
-                //success : manager can view the receipts and their fields as well
-                Assertions.assertEquals(i, receipt.getAmountToPay());
-                i++;
-            }*/
+        void getManagerPositive() {
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertEquals(managerUser.getUserName(), storeUT.getManager(ownerRealUser, managerUser.getUserName()).getUserName());
         }
 
         /**
-         * user which is not manager in the store requests for receipts
+         * try to get a manager with owner who didn't appoint him
          */
         @Test
-        void notManagerViewReceiptsNegative() {
-            //Throwable exception = Assertions.assertThrows(NoManagerInStoreException.class, () -> storeUT.managerViewReceipts(fakeOwnerReal));
-            //fail: the inserted user is not manager so cant see the receipts in store
-            //Assertions.assertEquals("The user name '" + "DT" + "' is not manager in the store number: '" + storeUT.getStoreId() + "'", exception.getMessage());
+        void getManagerNegative() {
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertNull(storeUT.getManager(fakeOwnerReal, managerUser.getUserName()));
+        }
+
+        @Test
+        void getOperationsCanDoPositive(){
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            List<String> operations = storeUT.getOperationsCanDo(managerUser);
+            Assertions.assertNotNull(operations);
+            Assertions.assertEquals(1, operations.size());
+            Assertions.assertTrue(operations.contains("view"));
+        }
+
+        @Test
+        void getOperationsCanDoNegative(){
+            List<String> operations = storeUT.getOperationsCanDo(managerUser);
+            Assertions.assertEquals(new ArrayList<>(), operations);
+        }
+
+        @Test
+        void getMySubMangersPositive(){
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            storeUT.appointAdditionManager(ownerRealUser, managerUser1);
+
+            List<MangerStore> mangerStoreList = storeUT.getMySubMangers(ownerRealUser.getUserName());
+            Assertions.assertEquals(2, mangerStoreList.size());
+            for (MangerStore mangerStore: mangerStoreList)
+                Assertions.assertTrue(mangerStore.getAppointedManager().getUserName().equals(managerUser.getUserName())
+                        || mangerStore.getAppointedManager().getUserName().equals(managerUser1.getUserName()));
+        }
+
+        @Test
+        void getMySubMangersNegative(){
+            Assertions.assertEquals(0, storeUT.getMySubMangers(fakeOwnerReal.getUserName()).size());
         }
 
         /**
-         * user which is manager in the store requests for receipts
+         * owner remove permission from manager permissions list
          */
         @Test
-        void ownerViewReceiptsPositive() {
-            addOwnerSetup();
-            insertReceiptsSetup();
-            /*List<Receipt> receipts = storeUT.ownerViewReceipts(ownerRealUser);  //get the receipts of store
-            int i = 0;
-            for (Receipt receipt : receipts) {
-                //success : manager can view the receipts and their fields as well
-                Assertions.assertEquals(i, receipt.getAmountToPay());
-                i++;
-            }*/
+        void removePermissionPositive() {
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            //success : owner can remove permission from the manager's permissions list
+            Assertions.assertTrue(storeUT.removePermission(ownerRealUser, managerUser, StorePermission.VIEW));
         }
 
         /**
-         * user which is not owner in the store requests for receipts
+         * not an owner try to remove permission from manager permissions list
          */
         @Test
-        void notOwnerViewReceiptsNegative() {
-            //Throwable exception = Assertions.assertThrows(NoManagerInStoreException.class, () -> storeUT.ownerViewReceipts(fakeOwnerReal));
-            //fail: the inserted user is not owner so cant see the receipts in store
-            //Assertions.assertEquals("The user name '" + "DT" + "' is not manager in the store number: '" + storeUT.getStoreId() + "'", exception.getMessage());
+        void removePermissionNegative() {
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            //fail: the user trying to remove is not an owner who appointed the manager
+            Assertions.assertFalse(storeUT.removePermission(fakeOwnerReal, managerUser, StorePermission.VIEW));
+        }
+
+        @Test
+        void getPermissionOfManagerPositive(){
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertEquals(1, storeUT.getManagersStore().size());
+
+            Set<StorePermission> permissions = storeUT.getPermissionOfManager(ownerRealUser, managerUser);
+            Assertions.assertNotNull(permissions);
+            Assertions.assertEquals(1, permissions.size());
+            Assertions.assertEquals("view", permissions.stream().findFirst().get().function);
+        }
+
+        @Test
+        void getPermissionOfManagerNegative(){
+            Set<StorePermission> operations = storeUT.getPermissionOfManager(fakeOwnerReal, managerUser);
+            Assertions.assertNull(operations);
+        }
+
+        @Test
+        void getManagersStorePositive(){
+            storeUT.addOwner(ownerRealUser, newOwner);
+            storeUT.approveOwner(ownerRealUser, newOwner.getUserName(), true);
+            storeUT.appointAdditionManager(newOwner, managerUser);
+            storeUT.appointAdditionManager(newOwner, managerUser1);
+
+            Set<MangerStore> mangerStoreSet = storeUT.getManagersStore();
+            Assertions.assertEquals(2, mangerStoreSet.size());
+            for (MangerStore mangerStore:mangerStoreSet)
+                Assertions.assertTrue(mangerStore.getAppointedManager().getUserName().equals(managerUser.getUserName())
+                        || mangerStore.getAppointedManager().getUserName().equals(managerUser1.getUserName()));
+        }
+
+        @Test
+        void getManagersStoreNegativeNoManagers(){
+            Set<MangerStore> mangerStoreSet = storeUT.getManagersStore();
+            Assertions.assertEquals(0, mangerStoreSet.size());
+        }
+
+        @Test
+        void managerHavePermissionPositive(){
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertTrue(storeUT.managerHavePermission(managerUser.getUserName(), StorePermission.VIEW));
+            Assertions.assertFalse(storeUT.managerHavePermission(managerUser.getUserName(), StorePermission.EDIT_PRODUCT));
+            storeUT.addPermissionToManager(ownerRealUser, managerUser, StorePermission.EDIT_PRODUCT);
+            Assertions.assertTrue(storeUT.managerHavePermission(managerUser.getUserName(), StorePermission.EDIT_PRODUCT));
+        }
+
+        @Test
+        void managerHavePermissionNegative(){
+            Assertions.assertFalse(storeUT.managerHavePermission(managerUser.getUserName(), StorePermission.VIEW));
+        }
+
+        @Test
+        void getPermissionCantDoPositive(){
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Set <StorePermission> storePermissions = storeUT.getPermissionCantDo(ownerRealUser, managerUser);
+            Assertions.assertFalse(storePermissions.contains(StorePermission.VIEW));
+            Assertions.assertTrue(storePermissions.contains(StorePermission.EDIT_PRODUCT));
+
+            storeUT.addPermissionToManager(ownerRealUser, managerUser, StorePermission.EDIT_PRODUCT);
+            storePermissions = storeUT.getPermissionCantDo(ownerRealUser, managerUser);
+            Assertions.assertFalse(storePermissions.contains(StorePermission.VIEW));
+            Assertions.assertFalse(storePermissions.contains(StorePermission.EDIT_PRODUCT));
+        }
+
+        @Test
+        void getPermissionCantDoNegative(){
+            storeUT.appointAdditionManager(ownerRealUser, managerUser);
+            Assertions.assertNull(storeUT.getPermissionCantDo(fakeOwnerReal, managerUser));
         }
 
         /**
-         * functionality of watching the store information
+         * add new purchase policy to store
          */
         @Test
-        void showStoreInfo() {
-            //success: shows the store info as string
-            //Assertions.assertEquals("The store Store under test has ID: " + storeUT.getStoreId() + "", storeUT.showStoreInfo());
+        public void addPurchasePolicyPositive() {
+            Assertions.assertEquals(0, storeUT.getPurchasePolicies().size());
+            storeUT.addPurchasePolicy(ownerRealUser, purchasePolicy);
+            Assertions.assertEquals(1, storeUT.getPurchasePolicies().size());
         }
 
-        /**
-         * functionality of watching the store products information
-         */
         @Test
-        void showProductsInStoreInfo() {
-            //success: no products in store so show empty string
-            //Assertions.assertEquals("", storeUT.showProductsInStoreInfo());
-        }
-
-        //////////////////////////UC 4.2 ///////////////////////////////////////
-
-        /**
-         * see success of applying discount from store on product in bag
-         * all kinds of discounts are
-         */
-        @Test
-        public void applyDiscountPoliciesPositive() {
-            Map<Product, Integer> productBag = new HashMap<>();
-            productBag.put(product, 1);
-            productBag.put(product2,1);
-            productBag.put(product3,1);
-            addNewDiscountToStoreSetup();
-            storeUT.applyDiscountPolicies(productBag);
-            //success: all discounts were applied
-            Assertions.assertTrue(discount1.isApplied());
-            Assertions.assertTrue(discount2.isApplied());
-            Assertions.assertTrue(discount3.isApplied());
-
-
-        }
-
-
-        /**
-         * see fail of applying discount from store on product in bag
-         * because of illegal negative price after discount
-         * can't be checked under unit tests need integration
-         */
-        @Test
-        public void applyDiscountPoliciesNegative() {
-            Map<Product, Integer> productBag = new HashMap<>();
-            productBag.put(product2, 1);
-
-            addNewDiscountToStoreSetup();   //add discount
-            product2.setCost(-10);
-            Throwable exception = Assertions
-                    .assertThrows(IllegalProductPriceException.class, () -> storeUT.applyDiscountPolicies(productBag));
-            Assertions.assertEquals("The discount with id: " + 35 +
-                    " caused price to be equal or less than zero!", exception.getMessage());
+        public void addPurchasePolicyNegative() {
+            Assertions.assertEquals(0, storeUT.getPurchasePolicies().size());
+            Assertions.assertThrows(NotAdministratorException.class, ()->
+            {storeUT.addPurchasePolicy(fakeOwnerReal, purchasePolicy);
+            });
+            Assertions.assertEquals(0, storeUT.getPurchasePolicies().size());
         }
 
         /**
@@ -1360,7 +1940,7 @@ class StoreTest {
             Map<Product, Integer> productBag = new HashMap<>();
             productBag.put(product, 1);
             BillingAddress billingAddress = BillingAddress.builder().country("Israel").build();
-            storeUT.isApprovedPurchasePolicies(productBag, billingAddress);
+            Assertions.assertTrue(storeUT.isApprovedPurchasePolicies(productBag, billingAddress));
         }
 
         /**
@@ -1369,16 +1949,15 @@ class StoreTest {
          */
         @Test
         public void isApprovedPurchasePoliciesPositive() {
-//            Map<Product, Integer> productBag = new HashMap<>();
-//            productBag.put(product, 1);
-//            Set<String> countries = new HashSet<>();
-//            countries.add("Israel");
-//            Purchase purchasePolicy = Purchase.builder()
-//                    .countriesPermitted(countries)
-//                    .build();
-//            addNewPurchasePolicyToStoreSetup(purchasePolicy);   //add discount
-//            BillingAddress billingAddress = BillingAddress.builder().country("Israel").build();
-//            storeUT.isApprovedPurchasePolicies(productBag, billingAddress);
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            Purchase purchase = Purchase.builder()
+                    .purchaseType(PurchaseType.SHOPPING_BAG_DETAILS)
+                    .purchasePolicy(new PurchasePolicy())
+                    .build();
+            storeUT.addPurchasePolicy(ownerRealUser, purchase);
+            BillingAddress billingAddress = BillingAddress.builder().country("Israel").build();
+            Assertions.assertFalse(storeUT.isApprovedPurchasePolicies(productBag, billingAddress));
         }
 
 
@@ -1388,141 +1967,190 @@ class StoreTest {
          */
         @Test
         public void isApprovedPurchasePoliciesNegative() {
-//            Map<Product, Integer> productBag = new HashMap<>();
-//            productBag.put(product, 1);
-//            Set<String> countries = new HashSet<>();
-//            countries.add("Uruguay");
-//            Purchase purchasePolicy = Purchase.builder()
-//                    .countriesPermitted(countries)
-//                    .build();
-//            addNewPurchasePolicyToStoreSetup(purchasePolicy);   //add discount
-//            BillingAddress billingAddress = BillingAddress.builder().country("Israel").build();
-//            Throwable exception = Assertions
-//                    .assertThrows(PurchasePolicyException.class, () -> storeUT.isApprovedPurchasePolicies(productBag, billingAddress));
-//            Assertions.assertEquals("Purchase policy error occured: Sorry, but your user details are incompatible with the store policy: " +
-//                    "store doesn't make deliveries to: Israel", exception.getMessage());
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            Purchase purchase= Purchase.builder()
+                    .purchaseType(PurchaseType.PRODUCT_DETAILS)
+                    .purchasePolicy(new PurchasePolicy())
+                    .build();
+            storeUT.addPurchasePolicy(ownerRealUser, purchase);
+            BillingAddress billingAddress = BillingAddress.builder().country("Israel").build();
+            Assertions.assertFalse(storeUT.isApprovedPurchasePolicies(productBag, billingAddress));
         }
-
-        /**
-         * add new discount to store
-         */
-        @Test
-        public void addDiscountToStore() {
-            Assertions.assertEquals(0, storeUT.getDiscounts().size());
-            storeUT.addDiscount(ownerRealUser, discount);
-            Assertions.assertEquals(1, storeUT.getDiscounts().size());
-        }
-
-        /**
-         * add new purchase policy to store
-         */
-        @Test
-        public void addPurchasePolicyToStore() {
-            Assertions.assertEquals(0, storeUT.getPurchasePolicies().size());
-            storeUT.addPurchasePolicy(ownerRealUser, purchasePolicy);
-            Assertions.assertEquals(1, storeUT.getPurchasePolicies().size());
-        }
-
-//        /**
-//         * edit existed discount in store
-//         */
-//        @Test
-//        public void editDiscountPositive() {
-//            discount = Discount.builder()
-//                    .discountId(0)
-//                    .discountPercentage(10)
-//                    .amountOfProductsForApplyDiscounts(new HashMap<>())
-//                    .endTime(Calendar.getInstance())
-//                    .description("")
-//                    .composedDiscounts(new ArrayList<>())
-//                    .compositeOperator(CompositeOperator.OR)
-//                    .isStoreDiscount(false)
-//                    .minPrice(0)
-//                    .productsUnderThisDiscount(new HashMap<>())
-//                    .build();
-//            addNewDiscountToStoreSetup(discount); //add discount to store
-//            discount.setMinPrice(10); // set new min price to edit
-//            Assertions.assertEquals(storeUT.addEditDiscount(ownerRealUser, discount).getMinPrice(), 10);
-//        }
-
-//        /**
-//         * edit not existed discount in store
-//         */
-//        @Test
-//        public void editDiscountNegative() {
-//            discount = Discount.builder()
-//                    .discountId(0)
-//                    .discountPercentage(10)
-//                    .amountOfProductsForApplyDiscounts(new HashMap<>())
-//                    .endTime(Calendar.getInstance())
-//                    .description("")
-//                    .composedDiscounts(new ArrayList<>())
-//                    .compositeOperator(CompositeOperator.OR)
-//                    .isStoreDiscount(false)
-//                    .minPrice(0)
-//                    .productsUnderThisDiscount(new HashMap<>())
-//                    .build();
-//            discount.setMinPrice(10); // set new min price to edit
-//            Assertions.assertNull(storeUT.addEditDiscount(ownerRealUser, discount));
-//        }
 
         /**
          * edit existed purchase in store
          */
         @Test
-        public void editPurchasePositive() {
-//            purchasePolicy = Purchase.builder()
-//                    .min(0)
-//                    .max(13)
-//                    .isShoppingBagPurchaseLimit(false)
-//                    .build();
-//            addNewPurchasePolicyToStoreSetup(purchasePolicy); //add discount to store
-//            purchasePolicy.setMax(100); // set new min price to edit
-//            Assertions.assertEquals(storeUT.addEditPurchase(ownerRealUser, purchasePolicy).getMax(), 100);
+        public void addEditPurchasePositive() {
+            purchasePolicy = Purchase.builder()
+                    .purchaseType(PurchaseType.PRODUCT_DETAILS)
+                    .build();
+            Assertions.assertEquals(purchasePolicy, storeUT.addPurchasePolicy(ownerRealUser, purchasePolicy));
+            purchasePolicy.setPurchaseType(PurchaseType.SHOPPING_BAG_DETAILS);
+            Assertions.assertEquals(purchasePolicy, storeUT.addEditPurchase(ownerRealUser, purchasePolicy));
         }
 
         /**
          * edit not existed purchase in store
          */
         @Test
-        public void editPurchaseNegative() {
-//            purchasePolicy = Purchase.builder()
-//                    .min(0)
-//                    .max(13)
-//                    .isShoppingBagPurchaseLimit(false)
-//                    .build();
-//            purchasePolicy.setMax(100); // set new min price to edit
-//            Assertions.assertNull(storeUT.addEditPurchase(ownerRealUser, purchasePolicy));
+        public void addEditPurchaseNegative() {
+            purchasePolicy = Purchase.builder()
+                    .purchaseType(PurchaseType.PRODUCT_DETAILS)
+                    .build();
+            Assertions.assertEquals(purchasePolicy, storeUT.addPurchasePolicy(ownerRealUser, purchasePolicy));
+            purchasePolicy.setPurchaseType(PurchaseType.SHOPPING_BAG_DETAILS);
+            Assertions.assertThrows(Exception.class, ()-> storeUT.addEditPurchase(fakeOwnerReal, purchasePolicy));
         }
-
-//////////////////setups///////////////////////////////////
 
         /**
-         * add all types of discounts to the store
+         * see success of applying discount from store on product in bag
+         * all kinds of discounts are
          */
-        private void addNewDiscountToStoreSetup() {
-            //storeUT.addDiscount(ownerRealUser, discount);
+        @Test
+        public void applyDiscountPoliciesPositive() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product, 1);
+            storeUT.addDiscount(ownerRealUser, discount1);
+            Assertions.assertFalse(discount1.isApplied());
+            storeUT.applyDiscountPolicies(productBag);
+            Assertions.assertFalse(discount1.isApplied());
+        }
+
+        /**
+         * see fail of applying discount from store on product in bag
+         * because of illegal negative price after discount
+         * can't be checked under unit tests need integration
+         */
+        @Test
+        public void applyDiscountPoliciesNegative() {
+            Map<Product, Integer> productBag = new HashMap<>();
+            productBag.put(product2, 1);
             storeUT.addDiscount(ownerRealUser,discount1);
-            storeUT.addDiscount(ownerRealUser,discount2);
-            storeUT.addDiscount(ownerRealUser,discount3);
-            storeUT.addDiscount(ownerRealUser,discount4);
-
+            product2.setCost(-10);
+            storeUT.applyDiscountPolicies(productBag);
+            Assertions.assertFalse(discount1.isApplied());
         }
 
-        private void addNewPurchasePolicyToStoreSetup(Purchase purchasePolicy) {
-            storeUT.addPurchasePolicy(ownerRealUser, purchasePolicy);
+        @Test
+        public void removeDiscountPositive(){
+            Discount discount1 = new Discount();
+            discount1.setDiscountId((long) 1);
+            storeUT.addDiscount(ownerRealUser, discount1).getDiscountId();
+            Assertions.assertTrue(storeUT.removeDiscount(ownerRealUser, (int) discount1.getDiscountId()));
         }
 
-        private void insertReceiptsSetup() {
-            for (int i = 0; i < 10; i++) {
-                storeUT.getReceipts().add(Receipt.builder()
-                        .amountToPay(i)
-                        .productsBought(new HashMap<Product, Integer>())
-                        .purchaseDate(new Date())
-                        .storeId(0)
-                        .userName("felix")
-                        .build());
-            }
+        @Test
+        public void removeDiscountNegative(){
+            Discount discount1 = mock(Discount.class);
+            storeUT.addDiscount(ownerRealUser, discount1).getDiscountId();
+            Assertions.assertThrows(Exception.class, ()->
+                    storeUT.removeDiscount(fakeOwnerReal, (int) discount1.getDiscountId()));
+        }
+
+
+        @Test
+        void getStoreDiscountsPositive(){
+            Discount discount1 = new Discount();
+            discount1.setDiscountId((long)1);
+            storeUT.addDiscount(ownerRealUser, discount1);
+            Assertions.assertEquals(1, storeUT.getStoreDiscounts(ownerRealUser).size());
+            Assertions.assertTrue(storeUT.getStoreDiscounts(ownerRealUser).contains(discount1));
+        }
+
+        @Test
+        void getStoreDiscountsNegative(){
+            Discount discount1 = new Discount();
+            discount1.setDiscountId((long)1);
+            storeUT.addDiscount(ownerRealUser, discount1);
+            Assertions.assertThrows(Exception.class,()->
+                    storeUT.getStoreDiscounts(fakeOwnerReal));
+        }
+
+        @Test
+        public void addDiscountPositive() {
+            Assertions.assertEquals(0, storeUT.getDiscounts().size());
+            Assertions.assertNotNull(storeUT.addDiscount(ownerRealUser, discount));
+            Assertions.assertEquals(1, storeUT.getDiscounts().size());
+        }
+
+        @Test
+        public void addDiscountNegative() {
+            Assertions.assertEquals(0, storeUT.getDiscounts().size());
+            Assertions.assertThrows(NotAdministratorException.class, ()->
+                    storeUT.addDiscount(fakeOwnerReal, discount));
+            Assertions.assertEquals(0, storeUT.getDiscounts().size());
+        }
+
+        @Test
+        public void editDiscountPositive() {
+            discount = Discount.builder()
+                    .discountId(0)
+                    .discountPercentage(10)
+                    .endTime(Calendar.getInstance())
+                    .description("")
+                    .build();
+            storeUT.addDiscount(ownerRealUser, discount);
+            discount.setDiscountPercentage(20);
+            Assertions.assertEquals(20, storeUT.addEditDiscount(ownerRealUser, discount).getDiscountPercentage());
+        }
+
+        @Test
+        public void editDiscountNegative() {
+            discount = Discount.builder()
+                    .discountId(0)
+                    .discountPercentage(10)
+                    .endTime(Calendar.getInstance())
+                    .description("")
+                    .build();
+            discount.setDiscountPercentage(20);
+            Assertions.assertThrows(NotAdministratorException.class, ()->
+                    storeUT.addEditDiscount(fakeOwnerReal, discount));
+        }
+
+        @Test
+        void getDiscountSimplePositive(){
+            Discount discount1 = Discount.builder()
+                    .discountId(1)
+                    .discountType(DiscountType.COMPOSE)
+                    .build();
+            Discount discount2 = Discount.builder()
+                    .discountId(2)
+                    .discountType(DiscountType.VISIBLE)
+                    .build();
+            Discount discount3 = Discount.builder()
+                    .discountId(3)
+                    .discountType(DiscountType.CONDITIONAL_PRODUCT)
+                    .build();
+            storeUT.addDiscount(ownerRealUser, discount1);
+            storeUT.addDiscount(ownerRealUser, discount2);
+            storeUT.addDiscount(ownerRealUser, discount3);
+
+            List<Discount> discounts = storeUT.getDiscountSimple();
+            Assertions.assertEquals(2, discounts.size());
+            for (Discount discount: discounts)
+                Assertions.assertNotEquals(DiscountType.COMPOSE, discount.getDiscountType());
+        }
+        @Test
+        void getDiscountSimpleNegative(){
+            List<Discount> discounts = storeUT.getDiscountSimple();
+            Assertions.assertEquals(0, discounts.size());
+        }
+
+        @Test
+        void getExistProductPositive() {
+            addNewProductSetUp();
+            //success: get exist product
+            Assertions.assertEquals(product, storeUT.getProduct(product.getProductSn()));
+        }
+
+        @Test
+        void getNotExistProductNegative() {
+            //success: get exist product
+            Throwable exception = Assertions.
+                    assertThrows(ProductDoesntExistException.class, () -> storeUT.getProduct(33));
+            Assertions.assertEquals("A product with id '" + 33 + "' is not exist in store with id: '" + storeUT.getStoreId() + "'", exception.getMessage());
         }
 
         private void addProductAsEditProductSetup() {
@@ -1534,69 +2162,5 @@ class StoreTest {
         private void addNewProductSetUp() {
             storeUT.addNewProduct(ownerRealUser, product);
         }
-
-        private void addManagerSetup() {
-            //storeUT.addManager(ownerRealUser, managerUser);  //adding alex as new manager in the store
-        }
-
-        private void addOwnerSetup() {
-            storeUT.addOwner(ownerRealUser, newOwnerReal);
-        }
-
-    }
-
-    private void setUpRemoveOwner(){
-        Set<OwnersAppointee> appointedOwners = new HashSet<>();
-        Set<UserSystem> owners = new HashSet<>();
-        owners.add(owner);
-        owners.add(managerUser);
-        Set<UserSystem> ownerSet = new HashSet<>();
-        ownerSet.add(managerUser);
-        //appointedOwners.add(new OwnersAppointee(owner.getUserName(),ownerSet));
-        ownerSet = makeOwnersSet(4, "Erik");
-        UserSystem usr = getUser(ownerSet);
-        //appointedOwners.add(new OwnersAppointee(managerUser.getUserName(),ownerSet));
-        owners.addAll(ownerSet);
-        ownerSet = makeOwnersSet(2, "Fez");
-        //appointedOwners.add(new OwnersAppointee(usr.getUserName(), ownerSet));
-        owners.addAll(ownerSet);
-        usr = getUser(ownerSet);
-        ownerSet = makeOwnersSet(2, "Michael");
-        //appointedOwners.add(new OwnersAppointee(usr.getUserName(), ownerSet));
-        owners.addAll(ownerSet);
-        //storeUT.setOwners(owners);
-        storeUT.setAppointedOwners(appointedOwners);
-        Set<Store> store = new HashSet<>();
-        store.add(storeUT);
-        owner.setOwnedStores(store);
-        managerUser.setOwnedStores(store);
-    }
-
-    private void setUpRemoveOwnerManager(){
-        setUpRemoveOwner();
-        ownerRealUser = mock(UserSystem.class);
-        when(ownerRealUser.getUserName()).thenReturn("IAmAManager");
-        //when(((MangerStore)any()).getAppointedManager()).thenReturn(ownerRealUser);
-        //storeUT.addManager(managerUser,ownerRealUser);
-    }
-
-    private UserSystem getUser(Set<UserSystem> users){
-        for (UserSystem user: users) {
-            return user;
-        }
-        return null;
-    }
-
-    private Set<UserSystem> makeOwnersSet(int length, String name){
-        Set<UserSystem> tempOwners = new HashSet<>();
-        for (int i=0; i < length ; i++){
-            Set<Store> stores = new HashSet<>();
-            stores.add(storeUT);
-            UserSystem userSystem = UserSystem.builder()
-                    .userName(name+i)
-                    .ownedStores(stores).build();
-            tempOwners.add(userSystem);
-        }
-        return tempOwners;
     }
 }
