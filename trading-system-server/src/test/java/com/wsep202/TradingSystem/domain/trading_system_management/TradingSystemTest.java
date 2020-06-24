@@ -1862,6 +1862,8 @@ class TradingSystemTest {
             Assertions.assertEquals(Double.parseDouble(formatter.format(product.getCost()*5)),receipts.get(0).getAmountToPay());
             //check the stock in store updated
             Assertions.assertTrue(amountOfProductInStore > store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is empty after purchase
+            Assertions.assertTrue(testShoppingCart.getNumOfProductsInCart()==0);
         }
 
         /**
@@ -1877,6 +1879,8 @@ class TradingSystemTest {
             Assertions.assertNull(tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
             //check that the amount of the product didn't change in store after fail charge
             Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is still empty
+            Assertions.assertTrue(testShoppingCart.getNumOfProductsInCart()==0);
         }
 
         /**
@@ -1893,9 +1897,11 @@ class TradingSystemTest {
             //check that the system does not allow to use a null payment details
             Assertions.assertNull(tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,null,billingAddress));
             //check that the system does not allow to use a null billing address
-            Assertions.assertNull(tradingSystem1.purchaseShoppingCartGuest(null,paymentDetails,null));
+            Assertions.assertNull(tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,null));
             //check that the amount of the product didn't change in store after fail charge
             Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is not empty after fail purchase
+            Assertions.assertTrue(testShoppingCart.getNumOfProductsInCart()!=0);
         }
 
         /**
@@ -1914,6 +1920,8 @@ class TradingSystemTest {
                     tradingSystem1.purchaseShoppingCartGuest(testShoppingCart,paymentDetails,billingAddress));
             //check that the amount of the product didn't change in store after fail charge
             Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is not empty after fail purchase
+            Assertions.assertTrue(testShoppingCart.getNumOfProductsInCart()!=0);
         }
 
         /**
@@ -1932,6 +1940,8 @@ class TradingSystemTest {
             Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
             //check that the amount of the product didn't change in store after fail charge
             Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is not empty after fail purchase
+            Assertions.assertTrue(testShoppingCart.getNumOfProductsInCart()!=0);
         }
 
         /**
@@ -1950,6 +1960,8 @@ class TradingSystemTest {
             Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
             //check that the amount of the product didn't change in store after fail charge
             Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is not empty after fail purchase
+            Assertions.assertTrue(testShoppingCart.getNumOfProductsInCart()!=0);
         }
 
         /**
@@ -1968,6 +1980,8 @@ class TradingSystemTest {
             Assertions.assertTrue(userSystem2.getReceipts().containsAll(receipts));
             //check the stock in store updated
             Assertions.assertTrue(amountOfProductInStore > store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is empty after purchase
+            Assertions.assertTrue(userSystem2.getShoppingCart().getNumOfProductsInCart()==0);
         }
 
         /**
@@ -1987,6 +2001,8 @@ class TradingSystemTest {
             Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
             //check that the amount of the product didn't change in store after fail charge
             Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is not empty after fail purchase
+            Assertions.assertTrue(testShoppingCart.getNumOfProductsInCart()!=0);
         }
 
         private void setUpDiscountPolicy(){
@@ -2020,6 +2036,8 @@ class TradingSystemTest {
             Assertions.assertTrue(testShoppingCart.getShoppingBag(store).getProductListFromStore().containsKey(product));
             //check that the amount of the product didn't change in store after fail charge
             Assertions.assertEquals(amountOfProductInStore, store.getProduct(product.getProductSn()).getAmount());
+            //check that cart is not empty after fail purchase
+            Assertions.assertTrue(testShoppingCart.getNumOfProductsInCart()!=0);
         }
 
         private void setUpPurchasePolicy(){
