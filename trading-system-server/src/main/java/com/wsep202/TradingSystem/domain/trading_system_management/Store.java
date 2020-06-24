@@ -945,4 +945,9 @@ public class Store {
         return -1; // userName doesn't exist in appointedOwners
     }
 
+    public Receipt addReceipt(Receipt receipt){
+        receipts.add(receipt);
+        return receipt;
+    }
+
 }
