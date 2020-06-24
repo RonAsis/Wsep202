@@ -224,27 +224,6 @@ public class initFileTest {
     }
 
     /**
-     * the following check activation of the add purchase policy facade method by the initial file
-     */
-    @Test
-    void checkAddPurchasePolicy(){
-        doAnswer(new Answer<Void>() {   //activate flag is true when the proper method is called in facade
-            @Override
-            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
-                isActivated = true;
-                return null;
-            }
-        }).when(facadeMock).addEditPurchase(anyString(),anyInt(),anyObject(),anyObject());
-        //set mock context for the add owner
-        Context context = mock(Context.class);
-        when(context.getUuid(anyString())).thenReturn(new UUID(1,1));
-        when(context.getRealStoreId(anyInt())).thenReturn(1);
-
-        verifyDefinitionTypeActivated("addPolicyPurchase",context);
-    }
-
-
-    /**
      * the following check activation of the add product facade method by the initial file
      */
     @Test
