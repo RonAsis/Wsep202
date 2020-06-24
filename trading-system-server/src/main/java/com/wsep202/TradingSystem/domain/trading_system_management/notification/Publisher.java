@@ -60,9 +60,14 @@ public class Publisher implements Subject {
         try {
             List<Notification> notifications = new LinkedList<>();
             observersWithNotification.forEach(observer -> {
-                List<Notification> notificationsObserver = observer.getNotifications();
-                tradingSystemDao.updateUser((UserSystem) observer);
-                notifications.addAll(notificationsObserver);
+                Optional<UserSystem> userSystemOptional = tradingSystemDao.getUserSystem(observer.getUserName());
+                if(userSystemOptional.isPresent()){
+                    UserSystem userSystem = userSystemOptional.get();
+                    List<Notification> notificationsObserver = userSystem.getNotifications();
+                    tradingSystemDao.updateUser(userSystem);
+                    notifications.addAll(notificationsObserver);
+                }
+
             });
             if (!CollectionUtils.isEmpty(notifications)) {
                 tradingSystemFacade.sendNotification(notifications);

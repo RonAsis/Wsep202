@@ -75,6 +75,7 @@ public class TradingSystemCashing {
                 shoppingBagsList.put(storeToUpdate, storeShoppingBagEntry.getValue());
                 shoppingBagsList.remove(storeShoppingBagEntry.getKey());
             });
+
         });
     }
 }
