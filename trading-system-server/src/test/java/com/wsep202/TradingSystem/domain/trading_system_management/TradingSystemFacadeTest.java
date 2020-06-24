@@ -50,7 +50,7 @@ class TradingSystemFacadeTest {
     private ServiceFacade serviceFacade;
     private MultipartFile userImage;
     private ShoppingCart shoppingCart;
-    private TradingSystemDao tradingSystemDao;
+    private TradingSystemDaoImpl tradingSystemDao;
     private Product product;
     private Discount discount;
     private MangerStore mangerStore;
@@ -765,8 +765,8 @@ class TradingSystemFacadeTest {
         private ServiceFacade serviceFacade;
         private MultipartFile userImage;
         private ShoppingCart shoppingCart;
-        @Autowired
-        private TradingSystemDao tradingSystemDao;
+        //@Autowired
+        private TradingSystemDaoImpl tradingSystemDao;
         private Product product;
         private Discount discount;
         private MangerStore mangerStore;
@@ -776,11 +776,13 @@ class TradingSystemFacadeTest {
 
         @BeforeEach
         void setUp() {
+            tradingSystemDao = new TradingSystemDaoImpl();
+            tradingSystemFacade = new TradingSystemFacade(tradingSystem,modelMapper,factoryObjects,serviceFacade,tradingSystemDao);
         }
 
         @AfterEach
         void tearDown() {
-            tradingSystemDao.setIsLogins(new HashMap<>());
+            tradingSystemDao.setIsLogins(new HashSet<>());
             tradingSystemDao.setStores(new HashSet<>());
             tradingSystemDao.setUsers(new HashSet<>());
         }
@@ -1318,21 +1320,7 @@ class TradingSystemFacadeTest {
         void testPurchaseShoppingCart() {
         }
 
-        @Test
-        void getOwnerStores() {
-        }
 
-        @Test
-        void getMangeStores() {
-        }
-
-        @Test
-        void getStores() {
-        }
-
-        @Test
-        void getProducts() {
-        }
 
         @Test
         void connectNotificationSystem() {
@@ -1342,77 +1330,19 @@ class TradingSystemFacadeTest {
         void sendNotification() {
         }
 
-        @Test
-        void getCategories() {
-        }
 
-        @Test
-        void getOperationsCanDo() {
-        }
-
-        @Test
-        void getAllOperationOfManger() {
-        }
-
-        @Test
-        void getTotalPriceOfShoppingCart() {
-        }
 
         @Test
         void addProductToShoppingCart() {
         }
 
-        @Test
-        void getShoppingCart() {
-        }
 
-        @Test
-        void testGetTotalPriceOfShoppingCart() {
-        }
-
-        @Test
-        void getUsers() {
-        }
-
-        @Test
-        void getDiscountsSimple() {
-        }
-
-        @Test
-        void getAlltDiscounts() {
-        }
-
-        @Test
-        void getAllStorePurchases() {
-        }
-
-        @Test
-        void getAllUsernameNotOwnerNotManger() {
-        }
-
-        @Test
-        void getMySubOwners() {
-        }
-
-        @Test
-        void getMySubMangers() {
-        }
-
-        @Test
-        void getPermissionCantDo() {
-        }
-
-        @Test
-        void isOwner() {
-        }
 
         @Test
         void changeProductAmountInShoppingBag() {
         }
 
-        @Test
-        void getMyOwnerToApprove() {
-        }
+
 
         @Test
         void approveOwner() {

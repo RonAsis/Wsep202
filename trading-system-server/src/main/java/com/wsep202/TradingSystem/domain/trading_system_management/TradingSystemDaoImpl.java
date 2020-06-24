@@ -275,6 +275,10 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
     public void setUsers(Set<UserSystem> users){
         this.users = users;
     }
+    public void setIsLogins(Set<UserSystem> usersLogin){
+        this.users = usersLogin;
+    }
+
 
     private int getNewIdStore() {
         return idAccStore++;
