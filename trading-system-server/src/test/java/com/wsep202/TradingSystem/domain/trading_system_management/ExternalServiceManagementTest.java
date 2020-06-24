@@ -1,6 +1,7 @@
 package com.wsep202.TradingSystem.domain.trading_system_management;
 
 import com.wsep202.TradingSystem.domain.exception.ExternalSystemException;
+import com.wsep202.TradingSystem.domain.exception.IllegalProductCostOrAmountException;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.BillingAddress;
 import com.wsep202.TradingSystem.domain.trading_system_management.purchase.PaymentDetails;
 import externals.*;
@@ -383,7 +384,7 @@ class ExternalServiceManagementTest {
             expectedStores.add(store.getStoreId()); //the expected store that failed to be returned in list
             //mock for charge system
             when(chargeSystem.cancelCharge(paymentDetails,"11",cart)).thenReturn(-1);
-            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,-2,store.getStoreId()),2);
+            bag.addProductToBag(new Product("p",ProductCategory.BOOKS_MOVIES_MUSIC,2,2,store.getStoreId()),2);
 
             //fail: the cancellation failed
             paymentDetails.setCreditCardNumber("123456789");    //valid card no. length
@@ -429,11 +430,6 @@ class ExternalServiceManagementTest {
             }
             when(supplySystem.deliver(addrInfo,cart)).thenReturn(-1);
             Assertions.assertTrue(externalServiceManagement.deliver(addrInfo,cart)==-1);
-//            //failed to deliver: system notifies by throwing proper exception
-//            Assertions.assertThrows(DeliveryRequestException.class,
-//                    ()->{
-//                        externalServiceManagement.deliver(addrInfo,cart);
-//                    });
         }
 
         /**
