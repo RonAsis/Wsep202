@@ -136,7 +136,7 @@ class VisibleDiscountTest {
 
             //apply discount
             discount.applyDiscount(productsToCheckAndApply);
-            Assertions.assertEquals(product1.getCost(),10);
+            Assertions.assertEquals(product1.getCost(),5);
             Assertions.assertEquals(product2.getCost(),20);
             Assertions.assertEquals(product1.getOriginalCost(),10);
             Assertions.assertEquals(product2.getOriginalCost(),20);
@@ -469,7 +469,7 @@ class VisibleDiscountTest {
             Assertions.assertEquals(product1.getCost(),5);
             Assertions.assertEquals(product2.getCost(),20.0);
             //verify original cost stays
-            Assertions.assertEquals(product1.getOriginalCost(),10);
+            Assertions.assertEquals(10,product1.getOriginalCost());
             Assertions.assertEquals(product2.getOriginalCost(),20);
             Calendar expiredEndTime = Calendar.getInstance();
             expiredEndTime.set(1545,1,1);
@@ -477,7 +477,7 @@ class VisibleDiscountTest {
 
             //apply discount
             discount.applyDiscount(productsToCheckAndApply);
-            Assertions.assertEquals(product1.getCost(),10);
+            Assertions.assertEquals(5,product1.getCost());
             Assertions.assertEquals(product2.getCost(),20);
             Assertions.assertEquals(product1.getOriginalCost(),10);
             Assertions.assertEquals(product2.getOriginalCost(),20);

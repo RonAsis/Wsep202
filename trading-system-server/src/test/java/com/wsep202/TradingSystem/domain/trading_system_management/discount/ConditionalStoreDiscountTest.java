@@ -99,7 +99,7 @@ class ConditionalStoreDiscountTest {
             totalAfterDiscount = getTotalCost(productsToCheckAndApply);
             totalOrigCost = getTotalOrigCost(productsToCheckAndApply);
             //success compare prices value of bag
-            Assertions.assertEquals(200, totalAfterDiscount);
+            Assertions.assertEquals(180, totalAfterDiscount);
             Assertions.assertEquals(200, totalOrigCost);
         }
 
