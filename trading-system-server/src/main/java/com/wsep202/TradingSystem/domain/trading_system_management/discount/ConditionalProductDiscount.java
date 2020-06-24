@@ -52,7 +52,7 @@ public class ConditionalProductDiscount extends DiscountPolicy {
                         int amountProductInAmountOfProductsForApplyDiscounts = getAmountProductInAmountOfProductsForApplyDiscounts(discount, product);
                         amountProductInAmountOfProductsForApplyDiscounts = amountProductInAmountOfProductsForApplyDiscounts == -1 ? amount : amountProductInAmountOfProductsForApplyDiscounts;
                         double discountCost = calculateDiscount(discount.getDiscountPercentage(), amountProductInAmountOfProductsForApplyDiscounts,
-                                amount, product.getOriginalCost());
+                                amount, product.getCost());
                         product.setCost(product.getCost() - discountCost);    //update the price by discountCost
                     }
                 });

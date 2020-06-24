@@ -329,7 +329,7 @@ public class Store {
      * @return - true if the user approved, else returns false
      */
     public boolean approveOwner(UserSystem ownerUser, String ownerToApprove, boolean status) {
-        appointingAgreements.stream()
+        return appointingAgreements.stream()
                 .filter(appointingAgreement -> appointingAgreement.getNewOwner().getUserName().equals(ownerToApprove))
                 .findFirst()
                 .map(appointingAgreement -> {
@@ -339,8 +339,7 @@ public class Store {
                     log.info("The owner: "+ownerUser.getUserName()+" approved: "+ownerToApprove+"" +
                             "with status: "+status);
                     return true;
-                });
-        return false;
+                }).orElse(false);
     }
 
     /**
