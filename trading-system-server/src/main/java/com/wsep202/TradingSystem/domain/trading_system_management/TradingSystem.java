@@ -21,11 +21,9 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -291,7 +289,6 @@ public class TradingSystem {
      * @param billingAddress - the delivery address of the user
      * @return a list of receipts for all of the purchases the user made
      */
-    @Transactional(rollbackOn = {TradingSystemException.class, RuntimeException.class})
     List<Receipt> purchaseAndDeliver(PaymentDetails paymentDetails,
                                      ShoppingCart shoppingCart, BillingAddress billingAddress,
                                      String customerName)
@@ -302,7 +299,7 @@ public class TradingSystem {
         log.info("all products in stock");
         shoppingCart.approvePurchasePolicy(billingAddress);
         log.info("applied stores purchase policies on shopping cart");
-        shoppingCart.applyDiscountPolicies(); //TODO: return the exceptions!!!!!! otherwise logic problem
+        shoppingCart.applyDiscountPolicies();
         log.info("applied stores discount policies on shopping cart");
         int chargeTransactionId = externalServiceManagement.charge(paymentDetails, shoppingCart);
         if (chargeTransactionId < 10000 || chargeTransactionId > 100000) {

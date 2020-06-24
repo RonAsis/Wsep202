@@ -28,13 +28,6 @@ public class SellerManagerService {
     }
 
     /**
-     * UC 4.2 (inherited from owner) - removing a discount.
-     */
-    public boolean removeDiscount(String username, int storeId, int discountId, UUID uuid) {
-        return tradingSystemFacade.removeDiscount(username, storeId, discountId, uuid);
-    }
-
-    /**
      * UC 4.2 (inherited from owner) - adding/ editing the store's discounts
      */
     public DiscountDto addEditDiscount(String username, int storeId, DiscountDto discountDto, UUID uuid) {

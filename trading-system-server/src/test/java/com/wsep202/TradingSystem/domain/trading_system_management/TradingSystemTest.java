@@ -228,7 +228,7 @@ class TradingSystemTest {
 
         /**
          * get one of the administrators in the system
-          */
+         */
         @Test
         void getAdministratorUserPositive() {
             setUpGetAdmin();
@@ -289,7 +289,7 @@ class TradingSystemTest {
          */
         @Test
         void getStoreByAdminNullObject() {
-           // setUpForGetStoreAdmin();
+            // setUpForGetStoreAdmin();
             Assertions.assertThrows(NotAdministratorException.class, () -> {
                 doNothing().when(store).setStoreId(1);
                 tradingSystem.getStoreByAdmin(null, 1, UUID.randomUUID());
@@ -338,8 +338,8 @@ class TradingSystemTest {
         void getUserWrongUser() {
             setUpGetUser();
             //check that the user does not exists in system
-           Assertions.assertNull(tradingSystem.getUser("WrongUser", UUID.randomUUID()));
-           tearDownGetStoreAdmin();
+            Assertions.assertNull(tradingSystem.getUser("WrongUser", UUID.randomUUID()));
+            tearDownGetStoreAdmin();
         }
 
         /**
@@ -348,7 +348,7 @@ class TradingSystemTest {
         @Test
         void getUserByAdminPositive() {
             setUpGetUserByAdmin();
-           Assertions.assertEquals(tradingSystem.getUserByAdmin
+            Assertions.assertEquals(tradingSystem.getUserByAdmin
                     ("admin", "userToReturn", uuid),userSystem);
             tearDownGetStoreAdmin();
         }
@@ -552,7 +552,7 @@ class TradingSystemTest {
 //                return stores.get(storeId);
 //            });
 
-            // the tests
+        // the tests
 //            for (int rank = -1; rank < 100; rank++) {
 //                List<Product> productsActual = tradingSystem.filterByStoreRank(products, rank);
 //                int finalRank = rank;
@@ -713,7 +713,7 @@ class TradingSystemTest {
             Assertions.assertEquals("castro",openStore.getStoreName());
             //check that this user is the store's owner
             Assertions.assertTrue(openStore.getOwnersUsername().contains(userSystem.getUserName()));
-           }
+        }
 
 
         /**
@@ -955,7 +955,7 @@ class TradingSystemTest {
             when(subject.unRegDailyVisitor("usernameTest")).thenReturn(true);
             when(tradingSystemDao.usersLoggedInSystem()).thenReturn(0);
             when(userSystem.logout()).thenReturn(true);
-           //doNothing().when(tradingSystemDao).logout("usernameTest");
+            //doNothing().when(tradingSystemDao).logout("usernameTest");
             //when(userSystem.isLogin()).thenReturn(true);
         }
 
@@ -995,21 +995,21 @@ class TradingSystemTest {
         private void registerAsSetupPass() {
             userToRegister = mock(UserSystem.class);
             when(userToRegister.getPassword()).thenReturn("12");
-        //    doNothing().when(userToRegister).setPassword("pass");
-          //  doNothing().when(userToRegister).setSalt("salt");
+            //    doNothing().when(userToRegister).setPassword("pass");
+            //  doNothing().when(userToRegister).setSalt("salt");
             when(userToRegister.getUserName()).thenReturn("usernameTest");
             when(userToRegister.getFirstName()).thenReturn("usersFirstName");
             when(userToRegister.getLastName()).thenReturn("usersLastName");
             when(userToRegister.getPassword()).thenReturn("IAmPassword");
             when(userToRegister.isValidUser()).thenReturn(true);
-           // doNothing().when(userToRegister).setImageUrl(any());
+            // doNothing().when(userToRegister).setImageUrl(any());
             PasswordSaltPair passwordSaltPair = mock(PasswordSaltPair.class);
             when(passwordSaltPair.getHashedPassword()).thenReturn("123345543gf");
             when(passwordSaltPair.getSalt()).thenReturn("salt");
             when(externalServiceManagement.getEncryptedPasswordAndSalt(userToRegister.getPassword())).thenReturn(passwordSaltPair);
             passwordEncoder = mock(PasswordEncoder.class);
             when(passwordEncoder.encode(userToRegister.getPassword())).thenReturn("IAmPassword");
-         //   doNothing().when(userToRegister).setPassword(userToRegister.getPassword());
+            //   doNothing().when(userToRegister).setPassword(userToRegister.getPassword());
         }
         /**
          * setup of successful pre registration
@@ -1356,8 +1356,8 @@ class TradingSystemTest {
             setEncoder();
             tradingSystem1 = new TradingSystem(externalServiceManagement, admin, tradingSystemDao, passwordEncoder);
             PasswordSaltPair psp = externalServiceManagement.getEncryptedPasswordAndSalt(admin.getPassword());
-          //  admin.setPassword(psp.getHashedPassword());
-          //  admin.setSalt(psp.getSalt());
+            //  admin.setPassword(psp.getHashedPassword());
+            //  admin.setSalt(psp.getSalt());
             factoryObjects = new FactoryObjects();
         }
 
@@ -1996,10 +1996,10 @@ class TradingSystemTest {
             VisibleDiscount visibleDiscount = new VisibleDiscount();
             visibleDiscount.setAmountOfProductsForApplyDiscounts(products);
             Discount discount = new Discount(-12,//percentage to big
-            Calendar.getInstance(),
-            "crazy discount",
+                    Calendar.getInstance(),
+                    "crazy discount",
                     visibleDiscount,
-            DiscountType.VISIBLE);
+                    DiscountType.VISIBLE);
             store.addDiscount(storeOwner,discount);//add policy to store
         }
 
@@ -2506,16 +2506,16 @@ class TradingSystemTest {
         private void setUpForPurchaseCart(){
             userToOpenStore = getUserSystemBuild();
             storeToOpen = Store.builder()
-                            .storeId(storeToOpen.getStoreId())
-                            .storeName("MovieStore").build();
+                    .storeId(storeToOpen.getStoreId())
+                    .storeName("MovieStore").build();
             //tradingSystem.insertStoreToStores(storeToOpen);
             testProduct = Product.builder()
-                            .name("Harry-Potter")
-                            .category(ProductCategory.BOOKS_MOVIES_MUSIC)
-                            .amount(45)
-                            .cost(12.9)
-                            .storeId(storeToOpen.getStoreId())
-                            .build();
+                    .name("Harry-Potter")
+                    .category(ProductCategory.BOOKS_MOVIES_MUSIC)
+                    .amount(45)
+                    .cost(12.9)
+                    .storeId(storeToOpen.getStoreId())
+                    .build();
             userToOpenStore.saveProductInShoppingBag(storeToOpen,testProduct,3);
             paymentDetails = new PaymentDetails("123456789", "237", "333333339","12","2022","myName");
             billingAddress = new BillingAddress("Israel Israeli", "Ben-Gurion 1", "Beer Sheva", "Israel","1234567");
@@ -2544,7 +2544,7 @@ class TradingSystemTest {
             paymentDetails1 = new PaymentDetails( "12345", "237", "333333339","12","2022",userToOpenStore.getFirstName());
             billingAddress = new BillingAddress("Israel Israeli", "Ben-Gurion 1", "Beer Sheva", "Israel","1234567");
             billingAddress1 = new BillingAddress("Ragnar Lodbrok", "Main Tent", "Kattegat", "Sweden","1");
-           // when(externalServiceManagement.)
+            // when(externalServiceManagement.)
         }
 
         /**
@@ -2653,7 +2653,7 @@ class TradingSystemTest {
             testShoppingCart = new ShoppingCart();
             testShoppingCart.addBagToCart(store,testShoppingBag1);
             store.editProduct(storeOwner,product.getProductSn(),product.getName(),
-                   "health",5,product.getCost());
+                    "health",5,product.getCost());
 //            when(testShoppingCart.getNumOfBagsInCart()).thenReturn(1);
 //            Map<Store, ShoppingBag> bagList= new HashMap<>();
 //            when(testShoppingCart.getShoppingBagsList()).thenReturn(bagList);

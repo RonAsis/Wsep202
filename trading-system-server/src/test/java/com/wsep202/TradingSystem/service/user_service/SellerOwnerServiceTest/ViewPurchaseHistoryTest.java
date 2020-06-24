@@ -120,7 +120,7 @@ public class ViewPurchaseHistoryTest {
      */
     @Test
     void viewHistoryPurchases() {
-        this.helper.createOwnerOpenStoreAddProductAddAndPurchaseShoppingCart(this.user.getUserName(), this.uuid);
+        //this.helper.createOwnerOpenStoreAddProductAddAndPurchaseShoppingCart(this.user.getUserName(), this.uuid);
         Assertions.assertNotNull(this.sellerOwnerService.viewPurchaseHistoryOfStoreOwner(
                 this.user.getUserName(), this.storeId, this.uuid));
     }

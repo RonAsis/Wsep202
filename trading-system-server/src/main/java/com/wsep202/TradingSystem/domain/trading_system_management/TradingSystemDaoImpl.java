@@ -141,13 +141,13 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public Discount addEditDiscount(Store store, UserSystem user, Discount discount) {
-        discount.setDiscountId(getNewIdDiscount());
+        //discount.setDiscountId(getNewIdDiscount());
         return store.addEditDiscount(user, discount);
     }
 
     @Override
     public Purchase addEditPurchase(Store store, UserSystem user, Purchase purchase) {
-        purchase.setPurchaseId(getNewIdPolicy());
+        //purchase.setPurchaseId(getNewIdPolicy());
         return store.addEditPurchase(user, purchase);
     }
 
@@ -210,12 +210,19 @@ public class TradingSystemDaoImpl extends TradingSystemDao {
 
     @Override
     public ShoppingCart getShoppingCart(String username, UUID uuid) {
-        if (isValidUuid(username, uuid)) {
-            return users.stream()
-                    .filter(userSystem -> userSystem.getUserName().equals(username))
-                    .findFirst()
-                    .map(UserSystem::getShoppingCart)
-                    .orElseThrow(() -> new UserDontExistInTheSystemException(username));
+        if(isValidUuid(username, uuid)){
+            if (users.stream().anyMatch(userSystem -> userSystem.getUserName().equals(username)))
+                return users.stream()
+                        .filter(userSystem -> userSystem.getUserName().equals(username))
+                        .findFirst()
+                        .map(UserSystem::getShoppingCart)
+                        .orElseThrow(()-> new UserDontExistInTheSystemException(username));
+            else
+                return administrators.stream()
+                        .filter(userSystem -> userSystem.getUserName().equals(username))
+                        .findFirst()
+                        .map(UserSystem::getShoppingCart)
+                        .orElseThrow(()-> new UserDontExistInTheSystemException(username));
         }
         throw new UserDontExistInTheSystemException(username);
     }

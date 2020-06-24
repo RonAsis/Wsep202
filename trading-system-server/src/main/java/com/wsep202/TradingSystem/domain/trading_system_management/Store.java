@@ -582,7 +582,7 @@ public class Store {
         return response;
     }
 
-    public boolean removeManagerRecursive(UserSystem ownerStore, UserSystem user) {
+    private boolean removeManagerRecursive(UserSystem ownerStore, UserSystem user) {
         boolean response = false;
         if (validatePermission(ownerStore, StorePermission.EDIT_Managers)) {  //the user is able to remove his appointments
             response = appointedManagers.stream()

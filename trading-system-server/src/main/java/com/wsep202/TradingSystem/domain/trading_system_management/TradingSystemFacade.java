@@ -302,7 +302,6 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
-    @Transactional(rollbackOn = {TradingSystemException.class, RuntimeException.class})
     public boolean addOwner(@NotBlank String ownerUsername, int storeId, @NotBlank String newOwnerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -324,7 +323,6 @@ public class TradingSystemFacade {
      * @param uuid
      * @return true if succeed
      */
-    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public ManagerDto addManager(@NotBlank String ownerUsername, int storeId, @NotBlank String newManagerUsername, UUID uuid) {
         try {
             UserSystem ownerUser = tradingSystem.getUser(ownerUsername, uuid);
@@ -476,7 +474,6 @@ public class TradingSystemFacade {
      * @param storeName     - the name of the new store
      * @return true if succeed
      */
-    @Transactional(rollbackOn = {TradingSystemException.class,RuntimeException.class})
     public StoreDto openStore(@NotBlank String usernameOwner, @NotBlank String storeName, String description, UUID uuid) {
         try {
             UserSystem user = tradingSystem.getUser(usernameOwner, uuid);

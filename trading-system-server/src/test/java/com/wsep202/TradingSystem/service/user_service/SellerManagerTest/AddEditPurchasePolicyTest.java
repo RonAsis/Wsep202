@@ -40,6 +40,7 @@ public class AddEditPurchasePolicyTest {
     ServiceTestsHelper helper;
     UserSystemDto owner = new UserSystemDto("username","name","lname");
     UserSystemDto manager = new UserSystemDto("manager","name","lname");
+    UserSystemDto manager1 = new UserSystemDto("manager1","name","lname");
     String userPassword = "password";
     MultipartFile image = null;
     UUID uuid;
@@ -55,6 +56,9 @@ public class AddEditPurchasePolicyTest {
         this.manager.setUserName(this.manager.getUserName()+counter);
         this.helper.registerUser(this.manager.getUserName(), this.userPassword,
                 this.manager.getFirstName(), this.manager.getLastName(), image);
+        this.manager1.setUserName(this.manager1.getUserName()+counter);
+        this.helper.registerUser(this.manager1.getUserName(), this.userPassword,
+                this.manager1.getFirstName(), this.manager1.getLastName(), image);
         this.owner.setUserName(this.owner.getUserName()+counter);
         this.helper.registerUser(this.owner.getUserName(), this.userPassword,
                 this.owner.getFirstName(), this.owner.getLastName(), image);
@@ -67,6 +71,7 @@ public class AddEditPurchasePolicyTest {
         if (storeId != null){
             this.storeId = storeId;
         }
+        this.sellerOwnerService.addManager(this.owner.getUserName(),this.storeId,this.manager1.getUserName(),this.uuid);
         this.helper.logoutUser(this.owner.getUserName(), this.uuid);
         returnedValueLogin = this.helper.loginUser(this.manager.getUserName(),
                 this.userPassword);
@@ -87,9 +92,9 @@ public class AddEditPurchasePolicyTest {
     @Test
     void notPermittedManagerAddingNewPurchasePolicy() {
         Assertions.assertThrows(Exception.class, () ->
-                {this.sellerManagerService.addEditPurchasePolicy(this.manager.getUserName(),
-                this.storeId, this.purchasePolicyDto, this.uuid);}
-                );
+                {this.sellerManagerService.addEditPurchasePolicy(this.manager1.getUserName(),
+                        this.storeId, this.purchasePolicyDto, this.uuid);}
+        );
     }
 
     /**
@@ -137,7 +142,7 @@ public class AddEditPurchasePolicyTest {
 
         this.helper.logoutUser(this.owner.getUserName(), ownerUuid);
         this.uuid = this.helper.loginUser(this.manager.getUserName(), this.userPassword).getKey();
-
+        this.purchasePolicyDto.setPurchaseId(-1);
       Assertions.assertNotNull(this.sellerManagerService.addEditPurchasePolicy(this.manager.getUserName(),
                 this.storeId, this.purchasePolicyDto, this.uuid));
     }
